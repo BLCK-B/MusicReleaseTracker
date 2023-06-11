@@ -4,7 +4,7 @@
 
 Multi-source scraper designed to find latest songs released from artists you care about. Available for windows, linux.
 
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/ac417ea7-31d0-4371-a67c-7a31586a2a5e" width="60%"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/ac417ea7-31d0-4371-a67c-7a31586a2a5e" width="600px"/>
 
 After the initial setup, click refresh button to know about any new songs. Combined view combines data from all sources and applies further processing. Currently available sources: Beatport, Musicbrainz, Junodowload.
 

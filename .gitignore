@@ -5,7 +5,6 @@ gradle/
 META-INF/
 MRT/
 out/
-MRTicon.ico
 musicdata.db
 
 .gradle

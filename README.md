@@ -2,7 +2,7 @@
 
 # MusicReleaseTracker
 
-Multi-source scraper designed to find latest songs released from artists you care about. Available for windows, linux.
+Multi-source scraper that finds the latest songs from artists you care about. Available for windows, linux.
 
 <img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/ac417ea7-31d0-4371-a67c-7a31586a2a5e" width="600px"/>
 
@@ -10,7 +10,7 @@ After the initial setup, click refresh button to know about any new songs. Combi
 
 ### Setup
 
-JDK is required, specified during installation. In the program, add artists and for each artist insert links for inidividual sources according to instructions. Then click refresh button in the right corner to start scraping the latest information.
+JDK is required, specified during installation. In the program, add artists and for each artist insert links for individual sources according to instructions. Then click refresh button in the right corner to start scraping the latest information.
 
 ### License
 

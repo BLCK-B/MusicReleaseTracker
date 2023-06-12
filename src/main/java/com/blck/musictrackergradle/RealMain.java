@@ -156,7 +156,7 @@ public class RealMain extends Application {
                 break;
             String songname = songsArray[songsArray.length - i - 1];
             String songdate = datesArray[datesArray.length - i - 1];
-            //discard songs with missing dates - imperfect
+            //discard songs with missing dates - band-aid
             if (songdate.equals("-") || songdate == null) {
                 i++;
                 continue;
@@ -314,16 +314,19 @@ public class RealMain extends Application {
 
     public static void fillCombviewTable() throws SQLException {
         //assembles table for combined view with source-specific processing
-        //checks entries from each source table from newest by date to entriesLimit, filters unwanted words, looks for duplicates
-        final int entriesLimit = 20;
+        //checks entries from each source table from newest by date to entriesLimit: filters unwanted words, looks for duplicates
+        final int entriesLimit = 15;
         int entriesInserted = 0;
         //unwanted words list
         String[] filterWords = {};
+        //clear table
         Connection conn = DriverManager.getConnection(DBtools.path);
         String sql = "DELETE FROM combview";
         Statement stmt = conn.createStatement();
         stmt.executeUpdate(sql);
 
+        ArrayList<String> insertedSongs = new ArrayList<>();
+        ArrayList<String> insertedDates = new ArrayList<>();
         //beatport
         //fill source array
         sql = "SELECT * FROM beatport ORDER BY date DESC";
@@ -343,22 +346,16 @@ public class RealMain extends Application {
                 if ((songname.toLowerCase()).contains(checkword.toLowerCase()))
                     continue cycle;
             }
-            //finding duplicates - imperfect
-            sql = "SELECT COUNT(*) FROM combview WHERE song = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songname);
-            ResultSet result = pstmt.executeQuery();
-            if (result.getInt(1) > 0) {
-                sql = "SELECT COUNT(*) FROM combview WHERE date = ? ";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, date);
-                result = pstmt.executeQuery();
-                if (result.getInt(1) > 0)
+            //finding duplicates
+            if (insertedSongs.contains(songname.toLowerCase())) {
+                if (insertedDates.contains(date))
                     continue;
             }
+            insertedSongs.add(songname.toLowerCase());
+            insertedDates.add(date);
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
-            pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, songname);
             pstmt.setString(2, artist);
             pstmt.setString(3, date);
@@ -383,23 +380,16 @@ public class RealMain extends Application {
                 if (songname.toLowerCase().contains(checkword.toLowerCase()))
                     continue cycle;
             }
-            //finding duplicates - imperfect
-            sql = "SELECT COUNT(*) FROM combview WHERE song = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songname);
-            ResultSet result = pstmt.executeQuery();
-            if (result.getInt(1) > 0) {
-                sql = "SELECT COUNT(*) FROM combview WHERE date = ? ";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, date);
-                result = pstmt.executeQuery();
-                if (result.getInt(1) > 0) {
+            //finding duplicates
+            if (insertedSongs.contains(songname.toLowerCase())) {
+                if (insertedDates.contains(date))
                     continue;
-                }
             }
+            insertedSongs.add(songname.toLowerCase());
+            insertedDates.add(date);
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
-            pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, songname);
             pstmt.setString(2, artist);
             pstmt.setString(3, date);
@@ -424,23 +414,16 @@ public class RealMain extends Application {
                 if (songname.toLowerCase().contains(checkword.toLowerCase()))
                     continue cycle;
             }
-            //finding duplicates - imperfect
-            sql = "SELECT COUNT(*) FROM combview WHERE song = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songname);
-            ResultSet result = pstmt.executeQuery();
-            if (result.getInt(1) > 0) {
-                sql = "SELECT COUNT(*) FROM combview WHERE date = ? ";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, date);
-                result = pstmt.executeQuery();
-                if (result.getInt(1) > 0) {
+            //finding duplicates
+            if (insertedSongs.contains(songname.toLowerCase())) {
+                if (insertedDates.contains(date))
                     continue;
-                }
             }
+            insertedSongs.add(songname.toLowerCase());
+            insertedDates.add(date);
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
-            pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, songname);
             pstmt.setString(2, artist);
             pstmt.setString(3, date);
@@ -448,9 +431,11 @@ public class RealMain extends Application {
             entriesInserted++;
         }
         entriesInserted = 0;
-            conn.close();
-            stmt.close();
-            RSinsertSongs.close();
+        conn.close();
+        stmt.close();
+        RSinsertSongs.close();
+        insertedSongs.clear();
+        insertedDates.clear();
     }
 
 }

@@ -177,7 +177,7 @@
                   <Insets bottom="100.0" left="140.0" top="100.0" />
                </StackPane.margin>
                <children>
-                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for musicbrainz.&#10;&#10;Go to https://musicbrainz.org&#10;find artist &gt; copy url&#10;&#10;&#10;Example link:&#10;https://musicbrainz.org/artistname/id/..." wrapText="true" />
+                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for musicbrainz.&#10;&#10;Go to https://musicbrainz.org&#10;find artist &gt; copy url&#10;&#10;&#10;Example link:&#10;https://musicbrainz.org/artist/id/..." wrapText="true" />
                   <HBox alignment="BOTTOM_CENTER" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="0.0" prefHeight="30.0" prefWidth="400.0">
                      <children>
                         <TextField fx:id="brainzUrlBar" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" prefHeight="30.0" prefWidth="320.0" HBox.hgrow="ALWAYS">

@@ -2,14 +2,16 @@
 
 # MusicReleaseTracker
 
-Multi-source scraper that finds the latest songs from your favourite artists. Available for windows, linux.
+Efficient multi-source scraper that finds the latest songs from your favourite artists. Available for windows, linux.
 
 <img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/ac417ea7-31d0-4371-a67c-7a31586a2a5e" width="600px"/>
 
+Look at newest songs from individual sources, artist by artist, and see them all ordered in "combined view". Enjoy the convenience of not having to browse around anymore. Intentional delays during scraping prevent excessive traffic. Currently available sources: Beatport, Musicbrainz, Junodownload.
+
 ### Setup
 
-JDK is required, specified during installation. In the program, add artists and for each artist insert links for individual sources according to instructions.
-After the initial setup, click refresh to start scraping. Combined view combines data from all sources and applies further processing. Currently available sources: Beatport, Musicbrainz, Junodownload.
+**JDK is required**, specified during installation. In the program, add artists and for each artist insert links for individual sources according to instructions.
+After the initial setup, click refresh to start scraping.
 
 ### License
 

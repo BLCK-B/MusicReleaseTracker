@@ -3,6 +3,7 @@
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableColumn?>
@@ -62,7 +63,7 @@
                <children>
                   <HBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="550.0" VBox.vgrow="NEVER">
                      <children>
-                        <Button id="filterbutton" fx:id="comviewButton" mnemonicParsing="false" onMousePressed="#clickComb" prefHeight="35.0" prefWidth="250.0" text="Combined view">
+                        <Button id="filterbutton" fx:id="combviewButton" mnemonicParsing="false" onMousePressed="#clickComb" prefHeight="35.0" prefWidth="250.0" text="Combined view">
                            <HBox.margin>
                               <Insets left="5.0" right="3.0" />
                            </HBox.margin>
@@ -149,18 +150,32 @@
                      <children>
                         <TextField fx:id="artistInputField" alignment="BOTTOM_CENTER" maxHeight="30.0" maxWidth="450.0" minHeight="30.0" minWidth="265.0" prefHeight="30.0" HBox.hgrow="ALWAYS">
                            <HBox.margin>
-                              <Insets right="1.0" top="166.0" />
+                              <Insets bottom="2.0" left="2.0" right="2.0" top="166.0" />
                            </HBox.margin>
                         </TextField>
-                        <Button fx:id="addconfirmButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onMouseClicked="#clickAddConfirm" prefHeight="30.0" prefWidth="40.0" text="ok">
+                        <Button fx:id="addconfirmButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#clickAddConfirm" prefHeight="30.0" prefWidth="30.0">
                            <HBox.margin>
-                              <Insets left="1.0" right="1.0" top="166.0" />
+                              <Insets bottom="2.0" left="2.0" right="2.0" top="166.0" />
                            </HBox.margin>
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../confirm.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
                         </Button>
-                        <Button fx:id="addcancelButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#clickAddCancel" prefHeight="30.0" prefWidth="40.0" text="no">
+                        <Button fx:id="addcancelButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onMouseClicked="#clickAddCancel" prefHeight="30.0" prefWidth="30.0">
                            <HBox.margin>
-                              <Insets left="1.0" right="1.0" top="166.0" />
+                              <Insets bottom="2.0" left="2.0" right="2.0" top="166.0" />
                            </HBox.margin>
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../cross.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
                         </Button>
                      </children>
                      <StackPane.margin>
@@ -177,46 +192,62 @@
                   <Insets bottom="100.0" left="140.0" top="100.0" />
                </StackPane.margin>
                <children>
-                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for musicbrainz.&#10;&#10;Go to https://musicbrainz.org&#10;find artist &gt; copy url&#10;&#10;&#10;Example link:&#10;https://musicbrainz.org/artist/id/..." wrapText="true" />
+                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for musicbrainz.&#10;&#10;Visit&#10;find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://musicbrainz.org/artist/id/..." wrapText="true" />
                   <HBox alignment="BOTTOM_CENTER" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="0.0" prefHeight="30.0" prefWidth="400.0">
                      <children>
                         <TextField fx:id="brainzUrlBar" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" prefHeight="30.0" prefWidth="320.0" HBox.hgrow="ALWAYS">
                            <HBox.margin>
-                              <Insets left="3.0" right="2.0" />
+                              <Insets left="5.0" right="2.0" />
                            </HBox.margin>
                         </TextField>
-                        <Button fx:id="brainzUrlButton" maxHeight="30.0" maxWidth="40.0" minHeight="35.0" minWidth="40.0" mnemonicParsing="false" onMouseClicked="#clickBrainzUrlButton" prefHeight="35.0" prefWidth="40.0" text="ok">
+                        <Button fx:id="brainzUrlButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#clickBrainzUrlButton" prefHeight="30.0" prefWidth="30.0">
                            <HBox.margin>
                               <Insets right="3.0" />
                            </HBox.margin>
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../confirm.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
                         </Button>
                      </children>
                      <StackPane.margin>
                         <Insets top="260.0" />
                      </StackPane.margin>
                   </HBox>
+                  <Hyperlink fx:id="linkMusicbrainz" onMouseClicked="#hyperlinkClick" text="https://musicbrainz.org" translateX="40.0" translateY="52.0" StackPane.alignment="TOP_LEFT" />
                </children>
             </StackPane>
             <StackPane fx:id="beatportUrlDiag" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="450.0" visible="false">
                <children>
-                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for beatport.&#10;&#10;Go to https://beatport.com&#10;find artist &gt; copy url&#10;&#10;&#10;Example link:&#10;https://beatport.com/artist/artistname/id/...&#10;" wrapText="true" />
+                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for beatport.&#10;&#10;Visit&#10;find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://beatport.com/artist/artistname/id/...&#10;" wrapText="true" />
                   <HBox alignment="BOTTOM_CENTER" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="0.0" prefHeight="30.0" prefWidth="400.0">
                      <children>
                         <TextField fx:id="beatportUrlBar" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" prefHeight="30.0" prefWidth="320.0" HBox.hgrow="ALWAYS">
                            <HBox.margin>
-                              <Insets left="3.0" right="2.0" />
+                              <Insets left="5.0" right="2.0" />
                            </HBox.margin>
                         </TextField>
-                        <Button fx:id="beatportUrlButton" maxHeight="30.0" maxWidth="40.0" minHeight="35.0" minWidth="40.0" mnemonicParsing="false" onMouseClicked="#clickBeatportUrlButton" prefHeight="30.0" prefWidth="40.0" text="ok">
+                        <Button fx:id="beatportUrlButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#clickBeatportUrlButton" prefHeight="30.0" prefWidth="30.0">
                            <HBox.margin>
                               <Insets right="3.0" />
                            </HBox.margin>
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../confirm.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
                         </Button>
                      </children>
                      <StackPane.margin>
                         <Insets top="260.0" />
                      </StackPane.margin>
                   </HBox>
+                  <Hyperlink fx:id="linkBeatport" onMouseClicked="#hyperlinkClick" text="https://beatport.com" translateX="40.0" translateY="52.0" StackPane.alignment="TOP_LEFT" />
                </children>
                <StackPane.margin>
                   <Insets bottom="100.0" left="140.0" top="100.0" />
@@ -224,27 +255,59 @@
             </StackPane>
             <StackPane fx:id="junodownloadUrlDiag" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="450.0" visible="false">
                <children>
-                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for junodownload.&#10;&#10;Go to https://junodownload.com&#10;find artist &gt; copy url&#10;&#10;&#10;Example link:&#10;https://junodownload.com/artists/artistname/...&#10;" wrapText="true" />
+                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for junodownload.&#10;&#10;Visit&#10;find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://junodownload.com/artists/artistname/...&#10;" wrapText="true" />
                   <HBox alignment="BOTTOM_CENTER" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="0.0" prefHeight="30.0" prefWidth="400.0">
                      <children>
                         <TextField fx:id="junodownloadUrlbar" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" prefHeight="30.0" prefWidth="320.0" HBox.hgrow="ALWAYS">
                            <HBox.margin>
-                              <Insets left="3.0" right="2.0" />
+                              <Insets left="5.0" right="2.0" />
                            </HBox.margin>
                         </TextField>
-                        <Button fx:id="junodownloadUrlButton" maxHeight="30.0" maxWidth="40.0" minHeight="35.0" minWidth="40.0" mnemonicParsing="false" onMouseClicked="#clickJunodownloadUrlButton" prefHeight="35.0" prefWidth="40.0" text="ok">
+                        <Button fx:id="junodownloadUrlButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#clickJunodownloadUrlButton" prefHeight="30.0" prefWidth="30.0">
                            <HBox.margin>
                               <Insets right="3.0" />
                            </HBox.margin>
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../confirm.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
                         </Button>
                      </children>
                      <StackPane.margin>
                         <Insets top="260.0" />
                      </StackPane.margin>
                   </HBox>
+                  <Hyperlink fx:id="linkJunodownload" onMouseClicked="#hyperlinkClick" text="https://junodownload.com" translateX="40.0" translateY="52.0" StackPane.alignment="TOP_LEFT" />
                </children>
                <StackPane.margin>
                   <Insets bottom="100.0" left="140.0" top="100.0" />
+               </StackPane.margin>
+            </StackPane>
+            <StackPane fx:id="settingsWindow" prefHeight="150.0" prefWidth="200.0" visible="false">
+               <children>
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <TextArea editable="false" mouseTransparent="true" prefHeight="798.0" prefWidth="715.0" />
+                        <Button fx:id="settingsCloseButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#clickSettingsClose" prefHeight="30.0" prefWidth="30.0" translateX="-5.0" translateY="5.0" StackPane.alignment="TOP_RIGHT">
+                           <graphic>
+                              <ImageView fx:id="cancelButton" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../cross.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                     <StackPane.margin>
+                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                     </StackPane.margin>
+                  </StackPane>
+               </children>
+               <StackPane.margin>
+                  <Insets />
                </StackPane.margin>
             </StackPane>
          </children>

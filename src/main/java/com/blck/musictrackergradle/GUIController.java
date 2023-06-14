@@ -1,4 +1,5 @@
 package com.blck.musictrackergradle;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -6,6 +7,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import org.jsoup.Jsoup;
@@ -73,13 +75,25 @@ public class GUIController {
     @FXML
     public Button refreshButton;
     @FXML
-    public Button comviewButton;
+    public Button combviewButton;
     @FXML
     public Button beatportButton;
     @FXML
     public Button brainzButton;
     @FXML
     public Button junodownloadButton;
+    @FXML
+    public Button settingsCloseButton;
+    @FXML
+    public StackPane settingsWindow;
+    @FXML
+    public Hyperlink linkMusicbrainz;
+    @FXML
+    public Hyperlink linkBeatport;
+    @FXML
+    public Hyperlink linkJunodownload;
+    @FXML
+    public ImageView cancelButton;
     @FXML
     private ProgressBar progressbar;
     @FXML
@@ -115,7 +129,7 @@ public class GUIController {
     @FXML
     public void initialize() throws SQLException {
         loadList();
-        comviewButton.getStyleClass().add("filterclicked");
+        combviewButton.getStyleClass().add("filterclicked");
         loadcombviewTable();
     }
 
@@ -166,9 +180,7 @@ public class GUIController {
 
     public void loadTable() throws SQLException {
         dataTable.clear();
-        brainzUrlDiag.setVisible(false);
-        beatportUrlDiag.setVisible(false);
-        junodownloadUrlDiag.setVisible(false);
+        hideWindows();
         combviewTable.setVisible(false);
         //url existence check
         Connection conn = DriverManager.getConnection(DBtools.path);
@@ -186,21 +198,9 @@ public class GUIController {
             conn.close();
             if (link == null || link.isEmpty()) {
                 switch (selectedSource) {
-                    case "musicbrainz" -> {
-                        brainzUrlDiag.setVisible(true);
-                        beatportUrlDiag.setVisible(false);
-                        junodownloadUrlDiag.setVisible(false);
-                    }
-                    case "beatport" -> {
-                        brainzUrlDiag.setVisible(false);
-                        beatportUrlDiag.setVisible(true);
-                        junodownloadUrlDiag.setVisible(false);
-                    }
-                    case "junodownload" -> {
-                        brainzUrlDiag.setVisible(false);
-                        beatportUrlDiag.setVisible(false);
-                        junodownloadUrlDiag.setVisible(true);
-                    }
+                    case "musicbrainz" -> brainzUrlDiag.setVisible(true);
+                    case "beatport" -> beatportUrlDiag.setVisible(true);
+                    case "junodownload" -> junodownloadUrlDiag.setVisible(true);
                 }
                 return;
             }
@@ -256,11 +256,9 @@ public class GUIController {
     }
 
     public void clickAdd(MouseEvent mouseEvent) {
+        hideWindows();
         addWindow.setVisible(true);
-        beatportUrlDiag.setVisible(false);
-        brainzUrlDiag.setVisible(false);
-        junodownloadUrlDiag.setVisible(false);
-        comviewButton.getStyleClass().remove("filterclicked");
+        combviewButton.getStyleClass().remove("filterclicked");
         brainzButton.getStyleClass().remove("filterclicked");
         beatportButton.getStyleClass().remove("filterclicked");
         junodownloadButton.getStyleClass().remove("filterclicked");
@@ -271,7 +269,7 @@ public class GUIController {
         artistInputField.clear();
         if (userInput.isEmpty() || userInput.isBlank())
             return;
-        addWindow.setVisible(false);
+        hideWindows();
         Connection conn = DriverManager.getConnection(DBtools.path);
         String sql = "insert into artists(artistname) values(?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -285,11 +283,11 @@ public class GUIController {
         lastClickedArtist = null;
     }
     public void clickAddCancel(MouseEvent mouseEvent) {
-        addWindow.setVisible(false);
+        hideWindows();
         artistInputField.clear();
     }
     public void clickDelete(MouseEvent mouseEvent) throws SQLException {
-        //delete last selected artist and all entries from artist (no need to refresh)
+        //delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
             Connection conn = DriverManager.getConnection(DBtools.path);
             String sql = "DELETE FROM artists WHERE artistname = ?";
@@ -311,59 +309,66 @@ public class GUIController {
             conn.close();
             pstmt.close();
             loadList();
+            hideWindows();
             fillCombviewTable();
             loadcombviewTable();
+            combviewButton.getStyleClass().add("filterclicked");
+            brainzButton.getStyleClass().remove("filterclicked");
+            beatportButton.getStyleClass().remove("filterclicked");
+            junodownloadButton.getStyleClass().remove("filterclicked");
         }
     }
 
     private void artistClick(String cellcontent) throws SQLException {
-        comviewButton.getStyleClass().remove("filterclicked");
+        combviewButton.getStyleClass().remove("filterclicked");
         lastClickedArtist = cellcontent;
         if (selectedSource != null)
             loadTable();
     }
 
     public void clickComb(MouseEvent mouseEvent) throws SQLException {
-        comviewButton.getStyleClass().add("filterclicked");
+        combviewButton.getStyleClass().remove("filterclicked");
         brainzButton.getStyleClass().remove("filterclicked");
         beatportButton.getStyleClass().remove("filterclicked");
         junodownloadButton.getStyleClass().remove("filterclicked");
+        combviewButton.getStyleClass().add("filterclicked");
         if (lastClickedCell != null) {
             lastClickedCell.getStyleClass().remove("selected-row");
             lastClickedArtist = null;
             selectedSource = null;
-            brainzUrlDiag.setVisible(false);
-            beatportUrlDiag.setVisible(false);
-            junodownloadUrlDiag.setVisible(false);
+            hideWindows();
         }
         loadcombviewTable();
     }
 
     public void clickBrainz(MouseEvent mouseEvent) throws SQLException {
-        brainzButton.getStyleClass().add("filterclicked");
-        comviewButton.getStyleClass().remove("filterclicked");
+        brainzButton.getStyleClass().remove("filterclicked");
+        combviewButton.getStyleClass().remove("filterclicked");
         beatportButton.getStyleClass().remove("filterclicked");
         junodownloadButton.getStyleClass().remove("filterclicked");
+        brainzButton.getStyleClass().add("filterclicked");
         selectedSource = "musicbrainz";
         if (lastClickedArtist != null) {
             loadTable();
         }
     }
     public void clickPort(MouseEvent mouseEvent) throws SQLException {
-        beatportButton.getStyleClass().add("filterclicked");
-        comviewButton.getStyleClass().remove("filterclicked");
+        beatportButton.getStyleClass().remove("filterclicked");
+        combviewButton.getStyleClass().remove("filterclicked");
         brainzButton.getStyleClass().remove("filterclicked");
         junodownloadButton.getStyleClass().remove("filterclicked");
+        beatportButton.getStyleClass().add("filterclicked");
         selectedSource = "beatport";
         if (lastClickedArtist != null) {
             loadTable();
         }
     }
     public void clickJunodownload(MouseEvent mouseEvent) throws SQLException {
-        junodownloadButton.getStyleClass().add("filterclicked");
-        comviewButton.getStyleClass().remove("filterclicked");
+        junodownloadButton.getStyleClass().remove("filterclicked");
+        combviewButton.getStyleClass().remove("filterclicked");
         brainzButton.getStyleClass().remove("filterclicked");
         beatportButton.getStyleClass().remove("filterclicked");
+        junodownloadButton.getStyleClass().add("filterclicked");
         selectedSource = "junodownload";
         if (lastClickedArtist != null) {
             loadTable();
@@ -427,7 +432,7 @@ public class GUIController {
             return;
         userInput += "releases/?music_product_type=single&laorder=date_down";
         junodownloadUrlbar.clear();
-        junodownloadUrlDiag.setVisible(false);
+        hideWindows();
         saveUrl(sql, userInput);
     }
     public void saveUrl(String sql, String userInput) throws SQLException {
@@ -447,7 +452,7 @@ public class GUIController {
             String[] songsArray = songs.eachText().toArray(new String[0]);
             if (songsArray == null)
                 return;
-            brainzUrlDiag.setVisible(false);
+            hideWindows();
         }
         else if (userInput.contains("beatport.com"))
         {
@@ -455,7 +460,7 @@ public class GUIController {
             String[] songsArray = songs.eachText().toArray(new String[0]);
             if (songsArray == null)
                 return;
-            beatportUrlDiag.setVisible(false);
+            hideWindows();
         }
         else if (userInput.contains("junodownload.com"))
         {
@@ -463,7 +468,7 @@ public class GUIController {
             String[] songsArray = songs.eachText().toArray(new String[0]);
             if (songsArray == null)
                 return;
-            junodownloadUrlDiag.setVisible(false);
+            hideWindows();
         }
         else
             return;
@@ -478,14 +483,19 @@ public class GUIController {
     }
 
     public void clickSettings(MouseEvent mouseEvent) {
+        settingsWindow.setVisible(true);
+    }
+    public void clickSettingsClose(MouseEvent mouseEvent) {
+        settingsWindow.setVisible(false);
     }
 
     public void clickScrapeButton(MouseEvent mouseEvent) {
         //amogus threading
+        hideWindows();
+        addButton.setVisible(false);
+        deleteButton.setVisible(false);
         refreshButton.setVisible(false);
         settingsButton.setVisible(false);
-        deleteButton.setVisible(false);
-        addButton.setVisible(false);
         progressbar.setVisible(true);
         progressbar.setProgress(0);
         Task<Void> scrapeTask = new Task<Void>() {
@@ -514,7 +524,7 @@ public class GUIController {
                     throw new RuntimeException(e);
                 }
             }
-            else if (lastClickedArtist == null && selectedSource == null) {
+            else {
                 try {
                     loadcombviewTable();
                 } catch (SQLException e) {
@@ -527,5 +537,40 @@ public class GUIController {
         executor.execute(scrapeTask);
         executor.shutdown();
     }
+
+    public void hideWindows() {
+        brainzUrlDiag.setVisible(false);
+        beatportUrlDiag.setVisible(false);
+        junodownloadUrlDiag.setVisible(false);
+        addWindow.setVisible(false);
+    }
+
+    public void hyperlinkClick(MouseEvent mouseEvent) {
+        Hyperlink clickedHyperlink = (Hyperlink) mouseEvent.getSource();
+        String url;
+        switch (clickedHyperlink.getId()) {
+            case "linkMusicbrainz" -> url = "https://musicbrainz.org";
+            case "linkBeatport" -> url = "https://beatport.com";
+            case "linkJunodownload" -> url = "https://junodownload.com";
+            default -> {
+                return;
+            }
+        }
+        ProcessBuilder processBuilder;
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("nix") || os.contains("nux") || os.contains("bsd")) {
+            //Linux
+            processBuilder = new ProcessBuilder("xdg-open", url);
+        } else {
+            //Windows
+            processBuilder = new ProcessBuilder("cmd.exe", "/c", "start", url);
+        }
+        try {
+            processBuilder.start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

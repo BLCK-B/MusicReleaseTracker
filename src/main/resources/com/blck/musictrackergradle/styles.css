@@ -118,7 +118,7 @@
     -fx-background-color: red;
     -fx-border-color: red;
 }
-#settingsButton, #refreshButton {
+#settingsButton, #refreshButton, #settingsCloseButton, #addconfirmButton:hover, #addcancelButton:hover, #brainzUrlButton:hover, #beatportUrlButton:hover, #junodownloadUrlButton:hover {
     -fx-background-color: black;
     -fx-border-width: 0;
 }
@@ -134,4 +134,13 @@
 }
 .progress-bar .bar {
     -fx-background-color: #CCCCFF;
+}
+
+#settingsWindow {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+}
+
+.hyperlink {
+    -fx-font-size: 16px;
+    -fx-focus-color: transparent;
 }

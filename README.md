@@ -1,10 +1,10 @@
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/f432e824-6772-401e-8419-90da707887f4)" width="220px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/f432e824-6772-401e-8419-90da707887f4)" width="180px"/>
 
-# MusicReleaseTracker
+## MusicReleaseTracker
 
 Efficient multi-source scraper that finds the latest songs from your favourite artists. Available for windows, linux.
 
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/ac417ea7-31d0-4371-a67c-7a31586a2a5e" width="600px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/2299bf41-7b3f-4992-86b6-d828b8ff23b7" width="600px"/>
 
 Look at newest songs from individual sources, artist by artist, and see them all ordered in "combined view". Enjoy the convenience of not having to browse around anymore. Intentional delays during scraping prevent excessive traffic. Currently available sources: Beatport, Musicbrainz, Junodownload.
 

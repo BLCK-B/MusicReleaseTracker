@@ -1,4 +1,5 @@
-package com.blck.musictrackergradle;
+package com.blck.MusicReleaseTracker;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -34,17 +35,17 @@ public class RealMain extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/blck/musictrackergradle/mygui.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/blck/MusicReleaseTracker/mygui.fxml"));
         Parent root = loader.load();
         GUIController = loader.getController();
         Scene scene = new Scene(root);
         Image icon = new Image(getClass().getResourceAsStream("/MRTlogo.png"));
         primaryStage.getIcons().add(icon);
         primaryStage.setTitle("Music Release Tracker");
+        primaryStage.setHeight(680);
+        primaryStage.setWidth(800);
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
-        primaryStage.setMinHeight(520);
-        primaryStage.setMinWidth(770);
-        primaryStage.setMaxWidth(880);
         primaryStage.show();
     }
 
@@ -59,7 +60,7 @@ public class RealMain extends Application {
 
     public static void scrapeData() throws SQLException, InterruptedException, IOException {
         //for each artistname: check 3 urls and load them into a list
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         String sql = "SELECT artistname FROM artists";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet artistnameResults = pstmt.executeQuery();
@@ -87,7 +88,7 @@ public class RealMain extends Application {
         //list for storing source urls (incl null) of one artist at a time
         ArrayList<String> eachArtistUrls = new ArrayList<>();
         for (String artistnamerow : artistnameList) {
-            conn = DriverManager.getConnection(DBtools.path);
+            conn = DriverManager.getConnection(DBtools.DBpath);
             eachArtistUrls.clear();
             sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
             pstmt = conn.prepareStatement(sql);
@@ -132,9 +133,11 @@ public class RealMain extends Application {
             double state = progress / artistnameList.size();
             GUIController.updateProgressBar(state);
         }
+        eachArtistUrls.clear();
+        artistnameList.clear();
+        System.gc();
     }
     private static void scrapeBrainz(String oneurl, String artistnamerow) throws IOException, SQLException {
-        System.out.println(oneurl);
         //scraper for musicbrainz
         Document doc = null;
         try {
@@ -147,7 +150,8 @@ public class RealMain extends Application {
         Elements dates = doc.select("ul.release-events > li:first-child").select("span.release-date");
         String[] songsArray = songs.eachText().toArray(new String[0]);
         String[] datesArray = dates.eachText().toArray(new String[0]);
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        doc.empty();
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         //fill table
         int entriesInserted = 0;
         int i = 0;
@@ -181,10 +185,13 @@ public class RealMain extends Application {
             result.close();
         }
         conn.close();
+        songs.clear();
+        dates.clear();
+        songsArray = null;
+        datesArray = null;
     }
 
     private static void scrapeBeatport(String oneurl, String artistnamerow) throws IOException, SQLException {
-        System.out.println(oneurl);
         //scraper for beatport
         Document doc = null;
         try {
@@ -199,7 +206,8 @@ public class RealMain extends Application {
         String[] songsArray = songs.eachText().toArray(new String[0]);
         String[] typeArray = types.eachText().toArray(new String[0]);
         String[] datesArray = dates.eachText().toArray(new String[0]);
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        doc.empty();
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         //fill table
         int entriesInserted = 0;
         int i = 0;
@@ -237,9 +245,14 @@ public class RealMain extends Application {
             result.close();
         }
         conn.close();
+        songs.clear();
+        types.clear();
+        dates.clear();
+        songsArray = null;
+        typeArray = null;
+        datesArray = null;
     }
     private static void scrapeJunodownload(String oneurl, String artistnamerow) throws IOException, SQLException {
-        System.out.println(oneurl);
         //scraper for junodownload
         Document doc = null;
         try {
@@ -251,6 +264,7 @@ public class RealMain extends Application {
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.mb-3.mb-lg-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
+        doc.empty();
         //dates: select including <br>, select correct substring
         Map<String, String> monthMap = new HashMap<>();
         monthMap.put("Jan", "01");
@@ -280,8 +294,7 @@ public class RealMain extends Application {
                 datesArray[i] = null;
             }
         }
-
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         //fill table
         int entriesInserted = 0;
         int i = 0;
@@ -310,23 +323,27 @@ public class RealMain extends Application {
             result.close();
         }
         conn.close();
+        conn.close();
+        songs.clear();
+        dates.clear();
+        songsArray = null;
+        datesArray = null;
     }
 
     public static void fillCombviewTable() throws SQLException {
         //assembles table for combined view with source-specific processing
         //checks entries from each source table from newest by date to entriesLimit: filters unwanted words, looks for duplicates
-        final int entriesLimit = 15;
+        final int entriesLimit = 13;
         int entriesInserted = 0;
-        //unwanted words list
-        String[] filterWords = {};
         //clear table
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         String sql = "DELETE FROM combview";
         Statement stmt = conn.createStatement();
         stmt.executeUpdate(sql);
 
         ArrayList<String> insertedSongs = new ArrayList<>();
         ArrayList<String> insertedDates = new ArrayList<>();
+        DBtools.readFilters();
         //beatport
         //fill source array
         sql = "SELECT * FROM beatport ORDER BY date DESC";
@@ -340,7 +357,7 @@ public class RealMain extends Application {
             String date = RSinsertSongs.getString("date");
             String songtype = RSinsertSongs.getString("type");
             //filtering words
-            for (String checkword : filterWords) {
+            for (String checkword : DBtools.filterWords) {
                 if ((songtype.toLowerCase()).contains(checkword.toLowerCase()))
                     continue cycle;
                 if ((songname.toLowerCase()).contains(checkword.toLowerCase()))
@@ -376,7 +393,7 @@ public class RealMain extends Application {
             String artist = RSinsertSongs.getString("artist");
             String date = RSinsertSongs.getString("date");
             //filtering words
-            for (String checkword : filterWords) {
+            for (String checkword : DBtools.filterWords) {
                 if (songname.toLowerCase().contains(checkword.toLowerCase()))
                     continue cycle;
             }
@@ -410,7 +427,7 @@ public class RealMain extends Application {
             String artist = RSinsertSongs.getString("artist");
             String date = RSinsertSongs.getString("date");
             //filtering words
-            for (String checkword : filterWords) {
+            for (String checkword : DBtools.filterWords) {
                 if (songname.toLowerCase().contains(checkword.toLowerCase()))
                     continue cycle;
             }
@@ -436,6 +453,7 @@ public class RealMain extends Application {
         RSinsertSongs.close();
         insertedSongs.clear();
         insertedDates.clear();
+        System.gc();
     }
 
 }

@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'com.blck'
-version '1.1.0'
+version '2.0.0'
 
 repositories {
     mavenCentral()
@@ -31,18 +31,18 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 application {
-    mainModule = 'com.blck.musictrackergradle'
-    mainClass = 'com.blck.musictrackergradle.Main'
+    mainModule = 'com.blck.MusicReleaseTracker'
+    mainClass = 'com.blck.MusicReleaseTracker.Main'
 }
 
 javafx {
-    version = '19'
+    version = '20.0.1'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
 dependencies {
-    implementation('org.xerial:sqlite-jdbc:3.40.1.0')
-    implementation 'org.jsoup:jsoup:1.15.4'
+    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'org.jsoup:jsoup:1.16.1'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
@@ -51,7 +51,7 @@ jlink {
     imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
-        name = 'MusicTrackerGradle'
+        name = 'MusicReleaseTracker'
     }
 }
 
@@ -66,13 +66,13 @@ sourceSets {
 //This will create an executable JAR file with a manifest that specifies the main class
 tasks.jar {
     manifest {
-        attributes 'Main-Class': 'com.blck.musictrackergradle.Main'
+        attributes 'Main-Class': 'com.blck.MusicReleaseTracker.Main'
     }
     duplicatesStrategy = 'EXCLUDE'
     from(sourceSets.main.output) {
         exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     }
-    archiveFileName = "MusicTrackerGradle.jar"
+    archiveFileName = "MusicReleaseTracker.jar"
     dependsOn configurations.runtimeClasspath
 }
 
@@ -80,7 +80,7 @@ shadowJar {
     configurations = [project.configurations.runtimeClasspath, project.configurations.shadow]
     archiveClassifier.set('')
     manifest {
-        attributes 'Main-Class': 'com.blck.musictrackergradle.Main'
+        attributes 'Main-Class': 'com.blck.MusicReleaseTracker.Main'
     }
     mergeServiceFiles()
 }

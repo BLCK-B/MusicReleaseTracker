@@ -13,9 +13,8 @@
 .table-view .column-header .label {
     -fx-background-color: black;
     -fx-text-fill: white;
-    -fx-border-width: 1px;
-    -fx-border-color: #353535;
-    -fx-border-radius: 5px;
+    -fx-border-width: 0 0 2px 0;
+    -fx-border-color: #CCCCFF;
 }
 .table-view .table-row-cell {
     -fx-background-color: black;
@@ -35,17 +34,31 @@
     -fx-background-color: black;
 }
 .list-cell {
-    -fx-background-color: black;
+    -fx-background-color: transparent;
     -fx-text-fill: white;
     -fx-border-color: black;
 }
 .list-cell:hover {
-    -fx-background-color: #2b2b2b;
+    -fx-background-color: #2d2d2d;
     -fx-text-fill: white;
 }
-.selected-row , .selected-row:hover {
+.selected-row, .selected-row:hover {
     -fx-background-color: #CCCCFF;
     -fx-text-fill: black;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 0px;
+}
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8px;
+}
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #CCCCFF;
+}
+.table-cell {
+    -fx-padding: 1px;
 }
 
 .text-area {
@@ -54,6 +67,7 @@
 }
 .text-area .content {
     -fx-background-color: black;
+    -fx-padding: 8px;
 }
 .text-area *.text {
     -fx-text-alignment: left;
@@ -62,26 +76,30 @@
 
 .text-field {
     -fx-alignment: center-left;
+    -fx-text-fill: white;
+    -fx-background-color: #2d2d2d;
+    -fx-border-width: 0;
 }
 
 .button
 {
     -fx-text-fill: white;
-    -fx-font-size: 14px;
     -fx-highlight-fill: transparent;
     -fx-highlight-text-fill: white;
-    -fx-background-color: black;
+    -fx-background-color: transparent;
     -fx-border-width: 2px;
     -fx-border-color: #B1B1B1;
     -fx-border-radius: 8px;
 }
 .button:hover {
-   -fx-background-color: #2b2b2b;
+   -fx-background-color: #2B2B2B;
    -fx-background-radius: 8px;
 }
 
 #filterbutton {
     -fx-font-size: 16px;
+    -fx-text-fill: #E4E4E4;
+    -fx-font-weight: bold;
 }
 #filterbutton.filterclicked {
    -fx-text-fill: black;
@@ -92,55 +110,58 @@
    -fx-background-radius: 8px;
 }
 
-#addButton {
-    -fx-background-color: #0a3f00;
-    -fx-text-fill: white;
-    -fx-border-width: 1px;
-    -fx-border-color: white;
-    -fx-border-radius: 5px;
-    -fx-border-color: #0a3f00;
-    -fx-background-radius: 5px;
-}
-#deleteButton {
-    -fx-background-color: #480500;
-    -fx-text-fill: white;
-    -fx-border-width: 1px;
-    -fx-border-color: white;
-    -fx-border-radius: 5px;
-    -fx-border-color: #480500;
-    -fx-background-radius: 5px;
-}
 #addButton:hover {
-    -fx-background-color: green;
-    -fx-border-color: green;
+    -fx-background-color: #CCCCFF;
+    -fx-border-color: #CCCCFF;
+    -fx-text-fill: black;
+    -fx-background-radius: 10px;
 }
 #deleteButton:hover {
-    -fx-background-color: red;
-    -fx-border-color: red;
+    -fx-background-color: #d30000;
+    -fx-border-color: #d30000;
+    -fx-background-radius: 10px;
 }
 #settingsButton, #refreshButton, #settingsCloseButton, #addconfirmButton:hover, #addcancelButton:hover, #brainzUrlButton:hover, #beatportUrlButton:hover, #junodownloadUrlButton:hover {
-    -fx-background-color: black;
+    -fx-background-color: transparent;
     -fx-border-width: 0;
 }
 
 .progress-bar {
-    -fx-background-color: black;
-    -fx-border-width: 2px;
-    -fx-border-color: white;
-    -fx-border-radius: 5px;
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
 }
 .progress-bar .track {
-    -fx-background-color: black;
+    -fx-background-color: #2d2d2d;
 }
 .progress-bar .bar {
     -fx-background-color: #CCCCFF;
 }
 
-#settingsWindow {
-    -fx-background-color: rgba(0, 0, 0, 0.6);
+#settingsWindow, #fadeTables {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
 }
 
 .hyperlink {
     -fx-font-size: 16px;
     -fx-focus-color: transparent;
+}
+
+.check-box .box {
+    -fx-border-color: #CCCCFF;
+    -fx-border-width: 2px;
+    -fx-background-color: black;
+    -fx-padding: 0;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+.check-box .box .mark {
+    -fx-shape: "M 1 1 L 9 1 L 9 9 L 1 9 Z";
+    -fx-background-insets: 0;
+}
+.check-box:selected .box .mark {
+    -fx-background-color: #CCCCFF;
+}
+
+.scroll-pane:focused {
+    -fx-background-insets: 0;
 }

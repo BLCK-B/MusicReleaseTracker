@@ -1,9 +1,12 @@
-package com.blck.musictrackergradle;
+package com.blck.MusicReleaseTracker;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /*      MusicReleaseTrcker
         Copyright (C) 2023 BLCK
@@ -18,31 +21,30 @@ import java.sql.Statement;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-//class for essential DB tasks
+//class for essential tasks
 public class DBtools {
-    public static String path;
+    public static String DBpath;
+
     public static void path() {
         String os = System.getProperty("os.name").toLowerCase();
         String ide = System.getProperty("ide.environment");
 
-        if (ide != null && ide.equals("IDE")) {
-            //IDE
-            path = "jdbc:sqlite:musicdata.db";
-        } else if (os.contains("win")) {
-            //Windows
+        if (ide != null && ide.equals("IDE")) { //IDE
             String appDataPath = System.getenv("APPDATA");
-            path = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "musicdata.db";
-        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-            //Linux
+            DBpath = "jdbc:sqlite:musicdata.db";
+        } else if (os.contains("win")) { //Windows
+            String appDataPath = System.getenv("APPDATA");
+            DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "musicdata.db";
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  //Linux
             String userHome = System.getProperty("user.home");
-            path = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "musicdata.db";
-        } else {
-            throw new UnsupportedOperationException("Unsupported operating system.");
+            DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "musicdata.db";
         }
+        else
+            throw new UnsupportedOperationException("Unsupported operating system.");
     }
 
     public static void createTables() throws SQLException {
-        Connection conn = DriverManager.getConnection(path);
+        Connection conn = DriverManager.getConnection(DBpath);
 
         String sql = "CREATE TABLE IF NOT EXISTS musicbrainz (\n"
                 + "	song text NOT NULL,\n"
@@ -89,4 +91,17 @@ public class DBtools {
         conn.close();
         stmt.close();
     }
+
+    public static List<String> filterWords = new ArrayList<>();
+
+    public static void readFilters() {
+
+    }
+
+    public static void UpdateSettingsDB() {
+
+    }
+
+
+
 }

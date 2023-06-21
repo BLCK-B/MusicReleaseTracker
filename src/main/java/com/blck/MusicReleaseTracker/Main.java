@@ -1,4 +1,4 @@
-package com.blck.musictrackergradle;
+package com.blck.MusicReleaseTracker;
 import java.sql.SQLException;
 
 /*      MusicReleaseTrcker

@@ -1,4 +1,4 @@
-package com.blck.musictrackergradle;
+package com.blck.MusicReleaseTracker;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -20,9 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static com.blck.musictrackergradle.RealMain.fillCombviewTable;
-import static com.blck.musictrackergradle.RealMain.scrapeData;
 
 /*      MusicReleaseTrcker
         Copyright (C) 2023 BLCK
@@ -95,6 +92,22 @@ public class GUIController {
     @FXML
     public ImageView cancelButton;
     @FXML
+    public StackPane fadeTables;
+    @FXML
+    public CheckBox FilterRemix;
+    @FXML
+    public CheckBox FilterExtended;
+    @FXML
+    public CheckBox FilterAcoustic;
+    @FXML
+    public CheckBox FilterVIP;
+    @FXML
+    public CheckBox FilterRemaster;
+    @FXML
+    public CheckBox FilterInstrumental;
+    @FXML
+    public ImageView refreshButtonActive;
+    @FXML
     private ProgressBar progressbar;
     @FXML
     private TableView<TableModelcombview> combviewTable;
@@ -121,7 +134,6 @@ public class GUIController {
     public void updateProgressBar(double state) {
         Platform.runLater(() -> progressbar.setProgress(state));
     }
-
     public ProgressBar getProgressBar() {
         return progressbar;
     }
@@ -131,12 +143,13 @@ public class GUIController {
         loadList();
         combviewButton.getStyleClass().add("filterclicked");
         loadcombviewTable();
+        loadFiltersGUI();
     }
 
     public void loadList() throws SQLException {
         dataList.clear();
         //populating artist list - from table "artists"
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists");
         Set<String> set = new HashSet<>();
@@ -183,7 +196,7 @@ public class GUIController {
         hideWindows();
         combviewTable.setVisible(false);
         //url existence check
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         String sql = null;
         switch (selectedSource) {
             case "musicbrainz" -> sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
@@ -198,16 +211,28 @@ public class GUIController {
             conn.close();
             if (link == null || link.isEmpty()) {
                 switch (selectedSource) {
-                    case "musicbrainz" -> brainzUrlDiag.setVisible(true);
-                    case "beatport" -> beatportUrlDiag.setVisible(true);
-                    case "junodownload" -> junodownloadUrlDiag.setVisible(true);
+                    case "musicbrainz" -> {
+                        brainzUrlDiag.setVisible(true) ;
+                        fadeTables.setVisible(true);
+                        Platform.runLater(() -> brainzUrlBar.requestFocus());
+                    }
+                    case "beatport" -> {
+                        beatportUrlDiag.setVisible(true);
+                        fadeTables.setVisible(true);
+                        Platform.runLater(() -> beatportUrlBar.requestFocus());
+                    }
+                    case "junodownload" -> {
+                        junodownloadUrlDiag.setVisible(true);
+                        fadeTables.setVisible(true);
+                        Platform.runLater(() -> junodownloadUrlbar.requestFocus());
+                    }
                 }
                 return;
             }
         }
 
         //populating table - for given artist and given source - launched every list and source click
-        conn = DriverManager.getConnection(DBtools.path);
+        conn = DriverManager.getConnection(DBtools.DBpath);
         switch (selectedSource) {
             case "musicbrainz" -> sql = "SELECT song, date FROM musicbrainz WHERE artist = ? ORDER BY date DESC";
             case "beatport" -> sql = "SELECT song, date FROM beatport WHERE artist = ? ORDER BY date DESC";
@@ -233,9 +258,9 @@ public class GUIController {
     public void loadcombviewTable() throws SQLException {
         combviewTable.setVisible(true);
         dataTablecombview.clear();
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         //populating combview table
-        String sql = "SELECT * FROM combview ORDER BY date DESC LIMIT 20";
+        String sql = "SELECT * FROM combview ORDER BY date DESC LIMIT 39";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet rs = pstmt.executeQuery();
         // Loop through the result set and add each row to the data list
@@ -258,19 +283,17 @@ public class GUIController {
     public void clickAdd(MouseEvent mouseEvent) {
         hideWindows();
         addWindow.setVisible(true);
-        combviewButton.getStyleClass().remove("filterclicked");
-        brainzButton.getStyleClass().remove("filterclicked");
-        beatportButton.getStyleClass().remove("filterclicked");
-        junodownloadButton.getStyleClass().remove("filterclicked");
+        fadeTables.setVisible(true);
+        artistInputField.requestFocus();
     }
     public void clickAddConfirm(MouseEvent mouseEvent) throws SQLException {
         //add new artist typed by user
         String userInput = artistInputField.getText();
-        artistInputField.clear();
-        if (userInput.isEmpty() || userInput.isBlank())
+        if (userInput.isEmpty() || userInput.isBlank() || userInput.length() > 30)
             return;
+        artistInputField.clear();
         hideWindows();
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         String sql = "insert into artists(artistname) values(?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, userInput);
@@ -289,7 +312,7 @@ public class GUIController {
     public void clickDelete(MouseEvent mouseEvent) throws SQLException {
         //delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
-            Connection conn = DriverManager.getConnection(DBtools.path);
+            Connection conn = DriverManager.getConnection(DBtools.DBpath);
             String sql = "DELETE FROM artists WHERE artistname = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, lastClickedArtist);
@@ -310,7 +333,7 @@ public class GUIController {
             pstmt.close();
             loadList();
             hideWindows();
-            fillCombviewTable();
+            RealMain.fillCombviewTable();
             loadcombviewTable();
             combviewButton.getStyleClass().add("filterclicked");
             brainzButton.getStyleClass().remove("filterclicked");
@@ -450,6 +473,8 @@ public class GUIController {
         {
             Elements songs = doc.select("[href*=/release/]");
             String[] songsArray = songs.eachText().toArray(new String[0]);
+            songs.clear();
+            doc.empty();
             if (songsArray == null)
                 return;
             hideWindows();
@@ -458,6 +483,8 @@ public class GUIController {
         {
             Elements songs = doc.select("span.buk-track-primary-title");
             String[] songsArray = songs.eachText().toArray(new String[0]);
+            songs.clear();
+            doc.empty();
             if (songsArray == null)
                 return;
             hideWindows();
@@ -466,6 +493,8 @@ public class GUIController {
         {
             Elements songs = doc.select("a.juno-title");
             String[] songsArray = songs.eachText().toArray(new String[0]);
+            songs.clear();
+            doc.empty();
             if (songsArray == null)
                 return;
             hideWindows();
@@ -473,7 +502,7 @@ public class GUIController {
         else
             return;
         //after passing check - save input
-        Connection conn = DriverManager.getConnection(DBtools.path);
+        Connection conn = DriverManager.getConnection(DBtools.DBpath);
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, userInput);
         pstmt.setString(2, lastClickedArtist);
@@ -485,8 +514,17 @@ public class GUIController {
     public void clickSettings(MouseEvent mouseEvent) {
         settingsWindow.setVisible(true);
     }
-    public void clickSettingsClose(MouseEvent mouseEvent) {
+    public void clickSettingsClose(MouseEvent mouseEvent) throws SQLException {
         settingsWindow.setVisible(false);
+        RealMain.fillCombviewTable();
+        if (selectedSource == null)
+            loadcombviewTable();
+    }
+    public void toggleFilter(MouseEvent event) {
+
+    }
+    public void loadFiltersGUI() {
+
     }
 
     public void clickScrapeButton(MouseEvent mouseEvent) {
@@ -494,26 +532,28 @@ public class GUIController {
         hideWindows();
         addButton.setVisible(false);
         deleteButton.setVisible(false);
-        refreshButton.setVisible(false);
-        settingsButton.setVisible(false);
+        refreshButton.setMouseTransparent(true);
+        refreshButtonActive.setVisible(true);
+        settingsButton.setMouseTransparent(true);
         progressbar.setVisible(true);
         progressbar.setProgress(0);
         Task<Void> scrapeTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                scrapeData();
+                RealMain.scrapeData();
                 return null;
             }
         };
 
         scrapeTask.setOnSucceeded(event -> {
-            refreshButton.setVisible(true);
-            settingsButton.setVisible(true);
+            refreshButton.setMouseTransparent(false);
+            refreshButtonActive.setVisible(false);
+            settingsButton.setMouseTransparent(false);
             deleteButton.setVisible(true);
             addButton.setVisible(true);
             progressbar.setVisible(false);
             try {
-                fillCombviewTable();
+                RealMain.fillCombviewTable();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -543,6 +583,7 @@ public class GUIController {
         beatportUrlDiag.setVisible(false);
         junodownloadUrlDiag.setVisible(false);
         addWindow.setVisible(false);
+        fadeTables.setVisible(false);
     }
 
     public void hyperlinkClick(MouseEvent mouseEvent) {
@@ -571,6 +612,5 @@ public class GUIController {
             throw new RuntimeException(e);
         }
     }
-
 
 }

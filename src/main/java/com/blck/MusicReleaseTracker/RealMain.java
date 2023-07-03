@@ -49,16 +49,30 @@ public class RealMain extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) throws SQLException {
-        DBtools.path();
-        DBtools.createTables();
+    public static void main(String[] args) {
+        try {
+            DBtools.path();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            DBtools.createTables();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            DBtools.updateSettingsDB();
+        } catch (Exception e) {
+            System.out.println("error handling config file");
+            e.printStackTrace();
+        }
         launch(args);
     }
 
     //entryLimit: how many entries per artist
     private static final int entryLimit = 15;
 
-    public static void scrapeData() throws SQLException, InterruptedException, IOException {
+    public static void scrapeData() throws SQLException, InterruptedException {
         //for each artistname: check 3 urls and load them into a list
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
         String sql = "SELECT artistname FROM artists";
@@ -114,16 +128,49 @@ public class RealMain extends Application {
             {
                 switch (i) {
                     case 1 -> {
-                        if (oneurl != null)
-                            scrapeBrainz(oneurl, artistnamerow);
+                        if (oneurl != null) {
+                            try {
+                                scrapeBrainz(oneurl, artistnamerow);
+                            } catch (Exception e) {
+                                System.out.println("error scraping musicbrainz");
+                                try {
+                                    scrapeBrainz(oneurl, artistnamerow);
+                                } catch (Exception e2) {
+                                    System.out.println("error re-scraping musicbrainz, moving on");
+                                    e2.printStackTrace();
+                                }
+                            }
+                        }
                     }
                     case 2 -> {
-                        if (oneurl != null)
-                            scrapeBeatport(oneurl, artistnamerow);
+                        if (oneurl != null) {
+                            try {
+                                scrapeBeatport(oneurl, artistnamerow);
+                            } catch (Exception e) {
+                                System.out.println("error scraping beatport");
+                                try {
+                                    scrapeBeatport(oneurl, artistnamerow);
+                                } catch (Exception e2) {
+                                    System.out.println("erorr re-scraping beatport, moving on");
+                                    e2.printStackTrace();
+                                }
+                            }
+                        }
                     }
                     case 3 -> {
-                        if (oneurl != null)
-                            scrapeJunodownload(oneurl, artistnamerow);
+                        if (oneurl != null) {
+                            try {
+                                scrapeJunodownload(oneurl, artistnamerow);
+                            } catch (Exception e) {
+                                System.out.println("error scraping junodownload");
+                                try {
+                                    scrapeBeatport(oneurl, artistnamerow);
+                                } catch (Exception e2) {
+                                    System.out.println("error re-scraping junodownload, moving on");
+                                    e2.printStackTrace();
+                                }
+                            }
+                        }
                         Thread.sleep(1200);
                     }
                 }
@@ -143,8 +190,7 @@ public class RealMain extends Application {
         try {
             doc = Jsoup.connect(oneurl).timeout(40000).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("Task timed out");
-            return;
+            System.out.println("scrapeBrainz timed out " + oneurl);
         }
         Elements songs = doc.select("[href*=/release/]");
         Elements dates = doc.select("ul.release-events > li:first-child").select("span.release-date");
@@ -197,8 +243,7 @@ public class RealMain extends Application {
         try {
             doc = Jsoup.connect(oneurl).timeout(40000).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("Task timed out");
-            return;
+            System.out.println("scrapeBeatport timed out " + oneurl);
         }
         Elements songs = doc.select("span.buk-track-primary-title");
         Elements types = doc.select("span.buk-track-remixed");
@@ -258,8 +303,7 @@ public class RealMain extends Application {
         try {
             doc = Jsoup.connect(oneurl).timeout(40000).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("Task timed out");
-            return;
+            System.out.println("scrapeJunodownload timed out " + oneurl);
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.mb-3.mb-lg-3");
@@ -343,7 +387,11 @@ public class RealMain extends Application {
 
         ArrayList<String> insertedSongs = new ArrayList<>();
         ArrayList<String> insertedDates = new ArrayList<>();
-        DBtools.readFilters();
+        try {
+            DBtools.readFilters();
+        } catch (Exception e) {
+            System.out.println("Filters could not load: " + e);
+        }
         //beatport
         //fill source array
         sql = "SELECT * FROM beatport ORDER BY date DESC";

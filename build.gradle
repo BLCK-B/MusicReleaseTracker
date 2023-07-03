@@ -8,14 +8,14 @@ plugins {
 }
 
 group 'com.blck'
-version '2.0.0'
+version '3.0.0'
 
 repositories {
     mavenCentral()
 }
 
 ext {
-    junitVersion = '5.9.2'
+    junitVersion = '5.9.3'
 }
 
 configurations {
@@ -43,6 +43,7 @@ javafx {
 dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
     implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'com.typesafe:config:1.4.2'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
@@ -77,6 +78,15 @@ tasks.jar {
 }
 
 shadowJar {
+    exclude 'org/sqlite/native/Linux-Musl/**'
+    exclude 'org/sqlite/native/Linux-Android/**'
+    exclude 'org/sqlite/native/FreeBSD/**'
+    exclude 'org/sqlite/native/Mac/**'
+    exclude 'org/sqlite/native/Linux/aarch64/**'
+    exclude 'org/sqlite/native/Linux/arm/**'
+    exclude 'org/sqlite/native/Linux/armv6/**'
+    exclude 'org/sqlite/native/Linux/ppc64/**'
+    exclude 'org/sqlite/native/Windows/aarch64/**'
     configurations = [project.configurations.runtimeClasspath, project.configurations.shadow]
     archiveClassifier.set('')
     manifest {

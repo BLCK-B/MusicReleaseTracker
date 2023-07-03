@@ -100,6 +100,8 @@
     -fx-font-size: 16px;
     -fx-text-fill: #E4E4E4;
     -fx-font-weight: bold;
+    -fx-focus-traversable: false;
+    -fx-background-insets: 0;
 }
 #filterbutton.filterclicked {
    -fx-text-fill: black;
@@ -124,6 +126,7 @@
 #settingsButton, #refreshButton, #settingsCloseButton, #addconfirmButton:hover, #addcancelButton:hover, #brainzUrlButton:hover, #beatportUrlButton:hover, #junodownloadUrlButton:hover {
     -fx-background-color: transparent;
     -fx-border-width: 0;
+    -fx-focus-traversable: false;
 }
 
 .progress-bar {

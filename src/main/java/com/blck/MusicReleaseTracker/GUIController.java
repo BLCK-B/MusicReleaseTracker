@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.typesafe.config.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,7 +14,10 @@ import javafx.scene.layout.StackPane;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import java.io.IOException;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigValueFactory;
+import java.io.*;
 import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.util.HashSet;
@@ -139,11 +143,21 @@ public class GUIController {
     }
 
     @FXML
-    public void initialize() throws SQLException {
-        loadList();
+    public void initialize() {
         combviewButton.getStyleClass().add("filterclicked");
-        loadcombviewTable();
-        loadFiltersGUI();
+        try {
+            loadList();
+            loadcombviewTable();
+        } catch (Exception e) {
+            System.out.println("could not load artist list or combiew table");
+            e.printStackTrace();
+        }
+        try {
+            loadFiltersGUI();
+        } catch (Exception e) {
+            System.out.println("failed reflecting filters in GUI");
+            e.printStackTrace();
+        }
     }
 
     public void loadList() throws SQLException {
@@ -176,7 +190,7 @@ public class GUIController {
                         try {
                             artistClick(cellcontent);
                         } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                            e.printStackTrace();
                         }
                         if (lastClickedCell != null) {
                             lastClickedCell.getStyleClass().remove("selected-row");
@@ -397,7 +411,7 @@ public class GUIController {
             loadTable();
         }
     }
-    public void clickBrainzUrlButton(MouseEvent mouseEvent) throws SQLException {
+    public void clickBrainzUrlButton(MouseEvent mouseEvent) throws SQLException, IOException {
         String sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
         String userInput = brainzUrlBar.getText();
         if (userInput.isEmpty() || userInput.isBlank())
@@ -417,7 +431,7 @@ public class GUIController {
         brainzUrlBar.clear();
         saveUrl(sql, userInput);
     }
-    public void clickBeatportUrlButton(MouseEvent mouseEvent) throws SQLException {
+    public void clickBeatportUrlButton(MouseEvent mouseEvent) throws SQLException, IOException {
         String sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
         String userInput = beatportUrlBar.getText();
         if (userInput.isEmpty() || userInput.isBlank())
@@ -439,7 +453,7 @@ public class GUIController {
         beatportUrlBar.clear();
         saveUrl(sql, userInput);
     }
-    public void clickJunodownloadUrlButton(MouseEvent mouseEvent) throws SQLException {
+    public void clickJunodownloadUrlButton(MouseEvent mouseEvent) throws SQLException, IOException {
         String sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
         String userInput = junodownloadUrlbar.getText();
         if (userInput.isEmpty() || userInput.isBlank())
@@ -458,16 +472,14 @@ public class GUIController {
         hideWindows();
         saveUrl(sql, userInput);
     }
-    public void saveUrl(String sql, String userInput) throws SQLException {
+    public void saveUrl(String sql, String userInput) throws SQLException, IOException {
         //validation of links
         Document doc = null;
         try {
             doc = Jsoup.connect(userInput).timeout(40000).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("Task timed out");
+            System.out.println("link verification: task timed out");
             return;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
         if (userInput.contains("musicbrainz.org"))
         {
@@ -516,15 +528,49 @@ public class GUIController {
     }
     public void clickSettingsClose(MouseEvent mouseEvent) throws SQLException {
         settingsWindow.setVisible(false);
-        RealMain.fillCombviewTable();
+        try {
+            RealMain.fillCombviewTable();
+        } catch (Exception e) {
+            System.out.println("could not fill combiew table");
+            e.printStackTrace();
+        }
         if (selectedSource == null)
             loadcombviewTable();
     }
     public void toggleFilter(MouseEvent event) {
-
+        //change config filter state on click
+        Config config = ConfigFactory.parseFile(new File(DBtools.ConfigPath));
+        CheckBox clickedCheckbox = (CheckBox) event.getSource();
+        String fxid = clickedCheckbox.getId();
+        boolean newState = clickedCheckbox.isSelected();
+        switch (fxid) {
+            case "FilterRemix" -> fxid = "Remix";
+            case "FilterVIP" -> fxid = "VIP";
+            case "FilterExtended" -> fxid = "Extended";
+            case "FilterRemaster" -> fxid = "Remaster";
+            case "FilterAcoustic" -> fxid = "Acoustic";
+            case "FilterInstrumental" -> fxid = "Instrumental";
+        }
+        config = config.withValue("filters." + fxid, ConfigValueFactory.fromAnyRef(newState));
+        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.ConfigPath))) {
+            writer.write(config.root().render(renderOptions));
+        } catch (IOException e) {
+            System.out.println("could not save filter change");
+            e.printStackTrace();
+        }
     }
-    public void loadFiltersGUI() {
 
+    public void loadFiltersGUI() {
+        //on startup reflect the state of filters in GUI
+        Config config = ConfigFactory.parseFile(new File(DBtools.ConfigPath));
+        Config filtersConfig = config.getConfig("filters");
+        FilterRemix.setSelected(filtersConfig.getBoolean("Remix"));
+        FilterVIP.setSelected(filtersConfig.getBoolean("VIP"));
+        FilterExtended.setSelected(filtersConfig.getBoolean("Extended"));
+        FilterRemaster.setSelected(filtersConfig.getBoolean("Remaster"));
+        FilterAcoustic.setSelected(filtersConfig.getBoolean("Acoustic"));
+        FilterInstrumental.setSelected(filtersConfig.getBoolean("Instrumental"));
     }
 
     public void clickScrapeButton(MouseEvent mouseEvent) {
@@ -539,8 +585,13 @@ public class GUIController {
         progressbar.setProgress(0);
         Task<Void> scrapeTask = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                RealMain.scrapeData();
+            protected Void call() {
+                try {
+                    RealMain.scrapeData();
+                } catch (Exception e) {
+                    System.out.println("catastrophic error during scraping");
+                    e.printStackTrace();
+                }
                 return null;
             }
         };
@@ -555,24 +606,24 @@ public class GUIController {
             try {
                 RealMain.fillCombviewTable();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
             if (lastClickedArtist != null && selectedSource != null) {
                 try {
                     loadTable();
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
             else {
                 try {
                     loadcombviewTable();
                 } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
         });
-        // create an ExecutorService to run tasks on separate threads
+        //create an ExecutorService to run tasks on separate threads
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(scrapeTask);
         executor.shutdown();
@@ -590,26 +641,34 @@ public class GUIController {
         Hyperlink clickedHyperlink = (Hyperlink) mouseEvent.getSource();
         String url;
         switch (clickedHyperlink.getId()) {
-            case "linkMusicbrainz" -> url = "https://musicbrainz.org";
-            case "linkBeatport" -> url = "https://beatport.com";
-            case "linkJunodownload" -> url = "https://junodownload.com";
+            case "linkMusicbrainz" -> {
+                url = "https://musicbrainz.org";
+                brainzUrlBar.requestFocus();
+            }
+            case "linkBeatport" -> {
+                url = "https://beatport.com";
+                beatportUrlBar.requestFocus();
+            }
+            case "linkJunodownload" -> {
+                url = "https://junodownload.com";
+                junodownloadUrlbar.requestFocus();
+            }
             default -> {
                 return;
             }
         }
         ProcessBuilder processBuilder;
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("nix") || os.contains("nux") || os.contains("bsd")) {
-            //Linux
+        if (os.contains("nix") || os.contains("nux") || os.contains("bsd")) { //linux
             processBuilder = new ProcessBuilder("xdg-open", url);
-        } else {
-            //Windows
+        } else {  //windows
             processBuilder = new ProcessBuilder("cmd.exe", "/c", "start", url);
         }
         try {
             processBuilder.start();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("hyperlink error");
+            e.printStackTrace();
         }
     }
 

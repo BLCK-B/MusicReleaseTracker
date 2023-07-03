@@ -227,7 +227,7 @@
                   <Insets left="170.0" />
                </StackPane.margin>
                <children>
-                  <TextArea editable="false" mouseTransparent="true" prefHeight="268.0" prefWidth="363.0" text="Insert source link for musicbrainz.&#10;&#10;Visit&#10;find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://musicbrainz.org/artist/id/..." wrapText="true" />
+                  <TextArea editable="false" mouseTransparent="true" prefHeight="268.0" prefWidth="363.0" text="Insert source link for musicbrainz.&#10;&#10;Visit                                        &gt; find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://musicbrainz.org/artist/id/..." wrapText="true" />
                   <HBox alignment="BOTTOM_LEFT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="0.0" prefHeight="30.0" prefWidth="400.0" StackPane.alignment="BOTTOM_LEFT">
                      <children>
                         <TextField fx:id="brainzUrlBar" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" prefHeight="30.0" prefWidth="320.0" HBox.hgrow="ALWAYS">
@@ -260,7 +260,7 @@
             </StackPane>
             <StackPane fx:id="beatportUrlDiag" alignment="BOTTOM_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="340.0" prefWidth="440.0" visible="false">
                <children>
-                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for beatport.&#10;&#10;Visit&#10;find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://beatport.com/artist/artistname/id/...&#10;" wrapText="true" StackPane.alignment="BOTTOM_LEFT" />
+                  <TextArea editable="false" mouseTransparent="true" prefHeight="200.0" prefWidth="200.0" text="Insert source link for beatport.&#10;&#10;Visit                                    &gt; find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://beatport.com/artist/artistname/id/...&#10;" wrapText="true" StackPane.alignment="BOTTOM_LEFT" />
                   <HBox alignment="BOTTOM_CENTER" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="0.0" prefHeight="30.0" prefWidth="400.0">
                      <children>
                         <TextField fx:id="beatportUrlBar" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="320.0" prefHeight="30.0" prefWidth="320.0" HBox.hgrow="ALWAYS">
@@ -296,7 +296,7 @@
             </StackPane>
             <StackPane fx:id="junodownloadUrlDiag" alignment="BOTTOM_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="340.0" prefWidth="440.0" visible="false">
                <children>
-                  <TextArea editable="false" mouseTransparent="true" prefHeight="342.0" prefWidth="440.0" text="Insert source link for junodownload.&#10;&#10;Visit&#10;find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://junodownload.com/artists/artistname/...&#10;" wrapText="true" />
+                  <TextArea editable="false" mouseTransparent="true" prefHeight="342.0" prefWidth="440.0" text="Insert source link for junodownload.&#10;&#10;Visit                                             &gt; find artist &gt; copy url&#10;&#10;Only correct links will be accepted.&#10;Example link:&#10;https://junodownload.com/artists/artistname/...&#10;" wrapText="true" />
                   <Hyperlink fx:id="linkJunodownload" onMouseClicked="#hyperlinkClick" text="https://junodownload.com" translateX="40.0" translateY="56.0" StackPane.alignment="TOP_LEFT" />
                   <HBox alignment="BOTTOM_LEFT" maxHeight="30.0" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="0.0" prefHeight="30.0" prefWidth="400.0" StackPane.alignment="BOTTOM_LEFT">
                      <children>
@@ -338,12 +338,12 @@
                           <content>
                             <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="750.0" prefWidth="728.0" style="-fx-background-color: black;">
                                  <children>
-                                    <TextArea editable="false" layoutX="77.0" layoutY="32.0" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" mouseTransparent="true" prefHeight="95.0" prefWidth="396.0" text="Exclusion filters&#10;Select words to be filtered out in Combined view.&#10;Will not do anything yet.">
+                                    <TextArea editable="false" layoutX="77.0" layoutY="32.0" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" mouseTransparent="true" prefHeight="70.0" prefWidth="432.0" text="Exclusion filters&#10;Select types of songs to be hidden in Combined view.">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
                                     </TextArea>
-                                    <GridPane layoutY="127.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="700.0">
+                                    <GridPane layoutY="115.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="700.0">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="335.0" minWidth="10.0" prefWidth="335.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="335.0" minWidth="10.0" prefWidth="335.0" />

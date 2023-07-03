@@ -1,5 +1,4 @@
 package com.blck.MusicReleaseTracker;
-import java.sql.SQLException;
 
 /*      MusicReleaseTrcker
         Copyright (C) 2023 BLCK
@@ -17,7 +16,7 @@ import java.sql.SQLException;
 //this redundant class was used because of javafx crap not working despite having declared all modules correctly
 public class Main {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         RealMain.main(args);
     }
 

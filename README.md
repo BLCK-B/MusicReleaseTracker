@@ -10,8 +10,15 @@ Look at newest songs from individual sources, artist by artist, and see them all
 
 ### Setup
 
-**JDK is required**, specified during installation. In the program, add artists and for each artist insert links for individual sources according to instructions.
-After the initial setup, click refresh to start scraping.
+**Windows**: download and launch exe installer.
+
+**Linux**: jar is provided in tar. OpenJDK or alternative and OpenJFX are required. Direct way to launch the jar (where XXX is the name of the jar):
+```
+java --module-path "/usr/lib/jvm/openjfx" --add-modules=javafx.controls,javafx.fxml -jar XXX.jar
+```
+
+In the program, add artists and for each artist insert links for individual (optional) sources according to instructions.
+After the initial setup, click refresh button to start scraping.
 
 ### License
 

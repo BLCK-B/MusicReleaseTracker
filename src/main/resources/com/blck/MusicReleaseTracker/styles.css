@@ -42,6 +42,10 @@
     -fx-background-color: #2d2d2d;
     -fx-text-fill: white;
 }
+.currentlyScraped, .currentlyScraped:hover {
+    -fx-text-fill: #CCCCFF;
+    -fx-font-weight: bold;
+}
 .selected-row, .selected-row:hover {
     -fx-background-color: #CCCCFF;
     -fx-text-fill: black;
@@ -88,7 +92,7 @@
     -fx-highlight-text-fill: white;
     -fx-background-color: transparent;
     -fx-border-width: 2px;
-    -fx-border-color: #B1B1B1;
+    -fx-border-color: #656565;
     -fx-border-radius: 8px;
 }
 .button:hover {
@@ -127,6 +131,9 @@
     -fx-background-color: transparent;
     -fx-border-width: 0;
     -fx-focus-traversable: false;
+}
+#addconfirmButton, #addcancelButton, #beatportUrlButton, #brainzUrlButton, #junodownloadUrlButton {
+    -fx-border-color: transparent;
 }
 
 .progress-bar {
@@ -167,4 +174,8 @@
 
 .scroll-pane:focused {
     -fx-background-insets: 0;
+}
+#settingsScrollPane, #settingsAnchorPane {
+    -fx-padding: 0;
+    -fx-margin: 0;
 }

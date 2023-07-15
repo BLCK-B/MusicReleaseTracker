@@ -4,11 +4,11 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id "org.openjfx.javafxplugin" version "0.0.14"
     id 'org.beryx.jlink' version '2.25.0'
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group 'com.blck'
-version '3.0.0'
+version '4.0.0'
 
 repositories {
     mavenCentral()
@@ -86,7 +86,9 @@ shadowJar {
     exclude 'org/sqlite/native/Linux/arm/**'
     exclude 'org/sqlite/native/Linux/armv6/**'
     exclude 'org/sqlite/native/Linux/ppc64/**'
+    exclude 'org/sqlite/native/Linux/x86/**'
     exclude 'org/sqlite/native/Windows/aarch64/**'
+    exclude 'org/sqlite/native/Windows/x86/**'
     configurations = [project.configurations.runtimeClasspath, project.configurations.shadow]
     archiveClassifier.set('')
     manifest {

@@ -112,8 +112,10 @@ public class DBtools {
     }
 
     public static List<String> filterWords = new ArrayList<>();
+    public static int entriesLimit = 0;
 
-    public static void readFilters() {
+    public static void readCombviewConfig() {
+        //read filters
         filterWords.clear();
         Config config = ConfigFactory.parseFile(new File(ConfigPath));
         Config filtersConfig = config.getConfig("filters");
@@ -123,12 +125,18 @@ public class DBtools {
             if (enabled)
                 filterWords.add(filter);
         }
+        //read combviewlength
+        switch (config.getString("combviewlength")) {
+            case "short" -> entriesLimit = 7;
+            case "medium" -> entriesLimit = 14;
+            case "long" -> entriesLimit = 40;
+        }
     }
 
     public static void updateSettingsDB() {
         //create config if it does not exist, transfer data to new structure if update changed it
         //the int version should be changed on structure update (change of string templateContent)
-        final int version = 1;
+        final int version = 2;
         String templateContent =
                 "version=" + version + "\n" +
                         "filters {\n" +
@@ -138,7 +146,8 @@ public class DBtools {
                         "   Remaster=false\n" +
                         "   Remix=false\n" +
                         "   VIP=false\n" +
-                        "}";
+                        "}\n" +
+                        "combviewlength=short";
         File templateFile = new File(ConfigFolder + "/MRTsettingsTemplate.hocon");
         if (!templateFile.exists()) {
             try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {

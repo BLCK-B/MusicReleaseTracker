@@ -1,6 +1,9 @@
 package com.blck.MusicReleaseTracker;
 
-import com.typesafe.config.*;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigValueFactory;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,20 +13,24 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigValueFactory;
-import java.io.*;
-import java.net.SocketTimeoutException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*      MusicReleaseTrcker
         Copyright (C) 2023 BLCK
@@ -112,6 +119,18 @@ public class GUIController {
     @FXML
     public ImageView refreshButtonActive;
     @FXML
+    public Hyperlink linkGithub;
+    @FXML
+    public CheckBox CVlengthShort;
+    @FXML
+    public CheckBox CVlengthMedium;
+    @FXML
+    public CheckBox CVlengthLong;
+    @FXML
+    public AnchorPane settingsAnchorPane;
+    @FXML
+    public ScrollPane settingsScrollPane;
+    @FXML
     private ProgressBar progressbar;
     @FXML
     private TableView<TableModelcombview> combviewTable;
@@ -131,7 +150,7 @@ public class GUIController {
     private final ObservableList<String> dataList = FXCollections.observableArrayList();
     private final ObservableList<TableModel> dataTable = FXCollections.observableArrayList();
     private final ObservableList<TableModelcombview> dataTablecombview = FXCollections.observableArrayList();
-    private ListCell<String> lastClickedCell = null;
+    private ListCell<?> lastClickedCell = null;
     private String lastClickedArtist = null;
     private String selectedSource = null;
 
@@ -153,7 +172,7 @@ public class GUIController {
             e.printStackTrace();
         }
         try {
-            loadFiltersGUI();
+            loadConfigGUI();
         } catch (Exception e) {
             System.out.println("failed reflecting filters in GUI");
             e.printStackTrace();
@@ -202,6 +221,50 @@ public class GUIController {
             }
             }
 
+        });
+    }
+    public void currentlyScrapedArtist(String artistnamerow) {
+        artistList.setCellFactory(param -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String cellContent, boolean empty) {
+                super.updateItem(cellContent, empty);
+                if (empty || cellContent == null) {
+                    setText(null);
+                } else {
+                    setText(cellContent);
+                    getStyleClass().remove("currentlyScraped");
+                    if (cellContent.equals(artistnamerow)) {
+                        getStyleClass().add("currentlyScraped");
+                    }
+                }
+            }
+        });
+        artistList.setOnMousePressed(event -> {
+            String selectedArtist = artistList.getSelectionModel().getSelectedItem();
+            if (selectedArtist != null) {
+                try {
+                    artistClick(selectedArtist);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if (lastClickedCell != null) {
+                    lastClickedCell.getStyleClass().remove("selected-row");
+                }
+                ListCell<?> targetCell = (ListCell<?>) event.getTarget();
+                targetCell.getStyleClass().add("selected-row");
+                lastClickedCell = targetCell;
+                lastClickedArtist = selectedArtist;
+            }
+        });
+    }
+    public void removeScrapedCss() {
+        artistList.setCellFactory(param -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String cellContent, boolean empty) {
+                super.updateItem(cellContent, empty);
+                    setText(cellContent);
+                    getStyleClass().remove("currentlyScraped");
+                }
         });
     }
 
@@ -255,7 +318,7 @@ public class GUIController {
         pstmt =conn.prepareStatement(sql);
         pstmt.setString(1, lastClickedArtist);
         rs = pstmt.executeQuery();
-        // Loop through the result set and add each row to the data list
+        //loop through the result set and add each row to the data list
         while (rs.next()) {
             String col1Value = rs.getString("song");
             String col2Value = rs.getString("date");
@@ -274,10 +337,10 @@ public class GUIController {
         dataTablecombview.clear();
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
         //populating combview table
-        String sql = "SELECT * FROM combview ORDER BY date DESC LIMIT 39";
+        String sql = "SELECT * FROM combview ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet rs = pstmt.executeQuery();
-        // Loop through the result set and add each row to the data list
+        //loop through the result set and add each row to the data list
         while (rs.next()) {
             String col1Value = rs.getString("song");
             String col2Value = rs.getString("artist");
@@ -411,7 +474,7 @@ public class GUIController {
             loadTable();
         }
     }
-    public void clickBrainzUrlButton(MouseEvent mouseEvent) throws SQLException, IOException {
+    public void clickBrainzUrlButton(MouseEvent mouseEvent) {
         String sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
         String userInput = brainzUrlBar.getText();
         if (userInput.isEmpty() || userInput.isBlank())
@@ -431,7 +494,7 @@ public class GUIController {
         brainzUrlBar.clear();
         saveUrl(sql, userInput);
     }
-    public void clickBeatportUrlButton(MouseEvent mouseEvent) throws SQLException, IOException {
+    public void clickBeatportUrlButton(MouseEvent mouseEvent) {
         String sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
         String userInput = beatportUrlBar.getText();
         if (userInput.isEmpty() || userInput.isBlank())
@@ -449,11 +512,11 @@ public class GUIController {
         }
         else
             return;
-        userInput += "/tracks/?per-page=50";
+        userInput += "/tracks";
         beatportUrlBar.clear();
         saveUrl(sql, userInput);
     }
-    public void clickJunodownloadUrlButton(MouseEvent mouseEvent) throws SQLException, IOException {
+    public void clickJunodownloadUrlButton(MouseEvent mouseEvent) {
         String sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
         String userInput = junodownloadUrlbar.getText();
         if (userInput.isEmpty() || userInput.isBlank())
@@ -472,55 +535,71 @@ public class GUIController {
         hideWindows();
         saveUrl(sql, userInput);
     }
-    public void saveUrl(String sql, String userInput) throws SQLException, IOException {
+    public void saveUrl(String sql, String userInput) {
         //validation of links
-        Document doc = null;
-        try {
-            doc = Jsoup.connect(userInput).timeout(40000).get();
-        } catch (SocketTimeoutException e) {
-            System.out.println("link verification: task timed out");
-            return;
-        }
-        if (userInput.contains("musicbrainz.org"))
-        {
-            Elements songs = doc.select("[href*=/release/]");
-            String[] songsArray = songs.eachText().toArray(new String[0]);
-            songs.clear();
-            doc.empty();
-            if (songsArray == null)
+        Thread checkingThread = new Thread(() -> {
+            Document doc = null;
+            try {
+                doc = Jsoup.connect(userInput).timeout(40000).get();
+            } catch (IOException e) {
+                System.out.println("link verification: task timed out");
                 return;
-            hideWindows();
-        }
-        else if (userInput.contains("beatport.com"))
-        {
-            Elements songs = doc.select("span.buk-track-primary-title");
-            String[] songsArray = songs.eachText().toArray(new String[0]);
-            songs.clear();
-            doc.empty();
-            if (songsArray == null)
+            }
+            if (userInput.contains("musicbrainz.org"))
+            {
+                Elements songs = doc.select("[href*=/release/]");
+                String[] songsArray = songs.eachText().toArray(new String[0]);
+                songs.clear();
+                doc.empty();
+                if (songsArray.length == 0 || songsArray == null)
+                    return;
+                hideWindows();
+            }
+            else if (userInput.contains("beatport.com"))
+            {
+                Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
+                String JSON = script.first().data();
+                Pattern pattern = Pattern.compile(
+                        "\"mix_name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
+                                "\"name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
+                                "\"new_release_date\"\\s*:\\s*\"([^\"]+)\""
+                );
+                Matcher matcher = pattern.matcher(JSON);
+                List<String> songsArray = new ArrayList<>();
+                while (matcher.find()) {
+                    songsArray.add(matcher.group(2));
+                }
+                doc.empty();
+                script.clear();
+                if (songsArray.size() == 0 || songsArray == null)
+                    return;
+                hideWindows();
+            }
+            else if (userInput.contains("junodownload.com"))
+            {
+                Elements songs = doc.select("a.juno-title");
+                String[] songsArray = songs.eachText().toArray(new String[0]);
+                songs.clear();
+                doc.empty();
+                if (songsArray.length == 0 || songsArray == null)
+                    return;
+                hideWindows();
+            }
+            else
                 return;
-            hideWindows();
-        }
-        else if (userInput.contains("junodownload.com"))
-        {
-            Elements songs = doc.select("a.juno-title");
-            String[] songsArray = songs.eachText().toArray(new String[0]);
-            songs.clear();
-            doc.empty();
-            if (songsArray == null)
-                return;
-            hideWindows();
-        }
-        else
-            return;
-        //after passing check - save input
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, userInput);
-        pstmt.setString(2, lastClickedArtist);
-        pstmt.executeUpdate();
-        conn.close();
-        pstmt.close();
+
+            Platform.runLater(() -> {
+                try (Connection conn = DriverManager.getConnection(DBtools.DBpath);
+                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setString(1, userInput);
+                    pstmt.setString(2, lastClickedArtist);
+                    pstmt.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        });
+        checkingThread.start();
     }
 
     public void clickSettings(MouseEvent mouseEvent) {
@@ -561,8 +640,50 @@ public class GUIController {
         }
     }
 
-    public void loadFiltersGUI() {
-        //on startup reflect the state of filters in GUI
+    public void toggleCVlength(MouseEvent event) {
+        //change config combviewlength state on click
+        Config config = ConfigFactory.parseFile(new File(DBtools.ConfigPath));
+        CheckBox clickedCheckbox = (CheckBox) event.getSource();
+        String fxid = clickedCheckbox.getId();
+        String newValue = switch (fxid) {
+            case "CVlengthShort" -> {
+                CVlengthShort.setMouseTransparent(true);
+                CVlengthMedium.setMouseTransparent(false);
+                CVlengthLong.setMouseTransparent(false);
+                CVlengthMedium.setSelected(false);
+                CVlengthLong.setSelected(false);
+                yield "short";
+            }
+            case "CVlengthMedium" -> {
+                CVlengthMedium.setMouseTransparent(true);
+                CVlengthShort.setMouseTransparent(false);
+                CVlengthLong.setMouseTransparent(false);
+                CVlengthShort.setSelected(false);
+                CVlengthLong.setSelected(false);
+                yield "medium";
+            }
+            case "CVlengthLong" -> {
+                CVlengthLong.setMouseTransparent(true);
+                CVlengthMedium.setMouseTransparent(false);
+                CVlengthShort.setMouseTransparent(false);
+                CVlengthShort.setSelected(false);
+                CVlengthMedium.setSelected(false);
+                yield "long";
+            }
+            default -> throw new IllegalStateException("unexpected value");
+        };
+        config = config.withValue("combviewlength", ConfigValueFactory.fromAnyRef(newValue));
+        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.ConfigPath))) {
+            writer.write(config.root().render(renderOptions));
+        } catch (IOException e) {
+            System.out.println("could not save combviewlength change");
+            e.printStackTrace();
+        }
+    }
+
+    public void loadConfigGUI() {
+        //reflect the states of config in GUI
         Config config = ConfigFactory.parseFile(new File(DBtools.ConfigPath));
         Config filtersConfig = config.getConfig("filters");
         FilterRemix.setSelected(filtersConfig.getBoolean("Remix"));
@@ -571,6 +692,14 @@ public class GUIController {
         FilterRemaster.setSelected(filtersConfig.getBoolean("Remaster"));
         FilterAcoustic.setSelected(filtersConfig.getBoolean("Acoustic"));
         FilterInstrumental.setSelected(filtersConfig.getBoolean("Instrumental"));
+
+        String combviewlength = config.getString("combviewlength");
+        CVlengthShort.setSelected(combviewlength.equals("short"));
+        CVlengthMedium.setSelected(combviewlength.equals("medium"));
+        CVlengthLong.setSelected(combviewlength.equals("long"));
+        CVlengthShort.setMouseTransparent(CVlengthShort.isSelected());
+        CVlengthMedium.setMouseTransparent(CVlengthMedium.isSelected());
+        CVlengthLong.setMouseTransparent(CVlengthLong.isSelected());
     }
 
     public void clickScrapeButton(MouseEvent mouseEvent) {
@@ -628,6 +757,9 @@ public class GUIController {
         executor.execute(scrapeTask);
         executor.shutdown();
     }
+    public void clickScrapeCancel(MouseEvent mouseEvent) {
+        RealMain.scrapeCancel = true;
+    }
 
     public void hideWindows() {
         brainzUrlDiag.setVisible(false);
@@ -653,6 +785,7 @@ public class GUIController {
                 url = "https://junodownload.com";
                 junodownloadUrlbar.requestFocus();
             }
+            case "linkGithub" -> url = "https://github.com/BLCK-B/MusicReleaseTracker";
             default -> {
                 return;
             }

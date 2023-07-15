@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.jsoup.Jsoup;
@@ -14,7 +15,10 @@ import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*      MusicReleaseTrcker
         Copyright (C) 2023 BLCK
@@ -41,7 +45,7 @@ public class RealMain extends Application {
         Scene scene = new Scene(root);
         Image icon = new Image(getClass().getResourceAsStream("/MRTlogo.png"));
         primaryStage.getIcons().add(icon);
-        primaryStage.setTitle("Music Release Tracker");
+        primaryStage.setTitle("MusicReleaseTracker");
         primaryStage.setHeight(680);
         primaryStage.setWidth(800);
         primaryStage.setResizable(false);
@@ -71,8 +75,10 @@ public class RealMain extends Application {
 
     //entryLimit: how many entries per artist
     private static final int entryLimit = 15;
+    public static boolean scrapeCancel = false;
 
     public static void scrapeData() throws SQLException, InterruptedException {
+        scrapeCancel = false;
         //for each artistname: check 3 urls and load them into a list
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
         String sql = "SELECT artistname FROM artists";
@@ -101,7 +107,9 @@ public class RealMain extends Application {
         stmt.close();
         //list for storing source urls (incl null) of one artist at a time
         ArrayList<String> eachArtistUrls = new ArrayList<>();
+        ListView<String> artistList = new ListView<>();
         for (String artistnamerow : artistnameList) {
+            GUIController.currentlyScrapedArtist(artistnamerow);
             conn = DriverManager.getConnection(DBtools.DBpath);
             eachArtistUrls.clear();
             sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
@@ -124,15 +132,22 @@ public class RealMain extends Application {
             RSeachArtistUrls.close();
             //calling scrapers
             int i = 1;
-            for (String oneurl : eachArtistUrls)
-            {
+            for (String oneurl : eachArtistUrls) {
+                if (scrapeCancel) {
+                    eachArtistUrls.clear();
+                    artistnameList.clear();
+                    GUIController.removeScrapedCss();
+                    System.gc();
+                    return;
+                }
+
                 switch (i) {
                     case 1 -> {
                         if (oneurl != null) {
                             try {
                                 scrapeBrainz(oneurl, artistnamerow);
                             } catch (Exception e) {
-                                System.out.println("error scraping musicbrainz");
+                                System.out.println("error scraping musicbrainz - trying again");
                                 try {
                                     scrapeBrainz(oneurl, artistnamerow);
                                 } catch (Exception e2) {
@@ -147,7 +162,7 @@ public class RealMain extends Application {
                             try {
                                 scrapeBeatport(oneurl, artistnamerow);
                             } catch (Exception e) {
-                                System.out.println("error scraping beatport");
+                                System.out.println("error scraping beatport - trying again");
                                 try {
                                     scrapeBeatport(oneurl, artistnamerow);
                                 } catch (Exception e2) {
@@ -162,7 +177,7 @@ public class RealMain extends Application {
                             try {
                                 scrapeJunodownload(oneurl, artistnamerow);
                             } catch (Exception e) {
-                                System.out.println("error scraping junodownload");
+                                System.out.println("error scraping junodownload - trying again");
                                 try {
                                     scrapeBeatport(oneurl, artistnamerow);
                                 } catch (Exception e2) {
@@ -180,10 +195,12 @@ public class RealMain extends Application {
             double state = progress / artistnameList.size();
             GUIController.updateProgressBar(state);
         }
+        GUIController.removeScrapedCss();
         eachArtistUrls.clear();
         artistnameList.clear();
         System.gc();
     }
+
     private static void scrapeBrainz(String oneurl, String artistnamerow) throws IOException, SQLException {
         //scraper for musicbrainz
         Document doc = null;
@@ -245,26 +262,38 @@ public class RealMain extends Application {
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeBeatport timed out " + oneurl);
         }
-        Elements songs = doc.select("span.buk-track-primary-title");
-        Elements types = doc.select("span.buk-track-remixed");
-        Elements dates = doc.select("p.buk-track-released");
-        String[] songsArray = songs.eachText().toArray(new String[0]);
-        String[] typeArray = types.eachText().toArray(new String[0]);
-        String[] datesArray = dates.eachText().toArray(new String[0]);
+        //pattern matching to make sense of the mess that is JSON extracted from script
+        Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
+        String JSON = script.first().data();
+        Pattern pattern = Pattern.compile(
+                "\"mix_name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
+                        "\"name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
+                        "\"new_release_date\"\\s*:\\s*\"([^\"]+)\""
+        );
+        Matcher matcher = pattern.matcher(JSON);
+        List<String> typeArray = new ArrayList<>();
+        List<String> songsArray = new ArrayList<>();
+        List<String> datesArray = new ArrayList<>();
+        while (matcher.find()) {
+            typeArray.add(matcher.group(1));
+            songsArray.add(matcher.group(2).replace("\\u0026", "&"));
+            datesArray.add(matcher.group(3));
+        }
         doc.empty();
+
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
         //fill table
         int entriesInserted = 0;
         int i = 0;
         mainloop: while (entriesInserted < entryLimit) {
-            if (i == songsArray.length - 1)
+            if (i == songsArray.size())
                 break;
-            String songname = songsArray[i];
-            String songdate = datesArray[i + 1];
-            String songtype = typeArray[i];
+            String songname = songsArray.get(i);
+            String songdate = datesArray.get(i);
+            String songtype = typeArray.get(i);
             //checking if rereleased
-            for (int x = (songsArray.length - 1); x > i; x--) {
-                if (songname.equals(songsArray[x])) {
+            for (int x = songsArray.size() - 1; x > i; x--) {
+                if (songname.equals(songsArray.get(x))) {
                     i++;
                     continue mainloop;
                 }
@@ -290,13 +319,13 @@ public class RealMain extends Application {
             result.close();
         }
         conn.close();
-        songs.clear();
-        types.clear();
-        dates.clear();
+        script.clear();
+        JSON = null;
         songsArray = null;
         typeArray = null;
         datesArray = null;
     }
+
     private static void scrapeJunodownload(String oneurl, String artistnamerow) throws IOException, SQLException {
         //scraper for junodownload
         Document doc = null;
@@ -377,7 +406,6 @@ public class RealMain extends Application {
     public static void fillCombviewTable() throws SQLException {
         //assembles table for combined view with source-specific processing
         //checks entries from each source table from newest by date to entriesLimit: filters unwanted words, looks for duplicates
-        final int entriesLimit = 13;
         int entriesInserted = 0;
         //clear table
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
@@ -387,18 +415,20 @@ public class RealMain extends Application {
 
         ArrayList<String> insertedSongs = new ArrayList<>();
         ArrayList<String> insertedDates = new ArrayList<>();
+
         try {
-            DBtools.readFilters();
+            DBtools.readCombviewConfig();
         } catch (Exception e) {
-            System.out.println("Filters could not load: " + e);
+            System.out.println("Error loading combview config: " + e);
         }
+
         //beatport
         //fill source array
         sql = "SELECT * FROM beatport ORDER BY date DESC";
         stmt = conn.createStatement();
         ResultSet RSinsertSongs = stmt.executeQuery(sql);
         cycle: while (RSinsertSongs.next()) {
-            if (entriesInserted == entriesLimit)
+            if (entriesInserted == DBtools.entriesLimit)
                 break;
             String songname = RSinsertSongs.getString("song");
             String artist = RSinsertSongs.getString("artist");
@@ -435,7 +465,7 @@ public class RealMain extends Application {
         stmt = conn.createStatement();
         RSinsertSongs = stmt.executeQuery(sql);
         cycle: while (RSinsertSongs.next()) {
-            if (entriesInserted == entriesLimit)
+            if (entriesInserted == DBtools.entriesLimit)
                 break;
             String songname = RSinsertSongs.getString("song");
             String artist = RSinsertSongs.getString("artist");
@@ -469,7 +499,7 @@ public class RealMain extends Application {
         stmt = conn.createStatement();
         RSinsertSongs = stmt.executeQuery(sql);
         cycle: while (RSinsertSongs.next()) {
-            if (entriesInserted == entriesLimit)
+            if (entriesInserted == DBtools.entriesLimit)
                 break;
             String songname = RSinsertSongs.getString("song");
             String artist = RSinsertSongs.getString("artist");

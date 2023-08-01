@@ -7,6 +7,9 @@
 <p align="center">
 Efficient multi-source scraper that helps you find new music and follow latest songs. Available for windows, linux.
 </p>
+<p align="center">
+This program is in active development and is not quite there yet. If it does not work as expected, file an issue or check back later, thanks.
+</p>
 
 <p align="center">
   <a href="https://github.com/BLCK-B/MusicReleaseTracker/releases/latest">

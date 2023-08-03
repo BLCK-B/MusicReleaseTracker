@@ -540,7 +540,7 @@ public class GUIController {
         Thread checkingThread = new Thread(() -> {
             Document doc = null;
             try {
-                doc = Jsoup.connect(userInput).timeout(40000).get();
+                doc = Jsoup.connect(userInput).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
             } catch (IOException e) {
                 System.out.println("link verification: task timed out");
                 return;
@@ -571,7 +571,7 @@ public class GUIController {
                 }
                 doc.empty();
                 script.clear();
-                if (songsArray.size() == 0 || songsArray == null)
+                if (songsArray.isEmpty())
                     return;
                 hideWindows();
             }

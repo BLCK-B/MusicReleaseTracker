@@ -89,7 +89,7 @@ public class RealMain extends Application {
         while (artistnameResults.next()) {
             artistnameList.add(artistnameResults.getString("artistname"));
         }
-        if (artistnameList.size() == 0)
+        if (artistnameList.isEmpty())
             return;
         //clear entries from tables
         sql = "DELETE FROM musicbrainz";
@@ -205,7 +205,7 @@ public class RealMain extends Application {
         //scraper for musicbrainz
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneurl).timeout(40000).get();
+            doc = Jsoup.connect(oneurl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeBrainz timed out " + oneurl);
         }
@@ -258,7 +258,7 @@ public class RealMain extends Application {
         //scraper for beatport
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneurl).timeout(40000).get();
+            doc = Jsoup.connect(oneurl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeBeatport timed out " + oneurl);
         }
@@ -330,7 +330,7 @@ public class RealMain extends Application {
         //scraper for junodownload
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneurl).timeout(40000).get();
+            doc = Jsoup.connect(oneurl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeJunodownload timed out " + oneurl);
         }
@@ -405,7 +405,7 @@ public class RealMain extends Application {
 
     public static void fillCombviewTable() throws SQLException {
         //assembles table for combined view with source-specific processing
-        //checks entries from each source table from newest by date to entriesLimit: filters unwanted words, looks for duplicates
+        //checks entries from each source table from newest by date until entriesLimit: filters unwanted words, looks for duplicates
         int entriesInserted = 0;
         //clear table
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
@@ -436,8 +436,12 @@ public class RealMain extends Application {
             String songtype = RSinsertSongs.getString("type");
             //filtering words
             for (String checkword : DBtools.filterWords) {
-                if ((songtype.toLowerCase()).contains(checkword.toLowerCase()))
+                if ((songtype.toLowerCase()).contains(checkword.toLowerCase())) {
+                    //beatport has comprehensive song types while others not
+                    insertedSongs.add(songname.toLowerCase());
+                    insertedDates.add(date);
                     continue cycle;
+                }
                 if ((songname.toLowerCase()).contains(checkword.toLowerCase()))
                     continue cycle;
             }

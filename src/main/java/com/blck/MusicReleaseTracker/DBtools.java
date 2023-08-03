@@ -135,10 +135,13 @@ public class DBtools {
 
     public static void updateSettingsDB() {
         //create config if it does not exist, transfer data to new structure if update changed it
-        //the int version should be changed on structure update (change of string templateContent)
-        final int version = 2;
+        //version:settings and DBversion:database should be changed on any respective structure update
+        //to reflect DBversion change, version is changed too
+        final int DBversion = 1;
+        final int version = DBversion + 2;
         String templateContent =
                 "version=" + version + "\n" +
+                "DBversion=" + DBversion + "\n" +
                         "filters {\n" +
                         "   Acoustic=false\n" +
                         "   Extended=false\n" +
@@ -169,6 +172,7 @@ public class DBtools {
         int fileVersion = config.getInt("version");
         if (fileVersion != version) {
             //if different version > update template > transfer all possible data to template > replace files
+            System.out.println("updating settings structure");
             try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
                 writer.write(templateContent);
             } catch (IOException e) {

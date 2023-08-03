@@ -40,6 +40,8 @@ java --module-path "/usr/lib/jvm/openjfx" --add-modules=javafx.controls,javafx.f
 In the program, add artists and for each artist optionally insert links of sources according to instructions.
 After the initial setup, click refresh button to initiate the scraping process.
 
+**JDK not found issue [#5](https://github.com/BLCK-B/MusicReleaseTracker/issues/5)**: you can solve this by [downloading JDK here](https://www.oracle.com/java/technologies/downloads/#jdk20-windows). The folder named jdk-20 must be located at `C:\Program Files\Java\jdk-20` exactly. This solution is temporary.
+
 ### License
 
 MusicReleaseTracker is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

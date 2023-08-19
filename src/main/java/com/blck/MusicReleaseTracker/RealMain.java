@@ -13,10 +13,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,6 +153,9 @@ public class RealMain extends Application {
                                 }
                             }
                         }
+                        progress++;
+                        double state = progress / artistnameList.size() / 3;
+                        GUIController.updateProgressBar(state);
                     }
                     case 2 -> {
                         if (oneurl != null) {
@@ -171,6 +171,9 @@ public class RealMain extends Application {
                                 }
                             }
                         }
+                        progress++;
+                        double state = progress / artistnameList.size() / 3;
+                        GUIController.updateProgressBar(state);
                     }
                     case 3 -> {
                         if (oneurl != null) {
@@ -186,14 +189,14 @@ public class RealMain extends Application {
                                 }
                             }
                         }
+                        progress++;
+                        double state = progress / artistnameList.size() / 3;
+                        GUIController.updateProgressBar(state);
                         Thread.sleep(1200);
                     }
                 }
                 i++;
             }
-            progress++;
-            double state = progress / artistnameList.size();
-            GUIController.updateProgressBar(state);
         }
         GUIController.removeScrapedCss();
         eachArtistUrls.clear();
@@ -446,12 +449,15 @@ public class RealMain extends Application {
                     continue cycle;
             }
             //finding duplicates
-            if (insertedSongs.contains(songname.toLowerCase())) {
-                if (insertedDates.contains(date))
-                    continue;
+            for (String oneSong : insertedSongs) {
+                if (oneSong.contains(songname.toLowerCase())) {
+                    if (insertedDates.contains(date))
+                        continue cycle;
+                }
             }
             insertedSongs.add(songname.toLowerCase());
             insertedDates.add(date);
+
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -480,12 +486,15 @@ public class RealMain extends Application {
                     continue cycle;
             }
             //finding duplicates
-            if (insertedSongs.contains(songname.toLowerCase())) {
-                if (insertedDates.contains(date))
-                    continue;
+            for (String oneSong : insertedSongs) {
+                if (oneSong.contains(songname.toLowerCase())) {
+                    if (insertedDates.contains(date))
+                        continue cycle;
+                }
             }
             insertedSongs.add(songname.toLowerCase());
             insertedDates.add(date);
+
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -514,12 +523,15 @@ public class RealMain extends Application {
                     continue cycle;
             }
             //finding duplicates
-            if (insertedSongs.contains(songname.toLowerCase())) {
-                if (insertedDates.contains(date))
-                    continue;
+            for (String oneSong : insertedSongs) {
+                if (oneSong.contains(songname.toLowerCase())) {
+                    if (insertedDates.contains(date))
+                        continue cycle;
+                }
             }
             insertedSongs.add(songname.toLowerCase());
             insertedDates.add(date);
+
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -529,6 +541,7 @@ public class RealMain extends Application {
             pstmt.executeUpdate();
             entriesInserted++;
         }
+
         entriesInserted = 0;
         conn.close();
         stmt.close();

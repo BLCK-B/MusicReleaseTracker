@@ -1,14 +1,13 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.javamodularity.moduleplugin' version '1.8.12'
     id "org.openjfx.javafxplugin" version "0.0.14"
     id 'org.beryx.jlink' version '2.26.0'
     id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 group 'com.blck'
-version '4.1'
+version '4.2'
 
 repositories {
     mavenCentral()
@@ -34,7 +33,7 @@ application {
 }
 
 javafx {
-    version = '20.0.1'
+    version = '20.0.2'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 

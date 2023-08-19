@@ -137,10 +137,10 @@
     -fx-border-width: 0;
 }
 .progress-bar .track {
-    -fx-background-color: #2d2d2d;
+    -fx-background-color: transparent;
 }
 .progress-bar .bar {
-    -fx-background-color: #CCCCFF;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #CCCCFF, #b47dd4);
 }
 
 #settingsWindow, #fadeTables {

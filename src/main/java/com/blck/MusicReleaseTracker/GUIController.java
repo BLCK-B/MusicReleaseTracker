@@ -185,11 +185,9 @@ public class GUIController {
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists");
-        Set<String> set = new HashSet<>();
         while (rs.next()) {
-            set.add(rs.getString("artistname"));
+            dataList.add(rs.getString("artistname"));
         }
-        dataList.addAll(set);
         artistList.setItems(dataList.sorted());
         conn.close();
         stmt.close();
@@ -386,36 +384,61 @@ public class GUIController {
         hideWindows();
         artistInputField.clear();
     }
+    private boolean deleteConfirmation = false;
     public void clickDelete(MouseEvent mouseEvent) throws SQLException {
         //delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
-            Connection conn = DriverManager.getConnection(DBtools.DBpath);
-            String sql = "DELETE FROM artists WHERE artistname = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, lastClickedArtist);
-            pstmt.executeUpdate();
-            sql = "DELETE FROM musicbrainz WHERE artist = ?";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, lastClickedArtist);
-            pstmt.executeUpdate();
-            sql = "DELETE FROM beatport WHERE artist = ?";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, lastClickedArtist);
-            pstmt.executeUpdate();
-            sql = "DELETE FROM junodownload WHERE artist = ?";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, lastClickedArtist);
-            pstmt.executeUpdate();
-            conn.close();
-            pstmt.close();
-            loadList();
-            hideWindows();
-            RealMain.fillCombviewTable();
-            loadcombviewTable();
-            combviewButton.getStyleClass().add("filterclicked");
-            brainzButton.getStyleClass().remove("filterclicked");
-            beatportButton.getStyleClass().remove("filterclicked");
-            junodownloadButton.getStyleClass().remove("filterclicked");
+            if (!deleteConfirmation) {
+                deleteConfirmation = true;
+                deleteButton.setText("confirm");
+                return;
+            }
+            Thread deletionThread = new Thread(() -> {
+                try {
+                    Connection conn = DriverManager.getConnection(DBtools.DBpath);
+                    String sql = "DELETE FROM artists WHERE artistname = ?";
+                    PreparedStatement pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, lastClickedArtist);
+                    pstmt.executeUpdate();
+                    sql = "DELETE FROM musicbrainz WHERE artist = ?";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, lastClickedArtist);
+                    pstmt.executeUpdate();
+                    sql = "DELETE FROM beatport WHERE artist = ?";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, lastClickedArtist);
+                    pstmt.executeUpdate();
+                    sql = "DELETE FROM junodownload WHERE artist = ?";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, lastClickedArtist);
+                    pstmt.executeUpdate();
+                }
+                catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            Platform.runLater(() -> {
+                try {
+                    loadList();
+                    hideWindows();
+                    RealMain.fillCombviewTable();
+                    loadcombviewTable();
+                    combviewButton.getStyleClass().add("filterclicked");
+                    brainzButton.getStyleClass().remove("filterclicked");
+                    beatportButton.getStyleClass().remove("filterclicked");
+                    junodownloadButton.getStyleClass().remove("filterclicked");
+                }
+                catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            });
+            deletionThread.start();
+        }
+    }
+    public void onDeleteExited(MouseEvent mouseEvent) {
+        if (deleteConfirmation) {
+            deleteConfirmation = false;
+            deleteButton.setText("delete");
         }
     }
 
@@ -705,8 +728,8 @@ public class GUIController {
     public void clickScrapeButton(MouseEvent mouseEvent) {
         //amogus threading
         hideWindows();
-        addButton.setVisible(false);
-        deleteButton.setVisible(false);
+        addButton.setMouseTransparent(true);
+        deleteButton.setMouseTransparent(true);
         refreshButton.setMouseTransparent(true);
         refreshButtonActive.setVisible(true);
         settingsButton.setMouseTransparent(true);
@@ -729,8 +752,8 @@ public class GUIController {
             refreshButton.setMouseTransparent(false);
             refreshButtonActive.setVisible(false);
             settingsButton.setMouseTransparent(false);
-            deleteButton.setVisible(true);
-            addButton.setVisible(true);
+            deleteButton.setMouseTransparent(false);
+            addButton.setMouseTransparent(false);
             progressbar.setVisible(false);
             try {
                 RealMain.fillCombviewTable();

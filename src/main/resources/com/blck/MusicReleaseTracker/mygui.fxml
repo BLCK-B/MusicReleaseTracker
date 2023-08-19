@@ -32,7 +32,7 @@
    <center>
       <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox cache="true" cacheHint="SPEED" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="197.0" prefHeight="625.0" prefWidth="197.0" StackPane.alignment="TOP_LEFT">
+            <VBox cache="true" cacheHint="SPEED" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="197.0" prefHeight="625.0" prefWidth="204.0" StackPane.alignment="TOP_LEFT">
                <children>
                   <StackPane cache="true" cacheHint="SPEED" prefHeight="38.0" prefWidth="200.0">
                      <children>
@@ -40,15 +40,15 @@
                            <children>
                               <Button fx:id="addButton" cache="true" cacheHint="SPEED" contentDisplay="CENTER" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#clickAdd" prefHeight="30.0" prefWidth="80.0" text="add">
                                  <HBox.margin>
-                                    <Insets left="15.0" right="5.0" />
+                                    <Insets left="15.0" right="5.0" top="1.0" />
                                  </HBox.margin>
                                  <padding>
                                     <Insets bottom="1.0" />
                                  </padding>
                               </Button>
-                              <Button fx:id="deleteButton" cache="true" cacheHint="SPEED" contentDisplay="CENTER" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#clickDelete" prefHeight="30.0" prefWidth="80.0" text="delete">
+                              <Button fx:id="deleteButton" cache="true" cacheHint="SPEED" contentDisplay="CENTER" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#clickDelete" onMouseExited="#onDeleteExited" prefHeight="30.0" prefWidth="80.0" text="delete">
                                  <HBox.margin>
-                                    <Insets left="1.0" right="1.0" />
+                                    <Insets left="1.0" right="1.0" top="1.0" />
                                  </HBox.margin>
                                  <padding>
                                     <Insets bottom="1.0" />
@@ -56,15 +56,11 @@
                               </Button>
                            </children>
                         </HBox>
-                        <ProgressBar fx:id="progressbar" cache="true" cacheHint="SPEED" mouseTransparent="true" prefHeight="22.0" prefWidth="150.0" progress="0.0" visible="false">
-                           <StackPane.margin>
-                              <Insets />
-                           </StackPane.margin></ProgressBar>
                      </children>
                   </StackPane>
-                  <ListView fx:id="artistList" cache="true" cacheHint="SPEED" maxHeight="1.7976931348623157E308" prefHeight="633.0" prefWidth="197.0" VBox.vgrow="ALWAYS">
+                  <ListView fx:id="artistList" cache="true" cacheHint="SPEED" maxHeight="1.7976931348623157E308" prefHeight="603.0" prefWidth="203.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>
-                        <Insets top="2.0" />
+                        <Insets bottom="8.0" left="-3.0" top="2.0" />
                      </VBox.margin>
                   </ListView>
                </children>
@@ -450,6 +446,11 @@
                   <Insets />
                </StackPane.margin>
             </StackPane>
+            <ProgressBar fx:id="progressbar" cache="true" cacheHint="SPEED" mouseTransparent="true" prefHeight="10.0" prefWidth="785.0" progress="0.0" visible="false" StackPane.alignment="BOTTOM_CENTER">
+               <StackPane.margin>
+                  <Insets bottom="-2.0" />
+               </StackPane.margin>
+            </ProgressBar>
          </children>
          <BorderPane.margin>
             <Insets top="4.0" />

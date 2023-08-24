@@ -40,6 +40,8 @@ java --module-path "/usr/lib/jvm/openjfx" --add-modules=javafx.controls,javafx.f
 In the program, add artists and for each artist optionally insert links of sources according to instructions.
 After the initial setup, click refresh button to initiate the scraping process.
 
+**Zero trust**: Hash check is not really possible unless you compile from source: used are launch4j and NSIS (script included). To avoid granting admin permission, download and unzip the installer. You can run the exe, but ensure a folder *MusicReleaseTracker* exists in appdata. Note the JDK issue.
+
 **JDK not found issue [#5](https://github.com/BLCK-B/MusicReleaseTracker/issues/5)**: you can solve this by [downloading JDK here](https://www.oracle.com/java/technologies/downloads/#jdk20-windows). The folder named jdk-20 must be located at `C:\Program Files\Java\jdk-20` exactly. This solution is temporary.
 
 ### License

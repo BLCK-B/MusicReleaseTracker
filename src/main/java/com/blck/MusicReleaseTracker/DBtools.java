@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,22 +26,17 @@ import com.typesafe.config.*;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-//class for essential tasks
+//class for essential tasks, mostly filesystem
 public class DBtools {
     public static String DBpath;
+    public static String TempDBPath;
     public static String ConfigPath;
     public static String ConfigFolder;
 
     public static void path() {
         String os = System.getProperty("os.name").toLowerCase();
-        String ide = System.getProperty("ide.environment");
 
-        if (ide != null && ide.equals("IDE")) { //IDE
-            String appDataPath = System.getenv("APPDATA");
-            DBpath = "jdbc:sqlite:musicdata.db";
-            ConfigPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
-            ConfigFolder = appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
-        } else if (os.contains("win")) { //Windows
+        if (os.contains("win")) { //Windows
             String appDataPath = System.getenv("APPDATA");
             DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "musicdata.db";
             ConfigPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
@@ -59,7 +51,7 @@ public class DBtools {
             ConfigFolder = userHome + File.separator + ".MusicReleaseTracker" + File.separator;
         }
         else
-            throw new UnsupportedOperationException("unsupported OS");
+            throw new UnsupportedOperationException("unsupported environment");
     }
 
     public static void createTables() throws SQLException {

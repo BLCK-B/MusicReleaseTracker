@@ -1,19 +1,18 @@
 package com.blck.MusicReleaseTracker;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,44 +29,31 @@ import java.util.regex.Pattern;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class RealMain extends Application {
+public class MainBackend {
 
-    private static GUIController GUIController;
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/blck/MusicReleaseTracker/mygui.fxml"));
-        Parent root = loader.load();
-        GUIController = loader.getController();
-        Scene scene = new Scene(root);
-        Image icon = new Image(getClass().getResourceAsStream("/MRTlogo.png"));
-        primaryStage.getIcons().add(icon);
-        primaryStage.setTitle("MusicReleaseTracker");
-        primaryStage.setHeight(680);
-        primaryStage.setWidth(800);
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        try {
-            DBtools.path();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    @Component
+    public static class StartupRunner implements CommandLineRunner {
+        //on startup of springboot server
+        @Override
+        public void run(String... args) {
+            System.out.println("SERVER STARTED");
+            try {
+                DBtools.path();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                DBtools.createTables();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                DBtools.updateSettingsDB();
+            } catch (Exception e) {
+                System.out.println("error handling config file");
+                e.printStackTrace();
+            }
         }
-        try {
-            DBtools.createTables();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            DBtools.updateSettingsDB();
-        } catch (Exception e) {
-            System.out.println("error handling config file");
-            e.printStackTrace();
-        }
-        launch(args);
     }
 
     //entryLimit: how many entries per artist
@@ -104,9 +90,7 @@ public class RealMain extends Application {
         stmt.close();
         //list for storing source urls (incl null) of one artist at a time
         ArrayList<String> eachArtistUrls = new ArrayList<>();
-        ListView<String> artistList = new ListView<>();
         for (String artistnamerow : artistnameList) {
-            GUIController.currentlyScrapedArtist(artistnamerow);
             conn = DriverManager.getConnection(DBtools.DBpath);
             eachArtistUrls.clear();
             sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
@@ -133,7 +117,6 @@ public class RealMain extends Application {
                 if (scrapeCancel) {
                     eachArtistUrls.clear();
                     artistnameList.clear();
-                    GUIController.removeScrapedCss();
                     System.gc();
                     return;
                 }
@@ -153,9 +136,6 @@ public class RealMain extends Application {
                                 }
                             }
                         }
-                        progress++;
-                        double state = progress / artistnameList.size() / 3;
-                        GUIController.updateProgressBar(state);
                     }
                     case 2 -> {
                         if (oneurl != null) {
@@ -171,9 +151,6 @@ public class RealMain extends Application {
                                 }
                             }
                         }
-                        progress++;
-                        double state = progress / artistnameList.size() / 3;
-                        GUIController.updateProgressBar(state);
                     }
                     case 3 -> {
                         if (oneurl != null) {
@@ -189,16 +166,14 @@ public class RealMain extends Application {
                                 }
                             }
                         }
-                        progress++;
-                        double state = progress / artistnameList.size() / 3;
-                        GUIController.updateProgressBar(state);
                         Thread.sleep(1200);
                     }
                 }
                 i++;
             }
+            progress++;
+            double state = progress / artistnameList.size();
         }
-        GUIController.removeScrapedCss();
         eachArtistUrls.clear();
         artistnameList.clear();
         System.gc();
@@ -359,13 +334,13 @@ public class RealMain extends Application {
         //loop over the dates, format them
         for (int i = 0; i < dates.size(); i++) {
             try {
-            String dateStr = dates.get(i).outerHtml().substring(dates.get(i).outerHtml().indexOf("<br>") + 4, dates.get(i).outerHtml().lastIndexOf("<br>")).trim();
-            String[] parts = dateStr.split(" ");
-            String month = parts[1];
-            String monthNumber = monthMap.get(month);
-            String result = null;
-            result = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
-            datesArray[i] = result;
+                String dateStr = dates.get(i).outerHtml().substring(dates.get(i).outerHtml().indexOf("<br>") + 4, dates.get(i).outerHtml().lastIndexOf("<br>")).trim();
+                String[] parts = dateStr.split(" ");
+                String month = parts[1];
+                String monthNumber = monthMap.get(month);
+                String result = null;
+                result = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
+                datesArray[i] = result;
             } catch (Exception e) {
                 datesArray[i] = null;
             }
@@ -449,15 +424,12 @@ public class RealMain extends Application {
                     continue cycle;
             }
             //finding duplicates
-            for (String oneSong : insertedSongs) {
-                if (oneSong.contains(songname.toLowerCase())) {
-                    if (insertedDates.contains(date))
-                        continue cycle;
-                }
+            if (insertedSongs.contains(songname.toLowerCase())) {
+                if (insertedDates.contains(date))
+                    continue;
             }
             insertedSongs.add(songname.toLowerCase());
             insertedDates.add(date);
-
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -486,15 +458,12 @@ public class RealMain extends Application {
                     continue cycle;
             }
             //finding duplicates
-            for (String oneSong : insertedSongs) {
-                if (oneSong.contains(songname.toLowerCase())) {
-                    if (insertedDates.contains(date))
-                        continue cycle;
-                }
+            if (insertedSongs.contains(songname.toLowerCase())) {
+                if (insertedDates.contains(date))
+                    continue;
             }
             insertedSongs.add(songname.toLowerCase());
             insertedDates.add(date);
-
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -523,15 +492,12 @@ public class RealMain extends Application {
                     continue cycle;
             }
             //finding duplicates
-            for (String oneSong : insertedSongs) {
-                if (oneSong.contains(songname.toLowerCase())) {
-                    if (insertedDates.contains(date))
-                        continue cycle;
-                }
+            if (insertedSongs.contains(songname.toLowerCase())) {
+                if (insertedDates.contains(date))
+                    continue;
             }
             insertedSongs.add(songname.toLowerCase());
             insertedDates.add(date);
-
             //success: adding to combview table
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -541,7 +507,6 @@ public class RealMain extends Application {
             pstmt.executeUpdate();
             entriesInserted++;
         }
-
         entriesInserted = 0;
         conn.close();
         stmt.close();

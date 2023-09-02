@@ -18,15 +18,14 @@ import javafx.scene.layout.StackPane;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -330,10 +329,31 @@ public class GUIController {
         pstmt.close();
         rs.close();
     }
+    //  .table-view .table-cell
     public void loadcombviewTable() throws SQLException {
         combviewTable.setVisible(true);
         dataTablecombview.clear();
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        //getting number of future releases
+        /*String sql = "SELECT COUNT(*) FROM combview WHERE date > ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, String.valueOf(String.valueOf(LocalDate.now())));
+        ResultSet result = pstmt.executeQuery();
+        int futureReleases = result.getInt(1);
+        //highlighting future releases
+        if (futureReleases > 0) {
+            combviewTable.setRowFactory(tableView -> new TableRow<TableModelcombview>() {
+                @Override
+                protected void updateIndex(int index) {
+                    super.updateIndex(index);
+                    if (index >= 0 && index < getTableView().getItems().size()) {
+                        TableRow<TableModelcombview> currentRow = getTableView().getItems().get(index);
+                        currentRow.getStyleClass().add("table-view");
+                        currentRow.getStyleClass().add("table-cell");
+                    }
+                }
+            });
+        }*/
         //populating combview table
         String sql = "SELECT * FROM combview ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -385,7 +405,7 @@ public class GUIController {
         artistInputField.clear();
     }
     private boolean deleteConfirmation = false;
-    public void clickDelete(MouseEvent mouseEvent) throws SQLException {
+    public void clickDelete(MouseEvent mouseEvent) {
         //delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
             if (!deleteConfirmation) {

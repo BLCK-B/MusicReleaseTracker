@@ -37,14 +37,8 @@ public class DBtools {
 
     public static void path() {
         String os = System.getProperty("os.name").toLowerCase();
-        String ide = System.getProperty("ide.environment");
 
-        if (ide != null && ide.equals("IDE")) { //IDE
-            String appDataPath = System.getenv("APPDATA");
-            DBpath = "jdbc:sqlite:musicdata.db";
-            ConfigPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
-            ConfigFolder = appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
-        } else if (os.contains("win")) { //Windows
+        if (os.contains("win")) { //Windows
             String appDataPath = System.getenv("APPDATA");
             DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "musicdata.db";
             ConfigPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";

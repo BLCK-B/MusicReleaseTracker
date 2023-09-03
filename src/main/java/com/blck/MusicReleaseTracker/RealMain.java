@@ -188,32 +188,13 @@ public class RealMain extends Application {
         Elements dates = doc.select("ul.release-events > li:first-child").select("span.release-date");
         String[] songsArray = songs.eachText().toArray(new String[0]);
         String[] datesArray = dates.eachText().toArray(new String[0]);
+        String[] typesArray = null;
         doc.empty();
 
         Collections.reverse(Arrays.asList(songsArray));
         Collections.reverse(Arrays.asList(datesArray));
-        //loop that fills SongClassList with song objects, up to entryLimit, and avoids duplicates
-        ArrayList<SongClass> SongClassList = new ArrayList<>();
-        ArrayList<String> previousNames = new ArrayList<>();
-        int inserted = 0;
-        int i = 0;
-        while (inserted < entryLimit) {
-            if (i == songsArray.length)
-                break;
 
-            String songName = songsArray[i];
-            String songDate = datesArray[i];
-            i++;
-
-            if (previousNames.contains(songName.toLowerCase()))
-                continue;
-
-            SongClassList.add(new SongClass(songName, songArtist, songDate));
-            previousNames.add(songName.toLowerCase());
-            inserted++;
-        }
-        //insert data into musicbrainz table
-        insertSet(SongClassList, "musicbrainz");
+        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "musicbrainz");
 
         songs.clear();
         dates.clear();
@@ -239,45 +220,31 @@ public class RealMain extends Application {
                         "\"new_release_date\"\\s*:\\s*\"([^\"]+)\""
         );
         Matcher matcher = pattern.matcher(JSON);
-        ArrayList<String> typeArray = new ArrayList<>();
-        ArrayList<String> songsArray = new ArrayList<>();
-        ArrayList<String> datesArray = new ArrayList<>();
+        ArrayList<String> typesArrayList = new ArrayList<>();
+        ArrayList<String> songsArrayList = new ArrayList<>();
+        ArrayList<String> datesArrayList = new ArrayList<>();
+
         while (matcher.find()) {
-            typeArray.add(matcher.group(1));
-            songsArray.add(matcher.group(2).replace("\\u0026", "&"));
-            datesArray.add(matcher.group(3));
+            typesArrayList.add(matcher.group(1));
+            songsArrayList.add(matcher.group(2).replace("\\u0026", "&"));
+            datesArrayList.add(matcher.group(3));
         }
         doc.empty();
+        //converting lists to arrays, to pass them to universal method
+        String[] typesArray = typesArrayList.toArray(new String[0]);
+        String[] songsArray = songsArrayList.toArray(new String[0]);
+        String[] datesArray = datesArrayList.toArray(new String[0]);
 
-        //loop that fills SongClassList with song objects, up to entryLimit, and avoids duplicates
-        ArrayList<SongClass> SongClassList = new ArrayList<>();
-        ArrayList<String> previousNames = new ArrayList<>();
-        int inserted = 0;
-        int i = 0;
-        while (inserted < entryLimit) {
-            if (i == songsArray.size())
-                break;
-
-            String songName = songsArray.get(i);
-            String songDate = datesArray.get(i);
-            String songType = typeArray.get(i);
-            i++;
-
-            if (previousNames.contains(songName.toLowerCase()))
-                continue;
-
-            SongClassList.add(new SongClass(songName, songArtist, songDate, songType));
-            previousNames.add(songName.toLowerCase());
-            inserted++;
-        }
-        //insert data into beatport table
-        insertSet(SongClassList, "beatport");
+        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "beatport");
 
         script.clear();
         JSON = null;
-        songsArray.clear();
-        typeArray.clear();
-        datesArray.clear();
+        songsArrayList.clear();
+        typesArrayList.clear();
+        datesArrayList.clear();
+        datesArray = null;
+        songsArray = null;
+        typesArray = null;
     }
 
     private static void scrapeJunodownload(String oneurl, String songArtist) throws IOException {
@@ -308,6 +275,7 @@ public class RealMain extends Application {
         monthMap.put("Nov", "11");
         monthMap.put("Dec", "12");
         String[] datesArray = new String[dates.size()];
+        String[] typesArray = null;
         //loop over the dates, format them
         for (int i = 0; i < dates.size(); i++) {
             try {
@@ -322,7 +290,16 @@ public class RealMain extends Application {
             }
         }
 
-        //loop that fills SongClassList with song objects, up to entryLimit, and avoids duplicates
+        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "junodownload");
+
+        songs.clear();
+        dates.clear();
+        songsArray = null;
+        datesArray = null;
+    }
+
+    public static void fillSongClassList(String[] songsArray, String[] datesArray, String[] typesArray, String songArtist, String source) {
+        //loop that fills SongClassList with song objects, up to entryLimit
         ArrayList<SongClass> SongClassList = new ArrayList<>();
         ArrayList<String> previousNames = new ArrayList<>();
         int inserted = 0;
@@ -331,22 +308,37 @@ public class RealMain extends Application {
             if (i == songsArray.length)
                 break;
 
-            String songName = songsArray[i];
-            String songDate = datesArray[i];
-            i++;
+            String songName = null;
+            String songDate = null;
+            String songType = null;
+            if (source.equals("musicbrainz") || (source.equals("junodownload"))) {
+                songName = songsArray[i];
+                songDate = datesArray[i];
+            }
+            else if (source.equals("beatport")) {
+                songName = songsArray[i];
+                songDate = datesArray[i];
+                songType = typesArray[i];
+            }
 
+            i++;
+            //avoid duplicates
             if (previousNames.contains(songName.toLowerCase()))
                 continue;
 
-            SongClassList.add(new SongClass(songName, songArtist, songDate));
+            if (source.equals("musicbrainz") || (source.equals("junodownload"))) {
+                SongClassList.add(new SongClass(songName, songArtist, songDate));
+            }
+            else if (source.equals("beatport")) {
+                SongClassList.add(new SongClass(songName, songArtist, songDate, songType));
+            }
+            //keep track of added
             previousNames.add(songName.toLowerCase());
             inserted++;
         }
-        //insert data into junodownload table
-        insertSet(SongClassList, "junodownload");
+        //pass objects to insert data into source table
+        insertSet(SongClassList, source);
 
-        songs.clear();
-        dates.clear();
         songsArray = null;
         datesArray = null;
     }

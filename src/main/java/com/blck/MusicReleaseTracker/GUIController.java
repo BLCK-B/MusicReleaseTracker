@@ -132,13 +132,13 @@ public class GUIController {
     @FXML
     private ProgressBar progressbar;
     @FXML
-    private TableView<TableModelcombview> combviewTable;
+    private TableView<TableModelCombview> combviewTable;
     @FXML
-    public TableColumn<TableModelcombview, String> songColCombview;
+    public TableColumn<TableModelCombview, String> songColCombview;
     @FXML
-    public TableColumn<TableModelcombview, String> artistColCombview;
+    public TableColumn<TableModelCombview, String> artistColCombview;
     @FXML
-    public TableColumn<TableModelcombview, String> dateColCombview;
+    public TableColumn<TableModelCombview, String> dateColCombview;
     @FXML
     private TableView<TableModel> mainTable;
     @FXML
@@ -148,7 +148,7 @@ public class GUIController {
 
     private final ObservableList<String> dataList = FXCollections.observableArrayList();
     private final ObservableList<TableModel> dataTable = FXCollections.observableArrayList();
-    private final ObservableList<TableModelcombview> dataTablecombview = FXCollections.observableArrayList();
+    private final ObservableList<TableModelCombview> dataTablecombview = FXCollections.observableArrayList();
     private ListCell<?> lastClickedCell = null;
     private String lastClickedArtist = null;
     private String selectedSource = null;
@@ -363,7 +363,7 @@ public class GUIController {
             String col1Value = rs.getString("song");
             String col2Value = rs.getString("artist");
             String col3Value = rs.getString("date");
-            dataTablecombview.add(new TableModelcombview(col1Value, col2Value, col3Value));
+            dataTablecombview.add(new TableModelCombview(col1Value, col2Value, col3Value));
         }
         songColCombview.setCellValueFactory(new PropertyValueFactory<>("column1"));
         artistColCombview.setCellValueFactory(new PropertyValueFactory<>("column2"));

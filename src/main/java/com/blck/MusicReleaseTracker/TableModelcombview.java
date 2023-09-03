@@ -14,23 +14,14 @@ import javafx.beans.property.SimpleStringProperty;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class TableModelcombview {
-    private final SimpleStringProperty column1;
-    private final SimpleStringProperty column2;
+public class TableModelCombview extends TableModel {
     private final SimpleStringProperty column3;
 
-    public TableModelcombview(String column1, String column2, String column3) {
-        this.column1 = new SimpleStringProperty(column1);
-        this.column2 = new SimpleStringProperty(column2);
+    public TableModelCombview(String column1, String column2, String column3) {
+        super(column1, column2);
         this.column3 = new SimpleStringProperty(column3);
     }
 
-    public String getColumn1() {
-        return column1.get();
-    }
-    public String getColumn2() {
-        return column2.get();
-    }
     public String getColumn3() {
         return column3.get();
     }

@@ -1,13 +1,12 @@
 ---
-name: Bug report
-about: Bug report
+name: Critical
+about: Changes on the side of sources or other faults causing program unable to function
 title: ''
-labels: bug
+labels: critical
 assignees: ''
 
 ---
 
-Check that this issue or similar does not already exist.
 What is your environment / OS?
 
 Describe your issue and steps to reproduce or a screenshot.

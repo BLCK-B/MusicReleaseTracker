@@ -130,7 +130,7 @@ public class DBtools {
     public static void updateSettingsDB() {
         //create config if it does not exist, transfer data to new structure if update changed it
         //version:settings and DBversion:database should be changed on any respective structure update
-        //to reflect DBversion change, version is changed too
+        //to reflect DBversion change, settings version is changed too
         final int DBversion = 1;
         final int version = DBversion + 2;
         String templateContent =

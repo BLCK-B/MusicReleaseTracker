@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -334,26 +335,30 @@ public class GUIController {
         combviewTable.setVisible(true);
         dataTablecombview.clear();
         Connection conn = DriverManager.getConnection(DBtools.DBpath);
-        //getting number of future releases
-        /*String sql = "SELECT COUNT(*) FROM combview WHERE date > ?";
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, String.valueOf(String.valueOf(LocalDate.now())));
-        ResultSet result = pstmt.executeQuery();
-        int futureReleases = result.getInt(1);
         //highlighting future releases
-        if (futureReleases > 0) {
-            combviewTable.setRowFactory(tableView -> new TableRow<TableModelcombview>() {
-                @Override
-                protected void updateIndex(int index) {
-                    super.updateIndex(index);
-                    if (index >= 0 && index < getTableView().getItems().size()) {
-                        TableRow<TableModelcombview> currentRow = getTableView().getItems().get(index);
-                        currentRow.getStyleClass().add("table-view");
-                        currentRow.getStyleClass().add("table-cell");
+        try {
+            String sql = "SELECT COUNT(*) FROM combview WHERE date > ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, String.valueOf(String.valueOf(LocalDate.now())));
+            ResultSet result = pstmt.executeQuery();
+            int futureReleases = result.getInt(1);
+            if (futureReleases > 0) {
+                combviewTable.setRowFactory(tableView -> new TableRow<TableModelCombview>() {
+                    @Override
+                    public void updateIndex(int index) {
+                        super.updateIndex(index);
+                        if (index >= 0 && index < futureReleases) {
+                            setStyle("-fx-opacity: 0.5;");
+                        } else {
+                            setStyle("");
+                        }
                     }
-                }
-            });
-        }*/
+                });
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         //populating combview table
         String sql = "SELECT * FROM combview ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -777,7 +782,7 @@ public class GUIController {
             progressbar.setVisible(false);
             try {
                 RealMain.fillCombviewTable();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             if (lastClickedArtist != null && selectedSource != null) {

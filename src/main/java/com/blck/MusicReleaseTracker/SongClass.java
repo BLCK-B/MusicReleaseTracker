@@ -36,7 +36,12 @@ public class SongClass {
 
     @Override
     public String toString() {
-        return songName +" "+ songArtist +" "+ songDate +" "+ songType;
+        if (this.songType != null)
+            return songName +" "+ songArtist +" "+ songDate +" "+ songType;
+        if (this.songType == null)
+            return songName +" "+ songArtist +" "+ songDate;
+
+        return null;
     }
 
 }

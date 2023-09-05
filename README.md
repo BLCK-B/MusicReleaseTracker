@@ -19,7 +19,7 @@ This program is in active development and is not quite there yet. If it does not
 
 ##
 
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/2299bf41-7b3f-4992-86b6-d828b8ff23b7" width="600px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/689c6c97-73b3-4482-9139-3d4107d1ae35" width="600px"/>
 
 ##
 

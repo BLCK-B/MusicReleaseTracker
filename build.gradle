@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'com.blck'
-version '4.2'
+version '5'
 
 repositories {
     mavenCentral()

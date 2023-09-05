@@ -12,27 +12,30 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*      MusicReleaseTrcker
+/*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -133,13 +136,13 @@ public class GUIController {
     @FXML
     private ProgressBar progressbar;
     @FXML
-    private TableView<TableModelcombview> combviewTable;
+    private TableView<TableModelCombview> combviewTable;
     @FXML
-    public TableColumn<TableModelcombview, String> songColCombview;
+    public TableColumn<TableModelCombview, String> songColCombview;
     @FXML
-    public TableColumn<TableModelcombview, String> artistColCombview;
+    public TableColumn<TableModelCombview, String> artistColCombview;
     @FXML
-    public TableColumn<TableModelcombview, String> dateColCombview;
+    public TableColumn<TableModelCombview, String> dateColCombview;
     @FXML
     private TableView<TableModel> mainTable;
     @FXML
@@ -149,7 +152,7 @@ public class GUIController {
 
     private final ObservableList<String> dataList = FXCollections.observableArrayList();
     private final ObservableList<TableModel> dataTable = FXCollections.observableArrayList();
-    private final ObservableList<TableModelcombview> dataTablecombview = FXCollections.observableArrayList();
+    private final ObservableList<TableModelCombview> dataTablecombview = FXCollections.observableArrayList();
     private ListCell<?> lastClickedCell = null;
     private String lastClickedArtist = null;
     private String selectedSource = null;
@@ -182,7 +185,7 @@ public class GUIController {
     public void loadList() throws SQLException {
         dataList.clear();
         //populating artist list - from table "artists"
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists");
         while (rs.next()) {
@@ -271,7 +274,7 @@ public class GUIController {
         hideWindows();
         combviewTable.setVisible(false);
         //url existence check
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         String sql = null;
         switch (selectedSource) {
             case "musicbrainz" -> sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
@@ -305,9 +308,9 @@ public class GUIController {
                 return;
             }
         }
-
+        conn.close();
         //populating table - for given artist and given source - launched every list and source click
-        conn = DriverManager.getConnection(DBtools.DBpath);
+        conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         switch (selectedSource) {
             case "musicbrainz" -> sql = "SELECT song, date FROM musicbrainz WHERE artist = ? ORDER BY date DESC";
             case "beatport" -> sql = "SELECT song, date FROM beatport WHERE artist = ? ORDER BY date DESC";
@@ -330,10 +333,11 @@ public class GUIController {
         pstmt.close();
         rs.close();
     }
+
     public void loadcombviewTable() throws SQLException {
         combviewTable.setVisible(true);
         dataTablecombview.clear();
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         //populating combview table
         String sql = "SELECT * FROM combview ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -343,7 +347,7 @@ public class GUIController {
             String col1Value = rs.getString("song");
             String col2Value = rs.getString("artist");
             String col3Value = rs.getString("date");
-            dataTablecombview.add(new TableModelcombview(col1Value, col2Value, col3Value));
+            dataTablecombview.add(new TableModelCombview(col1Value, col2Value, col3Value));
         }
         songColCombview.setCellValueFactory(new PropertyValueFactory<>("column1"));
         artistColCombview.setCellValueFactory(new PropertyValueFactory<>("column2"));
@@ -351,6 +355,43 @@ public class GUIController {
         // Set the data to the table view
         combviewTable.setItems(dataTablecombview);
         conn.close();
+
+        //highlight future releases, copy string to clipboard on row click
+        try {
+            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            sql = "SELECT COUNT(*) FROM combview WHERE date > ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, String.valueOf(LocalDate.now()));
+            ResultSet result = pstmt.executeQuery();
+            int futureReleases = result.getInt(1);
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            conn.close();
+
+            combviewTable.setRowFactory(tableView -> new TableRow<TableModelCombview>() {
+                @Override
+                public void updateIndex(int index) { //future releases
+                    super.updateIndex(index);
+                    if (index >= 0 && index < futureReleases) {
+                        setStyle("-fx-opacity: 0.5;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+                { //copy to clipboard
+                    setOnMouseClicked(event -> {
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            TableModelCombview rowData = getItem();
+                            String copyNameAndDate = rowData.getColumn2() + ": " + rowData.getColumn1() + " ";
+                            content.putString(copyNameAndDate);
+                            clipboard.setContent(content);
+                        }
+                    });
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         pstmt.close();
         rs.close();
     }
@@ -368,7 +409,7 @@ public class GUIController {
             return;
         artistInputField.clear();
         hideWindows();
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         String sql = "insert into artists(artistname) values(?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, userInput);
@@ -385,7 +426,7 @@ public class GUIController {
         artistInputField.clear();
     }
     private boolean deleteConfirmation = false;
-    public void clickDelete(MouseEvent mouseEvent) throws SQLException {
+    public void clickDelete(MouseEvent mouseEvent) {
         //delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
             if (!deleteConfirmation) {
@@ -395,7 +436,7 @@ public class GUIController {
             }
             Thread deletionThread = new Thread(() -> {
                 try {
-                    Connection conn = DriverManager.getConnection(DBtools.DBpath);
+                    Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
                     String sql = "DELETE FROM artists WHERE artistname = ?";
                     PreparedStatement pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, lastClickedArtist);
@@ -412,6 +453,7 @@ public class GUIController {
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, lastClickedArtist);
                     pstmt.executeUpdate();
+                    conn.close();
                 }
                 catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -612,7 +654,7 @@ public class GUIController {
                 return;
 
             Platform.runLater(() -> {
-                try (Connection conn = DriverManager.getConnection(DBtools.DBpath);
+                try (Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
                      PreparedStatement pstmt = conn.prepareStatement(sql)) {
                     pstmt.setString(1, userInput);
                     pstmt.setString(2, lastClickedArtist);
@@ -628,20 +670,20 @@ public class GUIController {
     public void clickSettings(MouseEvent mouseEvent) {
         settingsWindow.setVisible(true);
     }
-    public void clickSettingsClose(MouseEvent mouseEvent) throws SQLException {
+    public void clickSettingsClose(MouseEvent mouseEvent) {
         settingsWindow.setVisible(false);
         try {
             RealMain.fillCombviewTable();
+            if (selectedSource == null)
+                loadcombviewTable();
         } catch (Exception e) {
             System.out.println("could not fill combiew table");
             e.printStackTrace();
         }
-        if (selectedSource == null)
-            loadcombviewTable();
     }
     public void toggleFilter(MouseEvent event) {
         //change config filter state on click
-        Config config = ConfigFactory.parseFile(new File(DBtools.ConfigPath));
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
         CheckBox clickedCheckbox = (CheckBox) event.getSource();
         String fxid = clickedCheckbox.getId();
         boolean newState = clickedCheckbox.isSelected();
@@ -655,7 +697,7 @@ public class GUIController {
         }
         config = config.withValue("filters." + fxid, ConfigValueFactory.fromAnyRef(newState));
         ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.ConfigPath))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
             writer.write(config.root().render(renderOptions));
         } catch (IOException e) {
             System.out.println("could not save filter change");
@@ -665,7 +707,7 @@ public class GUIController {
 
     public void toggleCVlength(MouseEvent event) {
         //change config combviewlength state on click
-        Config config = ConfigFactory.parseFile(new File(DBtools.ConfigPath));
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
         CheckBox clickedCheckbox = (CheckBox) event.getSource();
         String fxid = clickedCheckbox.getId();
         String newValue = switch (fxid) {
@@ -697,7 +739,7 @@ public class GUIController {
         };
         config = config.withValue("combviewlength", ConfigValueFactory.fromAnyRef(newValue));
         ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.ConfigPath))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
             writer.write(config.root().render(renderOptions));
         } catch (IOException e) {
             System.out.println("could not save combviewlength change");
@@ -707,7 +749,7 @@ public class GUIController {
 
     public void loadConfigGUI() {
         //reflect the states of config in GUI
-        Config config = ConfigFactory.parseFile(new File(DBtools.ConfigPath));
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
         Config filtersConfig = config.getConfig("filters");
         FilterRemix.setSelected(filtersConfig.getBoolean("Remix"));
         FilterVIP.setSelected(filtersConfig.getBoolean("VIP"));
@@ -757,7 +799,7 @@ public class GUIController {
             progressbar.setVisible(false);
             try {
                 RealMain.fillCombviewTable();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             if (lastClickedArtist != null && selectedSource != null) {

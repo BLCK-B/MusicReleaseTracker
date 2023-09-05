@@ -21,6 +21,9 @@
     -fx-text-fill: white;
     -fx-border-color: black;
 }
+.table-view .table-row-cell:hover .table-cell {
+    -fx-underline: true;
+}
 .table-view {
    -fx-background-color: black;
    -fx-border-color: black;

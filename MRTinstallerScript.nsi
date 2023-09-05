@@ -26,19 +26,12 @@ Function SearchForJDK
     JDKFound:
 FunctionEnd
 
-; Uninstaller section
 Section "Uninstall"
-    ; Stop your application if it's running here
 
-    ; Remove Start Menu shortcut
     Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
-
-    ; Delete files and directories from the installation
     Delete "$INSTDIR\MusicReleaseTracker.exe"
     Delete "$INSTDIR\Uninstall.exe"
     RMDir "$INSTDIR"
-
-    ; Delete the uninstall entry from the registry
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MusicReleaseTracker"
 
 SectionEnd

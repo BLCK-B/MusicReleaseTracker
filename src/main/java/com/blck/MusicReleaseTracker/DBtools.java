@@ -1,5 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
+import com.typesafe.config.*;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,10 +13,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-
-import com.typesafe.config.*;
 
 /*      MusicReleaseTrcker
         Copyright (C) 2023 BLCK
@@ -31,33 +30,40 @@ import com.typesafe.config.*;
 
 //class for essential tasks
 public class DBtools {
-    public static String DBpath;
-    public static String ConfigPath;
-    public static String ConfigFolder;
 
+    public final static SettingsStore settingsStore = new SettingsStore();
     public static void path() {
+        String DBpath = null;
+        String configPath = null;
+        String configFolder = null;
         String os = System.getProperty("os.name").toLowerCase();
 
         if (os.contains("win")) { //Windows
             String appDataPath = System.getenv("APPDATA");
             DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "musicdata.db";
-            ConfigPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
-            ConfigFolder = appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
+            configPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
+            configFolder = appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
+            settingsStore.setConfigFolder(configFolder);
+            settingsStore.setConfigPath(configPath);
+            settingsStore.setDBpath(DBpath);
         } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  //Linux
             String userHome = System.getProperty("user.home");
             File folder = new File(userHome + File.separator + ".MusicReleaseTracker");
             if (!folder.exists())
                 folder.mkdirs();
             DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "musicdata.db";
-            ConfigPath = userHome + File.separator + ".MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
-            ConfigFolder = userHome + File.separator + ".MusicReleaseTracker" + File.separator;
+            configPath = userHome + File.separator + ".MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
+            configFolder = userHome + File.separator + ".MusicReleaseTracker" + File.separator;
+            settingsStore.setConfigFolder(configFolder);
+            settingsStore.setConfigPath(configPath);
+            settingsStore.setDBpath(DBpath);
         }
         else
             throw new UnsupportedOperationException("unsupported OS");
     }
 
     public static void createTables() throws SQLException {
-        Connection conn = DriverManager.getConnection(DBpath);
+        Connection conn = DriverManager.getConnection(settingsStore.getDBpath());
 
         String sql = "CREATE TABLE IF NOT EXISTS musicbrainz (\n"
                 + "	song text NOT NULL,\n"
@@ -105,13 +111,11 @@ public class DBtools {
         stmt.close();
     }
 
-    public static List<String> filterWords = new ArrayList<>();
-    public static int entriesLimit = 0;
-
     public static void readCombviewConfig() {
+        ArrayList<String> filterWords = new ArrayList<>();
+        int entriesLimit = 0;
         //read filters
-        filterWords.clear();
-        Config config = ConfigFactory.parseFile(new File(ConfigPath));
+        Config config = ConfigFactory.parseFile(new File(settingsStore.getConfigPath()));
         Config filtersConfig = config.getConfig("filters");
         for (Map.Entry<String, ConfigValue> entry : filtersConfig.entrySet()) {
             String filter = entry.getKey();
@@ -119,18 +123,22 @@ public class DBtools {
             if (enabled)
                 filterWords.add(filter);
         }
+        settingsStore.setFilterWords(filterWords);
         //read combviewlength
         switch (config.getString("combviewlength")) {
             case "short" -> entriesLimit = 7;
             case "medium" -> entriesLimit = 14;
             case "long" -> entriesLimit = 40;
         }
+        settingsStore.setEntriesLimit(entriesLimit);
     }
 
     public static void updateSettingsDB() {
+        String configFolder = settingsStore.getConfigFolder();
+        String configPath = settingsStore.getConfigPath();
         //create config if it does not exist, transfer data to new structure if update changed it
         //version:settings and DBversion:database should be changed on any respective structure update
-        //to reflect DBversion change, settings version is changed too
+        //to reflect DBversion change, version is changed too
         final int DBversion = 1;
         final int version = DBversion + 2;
         String templateContent =
@@ -145,7 +153,7 @@ public class DBtools {
                         "   VIP=false\n" +
                         "}\n" +
                         "combviewlength=short";
-        File templateFile = new File(ConfigFolder + "/MRTsettingsTemplate.hocon");
+        File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");
         if (!templateFile.exists()) {
             try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
                 writer.write(templateContent);
@@ -153,7 +161,7 @@ public class DBtools {
                 throw new RuntimeException(e);
             }
         }
-        File configFile = new File(ConfigPath);
+        File configFile = new File(configPath);
         if (!configFile.exists()) {
             try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
                 writer.write(templateContent);
@@ -162,7 +170,7 @@ public class DBtools {
             }
         }
         //comparing versions
-        Config config = ConfigFactory.parseFile(new File(ConfigPath));
+        Config config = ConfigFactory.parseFile(new File(configPath));
         int fileVersion = config.getInt("version");
         if (fileVersion != version) {
             //if different version > update template > transfer all possible data to template > replace files
@@ -173,8 +181,8 @@ public class DBtools {
                 throw new RuntimeException(e);
             }
             //transfer the states of options from MRTsettings to MRTsettingsTemplate, update version
-            config = ConfigFactory.parseFile(new File(ConfigPath));
-            Config templateConfig = ConfigFactory.parseFile(new File(ConfigFolder + "MRTsettingsTemplate.hocon"));
+            config = ConfigFactory.parseFile(new File(configPath));
+            Config templateConfig = ConfigFactory.parseFile(new File(configFolder + "MRTsettingsTemplate.hocon"));
             for (Map.Entry<String, ConfigValue> entry : config.entrySet()) {
                 String key = entry.getKey();
                 ConfigValue value = entry.getValue();
@@ -190,7 +198,7 @@ public class DBtools {
             }
             config = config.withValue("version", ConfigValueFactory.fromAnyRef(version));
             //save the updated template config to MRTsettingsTemplate.hocon
-            try (PrintWriter writer = new PrintWriter(new FileWriter(ConfigFolder + "MRTsettingsTemplate.hocon"))) {
+            try (PrintWriter writer = new PrintWriter(new FileWriter(configFolder + "MRTsettingsTemplate.hocon"))) {
                 ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
                 String renderedConfig = templateConfig.root().render(renderOptions);
                 writer.write(renderedConfig);

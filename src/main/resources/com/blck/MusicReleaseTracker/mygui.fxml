@@ -32,15 +32,15 @@
    <center>
       <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox cache="true" cacheHint="SPEED" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="197.0" prefHeight="625.0" prefWidth="204.0" StackPane.alignment="TOP_LEFT">
+            <VBox cache="true" cacheHint="SPEED" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="625.0" prefWidth="185.0" StackPane.alignment="TOP_LEFT">
                <children>
-                  <StackPane cache="true" cacheHint="SPEED" prefHeight="38.0" prefWidth="200.0">
+                  <StackPane cache="true" cacheHint="SPEED" prefHeight="38.0" prefWidth="185.0">
                      <children>
-                        <HBox cache="true" cacheHint="SPEED" minHeight="-Infinity" prefHeight="30.0" prefWidth="200.0">
+                        <HBox cache="true" cacheHint="SPEED" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="185.0">
                            <children>
                               <Button fx:id="addButton" cache="true" cacheHint="SPEED" contentDisplay="CENTER" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#clickAdd" prefHeight="30.0" prefWidth="80.0" text="add">
                                  <HBox.margin>
-                                    <Insets left="15.0" right="5.0" top="1.0" />
+                                    <Insets left="10.0" right="5.0" top="1.0" />
                                  </HBox.margin>
                                  <padding>
                                     <Insets bottom="1.0" />
@@ -58,7 +58,7 @@
                         </HBox>
                      </children>
                   </StackPane>
-                  <ListView fx:id="artistList" cache="true" cacheHint="SPEED" maxHeight="1.7976931348623157E308" prefHeight="603.0" prefWidth="203.0" VBox.vgrow="ALWAYS">
+                  <ListView fx:id="artistList" cache="true" cacheHint="SPEED" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="603.0" prefWidth="185.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets bottom="8.0" left="-3.0" top="2.0" />
                      </VBox.margin>
@@ -68,26 +68,26 @@
                   <Insets left="4.0" top="1.0" />
                </StackPane.margin>
             </VBox>
-            <VBox cache="true" cacheHint="SPEED" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="626.0" prefWidth="450.0" StackPane.alignment="TOP_RIGHT">
+            <VBox cache="true" cacheHint="SPEED" fillWidth="false" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="626.0" prefWidth="590.0" StackPane.alignment="TOP_RIGHT">
                <children>
-                  <HBox cache="true" cacheHint="SPEED" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="578.0" VBox.vgrow="NEVER">
+                  <HBox cache="true" cacheHint="SPEED" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="590.0" VBox.vgrow="NEVER">
                      <children>
-                        <Button id="filterbutton" fx:id="combviewButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickComb" prefHeight="38.0" prefWidth="264.0" text="Combined view">
+                        <Button id="filterbutton" fx:id="combviewButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickComb" prefHeight="38.0" prefWidth="265.0" text="Combined view">
                            <HBox.margin>
                               <Insets left="5.0" right="3.0" />
                            </HBox.margin>
                         </Button>
-                        <Button id="filterbutton" fx:id="beatportButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickPort" prefHeight="38.0" prefWidth="85.0" text="BP">
+                        <Button id="filterbutton" fx:id="beatportButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickPort" prefHeight="38.0" prefWidth="87.0" text="BP">
                            <HBox.margin>
                               <Insets left="3.0" right="3.0" />
                            </HBox.margin>
                         </Button>
-                        <Button id="filterbutton" fx:id="brainzButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickBrainz" prefHeight="38.0" prefWidth="85.0" text="MB">
+                        <Button id="filterbutton" fx:id="brainzButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickBrainz" prefHeight="38.0" prefWidth="87.0" text="MB">
                            <HBox.margin>
                               <Insets left="3.0" right="3.0" />
                            </HBox.margin>
                         </Button>
-                        <Button id="filterbutton" fx:id="junodownloadButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickJunodownload" prefHeight="38.0" prefWidth="85.0" text="JD">
+                        <Button id="filterbutton" fx:id="junodownloadButton" cache="true" cacheHint="SPEED" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onMousePressed="#clickJunodownload" prefHeight="38.0" prefWidth="87.0" text="JD">
                            <HBox.margin>
                               <Insets left="3.0" right="3.0" />
                            </HBox.margin>
@@ -101,7 +101,7 @@
                               </ImageView>
                            </graphic>
                            <HBox.margin>
-                              <Insets left="2.0" right="4.0" top="1.0" />
+                              <Insets left="4.0" right="5.0" top="1.0" />
                            </HBox.margin>
                         </Button>
                         <Group cache="true" cacheHint="SPEED">
@@ -130,12 +130,12 @@
                         <Insets />
                      </VBox.margin>
                   </HBox>
-                  <StackPane cache="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="586.0" prefWidth="568.0" VBox.vgrow="ALWAYS">
+                  <StackPane cache="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="583.0" prefWidth="590.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <TableView fx:id="mainTable" focusTraversable="false" maxWidth="1.7976931348623157E308" mouseTransparent="true" prefHeight="586.0" prefWidth="560.0">
+                        <TableView fx:id="mainTable" focusTraversable="false" maxWidth="1.7976931348623157E308" mouseTransparent="true" prefHeight="583.0" prefWidth="585.0">
                           <columns>
-                            <TableColumn fx:id="songCol" editable="false" minWidth="-Infinity" prefWidth="356.0" sortable="false" text="song" />
-                            <TableColumn fx:id="dateCol" editable="false" minWidth="-Infinity" prefWidth="177.0" sortable="false" text="date" />
+                            <TableColumn fx:id="songCol" editable="false" minWidth="-Infinity" prefWidth="360.0" sortable="false" text="song" />
+                            <TableColumn fx:id="dateCol" editable="false" minWidth="-Infinity" prefWidth="180.0" sortable="false" text="date" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -144,11 +144,11 @@
                               <Insets left="5.0" />
                            </padding>
                         </TableView>
-                        <TableView fx:id="combviewTable" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="586.0" prefWidth="550.0" visible="false">
+                        <TableView fx:id="combviewTable" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="586.0" prefWidth="585.0" visible="false">
                           <columns>
-                            <TableColumn fx:id="songColCombview" editable="false" minWidth="-Infinity" prefWidth="260.0" reorderable="false" resizable="false" sortable="false" text="song" />
-                            <TableColumn fx:id="artistColCombview" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="187.0" reorderable="false" resizable="false" sortable="false" text="artist" />
-                              <TableColumn fx:id="dateColCombview" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="115.0" reorderable="false" resizable="false" sortable="false" text="date" />
+                            <TableColumn fx:id="songColCombview" editable="false" minWidth="-Infinity" prefWidth="265.0" reorderable="false" resizable="false" sortable="false" text="song" />
+                            <TableColumn fx:id="artistColCombview" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="215.0" reorderable="false" resizable="false" sortable="false" text="artist" />
+                              <TableColumn fx:id="dateColCombview" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="105.0" reorderable="false" resizable="false" sortable="false" text="date" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -168,7 +168,7 @@
                   </StackPane>
                </children>
                <StackPane.margin>
-                  <Insets left="208.0" />
+                  <Insets />
                </StackPane.margin>
             </VBox>
             <StackPane fx:id="addWindow" cache="true" cacheHint="SPEED" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="233.0" prefWidth="356.0" visible="false">

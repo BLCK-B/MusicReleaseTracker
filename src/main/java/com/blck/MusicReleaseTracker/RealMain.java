@@ -13,12 +13,15 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/*      MusicReleaseTrcker
+/*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -80,7 +83,7 @@ public class RealMain extends Application {
     public static void scrapeData() throws SQLException, InterruptedException {
         scrapeCancel = false;
         //for each artistname: check all urls and load them into a list
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         String sql = "SELECT artistname FROM artists";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet artistnameResults = pstmt.executeQuery();
@@ -110,7 +113,7 @@ public class RealMain extends Application {
         ArrayList<String> eachArtistUrls = new ArrayList<>();
         for (String songArtist : artistnameList) {
             GUIController.currentlyScrapedArtist(songArtist);
-            conn = DriverManager.getConnection(DBtools.DBpath);
+            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             eachArtistUrls.clear();
             sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
             pstmt = conn.prepareStatement(sql);
@@ -352,7 +355,7 @@ public class RealMain extends Application {
     public static void insertSet(ArrayList<SongClass> SongClassList, String source) {
         //insert set of songs to a source table
         try {
-            Connection conn = DriverManager.getConnection(DBtools.DBpath);
+            Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             for (SongClass songObject : SongClassList) {
                 try {
                     if (songObject.getType() != null) {
@@ -383,25 +386,26 @@ public class RealMain extends Application {
     }
 
     public static void fillCombviewTable() {
-        //assembles table for combined view: filters unwanted words, looks for duplicates, sorts by date
+        //assembles table for combined view: filters unwanted words, looks for duplicates, sorts by date, other processing
+        //load filterwords and entrieslimit
+        try {
+            DBtools.readCombviewConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         int entriesInserted = 0;
+        int entriesLimit = DBtools.settingsStore.getEntriesLimit();
         //clear table
         Connection conn = null;
         String sql = null;
         Statement stmt = null;
         try {
-            conn = DriverManager.getConnection(DBtools.DBpath);
+            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             sql = "DELETE FROM combview";
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
             conn.close();
         }  catch (Exception e) {
-            e.printStackTrace();
-        }
-        //load filterwords
-        try {
-            DBtools.readCombviewConfig();
-        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -411,9 +415,9 @@ public class RealMain extends Application {
         ArrayList<SongClass> songObjectList = new ArrayList<>();
 
         try {
-            conn = DriverManager.getConnection(DBtools.DBpath);
+            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             for (String source : sourceTables) {
-                sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT " + DBtools.entriesLimit * 2;
+                sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT " + entriesLimit * 2;
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 
@@ -427,7 +431,7 @@ public class RealMain extends Application {
                     }
 
                     //filtering user-defined keywords
-                    for (String checkword : DBtools.filterWords) {
+                    for (String checkword : DBtools.settingsStore.getFilterWords()) {
                         if (songType != null) {
                             if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
                                 continue RScycle;
@@ -447,26 +451,55 @@ public class RealMain extends Application {
             e.printStackTrace();
         }
 
-        //map songObjectList to get rid of name-date duplicates
-        Map<String, SongClass> songMap = songObjectList.stream()
+        //map songObjectList to get rid of name-date duplicates, example key: ascension2023-06-13
+        //eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
+        Map<String, SongClass> nameDateMap = songObjectList.stream()
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
                         song -> song,
-                        (existingValue, newValue) -> existingValue //dont overwrite already existing key
+                        (existingValue, newValue) -> {
+                            //append artist from duplicate song to the already existing object in map
+                            existingValue.appendArtist(newValue.getArtist());
+                            return existingValue;
+                        }
                 ));
+        //map nameDateMap.values to get rid of name-artist duplicates, example key: ascensionkoansound
+        //eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Map<String, SongClass> nameArtistMap = nameDateMap.values().stream()
+                .collect(Collectors.toMap(
+                        song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getArtist().replaceAll("\\s+", "").toLowerCase(),
+                        song -> song,
+                        (existingValue, newValue) -> {
+                            try {
+                                Date existingDate = dateFormat.parse(existingValue.getDate());
+                                Date newDate = dateFormat.parse(newValue.getDate());
+                                if (existingDate.compareTo(newDate) < 0)
+                                    return existingValue;
+                                else
+                                    return  newValue;
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                ));
+
         //create a list of SongClass objects sorted by date from map
-        List<SongClass> finalSortedList = songMap.values().stream()
+        List<SongClass> finalSortedList = nameArtistMap.values().stream()
                 .sorted(Comparator.comparing(SongClass::getDate, Comparator.reverseOrder()))
                 .toList();
 
+        nameDateMap.clear();
+        nameArtistMap.clear();
+
         //insert data into table
         try {
-            conn = DriverManager.getConnection(DBtools.DBpath);
+            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             int i = 0;
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             for (SongClass item : finalSortedList) {
-                if (i == DBtools.entriesLimit * sourceTables.length)
+                if (i == entriesLimit * sourceTables.length)
                     break;
                 pstmt.setString(1, item.getName());
                 pstmt.setString(2, item.getArtist());
@@ -477,7 +510,6 @@ public class RealMain extends Application {
             songObjectList.clear();
             stmt.close();
             pstmt.close();
-            songMap.clear();
             conn.close();
         }  catch (Exception e) {
             e.printStackTrace();

@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
-/*      MusicReleaseTrcker
+/*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -13,7 +13,6 @@ package com.blck.MusicReleaseTracker;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-//this redundant class was used because of javafx crap not working despite having declared all modules correctly
 public class Main {
 
     public static void main(String[] args) {

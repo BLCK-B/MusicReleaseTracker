@@ -1,13 +1,13 @@
 plugins {
     id 'java'
     id 'application'
-    id "org.openjfx.javafxplugin" version "0.0.14"
+    id "org.openjfx.javafxplugin" version "0.1.0"
     id 'org.beryx.jlink' version '2.26.0'
     id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 group 'com.blck'
-version '5'
+version '5.1'
 
 repositories {
     mavenCentral()
@@ -23,7 +23,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_19
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
@@ -38,10 +38,14 @@ javafx {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation 'org.jsoup:jsoup:1.16.1'
+    // https://mvnrepository.com/artifact/com.typesafe/config
     implementation 'com.typesafe:config:1.4.2'
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

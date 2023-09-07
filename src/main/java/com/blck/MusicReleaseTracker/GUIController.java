@@ -1,5 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
+import com.blck.MusicReleaseTracker.ModelsEnums.TableModelCombview;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
@@ -21,7 +23,6 @@ import javafx.scene.layout.StackPane;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -382,9 +383,11 @@ public class GUIController {
                     setOnMouseClicked(event -> {
                         if (event.getButton() == MouseButton.PRIMARY) {
                             TableModelCombview rowData = getItem();
-                            String copyNameAndDate = rowData.getColumn2() + ": " + rowData.getColumn1() + " ";
-                            content.putString(copyNameAndDate);
-                            clipboard.setContent(content);
+                            if (rowData != null) {
+                                String copyNameAndDate = rowData.getColumn2() + ": " + rowData.getColumn1() + " ";
+                                content.putString(copyNameAndDate);
+                                clipboard.setContent(content);
+                            }
                         }
                     });
                 }
@@ -404,7 +407,7 @@ public class GUIController {
     }
     public void clickAddConfirm(MouseEvent mouseEvent) throws SQLException {
         //add new artist typed by user
-        String userInput = artistInputField.getText();
+        String userInput = artistInputField.getText().trim();
         if (userInput.isEmpty() || userInput.isBlank() || userInput.length() > 30)
             return;
         artistInputField.clear();
@@ -541,7 +544,7 @@ public class GUIController {
     }
     public void clickBrainzUrlButton(MouseEvent mouseEvent) {
         String sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
-        String userInput = brainzUrlBar.getText();
+        String userInput = brainzUrlBar.getText().trim();
         if (userInput.isEmpty() || userInput.isBlank())
             return;
         //reduce to base form then modify
@@ -561,7 +564,7 @@ public class GUIController {
     }
     public void clickBeatportUrlButton(MouseEvent mouseEvent) {
         String sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
-        String userInput = beatportUrlBar.getText();
+        String userInput = beatportUrlBar.getText().trim();
         if (userInput.isEmpty() || userInput.isBlank())
             return;
         //reduce to base form then modify
@@ -583,7 +586,7 @@ public class GUIController {
     }
     public void clickJunodownloadUrlButton(MouseEvent mouseEvent) {
         String sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
-        String userInput = junodownloadUrlbar.getText();
+        String userInput = junodownloadUrlbar.getText().trim();
         if (userInput.isEmpty() || userInput.isBlank())
             return;
         //reduce to base form then modify
@@ -654,8 +657,9 @@ public class GUIController {
                 return;
 
             Platform.runLater(() -> {
-                try (Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                try {
+                    Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                    PreparedStatement pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, userInput);
                     pstmt.setString(2, lastClickedArtist);
                     pstmt.executeUpdate();
@@ -815,6 +819,17 @@ public class GUIController {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            Connection conn = null;
+            try {
+                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                String sql = "VACUUM;";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.execute();
+                pstmt.close();
+                conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         });
         //create an ExecutorService to run tasks on separate threads

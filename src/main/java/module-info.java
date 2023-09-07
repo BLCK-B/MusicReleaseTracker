@@ -7,4 +7,6 @@ module com.blck.MusicReleaseTracker {
 
     opens com.blck.MusicReleaseTracker to javafx.fxml;
     exports com.blck.MusicReleaseTracker;
+    exports com.blck.MusicReleaseTracker.ModelsEnums;
+    opens com.blck.MusicReleaseTracker.ModelsEnums to javafx.fxml;
 }

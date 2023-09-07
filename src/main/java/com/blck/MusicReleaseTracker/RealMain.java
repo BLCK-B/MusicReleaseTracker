@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.ModelsEnums.MonthNumbers;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,14 +10,13 @@ import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -154,7 +154,7 @@ public class RealMain extends Application {
                         }
                     } catch (Exception e) {
                         //on fail, try once more
-                        System.out.println("error scraping source" + i + ",trying again (1=musicbrainz 2=beatport 3=junodownload)");
+                        System.out.println("error scraping source" + oneUrl + ",trying again");
                         try {
                             switch(i) {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);
@@ -162,7 +162,7 @@ public class RealMain extends Application {
                                 case 3 -> scrapeJunodownload(oneUrl, songArtist);
                             }
                         } catch (Exception e2) {
-                            System.out.println("error re-scraping source" + i + ", moving on");
+                            System.out.println("error re-scraping, moving on");
                             e2.printStackTrace();
                         }
                     }
@@ -194,13 +194,37 @@ public class RealMain extends Application {
         }
         Elements songs = doc.select("[href*=/release/]");
         Elements dates = doc.select("ul.release-events > li:first-child").select("span.release-date");
-        String[] songsArray = songs.eachText().toArray(new String[0]);
-        String[] datesArray = dates.eachText().toArray(new String[0]);
-        String[] typesArray = null;
-        doc.empty();
 
-        Collections.reverse(Arrays.asList(songsArray));
-        Collections.reverse(Arrays.asList(datesArray));
+        String[] songsDirtyArray = songs.eachText().toArray(new String[0]);
+        String[] datesDirtyArray = dates.eachText().toArray(new String[0]);
+        String[] typesArray = null;
+
+        ArrayList<String> songsArrayList = new ArrayList<>();
+        ArrayList<String> datesArrayList = new ArrayList<>();
+
+        //avoid songs without a date - and preliminarily duplicates while ensuring newer rereleases dont make the cut
+        ArrayList<String> insertedSongs = new ArrayList<>();
+        int i = 0;
+        while (i < datesDirtyArray.length) {
+            if (datesDirtyArray[i].length() != 10 || insertedSongs.contains(songsDirtyArray[i])) {
+                i++;
+                continue;
+            }
+            else
+                insertedSongs.add(songsDirtyArray[i]);
+
+            songsArrayList.add(songsDirtyArray[i]);
+            datesArrayList.add(datesDirtyArray[i]);
+            i++;
+        }
+
+        doc.empty();
+        insertedSongs.clear();
+
+        Collections.reverse(songsArrayList);
+        Collections.reverse(datesArrayList);
+        String[] songsArray = songsArrayList.toArray(new String[0]);
+        String[] datesArray = datesArrayList.toArray(new String[0]);
 
         fillSongClassList(songsArray, datesArray, typesArray, songArtist, "musicbrainz");
 
@@ -353,32 +377,34 @@ public class RealMain extends Application {
     }
 
     public static void insertSet(ArrayList<SongClass> SongClassList, String source) {
+        PreparedStatement pstmt = null;
         //insert set of songs to a source table
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             for (SongClass songObject : SongClassList) {
-                try {
-                    if (songObject.getType() != null) {
-                        String sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
-                        PreparedStatement pstmt = conn.prepareStatement(sql);
-                        pstmt.setString(1, songObject.getName());
-                        pstmt.setString(2, songObject.getArtist());
-                        pstmt.setString(3, songObject.getDate());
-                        pstmt.setString(4, songObject.getType());
-                        pstmt.executeUpdate();
-                    }
-                    else {
-                        String sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
-                        PreparedStatement pstmt = conn.prepareStatement(sql);
-                        pstmt.setString(1, songObject.getName());
-                        pstmt.setString(2, songObject.getArtist());
-                        pstmt.setString(3, songObject.getDate());
-                        pstmt.executeUpdate();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (songObject.getType() != null) {
+                    String sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, songObject.getName());
+                    pstmt.setString(2, songObject.getArtist());
+                    pstmt.setString(3, songObject.getDate());
+                    pstmt.setString(4, songObject.getType());
                 }
+                else {
+                    String sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, songObject.getName());
+                    pstmt.setString(2, songObject.getArtist());
+                    pstmt.setString(3, songObject.getDate());
+                }
+                pstmt.addBatch();
+                pstmt.executeUpdate();
             }
+            conn.setAutoCommit(false);
+            pstmt.executeBatch();
+            conn.commit();
+            conn.setAutoCommit(true);
+            pstmt.clearBatch();
             conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -417,7 +443,7 @@ public class RealMain extends Application {
         try {
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             for (String source : sourceTables) {
-                sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT " + entriesLimit * 2;
+                sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT " + entriesLimit * 5;
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 
@@ -494,19 +520,26 @@ public class RealMain extends Application {
 
         //insert data into table
         try {
+            //precomitting batch insert is way faster
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-            int i = 0;
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
+            int i = 0;
             for (SongClass item : finalSortedList) {
                 if (i == entriesLimit * sourceTables.length)
                     break;
                 pstmt.setString(1, item.getName());
                 pstmt.setString(2, item.getArtist());
                 pstmt.setString(3, item.getDate());
-                pstmt.executeUpdate();
+                pstmt.addBatch();
                 i++;
             }
+            conn.setAutoCommit(false);
+            pstmt.executeBatch();
+            conn.commit();
+            conn.setAutoCommit(true);
+            pstmt.clearBatch();
+
             songObjectList.clear();
             stmt.close();
             pstmt.close();

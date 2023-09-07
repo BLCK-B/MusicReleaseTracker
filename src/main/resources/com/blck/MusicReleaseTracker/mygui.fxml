@@ -413,7 +413,7 @@
                                           <CheckBox fx:id="CVlengthLong" mnemonicParsing="false" onMouseClicked="#toggleCVlength" text="Long" textFill="WHITE" GridPane.rowIndex="2" />
                                        </children>
                                     </GridPane>
-                                    <TextArea editable="false" layoutX="78.0" layoutY="304.0" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" mouseTransparent="true" prefHeight="38.0" prefWidth="234.0" text="Combined view table length">
+                                    <TextArea editable="false" layoutX="78.0" layoutY="304.0" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" mouseTransparent="true" prefHeight="47.0" prefWidth="234.0" text="Combined view table length">
                                        <font>
                                           <Font size="14.0" />
                                        </font>

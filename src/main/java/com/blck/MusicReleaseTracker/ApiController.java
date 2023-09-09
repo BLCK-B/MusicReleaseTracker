@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
@@ -37,6 +38,12 @@ public class ApiController {
     public List<TableModel> sourceTabClick(@RequestBody Map<String, String> requestData) {
         String source = requestData.get("source");
         return sendRequest.sourceTabClick(source);
+    }
+
+    @PostMapping("/clickArtistAdd")
+    public void clickArtistAdd(@RequestBody String input) {
+        System.out.println(input);
+        sendRequest.artistAddConfirm(input);
     }
 
 }

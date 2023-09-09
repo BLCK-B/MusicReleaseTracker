@@ -1,15 +1,12 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.ModelsEnums.MonthNumbers;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
@@ -34,53 +31,41 @@ import java.util.stream.Collectors;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class RealMain extends Application {
+public class MainBackend {
 
     private static GUIController GUIController;
 
-    //preparing UI for start
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/blck/MusicReleaseTracker/mygui.fxml"));
-        Parent root = loader.load();
-        GUIController = loader.getController();
-        Scene scene = new Scene(root);
-        Image icon = new Image(getClass().getResourceAsStream("/MRTlogo.png"));
-        primaryStage.getIcons().add(icon);
-        primaryStage.setTitle("MusicReleaseTracker");
-        primaryStage.setHeight(680);
-        primaryStage.setWidth(800);
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        try {
-            DBtools.path();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    @Component
+    public static class StartupRunner implements CommandLineRunner {
+        //on startup of springboot server
+        @Override
+        public void run(String... args) {
+            System.out.println("---------------SERVER STARTED----------------");
+            try {
+                DBtools.path();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                DBtools.createTables();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                DBtools.updateSettingsDB();
+            } catch (Exception e) {
+                System.out.println("error handling config file");
+                e.printStackTrace();
+            }
         }
-        try {
-            DBtools.createTables();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            DBtools.updateSettingsDB();
-        } catch (Exception e) {
-            System.out.println("error handling config file");
-            e.printStackTrace();
-        }
-        launch(args);
     }
 
     //entryLimit: how many entries per artist
     private static final int entryLimit = 15;
     public static boolean scrapeCancel = false;
 
-    //calling method for scrapers, based on artist URLs
     public static void scrapeData() throws SQLException, InterruptedException {
+        //calling method for scrapers, based on artist URLs
         scrapeCancel = false;
         //for each artistname: check all urls and load them into a list
         Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
@@ -112,7 +97,6 @@ public class RealMain extends Application {
         //list for source urls (incl null) - one artist at a time
         ArrayList<String> eachArtistUrls = new ArrayList<>();
         for (String songArtist : artistnameList) {
-            GUIController.currentlyScrapedArtist(songArtist);
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             eachArtistUrls.clear();
             sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
@@ -140,7 +124,6 @@ public class RealMain extends Application {
                 if (scrapeCancel) {
                     eachArtistUrls.clear();
                     artistnameList.clear();
-                    GUIController.removeScrapedCss();
                     System.gc();
                     return;
                 }
@@ -173,11 +156,9 @@ public class RealMain extends Application {
                 //calculating progressbar value
                 progress++;
                 double state = progress / artistnameList.size() / 3;
-                GUIController.updateProgressBar(state);
                 i++;
             }
         }
-        GUIController.removeScrapedCss();
         eachArtistUrls.clear();
         artistnameList.clear();
         System.gc();

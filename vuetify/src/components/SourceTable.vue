@@ -1,5 +1,4 @@
 <template>
-  <div>
 
     <v-table
       fixed-header
@@ -15,7 +14,7 @@
       </thead>
 
       <tbody>
-        <tr v-for="(item, index) in TableData" :key="index">
+        <tr v-for="(item, index) in tableData" :key="index">
           <td style="height:25px;">{{ item.song }}</td>
           <td v-if="!hideArtistColumn" style="height:25px;">{{ item.artist }}</td>
           <td style="height:25px;">{{ item.date }}</td>
@@ -23,28 +22,29 @@
       </tbody>
     </v-table>
 
-  </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
-  props: ['TableData'],
   computed: {
+    ...mapState([
+      'tableData'
+    ]),
     hideArtistColumn() {
-        //hide artists if column is null
-        return this.TableData.some(item => item.artist === null);
+      return this.tableData.some(item => item.artist === null);
     },
     hideTable() {
-        //hide table if null
-        const conditionMet = this.TableData.some(item => item.song !== null);
-        if (!conditionMet) {
-          this.emitTableNullEvent(); // Trigger the method when condition is met
-        }
-        return conditionMet;
+      const conditionMet = this.tableData.some(item => item.song !== null);
+      if (!conditionMet) {
+        this.emitNullEvent();
+      }
+      return conditionMet;
     },
   },
   methods: {
-    emitTableNullEvent() {
+    emitNullEvent() {
       this.$emit('table-null');
     },
   },
@@ -52,8 +52,9 @@ export default {
 </script>
 
 <style scoped>
+
 .v-table {
-  width: 90%;
+  width: 75%;
   font-size: 14px;
 }
 .song{

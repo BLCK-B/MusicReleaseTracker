@@ -1,9 +1,10 @@
 plugins {
     id 'java'
     id 'application'
-    id "org.openjfx.javafxplugin" version "0.1.0"
     id 'org.beryx.jlink' version '2.26.0'
     id "com.github.johnrengelman.shadow" version "8.1.1"
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
 }
 
 group 'com.blck'
@@ -32,11 +33,6 @@ application {
     mainClass = 'com.blck.MusicReleaseTracker.Main'
 }
 
-javafx {
-    version = '20.0.2'
-    modules = ['javafx.controls', 'javafx.fxml']
-}
-
 dependencies {
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
@@ -47,10 +43,25 @@ dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+bootDistZip {
+    dependsOn shadowJar
+}
+bootDistTar {
+    dependsOn shadowJar
+}
+bootStartScripts {
+    dependsOn shadowJar
+}
+tasks.startShadowScripts.dependsOn(tasks.bootJar)
+bootJar {
+    duplicatesStrategy = 'exclude'
 }
 
 jlink {
-    imageZip = project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'MusicReleaseTracker'
@@ -96,8 +107,4 @@ shadowJar {
         attributes 'Main-Class': 'com.blck.MusicReleaseTracker.Main'
     }
     mergeServiceFiles()
-}
-
-run {
-    systemProperty "ide.environment", "IDE"
 }

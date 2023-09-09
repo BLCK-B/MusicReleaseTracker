@@ -1,24 +1,10 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.ModelsEnums;
 
 public class TableModel {
-   /* private String song;
-    private String date;
 
-    public TableModel(String song, String date) {
-        this.song = song;
-        this.date = date;
-    }
-
-    public String getSong() {
-        return song;
-    }
-    public String getDate() {
-        return date;
-    }*/
-
-    private String song;
-    private String artist;
-    private String date;
+    private final String song;
+    private final String artist;
+    private final String date;
 
     public TableModel(String song, String artist, String date) {
         this.song = song;

@@ -1,12 +1,13 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+//class with methods called from ApiController
 @Service
 public class GUIController {
 
@@ -16,7 +17,7 @@ public class GUIController {
 
     public List<String> loadList() throws SQLException {
         List<String> dataList = new ArrayList<>();
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname ASC");
         while (rs.next()) {
@@ -26,6 +27,24 @@ public class GUIController {
         stmt.close();
         rs.close();
         return dataList;
+    }
+    public void artistAddConfirm(String input) {
+        //add new artist typed by user
+        input = input.replace("=" , "").trim();
+        if (input.isEmpty() || input.isBlank() || input.length() > 30 || input.equals("[]"))
+            return;
+        try {
+            Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            String sql = "insert into artists(artistname) values(?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, input);
+            pstmt.executeUpdate();
+            conn.close();
+            pstmt.close();
+            lastClickedArtist = null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<TableModel> artistListClick(String artist) {
@@ -72,38 +91,9 @@ public class GUIController {
 
     public void loadTable() throws SQLException {
         tableContent.clear();
-        /*Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        //adding data to tableContent
         String sql = null;
-        switch (selectedSource) {
-            case "musicbrainz" -> sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
-            case "beatport" -> sql = "SELECT urlbeatport FROM artists WHERE artistname = ? ";
-            case "junodownload" -> sql = "SELECT urljunodownload FROM artists WHERE artistname = ? ";
-        }
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, lastClickedArtist);
-        ResultSet rs = pstmt.executeQuery();
-        //if missing url
-        if (rs.next()) {
-            String link = rs.getString(1);
-            conn.close();
-            if (link == null || link.isEmpty()) {
-                switch (selectedSource) {
-                    case "musicbrainz" -> {
-                        System.out.println("dialog MB");
-                    }
-                    case "beatport" -> {
-                        System.out.println("dialog BP");
-                    }
-                    case "junodownload" -> {
-                        System.out.println("dialog JD");
-                    }
-                }
-                return;
-            }
-        }*/
-        //populating table
-        String sql = null;
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         switch (selectedSource) {
             case "musicbrainz" -> sql = "SELECT song, date FROM musicbrainz WHERE artist = ? ORDER BY date DESC";
             case "beatport" -> sql = "SELECT song, date FROM beatport WHERE artist = ? ORDER BY date DESC";
@@ -126,7 +116,7 @@ public class GUIController {
 
     public void loadCombviewTable() throws SQLException {
         tableContent.clear();
-        Connection conn = DriverManager.getConnection(DBtools.DBpath);
+        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         //populating combview table
         String sql = "SELECT * FROM combview ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);

@@ -2,28 +2,36 @@
 import { createStore } from 'vuex'
 
 const state = {
-  // Your initial state variables go here
-  sourceTab: 'combview',
-  tableData: null,
+  // Your initial state variables
+  artist: [],
+  sourceTab: "combview",
+  tableData: [],
+  addDialogVis: false,
 };
 
 const mutations = {
-  // Mutations to update the state go here
-  SET_SOURCE_TAB(state, newTab) {
-    state.sourceTab = newTab;
-    console.log(state.sourceTab);
+  // Synchronous updates of states
+  SET_SOURCE_TAB(state, sourceTab) {
+    state.sourceTab = sourceTab;
+  },
+  SET_SELECTED_ARTIST(state, artist) {
+    state.artist = artist;
   },
   SET_TABLE_CONTENT(state, tableData) {
     state.tableData = tableData;
   },
+  SET_ADD_VIS(state, addDialogVis) {
+    state.addDialogVis = addDialogVis;
+  },
 };
 
 const actions = {
-  // Actions to perform async operations go here
+  // Actions to perform async operations
+  
 };
 
 const getters = {
-  // Getters to retrieve computed state values go here
+  // Getters to retrieve computed state values
 };
 
 export default createStore({

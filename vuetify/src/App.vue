@@ -1,39 +1,25 @@
 <template>
 
   <v-app>
-    <!-- Sidebar -->
+    <!-- sidebar -->
     <v-navigation-drawer app class="sidebar" permanent>
-
-      <v-row justify="end">
-        <v-col cols="auto">
-          <v-btn>add</v-btn>
-          <v-btn>remove</v-btn>
-        </v-col>
-      </v-row>
-      
-      <artist-list @update-table="handleUpdateTable" :data="artistsArrayList"/>
+      <artist-list/>
     </v-navigation-drawer>
     
-    <!-- Main content -->
+    
     <v-main class="main-content">
-      <!-- Top App Bar -->
+      <!-- top bar -->
       <v-app-bar app class="app-bar">
-        <SourceMenu @update-table="handleUpdateTable" :data="sourceTab"/>
-
-        <v-btn class="imgbutton">
-          <img class="image" src="settings.png"/>
-        </v-btn>
-        <v-btn class="imgbutton">
-          <img class="image" src="refresh.png"/>
-        </v-btn>
-
+        <SourceMenu/>
       </v-app-bar>
-      <!-- Page content -->
-      <v-container fluid>
-        
-        <SourceTable @table-null="showDialogURLmethod" :TableData="TableData"/>
+      <!-- content -->
+      <v-container class="maincontent">
 
-        <DialogsURL v-if="showDialogURL"/>
+        <AddArtistDialog/>
+        
+        <SourceTable class="sourcetable" @table-null="showDialogURLmethod" :TableData="tableData"/>
+
+        <DialogsURL/>
         
       </v-container>
     </v-main>
@@ -46,15 +32,13 @@ import ArtistList from './components/ArtistList.vue';
 import SourceMenu from './components/SourceMenu.vue';
 import SourceTable from './components/SourceTable.vue';
 import DialogsURL from './components/DialogsURL.vue';
+import AddArtistDialog from './components/AddArtistDialog.vue';
+import { mapState, mapActions } from 'vuex';
 
 export default {
     data() {
         return {
-            artistsArrayList: [],
-            sourceTab: [],
-            TableData: [],
-            message: '',
-            showDialogURL: false,
+            
         };
     },
     components: {
@@ -62,31 +46,36 @@ export default {
       SourceMenu,
       SourceTable,
       DialogsURL,
+      AddArtistDialog,
+    },
+    computed: {
+      
     },
     methods: {
-      handleUpdateTable(data) {
-        this.TableData = data;
-        this.showDialogURL = false;
-      },
-      showDialogURLmethod() {
-        this.showDialogURL = true;
-      },
+      
     },
+    
 };
 </script>
 
 <style scoped>
   .sidebar {
-    width: 10rem !important;
+    width: 170px !important;
   }
   .app-bar {
     height: 45px;
   }
-  .image {
-    height: 35px;
+  .maincontent, .app-bar {
+    left: 180px !important;
   }
-  .imgbutton {
-    margin-bottom: 15px;
+  .app-bar {
+    width: 560px !important;
   }
+  .sourcetable {
+    position: absolute;
+    left: 180px;
+    top: 45px;
+  }
+
 </style>
 

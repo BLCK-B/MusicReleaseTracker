@@ -12,3 +12,4 @@ app.use(vuetify)
 app.use(store)
 app.mount('#app')
 
+

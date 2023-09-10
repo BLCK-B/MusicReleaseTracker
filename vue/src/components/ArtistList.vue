@@ -1,0 +1,131 @@
+<template>
+  <div class="buttonspace">
+    <button @mousedown="clickAddArtist" class="addbtn">add</button>
+    <button @mousedown="clickDeleteArtist" class="deletebtn">delete</button>
+  </div>
+
+    <div class="artistlist">
+      <!-- loop through the array and display each artist as a clickable list item -->
+      <li v-for="item in artistsArrayList" :key="item" @mousedown="handleItemClick(item)" :class="{'highlighted': item === lastClickedItem}" class="listbtn">
+          <div class="listitems">
+            {{ item }}
+          </div>
+      </li>
+    </div>
+
+</template>
+
+
+<script>
+import axios from 'axios';
+import { mapState, mapMutations } from 'vuex';
+
+export default {
+  data() {
+    return {
+      artistsArrayList: [],
+      lastClickedItem: null,
+    };
+  },
+  created() {
+    this.loadList();
+  },
+  methods: {
+    loadList() {
+      axios.get('http://localhost:8080/api/loadList')
+        .then(response => {
+          this.artistsArrayList = response.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    handleItemClick(artist) {
+      this.$store.commit('SET_ADD_VIS', false);
+      this.lastClickedItem = artist;
+      axios.post('http://localhost:8080/api/artistListClick', { artist })
+        .then(response => {
+          this.$store.commit('SET_SELECTED_ARTIST', artist);
+          this.$store.commit('SET_TABLE_CONTENT', response.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    clickAddArtist() {
+      this.$store.commit('SET_ADD_VIS', true);
+    },
+    clickDeleteArtist() {
+      if (this.lastClickedItem !== "") {
+        axios.get('http://localhost:8080/api/clickArtistDelete')
+        .then(() => {
+          this.$store.commit('SET_SELECTED_ARTIST', "");
+          this.$store.commit('SET_SOURCE_TAB', "musicbrainz");
+          this.loadList();
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      }
+    },
+  },
+  watch: {
+    '$store.state.loadListRequest'(loadListRequest) {
+      if (loadListRequest) {
+        this.$store.commit('SET_LOAD_REQUEST', false);
+        this.loadList();
+      }
+    }
+  },
+};
+</script>
+
+<style scoped>
+
+.listbtn {
+  display: block;
+  width: 100%;
+  height: 28px;
+  border-radius: 0px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.artistlist {
+  height: 535px;
+  overflow-y: auto;
+}
+.buttonspace {
+  margin-bottom: 5px;
+}
+.addbtn, .deletebtn {
+  font-size: 12px;
+  width: 75px;
+  height: 28px;
+  border: 2px solid grey;
+  border-radius: 5px;
+  background-color: white;
+}
+.addbtn {
+  margin-left: 5px;
+}
+.addbtn:hover {
+  background-color: #CCCCFF;
+}
+.deletebtn {
+  margin-left: 5px;
+}
+.deletebtn:hover {
+  background-color: red;
+}
+.listbtn:hover {
+  background-color: grey;
+}
+.highlighted {
+  background-color: #CCCCFF;
+}
+.highlighted:hover {
+  background-color: #CCCCFF;
+}
+
+</style>

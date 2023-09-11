@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <!-- sidebar -->
-    <div class="sidebar">
+    <div class="list">
       <artist-list />
     </div>
 
@@ -54,34 +54,32 @@ export default {
 <style scoped>
   
   .app {
-    font-family: 'robotoregular', sans-serif;
+    font-family: 'arial', sans-serif;
     font-size: 14px;
     user-select: none;
+    display: flex;
   }
-  .sidebar {
+  .list {
     width: 170px;
-    top: 5px;
-    position: absolute;
+    min-width: 170px;
+    top: 3px;
+    position: relative;
   }
   .maincontent {
-    width: 75%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    flex-grow: 1;
   }
   .topbar {
-    position: absolute;
-    left: 180px;
+    left: 5px;
+    position: relative;
   }
   .dialogsurl {
-    position: absolute;
-    top: 150px;
-    left: 45%;
+    position: relative;
+    top: 110px;
+    left: 55px;
   }
   .sourcetable {
-    position: absolute;
-    left: 180px;
-    top: 45px;
+    position: relative;
+    top: 10px;
   }
 
 </style>

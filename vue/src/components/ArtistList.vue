@@ -1,7 +1,7 @@
 <template>
   <div class="buttonspace">
-    <button @mousedown="clickAddArtist" class="addbtn">add</button>
-    <button @mousedown="clickDeleteArtist" class="deletebtn">delete</button>
+    <button @mousedown="clickAddArtist" class="addbtn" :disabled="!allowButtons">add</button>
+    <button @mousedown="clickDeleteArtist" class="deletebtn" :disabled="!allowButtons">delete</button>
   </div>
 
     <div class="artistlist">
@@ -29,6 +29,11 @@ export default {
   },
   created() {
     this.loadList();
+  },
+  computed: {
+    ...mapState([
+      'allowButtons',
+    ])
   },
   methods: {
     loadList() {
@@ -84,15 +89,18 @@ export default {
 
 .listbtn {
   display: block;
-  width: 100%;
+  width: 95%;
   height: 28px;
   border-radius: 0px;
   margin: 0;
   display: flex;
   align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .artistlist {
-  height: 535px;
+  min-height: 535px;
+  height: 96vh;
   overflow-y: auto;
 }
 .buttonspace {

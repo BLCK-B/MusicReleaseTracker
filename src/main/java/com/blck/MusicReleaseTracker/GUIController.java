@@ -278,4 +278,29 @@ public class GUIController {
         }
     }
 
+    public void clickScrape() {
+        try {
+            MainBackend.scrapeData();
+        } catch (Exception e) {
+            System.out.println("catastrophic error during scraping");
+            e.printStackTrace();
+        }
+        try {
+            MainBackend.fillCombviewTable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            String sql = "VACUUM;";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.execute();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

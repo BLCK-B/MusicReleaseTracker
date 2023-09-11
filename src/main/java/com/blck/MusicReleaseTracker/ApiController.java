@@ -58,4 +58,8 @@ public class ApiController {
         sendRequest.clickAddURL(url);
     }
 
+    @RequestMapping ("/clickScrape")
+    public void clickScrape() {
+        sendRequest.clickScrape();
+    }
 }

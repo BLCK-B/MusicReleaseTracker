@@ -55,16 +55,17 @@ export default {
 
 <style scoped>
 .table-container{
-  height: 530px;
+  height: 90vh;
+  padding-left: 5px;
 }
 .table-body {
-  height: 500px;
+  height: 100%;
   overflow-y: auto;
   user-select: text;
 }
 
 table {
-  width: 70%;
+  width: 100%;
   min-width: 500px;
 }
 th {
@@ -76,10 +77,14 @@ tr {
 }
 
 .song, .tdsong{
-  width: 50%;
+  width: 45%;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .artist, .tdartist{
-  width: 32%;
+  width: 37%;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;

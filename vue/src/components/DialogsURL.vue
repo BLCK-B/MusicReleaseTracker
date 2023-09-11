@@ -1,6 +1,6 @@
 <!-- the dialog will be rendered if the expression is true -->
 <template>
-    <div v-if="sourceTab === 'musicbrainz' && urlVisibility" class="dialog">
+    <div v-if="sourceTab === 'musicbrainz' && urlVisibility && allowButtons" class="dialog">
       <p>Insert source link for musicbrainz.</p><br>
       <p>Visit <a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy url</p><br>
       <p>Only correct links will be accepted.</p>
@@ -9,7 +9,7 @@
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
-    <div v-else-if="sourceTab === 'beatport' && urlVisibility" class="dialog">
+    <div v-else-if="sourceTab === 'beatport' && urlVisibility && allowButtons" class="dialog">
       <p>Insert source link for beatport.</p><br>
       <p>Visit <a href="https://beatport.com">https://beatport.com</a> > find artist > copy url</p><br>
       <p>Only correct links will be accepted.</p>
@@ -18,7 +18,7 @@
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
-    <div v-else-if="sourceTab === 'junodownload' && urlVisibility" class="dialog">
+    <div v-else-if="sourceTab === 'junodownload' && urlVisibility && allowButtons" class="dialog">
       <p>Insert source link for junodownload.</p><br>
       <p>Visit <a href="https://junodownload.com">https://junodownload.com</a> > find artist > copy url</p><br>
       <p>Only correct links will be accepted.</p>
@@ -48,6 +48,7 @@ export default {
         ...mapState([
         "tableData",
         "sourceTab",
+        'allowButtons',
         ]),
         urlVisibility() {
         const conditionMet = this.tableData.length === 0;

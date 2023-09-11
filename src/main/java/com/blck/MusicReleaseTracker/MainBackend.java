@@ -378,14 +378,11 @@ public class MainBackend {
                     pstmt.setString(2, songObject.getArtist());
                     pstmt.setString(3, songObject.getDate());
                 }
-                pstmt.addBatch();
                 pstmt.executeUpdate();
             }
             conn.setAutoCommit(false);
-            pstmt.executeBatch();
             conn.commit();
             conn.setAutoCommit(true);
-            pstmt.clearBatch();
             conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);

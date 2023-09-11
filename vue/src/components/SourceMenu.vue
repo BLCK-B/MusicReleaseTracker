@@ -1,16 +1,16 @@
 <template>
   <div class="wrapper">
     <div class="tabs">
-      <div @mousedown="handleSourceClick('combview')" class="cvtab" id="combview">Combined view</div>
-      <div @mousedown="handleSourceClick('beatport')" class="stab" id="beatport">BP</div>
-      <div @mousedown="handleSourceClick('musicbrainz')" class="stab" id="musicbrainz">MB</div>
-      <div @mousedown="handleSourceClick('junodownload')" class="stab" id="junodownload">JD</div>
+      <div @mousedown="handleSourceClick('combview')" :class="{ 'active': activeTab === 'combview' }" class="cvtab" id="combview">Combined view</div>
+      <div @mousedown="handleSourceClick('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="stab" id="beatport">BP</div>
+      <div @mousedown="handleSourceClick('musicbrainz')" :class="{ 'active': activeTab === 'musicbrainz' }" class="stab" id="musicbrainz">MB</div>
+      <div @mousedown="handleSourceClick('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab" id="junodownload">JD</div>
     </div>
     
-    <button @click="handleImgButtonClick('settings.png')" class="imgbutton">
+    <button @click="clickSettings('settings.png')" class="imgbutton" :disabled="!allowButtons">
       <img class="image" src="src/components/icons/settings.png" alt="Settings"/>
     </button>
-    <button @click="handleImgButtonClick('refresh.png')" class="imgbutton">
+    <button @click="clickScrape('refresh.png')" class="imgbutton" :disabled="!allowButtons">
       <img class="image" src="src/components/icons/refresh.png" alt="Refresh"/>
     </button>
 
@@ -22,10 +22,16 @@ import axios from 'axios';
 import { mapState, mapMutations } from 'vuex';
 
 export default {
+  data() {
+     return {
+       activeTab: "combview",
+     }
+  },
   computed: {
     ...mapState([
       'sourceTab',
-      'tableData'
+      'tableData',
+      'allowButtons',
     ])
   },
   created() {
@@ -40,6 +46,7 @@ export default {
   },
   methods: {
     handleSourceClick(source) {
+      this.activeTab = source;
       this.$store.commit('SET_ADD_VIS', false);
       axios.post('http://localhost:8080/api/sourceTabClick', { source })
         .then((response) => {
@@ -50,6 +57,17 @@ export default {
           console.error(error);
         });
     },
+    clickScrape() {
+      this.$store.commit('SET_ALLOW_BUTTONS', false);
+      axios.post('http://localhost:8080/api/clickScrape')
+        .then(() => {
+          this.$store.commit('SET_ALLOW_BUTTONS', true);
+          this.handleSourceClick("combview");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   },
 };
 </script>
@@ -58,6 +76,7 @@ export default {
  
 .wrapper {
   min-width: 500px;
+  width: 100%;
   display: flex;
   align-items: center;
 }
@@ -65,6 +84,7 @@ export default {
   display: flex;
   text-align: center;
   font-weight: bold;
+  flex-grow: 1;
 }
 .image {
   height: 30px;
@@ -74,17 +94,26 @@ export default {
   margin-left: 8px;
 }
 .cvtab {
-  width: 180px;
-  background-color: #CCCCFF;
+  width: 80%;
+  max-width: 400px;
   padding: 8px;
+  border: solid 3px transparent;
+  border-bottom: solid 3px #CCCCFF;
 }
 .stab {
-  width: 60px;
-  background-color: #CCCCFF;
+  width: 20%;
+  max-width: 150px;
   padding: 8px;
+  border: solid 3px transparent;
+  border-bottom: solid 3px #CCCCFF;
 }
 .tabs :hover {
-  background-color: grey;
+  border-bottom: solid 3px black;
+}
+.active {
+  transition: 0.2s;
+  background-color: #e2e2e2;
+  border-bottom: solid 3px black;
 }
 
 </style>

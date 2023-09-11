@@ -8,6 +8,7 @@ const state = {
   tableData: [],
   addDialogVis: false,
   loadListRequest: false,
+  allowButtons: true,
 };
 
 const mutations = {
@@ -26,6 +27,9 @@ const mutations = {
   },
   SET_LOAD_REQUEST(state, loadListRequest) {
     state.loadListRequest = loadListRequest;
+  },
+  SET_ALLOW_BUTTONS(state, allowButtons) {
+    state.allowButtons = allowButtons;
   },
 };
 

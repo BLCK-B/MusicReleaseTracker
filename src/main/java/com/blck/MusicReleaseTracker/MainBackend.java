@@ -4,8 +4,11 @@ import com.blck.MusicReleaseTracker.ModelsEnums.MonthNumbers;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -14,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,6 +37,7 @@ import java.util.stream.Collectors;
 
 public class MainBackend {
 
+    private static SSEController sseController = new SSEController();
     private static GUIController GUIController;
 
     @Component
@@ -157,6 +162,7 @@ public class MainBackend {
                 progress++;
                 double state = progress / artistnameList.size() / 3;
                 i++;
+                sseController.sendProgress(state);
             }
         }
         eachArtistUrls.clear();

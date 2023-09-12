@@ -7,6 +7,7 @@ module com.blck.MusicReleaseTracker {
     requires spring.beans;
     requires spring.boot.autoconfigure;
     requires spring.boot;
+    requires spring.webmvc;
 
     opens com.blck.MusicReleaseTracker;
 

@@ -9,6 +9,7 @@ const state = {
   addDialogVis: false,
   loadListRequest: false,
   allowButtons: true,
+  progress: 0,
 };
 
 const mutations = {
@@ -30,6 +31,9 @@ const mutations = {
   },
   SET_ALLOW_BUTTONS(state, allowButtons) {
     state.allowButtons = allowButtons;
+  },
+  SET_PROGRESS(state, progress) {
+    state.progress = progress * 100;
   },
 };
 

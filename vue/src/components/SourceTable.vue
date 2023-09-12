@@ -1,15 +1,15 @@
 <template>
-  <div v-if="hideTable" class="table-container">
+  <div class="table-container">
 
-    <table>
-      <thead>
-        <tr>
-          <th class="song">song</th>
-          <th v-if="!hideArtistColumn" class="artist">artist</th>
-          <th class="date">date</th>
-        </tr>
-      </thead>
-    </table>
+    <div class="table-header">
+      <table>
+          <tr>
+            <th class="song">song</th>
+            <th v-if="!hideArtistColumn" class="artist">artist</th>
+            <th class="date">date</th>
+          </tr>
+      </table>
+    </div>
 
     <div class="table-body">
       <table>
@@ -22,7 +22,7 @@
         </tbody>
       </table>
     </div>
-
+    
   </div>
 </template>
 
@@ -54,44 +54,58 @@ export default {
 </script>
 
 <style scoped>
-.table-container{
-  height: 90vh;
-  padding-left: 5px;
+
+.table-container {
+  height: 92%;
+  overflow-y: scroll;
+}
+.table-header {
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: white;
+  z-index: 3;
 }
 .table-body {
-  height: 100%;
+  flex-grow: 1;
   overflow-y: auto;
   user-select: text;
+  margin-bottom: 10vh;
 }
 
 table {
   width: 100%;
   min-width: 500px;
+  border-collapse: collapse;
 }
+
+th, td {
+  padding: 4px;
+}
+
 th {
-  padding-bottom: 6px;
-  border-bottom: solid 2px #CCCCFF;
-}
-tr {
-  height: 14px;
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
 }
 
-.song, .tdsong{
-  width: 45%;
+.song, .tdsong {
+  width: 50%;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.artist, .tdartist{
-  width: 37%;
+
+.artist, .tdartist {
+  width: 50%;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.date, .tddate{
-  width: 18%;
-}
 
+.date, .tddate {
+  width: 100px;
+  min-width: 100px;
+}
 </style>

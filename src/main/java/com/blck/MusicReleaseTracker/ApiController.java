@@ -3,7 +3,6 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;

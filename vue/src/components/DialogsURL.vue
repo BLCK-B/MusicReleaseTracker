@@ -1,7 +1,7 @@
 <!-- the dialog will be rendered if the expression is true -->
 <template>
     <div v-if="sourceTab === 'musicbrainz' && urlVisibility && allowButtons" class="dialog">
-      <p>Insert source link for musicbrainz.</p><br>
+      <p>Insert sourcelink for musicbrainz.</p><br>
       <p>Visit <a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy url</p><br>
       <p>Only correct links will be accepted.</p>
       <p>Example link:</p>

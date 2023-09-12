@@ -2,7 +2,7 @@
   <div class="app">
     <!-- sidebar -->
     <div class="list">
-      <artist-list />
+      <ArtistList/>
     </div>
 
       <div class="maincontent">
@@ -15,6 +15,10 @@
         <SourceTable class="sourcetable" @table-null="showDialogURLmethod" :TableData="tableData"/>
         <DialogsURL class="dialogsurl"/>
       </div>
+
+      <div class="progressbar">
+       <ProgressBar/>
+      </div>
   
   </div>
 </template>
@@ -26,6 +30,7 @@ import SourceMenu from './components/SourceMenu.vue';
 import SourceTable from './components/SourceTable.vue';
 import DialogsURL from './components/DialogsURL.vue';
 import AddArtistDialog from './components/AddArtistDialog.vue';
+import ProgressBar from './components/ProgressBar.vue';
 import { mapState, mapActions } from 'vuex';
 
 export default {
@@ -40,6 +45,7 @@ export default {
       SourceTable,
       DialogsURL,
       AddArtistDialog,
+      ProgressBar,
     },
     computed: {
       
@@ -52,12 +58,17 @@ export default {
 </script>
 
 <style scoped>
-  
   .app {
     font-family: 'arial', sans-serif;
     font-size: 14px;
     user-select: none;
     display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-left: 5px;
+    padding-top: 3px;
+    width: 100%;
   }
   .list {
     width: 170px;
@@ -67,6 +78,7 @@ export default {
   }
   .maincontent {
     flex-grow: 1;
+    height: 100vh;
   }
   .topbar {
     left: 5px;
@@ -80,6 +92,13 @@ export default {
   .sourcetable {
     position: relative;
     top: 10px;
+  }
+  .progressbar {
+    position: absolute;
+    bottom: 36px;
+    left: 0;
+    z-index: 5;
+    width: 100%;
   }
 
 </style>

@@ -88,7 +88,6 @@ export default {
 <style scoped>
 
 .listbtn {
-  display: block;
   width: 95%;
   height: 28px;
   border-radius: 0px;
@@ -99,9 +98,8 @@ export default {
   overflow: hidden;
 }
 .artistlist {
-  min-height: 535px;
-  height: 96vh;
-  overflow-y: auto;
+  height: 100vh;
+  overflow-y: scroll;
 }
 .buttonspace {
   margin-bottom: 5px;

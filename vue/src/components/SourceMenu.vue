@@ -7,10 +7,10 @@
       <div @mousedown="handleSourceClick('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab" id="junodownload">JD</div>
     </div>
     
-    <button @click="clickSettings('settings.png')" class="imgbutton" :disabled="!allowButtons">
+    <button @click="clickSettings('settings.png')" class="imgbutton1" :disabled="!allowButtons">
       <img class="image" src="src/components/icons/settings.png" alt="Settings"/>
     </button>
-    <button @click="clickScrape('refresh.png')" class="imgbutton" :disabled="!allowButtons">
+    <button @click="clickScrape('refresh.png')" class="imgbutton2" :disabled="!allowButtons">
       <img class="image" src="src/components/icons/refresh.png" alt="Refresh"/>
     </button>
 
@@ -25,6 +25,7 @@ export default {
   data() {
      return {
        activeTab: "combview",
+       eventSource: null,
      }
   },
   computed: {
@@ -59,10 +60,18 @@ export default {
     },
     clickScrape() {
       this.$store.commit('SET_ALLOW_BUTTONS', false);
+      this.eventSource = new EventSource('http://localhost:8080/progress');
+      this.eventSource.onmessage = (event) => {
+        console.log(event.data);
+        const progress = parseFloat(event.data);
+        this.$store.commit('SET_PROGRESS', progress);
+      };
+
       axios.post('http://localhost:8080/api/clickScrape')
         .then(() => {
           this.$store.commit('SET_ALLOW_BUTTONS', true);
           this.handleSourceClick("combview");
+          this.eventSource.close();
         })
         .catch((error) => {
           console.error(error);
@@ -89,9 +98,14 @@ export default {
 .image {
   height: 30px;
 }
-.imgbutton {
+.imgbutton1 {
   padding: 0;
   margin-left: 8px;
+}
+.imgbutton2 {
+  padding: 0;
+  margin-left: 8px;
+  margin-right: 20px;
 }
 .cvtab {
   width: 80%;

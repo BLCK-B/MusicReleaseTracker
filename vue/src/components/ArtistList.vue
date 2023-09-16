@@ -86,7 +86,6 @@ export default {
 </script>
 
 <style scoped>
-
 .listbtn {
   width: 95%;
   height: 28px;
@@ -96,6 +95,7 @@ export default {
   align-items: center;
   white-space: nowrap;
   overflow: hidden;
+  padding-left: 7px;
 }
 .artistlist {
   height: 100vh;
@@ -108,30 +108,35 @@ export default {
   font-size: 12px;
   width: 75px;
   height: 28px;
-  border: 2px solid grey;
-  border-radius: 5px;
-  background-color: white;
+  border: 2px solid var(--dull-color);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--contrast-color);
 }
 .addbtn {
   margin-left: 5px;
 }
 .addbtn:hover {
-  background-color: #CCCCFF;
+  background-color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  color: var(--accent-contrast);
 }
 .deletebtn {
   margin-left: 5px;
 }
 .deletebtn:hover {
   background-color: red;
+  border: 2px solid red;
 }
 .listbtn:hover {
-  background-color: grey;
+  background-color: var(--duller-color);
 }
 .highlighted {
-  background-color: #CCCCFF;
+  background-color: var(--accent-color);
+  color: var(--accent-contrast);
 }
 .highlighted:hover {
-  background-color: #CCCCFF;
+  background-color:  var(--accent-color);
 }
 
 </style>

@@ -4,6 +4,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
+
+import static com.blck.MusicReleaseTracker.DBtools.settingsStore;
+
 @RestController
 public class SSEController {
     private static SseEmitter emitter;
@@ -24,4 +28,5 @@ public class SSEController {
                 emitter.complete();
         }
     }
+
 }

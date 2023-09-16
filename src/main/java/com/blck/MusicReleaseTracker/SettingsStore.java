@@ -21,7 +21,7 @@ public class SettingsStore {
     private String configPath;
     private String configFolder;
     private ArrayList<String> filterWords;
-    private int entriesLimit;
+    private final int entriesLimit = 40;
 
     public SettingsStore() {
     }
@@ -54,9 +54,6 @@ public class SettingsStore {
         return filterWords;
     }
 
-    public void setEntriesLimit(int entriesLimit) {
-        this.entriesLimit = entriesLimit;
-    }
     public int getEntriesLimit() {
         return entriesLimit;
     }

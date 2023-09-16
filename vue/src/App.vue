@@ -37,6 +37,7 @@ import ProgressBar from './components/ProgressBar.vue';
 import SettingsWindow from './components/SettingsWindow.vue';
 import { mapState, mapActions } from 'vuex';
 
+
 export default {
   data() {
       return {
@@ -51,6 +52,19 @@ export default {
     AddArtistDialog,
     ProgressBar,
     SettingsWindow
+  },
+  created() {
+    const themePath1 = '/src/assets/primaryLight.css';
+    const linkElement1 = document.createElement('link');
+    linkElement1.rel = 'stylesheet';
+    linkElement1.href = themePath1;
+    document.head.appendChild(linkElement1);
+
+    const themePath2 = '/src/assets/secondaryCactus.css';
+    const linkElement2 = document.createElement('link');
+    linkElement2.rel = 'stylesheet';
+    linkElement2.href = themePath2;
+    document.head.appendChild(linkElement2);
   },
   computed: {
     ...mapState([
@@ -76,12 +90,18 @@ export default {
     padding-left: 5px;
     padding-top: 3px;
     width: 100%;
+    background-color: var(--primary-color);
+    color: var(--contrast-color);
   }
   .list {
     width: 170px;
     min-width: 170px;
-    top: 3px;
+    padding-top: 5px;
+    padding-left: 2px;
+    top: -3px;
+    left: -5px;
     position: relative;
+    background-color: #f3f3f3;
   }
   .maincontent {
     flex-grow: 1;

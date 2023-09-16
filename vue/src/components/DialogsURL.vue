@@ -77,9 +77,25 @@ export default {
 <style scoped>
     .dialog {
         width: 360px;
-        background-color: #CCCCFF;
+        background-color: var(--primary-color);
+        border: 1px solid var(--contrast-color);
+        color: var(--contrast-color);
     }
     input {
-        width: 82%;
+        background-color: var(--duller-color);
+        color: var(--contrast-color);
+        border: none;
+        width: 85%;
+    }
+    button {
+        color: black;
+        border: none;
+        float: right;
+    }
+    button:hover {
+        opacity: 70%;
+    }
+    a {
+        color: var(--accent-color);
     }
 </style>

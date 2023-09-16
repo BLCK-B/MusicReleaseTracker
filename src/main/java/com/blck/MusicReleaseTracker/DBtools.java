@@ -1,7 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
 import com.typesafe.config.*;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -124,13 +123,6 @@ public class DBtools {
                 filterWords.add(filter);
         }
         settingsStore.setFilterWords(filterWords);
-        //read combviewlength
-        switch (config.getString("combviewlength")) {
-            case "short" -> entriesLimit = 7;
-            case "medium" -> entriesLimit = 14;
-            case "long" -> entriesLimit = 40;
-        }
-        settingsStore.setEntriesLimit(entriesLimit);
     }
 
     public static void updateSettingsDB() {

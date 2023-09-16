@@ -7,7 +7,7 @@
       <div @mousedown="handleSourceClick('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab" id="junodownload">JD</div>
     </div>
     
-    <button @click="clickSettings('settings.png')" class="imgbutton1" :disabled="!allowButtons">
+    <button @click="openSettings('settings.png')" class="imgbutton1" :disabled="!allowButtons">
       <img class="image" src="src/components/icons/settings.png" alt="Settings"/>
     </button>
     <button @click="clickScrape('refresh.png')" class="imgbutton2" :disabled="!allowButtons">
@@ -77,7 +77,7 @@ export default {
           console.error(error);
         });
     },
-    clickSettings() {
+    openSettings() {
       this.$store.commit('SET_SETTINGS_OPEN', true);
     },
   },
@@ -99,38 +99,52 @@ export default {
   flex-grow: 1;
 }
 .image {
-  height: 30px;
+  height: 32px;
+}
+.image:hover {
+  opacity: 70%;
 }
 .imgbutton1 {
   padding: 0;
   margin-left: 8px;
+  background-color: transparent;
+  border: none;
+  margin-top: 2px;
 }
 .imgbutton2 {
   padding: 0;
   margin-left: 8px;
   margin-right: 20px;
+  background-color: transparent;
+  border: none;
+  margin-top: 2px;
 }
 .cvtab {
   width: 80%;
   max-width: 400px;
   padding: 8px;
   border: solid 3px transparent;
-  border-bottom: solid 3px #CCCCFF;
+  border-bottom: solid 3px var(--accent-color);
 }
 .stab {
   width: 20%;
   max-width: 150px;
   padding: 8px;
   border: solid 3px transparent;
-  border-bottom: solid 3px #CCCCFF;
+  border-bottom: solid 3px var(--accent-color);
 }
 .tabs :hover {
-  border-bottom: solid 3px black;
+  border-bottom: solid 3px var(--dull-color);;
 }
 .active {
-  transition: 0.2s;
-  background-color: #e2e2e2;
-  border-bottom: solid 3px black;
+  transition: 0.15s;
+  background-color: var(--accent-color);
+  color: var(--accent-contrast);
+  border-bottom: solid 3px var(--accent-color);
+  border-radius: 5px;
+}
+.active:hover {
+  border-bottom: solid 3px var(--accent-color);
 }
 
 </style>

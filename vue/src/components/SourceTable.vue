@@ -79,7 +79,8 @@ th, td {
 }
 
 th {
-  background-color: #f2f2f2;
+  background-color: var(--primary-color);
+  border: none;
   position: sticky;
   top: 0;
 }

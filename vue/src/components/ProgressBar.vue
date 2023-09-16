@@ -1,5 +1,5 @@
 <template>
-    <div class="progress-container" v-if="!allowButtons">
+    <div class="progress-container">
       <div class="progressbar" :style="{ width: `${progress}%` }"></div>
     </div>
   </template>
@@ -22,12 +22,12 @@ export default {
 
 <style scoped>
 .progress-container {
-    background-color: grey;
+    background-color: var(--primary-color);
 }
 .progressbar {
     height: 5px;
     line-height: 5px;
     text-align: center;
-    background-color: red;
+    background-color: var(--accent-color);
 }
 </style>

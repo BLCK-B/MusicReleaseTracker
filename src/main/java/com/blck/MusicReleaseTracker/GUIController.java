@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +28,7 @@ public class GUIController {
 
     private String lastClickedArtist;
     private String selectedSource;
-    private List<TableModel> tableContent = new ArrayList<>();
+    private final List<TableModel> tableContent = new ArrayList<>();
 
     public List<String> loadList() throws SQLException {
         List<String> dataList = new ArrayList<>();
@@ -311,6 +313,23 @@ public class GUIController {
         }
     }
 
+    public HashMap<String, Boolean> settingsOpened() {
+        //gather all settings states and return them to frontend
+        DBtools.readCombviewConfig();
+        HashMap<String, Boolean> configData = new HashMap<>();
+
+        ArrayList<String> filterWords = DBtools.settingsStore.getFilterWords();
+        String[] allFilters = new String[]{"Acoustic", "Extended", "Instrumental", "Remaster", "Remix", "VIP"};
+        for (String filter : allFilters) {
+            if (filterWords.contains(filter))
+                configData.put(filter, true);
+            else
+                configData.put(filter, false);
+        }
+
+        return configData;
+    }
+
     public void toggleFilter(String filter, Boolean value) {
         //change config filter state
         Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
@@ -324,6 +343,5 @@ public class GUIController {
             e.printStackTrace();
         }
     }
-
 
 }

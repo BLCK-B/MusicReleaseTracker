@@ -11,6 +11,9 @@ const state = {
   allowButtons: true,
   progress: 0,
   settingsOpen: false,
+
+  primaryColor: 'white',
+  accentColor: 'blue',
 };
 
 const mutations = {
@@ -38,7 +41,13 @@ const mutations = {
   },
   SET_SETTINGS_OPEN(state, settingsOpen) {
     state.settingsOpen = settingsOpen;
-    console.log(settingsOpen);
+  },
+
+  SET_PRIMARY_COLOR(state, color) {
+    state.primaryColor = color;
+  },
+  SET_ACCENT_COLOR(state, color) {
+    state.accentColor = color;
   },
 };
 

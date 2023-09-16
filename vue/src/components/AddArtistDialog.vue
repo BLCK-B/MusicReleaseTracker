@@ -60,12 +60,25 @@ export default {
     height: 230px;
     position: absolute;
     z-index: 3;
-    background-color: grey;
+    background-color: var(--primary-color);
+    border: 1px solid var(--contrast-color);
 }
 .diag-actions {
     position: relative;
-    top: 155px;
+    top: 160px;
     left: 5px;
+}
+button {
+    color: black;
+    border: none;
+    padding: 2px;
+    margin-right: 5px;
+    float: right;
+}
+input {
+    background-color: var(--duller-color);
+    color: var(--contrast-color);
+    border: none;
 }
 
 </style>

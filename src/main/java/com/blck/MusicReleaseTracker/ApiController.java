@@ -6,17 +6,13 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 public class ApiController {
-    /*
-    If you are retrieving a list and not sending any data in the request body, use @GetMapping
-    If you are sending data, use @PostMapping
-    For universal, @RequestMapping
-    */
 
     private final GUIController sendRequest;
 
@@ -66,5 +62,10 @@ public class ApiController {
     @PostMapping("/toggleFilter")
     public void toggleFilter(@RequestParam String filter, @RequestParam Boolean value) {
         sendRequest.toggleFilter(filter, value);
+    }
+
+    @GetMapping("/settingsOpened")
+    public HashMap<String, Boolean> settingsOpened() {
+        return sendRequest.settingsOpened();
     }
 }

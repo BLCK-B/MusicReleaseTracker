@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 public class MainBackend {
 
-    private static SSEController sseController = new SSEController();
+    private static final SSEController sseController = new SSEController();
     private static GUIController GUIController;
 
     @Component
@@ -157,7 +157,7 @@ public class MainBackend {
                 progress++;
                 double state = progress / artistnameList.size() / 3;
                 i++;
-                sseController.sendProgress(state);
+                SSEController.sendProgress(state);
             }
         }
         eachArtistUrls.clear();

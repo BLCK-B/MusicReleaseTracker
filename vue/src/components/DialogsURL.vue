@@ -51,8 +51,8 @@ export default {
         'allowButtons',
         ]),
         urlVisibility() {
-        const conditionMet = this.tableData.length === 0;
-        return conditionMet;
+            const conditionMet = this.tableData.length === 0;
+            return conditionMet;
         },
         isValid() {
             return this.rules.every(rule => rule(this.input) === true);

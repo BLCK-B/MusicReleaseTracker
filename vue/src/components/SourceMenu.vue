@@ -33,6 +33,7 @@ export default {
       'sourceTab',
       'tableData',
       'allowButtons',
+      'settingsOpen',
     ])
   },
   created() {
@@ -62,7 +63,6 @@ export default {
       this.$store.commit('SET_ALLOW_BUTTONS', false);
       this.eventSource = new EventSource('http://localhost:8080/progress');
       this.eventSource.onmessage = (event) => {
-        console.log(event.data);
         const progress = parseFloat(event.data);
         this.$store.commit('SET_PROGRESS', progress);
       };
@@ -76,7 +76,10 @@ export default {
         .catch((error) => {
           console.error(error);
         });
-    }
+    },
+    clickSettings() {
+      this.$store.commit('SET_SETTINGS_OPEN', true);
+    },
   },
 };
 </script>

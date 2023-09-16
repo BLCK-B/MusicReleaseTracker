@@ -15,7 +15,6 @@ public class SSEController {
     }
 
     public static void sendProgress(double state) {
-        System.out.println(emitter);
         try {
             emitter.send(String.valueOf(state));
         } catch (Exception e) {

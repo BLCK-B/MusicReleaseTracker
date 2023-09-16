@@ -46,6 +46,7 @@ public class ApiController {
     public void clickArtistAdd(@RequestBody String input) {
         sendRequest.artistAddConfirm(input);
     }
+
     @RequestMapping ("/clickArtistDelete")
     public void clickArtistDelete() {
         sendRequest.artistClickDelete();
@@ -60,5 +61,10 @@ public class ApiController {
     @RequestMapping ("/clickScrape")
     public void clickScrape() {
         sendRequest.clickScrape();
+    }
+
+    @PostMapping("/toggleFilter")
+    public void toggleFilter(@RequestParam String filter, @RequestParam Boolean value) {
+        sendRequest.toggleFilter(filter, value);
     }
 }

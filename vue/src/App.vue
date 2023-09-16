@@ -1,26 +1,29 @@
 <template>
-  <div class="app">
-    <!-- sidebar -->
-    <div class="list">
-      <ArtistList/>
-    </div>
+  <div class="app" v-if="!settingsOpen">
+      <!-- sidebar -->
+      <div class="list">
+        <ArtistList/>
+      </div>
 
-      <div class="maincontent">
-        <!-- top bar -->
-        <div class="topbar">
-          <SourceMenu/>
+        <div class="maincontent">
+          <!-- top bar -->
+          <div class="topbar">
+            <SourceMenu/>
+          </div>
+          <!-- content -->
+          <AddArtistDialog/>
+          <SourceTable class="sourcetable"/>
+          <DialogsURL class="dialogsurl"/>
         </div>
-        <!-- content -->
-        <AddArtistDialog/>
-        <SourceTable class="sourcetable" @table-null="showDialogURLmethod" :TableData="tableData"/>
-        <DialogsURL class="dialogsurl"/>
-      </div>
 
-      <div class="progressbar">
-       <ProgressBar/>
-      </div>
+        <div class="progressbar">
+        <ProgressBar/>
+        </div>
   
   </div>
+
+  <SettingsWindow v-if="settingsOpen"/>
+
 </template>
 
 
@@ -31,28 +34,32 @@ import SourceTable from './components/SourceTable.vue';
 import DialogsURL from './components/DialogsURL.vue';
 import AddArtistDialog from './components/AddArtistDialog.vue';
 import ProgressBar from './components/ProgressBar.vue';
+import SettingsWindow from './components/SettingsWindow.vue';
 import { mapState, mapActions } from 'vuex';
 
 export default {
-    data() {
-        return {
-            
-        };
-    },
-    components: {
-      ArtistList,
-      SourceMenu,
-      SourceTable,
-      DialogsURL,
-      AddArtistDialog,
-      ProgressBar,
-    },
-    computed: {
-      
-    },
-    methods: {
-      
-    },
+  data() {
+      return {
+          
+      };
+  },
+  components: {
+    ArtistList,
+    SourceMenu,
+    SourceTable,
+    DialogsURL,
+    AddArtistDialog,
+    ProgressBar,
+    SettingsWindow
+  },
+  computed: {
+    ...mapState([
+    'settingsOpen',
+    ])
+  },
+  methods: {
+    
+  },
     
 };
 </script>
@@ -85,9 +92,9 @@ export default {
     position: relative;
   }
   .dialogsurl {
-    position: relative;
-    top: 110px;
-    left: 55px;
+    top: 180px;
+    left: 260px;
+    position: absolute;
   }
   .sourcetable {
     position: relative;

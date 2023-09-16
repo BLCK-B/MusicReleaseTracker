@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container">
+  <div class="table-container" v-if="hideTable">
 
     <div class="table-header">
       <table>
@@ -38,11 +38,7 @@ export default {
       return this.tableData.some(item => item.artist === null);
     },
     hideTable() {
-      const conditionMet = this.tableData.some(item => item.song !== null);
-      if (!conditionMet) {
-        this.emitNullEvent();
-      }
-      return conditionMet;
+      return this.tableData.some(item => item.song !== null);
     },
   },
   methods: {

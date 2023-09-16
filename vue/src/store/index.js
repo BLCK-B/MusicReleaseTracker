@@ -10,6 +10,7 @@ const state = {
   loadListRequest: false,
   allowButtons: true,
   progress: 0,
+  settingsOpen: false,
 };
 
 const mutations = {
@@ -34,6 +35,10 @@ const mutations = {
   },
   SET_PROGRESS(state, progress) {
     state.progress = progress * 100;
+  },
+  SET_SETTINGS_OPEN(state, settingsOpen) {
+    state.settingsOpen = settingsOpen;
+    console.log(settingsOpen);
   },
 };
 

@@ -1,11 +1,19 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigValueFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -302,5 +310,20 @@ public class GUIController {
             throw new RuntimeException(e);
         }
     }
+
+    public void toggleFilter(String filter, Boolean value) {
+        //change config filter state
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
+        config = config.withValue("filters." + filter, ConfigValueFactory.fromAnyRef(value));
+        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
+            writer.write(config.root().render(renderOptions));
+        } catch (IOException e) {
+            System.out.println("could not save filter change");
+            e.printStackTrace();
+        }
+    }
+
 
 }

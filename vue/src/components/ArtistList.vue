@@ -11,6 +11,8 @@
             {{ item }}
           </div>
       </li>
+      <!-- adding height for enabling scroll all the way -->
+      <li v-for="item in artistsArrayList" :key="item"></li>
     </div>
 
 </template>
@@ -138,5 +140,6 @@ export default {
 .highlighted:hover {
   background-color:  var(--accent-color);
 }
+
 
 </style>

@@ -11,7 +11,6 @@ export default {
     computed: {
         ...mapState([
             'progress',
-            'allowButtons',
         ]),
     },
     methods: {
@@ -22,12 +21,12 @@ export default {
 
 <style scoped>
 .progress-container {
-    background-color: var(--primary-color);
+  background-color: var(--primary-color);
 }
 .progressbar {
-    height: 5px;
-    line-height: 5px;
-    text-align: center;
-    background-color: var(--accent-color);
+  height: 5px;
+  line-height: 5px;
+  text-align: center;
+  background-color: var(--accent-color);
 }
 </style>

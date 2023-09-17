@@ -1,4 +1,5 @@
 <template>
+
   <div class="app" v-if="!settingsOpen">
       <!-- sidebar -->
       <div class="list">
@@ -22,7 +23,9 @@
   
   </div>
 
-  <SettingsWindow v-if="settingsOpen"/>
+  <div class="app" v-if="settingsOpen">
+    <SettingsWindow/>
+  </div>
 
 </template>
 
@@ -54,13 +57,13 @@ export default {
     SettingsWindow
   },
   created() {
-    const themePath1 = '/src/assets/primaryLight.css';
+    const themePath1 = '/src/assets/primaryBlack.css';
     const linkElement1 = document.createElement('link');
     linkElement1.rel = 'stylesheet';
     linkElement1.href = themePath1;
     document.head.appendChild(linkElement1);
 
-    const themePath2 = '/src/assets/secondaryCactus.css';
+    const themePath2 = '/src/assets/secondaryRose.css';
     const linkElement2 = document.createElement('link');
     linkElement2.rel = 'stylesheet';
     linkElement2.href = themePath2;
@@ -90,6 +93,7 @@ export default {
     padding-left: 5px;
     padding-top: 3px;
     width: 100%;
+    height: 100%;
     background-color: var(--primary-color);
     color: var(--contrast-color);
   }
@@ -101,7 +105,7 @@ export default {
     top: -3px;
     left: -5px;
     position: relative;
-    background-color: #f3f3f3;
+    background-color: var(--subtle-color);
   }
   .maincontent {
     flex-grow: 1;
@@ -112,17 +116,17 @@ export default {
     position: relative;
   }
   .dialogsurl {
-    top: 180px;
-    left: 260px;
+    top: 25%;
+    left: 35%;
     position: absolute;
   }
   .sourcetable {
     position: relative;
-    top: 10px;
+    top: 6px;
   }
   .progressbar {
     position: absolute;
-    bottom: 36px;
+    bottom: 3px;
     left: 0;
     z-index: 5;
     width: 100%;

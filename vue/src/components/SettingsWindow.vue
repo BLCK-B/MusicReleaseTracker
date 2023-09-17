@@ -6,36 +6,35 @@
       <img class="image" src="src/components/icons/cross.png" alt="close"/>
     </button>
 
-    <section class="typefilters">
+    <section>
       <p>Exclusion filters<br>Select types of songs to be hidden in Combined view.</p>
 
       <div class="toggle-buttons">
         <div class="grid-item">
-          <label>Remix</label>
           <input type="checkbox" v-model="filters.Remix" @change="updateFilter('Remix', $event.target.checked)">
+          <label>Remix</label>
         </div>
         <div class="grid-item">
-          <label>VIP</label>
           <input type="checkbox" v-model="filters.VIP" @change="updateFilter('VIP', $event.target.checked)">
+          <label>VIP</label>
         </div>
         <div class="grid-item">
-          <label>Instrumental</label>
           <input type="checkbox" v-model="filters.Instrumental" @change="updateFilter('Instrumental', $event.target.checked)">
+          <label>Instrumental</label>
         </div>
         <div class="grid-item">
-          <label>Acoustic</label>
           <input type="checkbox" v-model="filters.Acoustic" @change="updateFilter('Acoustic', $event.target.checked)">
+          <label>Acoustic</label>
         </div>
         <div class="grid-item">
-          <label>Extended</label>
           <input type="checkbox" v-model="filters.Extended" @change="updateFilter('Extended', $event.target.checked)">
+          <label>Extended</label>
         </div>
         <div class="grid-item">
-          <label>Remaster</label>
           <input type="checkbox" v-model="filters.Remaster" @change="updateFilter('Remaster', $event.target.checked)">
+          <label>Remaster</label>
         </div>
       </div>
-
     </section>
 
  </div>
@@ -88,7 +87,7 @@ export default {
 </script>
 
 <style scoped>
-* {
+.settings {
   font-family: 'arial', sans-serif;
   font-size: 14px;
   user-select: none;
@@ -101,23 +100,28 @@ export default {
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 10px;
 }
-
-.radio-buttons {
-  display: flex;
-  flex-direction: column;
-}
-.radio-option {
-  display: flex;
-  align-items: center;
-}
 .imgbutton {
   position: absolute;
   right: 0;
   top: 0;
   padding: 0;
+  margin: 10px;
+  background-color: transparent;
+  border: none;
 }
 .image {
-  height: 25px;
+  height: 33px;
+}
+input {
+  margin-right: 5px;
+}
+section {
+  position: relative;
+  top: 20px;
+  left: 20px;
+  padding: 1px 15px 10px 15px;
+  background-color: var(--duller-color);
+  border-radius: 5px;
 }
 
 </style>

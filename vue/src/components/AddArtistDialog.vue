@@ -6,7 +6,7 @@
       </div>
   
         <div class="diag-actions">
-            <input v-model="input" :class="{ 'invalid': !isValid }" />
+            <input v-model="input" :class="{ 'invalid': !isValid }"/>
             <button @click="clickAdd" :disabled="!isValid">insert</button>
             <button @click="clickClose">cancel</button>
         </div>
@@ -54,31 +54,35 @@ export default {
 <style scoped>
 
 .wrapper {
-    top: 180px;
-    left: 260px;
+    top: 25%;
+    left: 35%;
     width: 300px;
     height: 230px;
     position: absolute;
     z-index: 3;
     background-color: var(--primary-color);
     border: 1px solid var(--contrast-color);
+    padding: 8px;
 }
 .diag-actions {
-    position: relative;
-    top: 160px;
+    position: absolute;
+    bottom: 3px;
     left: 5px;
 }
 button {
     color: black;
     border: none;
     padding: 2px;
-    margin-right: 5px;
-    float: right;
+    margin-left: 5px;
 }
 input {
     background-color: var(--duller-color);
     color: var(--contrast-color);
+    width: 200px;
     border: none;
+}
+input:focus {
+  outline: none;
 }
 
 </style>

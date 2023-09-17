@@ -7,11 +7,11 @@
       <div @mousedown="handleSourceClick('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab" id="junodownload">JD</div>
     </div>
     
-    <button @click="openSettings('settings.png')" class="imgbutton1" :disabled="!allowButtons">
-      <img class="image" src="src/components/icons/settings.png" alt="Settings"/>
+    <button @click="openSettings()" class="imgbutton1" :disabled="!allowButtons">
+      <img class="image" src="src/components/icons/optionsblack.png" alt="Settings"/>
     </button>
-    <button @click="clickScrape('refresh.png')" class="imgbutton2" :disabled="!allowButtons">
-      <img class="image" src="src/components/icons/refresh.png" alt="Refresh"/>
+    <button @click="clickScrape()" class="imgbutton2" :disabled="!allowButtons">
+      <img class="image" src="src/components/icons/refreshuniversal.png" alt="Refresh"/>
     </button>
 
   </div>
@@ -60,6 +60,7 @@ export default {
         });
     },
     clickScrape() {
+      console.log("clickscrape");
       this.$store.commit('SET_ALLOW_BUTTONS', false);
       this.eventSource = new EventSource('http://localhost:8080/progress');
       this.eventSource.onmessage = (event) => {
@@ -72,6 +73,7 @@ export default {
           this.$store.commit('SET_ALLOW_BUTTONS', true);
           this.handleSourceClick("combview");
           this.eventSource.close();
+          this.$store.commit('SET_PROGRESS', 0);
         })
         .catch((error) => {
           console.error(error);
@@ -91,33 +93,43 @@ export default {
   width: 100%;
   display: flex;
   align-items: center;
+  height: 38px;
 }
 .tabs {
   display: flex;
   text-align: center;
   font-weight: bold;
   flex-grow: 1;
+  height: 38px;
 }
 .image {
   height: 32px;
+  width: 32px;
 }
-.image:hover {
+.imgbutton1:hover, .imgbutton2:hover {
   opacity: 70%;
 }
 .imgbutton1 {
   padding: 0;
+  height: 32px;
+  width: 32px;
   margin-left: 8px;
-  background-color: transparent;
+  background-color: var(--accent-color);
   border: none;
   margin-top: 2px;
+  height: 32px;
+  width: 32px;
 }
 .imgbutton2 {
   padding: 0;
   margin-left: 8px;
   margin-right: 20px;
-  background-color: transparent;
+  background-color: var(--accent-color);
   border: none;
   margin-top: 2px;
+  border-radius: 50px;
+  height: 32px;
+  width: 32px;
 }
 .cvtab {
   width: 80%;

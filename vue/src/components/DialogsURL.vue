@@ -1,34 +1,37 @@
 <!-- the dialog will be rendered if the expression is true -->
 <template>
     <div v-if="sourceTab === 'musicbrainz' && urlVisibility && allowButtons" class="dialog">
-      <p>Insert sourcelink for musicbrainz.</p><br>
-      <p>Visit <a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy url</p><br>
-      <p>Only correct links will be accepted.</p>
+      <h1>MusicBrainz source</h1>
+      <p class="artist">{{ artist }}</p><br>
+      <p><a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy url</p>
+      <p>Only correct links will be accepted.</p><br>
       <p>Example link:</p>
-      <p>https://musicbrainz.org/artist/id/...</p>
+      <p>https://musicbrainz.org/artist/<span class="variabletext">id/...</span></p>
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
     <div v-else-if="sourceTab === 'beatport' && urlVisibility && allowButtons" class="dialog">
-      <p>Insert source link for beatport.</p><br>
-      <p>Visit <a href="https://beatport.com">https://beatport.com</a> > find artist > copy url</p><br>
-      <p>Only correct links will be accepted.</p>
+        <h1>Beatport source</h1>
+        <p class="artist">{{ artist }}</p><br>
+      <p><a href="https://beatport.com">https://beatport.com</a> > find artist > copy url</p>
+      <p>Only correct links will be accepted.</p><br>
       <p>Example link:</p>
-      <p>https://beatport.com/artist/artistname/id/...</p>
+      <p>https://beatport.com/artist/<span class="variabletext">artistname/id/...</span></p>
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
     <div v-else-if="sourceTab === 'junodownload' && urlVisibility && allowButtons" class="dialog">
-      <p>Insert source link for junodownload.</p><br>
-      <p>Visit <a href="https://junodownload.com">https://junodownload.com</a> > find artist > copy url</p><br>
-      <p>Only correct links will be accepted.</p>
+        <h1>Junodownload source</h1>
+        <p class="artist">{{ artist }}</p><br>
+      <p><a href="https://junodownload.com">https://junodownload.com</a> > find artist > copy url</p>
+      <p>Only correct links will be accepted.</p><br>
       <p>Example link:</p>
-      <p>https://junodownload.com/artists/artistname/...</p>
+      <p>https://junodownload.com/artists/<span class="variabletext">artistname/...</span></p>
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
     
-  </template>
+</template>
   
 <script>
 import axios from 'axios';
@@ -48,7 +51,8 @@ export default {
         ...mapState([
         "tableData",
         "sourceTab",
-        'allowButtons',
+        "allowButtons",
+        "artist",
         ]),
         urlVisibility() {
             const conditionMet = this.tableData.length === 0;
@@ -76,26 +80,53 @@ export default {
 
 <style scoped>
     .dialog {
-        width: 360px;
+        width: 375px;
+        height: 280px;
         background-color: var(--primary-color);
         border: 1px solid var(--contrast-color);
         color: var(--contrast-color);
+        padding: 8px;
     }
     input {
         background-color: var(--duller-color);
         color: var(--contrast-color);
         border: none;
-        width: 85%;
+        width: 328px;
+        position: absolute;
+        bottom: 3px;
+        left: 5px;
+    }
+    input:focus {
+        outline: none;
     }
     button {
         color: black;
         border: none;
-        float: right;
+        position: absolute;
+        right: 5px;
+        bottom: 3px;
     }
     button:hover {
         opacity: 70%;
     }
     a {
         color: var(--accent-color);
+        font-weight: bold;
+        text-decoration: none;
     }
+    a:hover {
+        text-decoration: underline;
+    }
+    h1 {
+        font-size: 17px;
+        font-weight: normal;
+        
+    }
+    .variabletext {
+        color: var(--accent-color);
+    }
+    .artist {
+        user-select: text;
+    }
+    
 </style>

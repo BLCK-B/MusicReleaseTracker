@@ -193,9 +193,9 @@ public class MainBackend {
                 continue;
             }
             else
-                insertedSongs.add(songsDirtyArray[i]);
+                insertedSongs.add(songsDirtyArray[i].replace("’", "'"));
 
-            songsArrayList.add(songsDirtyArray[i]);
+            songsArrayList.add(songsDirtyArray[i].replace("’", "'"));
             datesArrayList.add(datesDirtyArray[i]);
             i++;
         }
@@ -240,7 +240,7 @@ public class MainBackend {
 
         while (matcher.find()) {
             typesArrayList.add(matcher.group(1));
-            songsArrayList.add(matcher.group(2).replace("\\u0026", "&"));
+            songsArrayList.add(matcher.group(2).replace("\\u0026", "&").replace("’", "'"));
             datesArrayList.add(matcher.group(3));
         }
         doc.empty();
@@ -273,6 +273,9 @@ public class MainBackend {
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.mb-3.mb-lg-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
+        for (int i = 0; i < songsArray.length; i++) {
+            songsArray[i] = songsArray[i].replace("’", "'");
+        }
         String[] datesArray = new String[dates.size()];
         String[] typesArray = null;
         doc.empty();

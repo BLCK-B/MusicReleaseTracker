@@ -1,6 +1,6 @@
 <!-- the dialog will be rendered if the expression is true -->
 <template>
-    <div v-if="sourceTab === 'musicbrainz' && urlVisibility && allowButtons" class="dialog">
+    <div v-if="sourceTab === 'musicbrainz' && urlVisibility && allowButtons && artist.length !== 0" class="dialog">
       <h1>MusicBrainz source</h1>
       <p class="artist">{{ artist }}</p><br>
       <p><a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy url</p>
@@ -10,7 +10,7 @@
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
-    <div v-else-if="sourceTab === 'beatport' && urlVisibility && allowButtons" class="dialog">
+    <div v-else-if="sourceTab === 'beatport' && urlVisibility && allowButtons && artist.length !== 0" class="dialog">
         <h1>Beatport source</h1>
         <p class="artist">{{ artist }}</p><br>
       <p><a href="https://beatport.com">https://beatport.com</a> > find artist > copy url</p>
@@ -20,7 +20,7 @@
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
-    <div v-else-if="sourceTab === 'junodownload' && urlVisibility && allowButtons" class="dialog">
+    <div v-else-if="sourceTab === 'junodownload' && urlVisibility && allowButtons && artist.length !== 0" class="dialog">
         <h1>Junodownload source</h1>
         <p class="artist">{{ artist }}</p><br>
       <p><a href="https://junodownload.com">https://junodownload.com</a> > find artist > copy url</p>

@@ -44,7 +44,9 @@ import { mapState, mapActions } from 'vuex';
 export default {
   data() {
       return {
-          
+        appliedStyles: [],
+        theme: "Black",
+        accent: "Classic",
       };
   },
   components: {
@@ -57,25 +59,47 @@ export default {
     SettingsWindow
   },
   created() {
-    const themePath1 = '/src/assets/primaryBlack.css';
-    const linkElement1 = document.createElement('link');
-    linkElement1.rel = 'stylesheet';
-    linkElement1.href = themePath1;
-    document.head.appendChild(linkElement1);
-
-    const themePath2 = '/src/assets/secondaryRose.css';
-    const linkElement2 = document.createElement('link');
-    linkElement2.rel = 'stylesheet';
-    linkElement2.href = themePath2;
-    document.head.appendChild(linkElement2);
+    this.applyTheme(this.theme, this.accent);
   },
   computed: {
     ...mapState([
-    'settingsOpen',
+    "settingsOpen",
+    "primaryColor",
+    "accentColor",
     ])
   },
+  watch: {
+    primaryColor(theme) {
+      this.theme = theme;
+      this.applyTheme(theme, this.accent);
+    },
+    accentColor(accent) {
+      this.accent = accent;
+      this.applyTheme(this.theme, accent);
+    }
+  },
   methods: {
-    
+    applyTheme(theme, accent) {
+      //remove previously applied css
+      this.appliedStyles.forEach(style => {
+      style.remove();
+      });
+      this.appliedStyles = [];
+
+      let themePath = `/src/assets/primary${theme}.css`;
+      let linkElement = document.createElement('link');
+      linkElement.rel = 'stylesheet';
+      linkElement.href = themePath;
+      document.head.appendChild(linkElement);
+      this.appliedStyles.push(linkElement);
+
+      themePath = `/src/assets/secondary${accent}.css`;
+      linkElement = document.createElement('link');
+      linkElement.rel = 'stylesheet';
+      linkElement.href = themePath;
+      document.head.appendChild(linkElement);
+      this.appliedStyles.push(linkElement);
+    },
   },
     
 };

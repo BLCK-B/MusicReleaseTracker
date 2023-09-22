@@ -122,6 +122,7 @@ public class MainBackend {
             for (String oneUrl : eachArtistUrls) {
                 //if clicked cancel
                 if (scrapeCancel) {
+                    SSEController.sendProgress(1.0);
                     eachArtistUrls.clear();
                     artistnameList.clear();
                     System.gc();
@@ -165,7 +166,7 @@ public class MainBackend {
         System.gc();
     }
 
-    private static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
         //scraper for musicbrainz
         Document doc = null;
         try {
@@ -216,7 +217,7 @@ public class MainBackend {
         datesArray = null;
     }
 
-    private static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {
         //scraper for beatport
         Document doc = null;
         try {
@@ -261,7 +262,7 @@ public class MainBackend {
         typesArray = null;
     }
 
-    private static void scrapeJunodownload(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeJunodownload(String oneUrl, String songArtist) throws IOException {
         //scraper for junodownload
         Document doc = null;
         try {

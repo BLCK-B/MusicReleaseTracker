@@ -18,7 +18,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,11 +111,11 @@ public class GUIController {
     public List<TableModel> sourceTabClick(String source) {
         selectedSource = source;
         if (!selectedSource.equals("combview")) {
-                try {
-                    loadTable();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+            try {
+                loadTable();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         if (selectedSource.equals("combview")) {
             try {
@@ -171,8 +170,11 @@ public class GUIController {
         pstmt.close();
         rs.close();
     }
+    public void fillCombview() {
+        MainBackend.fillCombviewTable();
+    }
 
-    public void clickAddURL(String url) {
+    public void AclickAddURL(String url) {
         url = url.replace("=" , "").trim();
         if (url.isEmpty() || url.isBlank())
             return;
@@ -225,6 +227,78 @@ public class GUIController {
             }
         }
         saveUrl(sql, url);
+    }
+
+    public void clickAddURL(String url) {
+        url = url.replace("=" , "").trim();
+        if (url.isEmpty() || url.isBlank())
+            return;
+
+        String sql = null;
+        int artistIndex;
+        //reduce to base form then modify
+        switch (selectedSource) {
+            case "musicbrainz" -> {
+                sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
+                artistIndex = url.indexOf("/artist/");
+                if (artistIndex != -1 && url.contains("musicbrainz.org")) {
+                    int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
+                    if (artistIdIndex != -1)
+                        url = url.substring(0, artistIdIndex);
+                }
+                else
+                    return;
+                //modify link to latest releases
+                if(!url.contains("page="))
+                    url += "/releases/?page=20";
+
+                try {
+                    MainBackend.scrapeBrainz(url, lastClickedArtist);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case "beatport" -> {
+                sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
+                artistIndex = url.indexOf("/artist/");
+                if (artistIndex != -1 && url.contains("beatport.com")) {
+                    int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
+                    if (artistIdIndex != -1) {
+                        artistIdIndex = url.indexOf('/', artistIdIndex + 1); // skip one '/' and find the next '/'
+                        if (artistIdIndex != -1) {
+                            url = url.substring(0, artistIdIndex); // remove the trailing '/'
+                        }
+                    }
+                }
+                else
+                    return;
+                url += "/tracks";
+                try {
+                    MainBackend.scrapeBeatport(url, lastClickedArtist);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case "junodownload" -> {
+                sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
+                artistIndex = url.indexOf("/artists/");
+                if (artistIndex != -1 && url.contains("junodownload.com")) {
+                    int artistIdIndex = url.indexOf('/', artistIndex + "/artists/".length());
+                    if (artistIdIndex != -1)
+                        url = url.substring(0, artistIdIndex + 1);
+                }
+                else
+                    return;
+                url += "releases/?music_product_type=single&laorder=date_down";
+
+                try {
+                    MainBackend.scrapeJunodownload(url, lastClickedArtist);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        //saveUrl(sql, url);
     }
 
     public void saveUrl(String sql, String url) {
@@ -311,6 +385,9 @@ public class GUIController {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void cancelScrape() {
+        MainBackend.scrapeCancel = true;
     }
 
     public HashMap<String, Boolean> settingsOpened() {

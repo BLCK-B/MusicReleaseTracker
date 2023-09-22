@@ -2,7 +2,6 @@
 import { createStore } from 'vuex'
 
 const state = {
-  // Your initial state variables
   artist: [],
   sourceTab: "combview",
   tableData: [],
@@ -13,6 +12,7 @@ const state = {
   settingsOpen: false,
   primaryColor: "Black",
   accentColor: "Classic",
+  previewvis: false,
 };
 
 const mutations = {
@@ -46,6 +46,9 @@ const mutations = {
   },
   SET_ACCENT_COLOR(state, color) {
     state.accentColor = color;
+  },
+  SET_PREVIEW_VIS(state, previewvis) {
+    state.previewvis = previewvis;
   },
 };
 

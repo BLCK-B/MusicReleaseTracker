@@ -68,4 +68,14 @@ public class ApiController {
     public HashMap<String, Boolean> settingsOpened() {
         return sendRequest.settingsOpened();
     }
+
+    @PostMapping("/cancelScrape")
+    public void cancelScrape() {
+        sendRequest.cancelScrape();
+    }
+
+    @PostMapping("/fillCombview")
+    public void fillCombview() {
+        sendRequest.fillCombview();
+    }
 }

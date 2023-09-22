@@ -42,9 +42,7 @@ export default {
     },
   },
   methods: {
-    emitNullEvent() {
-      this.$emit('table-null');
-    },
+  
   },
 };
 </script>
@@ -58,7 +56,6 @@ export default {
 .table-header {
   flex-shrink: 0;
   overflow: hidden;
-  background-color: white;
   z-index: 3;
 }
 .table-body {

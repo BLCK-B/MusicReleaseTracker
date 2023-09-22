@@ -3,7 +3,8 @@
  <div class="settings">
 
     <button @click="clickClose()" class="imgbutton">
-      <img class="image" src="src/components/icons/cross.png" alt="close"/>
+      <img v-if="primaryColor !== 'Light'" class="image" src="src/components/icons/crossdark.png" alt="close"/>
+      <img v-if="primaryColor === 'Light'" class="image" src="src/components/icons/crosslight.png" alt="close"/>
     </button>
 
     <section>
@@ -99,7 +100,9 @@ export default {
     }
   },
   computed: {
-  
+    ...mapState([
+        'primaryColor',
+    ]),
   },
   created() {
     axios.get('http://localhost:8080/api/settingsOpened')
@@ -189,6 +192,9 @@ section {
 }
 .appearance {
   border-right: 5px solid var(--accent-color);
+}
+.imgbutton:hover {
+  opacity: 60%;
 }
 
 </style>

@@ -1,15 +1,18 @@
 <template>
     <div v-if="addDialogVis" class="wrapper">
 
-      <div class="card-text">
+    <div class="card-text">
         <p class="text--primary">Type artist's name and confirm.</p>
-      </div>
+    </div>
   
-        <div class="diag-actions">
-            <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickAdd" :disabled="!isValid">insert</button>
-            <button @click="clickClose">cancel</button>
-        </div>
+    <div class="diag-actions">
+        <input v-model="input" :class="{ 'invalid': !isValid }"/>
+        <button @click="clickAdd" :disabled="!isValid">insert</button>
+        <button @click="clickClose" class="imgbutton">
+            <img v-if="primaryColor !== 'Light'" class="image" src="src/components/icons/crossdark.png" alt="insert"/>
+            <img v-if="primaryColor === 'Light'" class="image" src="src/components/icons/crosslight.png" alt="insert"/>
+        </button>
+    </div>
 
     </div>
   </template>
@@ -43,7 +46,10 @@ export default {
         },
     },
     computed: {
-        ...mapState(['addDialogVis']),
+        ...mapState([
+            'addDialogVis',
+            "primaryColor",
+        ]),
         isValid() {
             return this.rules.every(rule => rule(this.input) === true);
         },
@@ -73,16 +79,30 @@ button {
     color: black;
     border: none;
     padding: 2px;
-    margin-left: 5px;
+    margin-left: 10px;
 }
 input {
     background-color: var(--duller-color);
     color: var(--contrast-color);
-    width: 200px;
+    width: 225px;
     border: none;
 }
 input:focus {
-  outline: none;
+    outline: none;
+}
+.imgbutton, .image {
+    height: 23px;
+    width: 23px;
+    padding: 0;
+    float: right;
+    margin-left: 5px;
+    background-color: transparent;
+}
+.imgbutton {
+    position: relative;
+}
+.imgbutton:hover {
+    opacity: 50%;
 }
 
 </style>

@@ -30,7 +30,6 @@
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickURL" :disabled="!isValid">insert</button>
     </div>
-    
 </template>
   
 <script>
@@ -39,7 +38,7 @@ import { mapState } from 'vuex';
 
 export default {
     data: () => ({
-        input: '',
+        input: "",
         rules: [
         value => !!value.trim(),
         value => value.includes("musicbrainz.org/artist/") ||
@@ -67,7 +66,12 @@ export default {
             const url = encodeURIComponent(this.input);
             axios.post('http://localhost:8080/api/clickAddURL', url)
             .then(() => {
-                console.log("success");
+                const artist = this.artist;
+                axios.post('http://localhost:8080/api/artistListClick', { artist })
+                    .then(response => {
+                        this.$store.commit('SET_TABLE_CONTENT', response.data);
+                        this.$store.commit('SET_PREVIEW_VIS', true);
+                    })
             })
             .catch(error => {
                 console.error(error);

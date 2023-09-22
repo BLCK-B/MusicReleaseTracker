@@ -3,13 +3,14 @@
   <div class="app" v-if="!settingsOpen">
       <!-- sidebar -->
       <div class="list">
-        <ArtistList/>
+        <ArtistList v-if="!previewvis"/>
+        <PreviewDialog v-if="previewvis" class="preview"/>
       </div>
 
         <div class="maincontent">
           <!-- top bar -->
           <div class="topbar">
-            <SourceMenu/>
+            <SourceMenu v-if="!previewvis"/>
           </div>
           <!-- content -->
           <AddArtistDialog/>
@@ -18,7 +19,7 @@
         </div>
 
         <div class="progressbar">
-        <ProgressBar/>
+          <ProgressBar/>
         </div>
   
   </div>
@@ -38,7 +39,9 @@ import DialogsURL from './components/DialogsURL.vue';
 import AddArtistDialog from './components/AddArtistDialog.vue';
 import ProgressBar from './components/ProgressBar.vue';
 import SettingsWindow from './components/SettingsWindow.vue';
-import { mapState, mapActions } from 'vuex';
+import PreviewDialog from './components/PreviewDialog.vue';
+import { mapState, mapMutations } from 'vuex';
+import axios from 'axios';
 
 
 export default {
@@ -56,8 +59,9 @@ export default {
     DialogsURL,
     AddArtistDialog,
     ProgressBar,
-    SettingsWindow
-  },
+    SettingsWindow,
+    PreviewDialog
+},
   created() {
     this.applyTheme(this.theme, this.accent);
   },
@@ -66,6 +70,7 @@ export default {
     "settingsOpen",
     "primaryColor",
     "accentColor",
+    "previewvis",
     ])
   },
   watch: {
@@ -76,7 +81,15 @@ export default {
     accentColor(accent) {
       this.accent = accent;
       this.applyTheme(this.theme, accent);
-    }
+    },
+    settingsOpen(open) {
+      if (!open) {
+        axios.post('http://localhost:8080/api/fillCombview')
+        .catch((error) => {
+          console.error(error);
+        });
+      }
+    },
   },
   methods: {
     applyTheme(theme, accent) {

@@ -8,9 +8,11 @@
     </div>
     
     <button @click="openSettings()" class="imgbutton1" :disabled="!allowButtons">
-      <img class="image" src="src/components/icons/optionsblack.png" alt="Settings"/>
+      <img v-if="primaryColor === 'Black'" class="image" src="src/components/icons/optionsblack.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Dark'" class="image" src="src/components/icons/optionsdark.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Light'" class="image" src="src/components/icons/optionslight.png" alt="Settings"/>
     </button>
-    <button @click="clickScrape()" class="imgbutton2" :disabled="!allowButtons">
+    <button @click="clickScrape()" v-bind:style="{ 'background-color': scrapeColor }" class="imgbutton2">
       <img class="image" src="src/components/icons/refreshuniversal.png" alt="Refresh"/>
     </button>
 
@@ -26,6 +28,7 @@ export default {
      return {
        activeTab: "combview",
        eventSource: null,
+       scrapeColor: "var(--accent-color)",
      }
   },
   computed: {
@@ -33,7 +36,7 @@ export default {
       'sourceTab',
       'tableData',
       'allowButtons',
-      'settingsOpen',
+      'primaryColor',
     ])
   },
   created() {
@@ -41,9 +44,8 @@ export default {
   },
   watch: {
     sourceTab(tabValue) {
-      if (tabValue) {
+      if (tabValue)
         this.handleSourceClick(tabValue);
-      }
     },
   },
   methods: {
@@ -60,24 +62,35 @@ export default {
         });
     },
     clickScrape() {
-      console.log("clickscrape");
-      this.$store.commit('SET_ALLOW_BUTTONS', false);
-      this.eventSource = new EventSource('http://localhost:8080/progress');
-      this.eventSource.onmessage = (event) => {
-        const progress = parseFloat(event.data);
-        this.$store.commit('SET_PROGRESS', progress);
-      };
+      const allowButtons = this.allowButtons;
+      if (!allowButtons) {
+        axios.post('http://localhost:8080/api/cancelScrape')
+          .then(() => {
+            this.$store.commit('SET_ALLOW_BUTTONS', true);
+            this.scrapeColor = "var(--accent-color)";
+          })
+      }
+      else {
+        this.$store.commit('SET_ALLOW_BUTTONS', false);
+        this.scrapeColor = "var(--dull-color)";
+        this.eventSource = new EventSource('http://localhost:8080/progress');
+        this.eventSource.onmessage = (event) => {
+          const progress = parseFloat(event.data);
+          this.$store.commit('SET_PROGRESS', progress);
+        };
 
-      axios.post('http://localhost:8080/api/clickScrape')
-        .then(() => {
-          this.$store.commit('SET_ALLOW_BUTTONS', true);
-          this.handleSourceClick("combview");
-          this.eventSource.close();
-          this.$store.commit('SET_PROGRESS', 0);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+        axios.post('http://localhost:8080/api/clickScrape')
+          .then(() => {
+            this.scrapeColor = "var(--accent-color)";
+            this.$store.commit('SET_ALLOW_BUTTONS', true);
+            this.handleSourceClick("combview");
+            this.eventSource.close();
+            this.$store.commit('SET_PROGRESS', 0);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     },
     openSettings() {
       this.$store.commit('SET_SETTINGS_OPEN', true);
@@ -124,7 +137,6 @@ export default {
   padding: 0;
   margin-left: 8px;
   margin-right: 20px;
-  background-color: var(--accent-color);
   border: none;
   margin-top: 2px;
   border-radius: 50px;

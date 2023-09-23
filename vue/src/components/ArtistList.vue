@@ -17,7 +17,6 @@
 
 </template>
 
-
 <script>
 import axios from 'axios';
 import { mapState, mapMutations } from 'vuex';
@@ -34,10 +33,19 @@ export default {
   },
   computed: {
     ...mapState([
-      'allowButtons',
+      "allowButtons",
     ])
   },
+  watch: {
+    '$store.state.loadListRequest'(loadListRequest) {
+        if (loadListRequest) {
+          this.$store.commit('SET_LOAD_REQUEST', false);
+          this.loadList();
+        }
+    }
+  },
   methods: {
+    //populate list from backend
     loadList() {
       axios.get('http://localhost:8080/api/loadList')
         .then(response => {
@@ -47,6 +55,7 @@ export default {
           console.error(error);
         });
     },
+    //load respective table when artist selected
     handleItemClick(artist) {
       this.$store.commit('SET_ADD_VIS', false);
       this.lastClickedItem = artist;
@@ -59,15 +68,17 @@ export default {
           console.error(error);
         });
     },
+    //show AddArtistDialog
     clickAddArtist() {
       this.$store.commit('SET_ADD_VIS', true);
     },
+    //delete all (last selected) artist entries from db, rebuild combview
     clickDeleteArtist() {
       if (this.lastClickedItem !== "") {
         axios.get('http://localhost:8080/api/clickArtistDelete')
         .then(() => {
           this.$store.commit('SET_SELECTED_ARTIST', "");
-          this.$store.commit('SET_SOURCE_TAB', "musicbrainz");
+          this.$store.commit('SET_SOURCE_TAB', "combview");
           this.loadList();
         })
         .catch(error => {
@@ -75,14 +86,6 @@ export default {
         });
       }
     },
-  },
-  watch: {
-    '$store.state.loadListRequest'(loadListRequest) {
-      if (loadListRequest) {
-        this.$store.commit('SET_LOAD_REQUEST', false);
-        this.loadList();
-      }
-    }
   },
 };
 </script>

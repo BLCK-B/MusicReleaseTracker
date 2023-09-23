@@ -30,17 +30,19 @@ export default {
         ],
     }),
     methods: {
+        //add artist to db
         clickAdd() {
-        axios.post('http://localhost:8080/api/clickArtistAdd', this.input)
-            .then(() => {
-                this.$store.commit('SET_SELECTED_ARTIST', "");
-                this.$store.commit('SET_ADD_VIS', false);
-                this.$store.commit('SET_LOAD_REQUEST', true);
-            })
-            .catch(error => {
-                console.error(error);
-            });
+            axios.post('http://localhost:8080/api/clickArtistAdd', this.input)
+                .then(() => {
+                    this.$store.commit('SET_SELECTED_ARTIST', "");
+                    this.$store.commit('SET_ADD_VIS', false);
+                    this.$store.commit('SET_LOAD_REQUEST', true);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         },
+        //close dialog
         clickClose() {
             this.$store.commit('SET_ADD_VIS', false);
         },
@@ -50,6 +52,7 @@ export default {
             'addDialogVis',
             "primaryColor",
         ]),
+        //if no rules in data broken, enable add button
         isValid() {
             return this.rules.every(rule => rule(this.input) === true);
         },

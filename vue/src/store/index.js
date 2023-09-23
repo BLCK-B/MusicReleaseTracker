@@ -3,7 +3,7 @@ import { createStore } from 'vuex'
 
 const state = {
   artist: [],
-  sourceTab: "combview",
+  sourceTab: "",
   tableData: [],
   addDialogVis: false,
   loadListRequest: false,
@@ -16,7 +16,7 @@ const state = {
 };
 
 const mutations = {
-  // Synchronous updates of states
+  //synchronous updates of states
   SET_SOURCE_TAB(state, sourceTab) {
     state.sourceTab = sourceTab;
   },
@@ -53,12 +53,12 @@ const mutations = {
 };
 
 const actions = {
-  // Actions to perform async operations
+  //actions to perform async operations
   
 };
 
 const getters = {
-  // Getters to retrieve computed state values
+  //getters to retrieve computed state values
 };
 
 export default createStore({

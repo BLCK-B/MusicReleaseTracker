@@ -14,8 +14,8 @@ export default {
         ]),
     },
     methods: {
-    ...mapMutations(['setProgress']),
-  },
+        ...mapMutations(['setProgress']),
+    },
 }
 </script>
 

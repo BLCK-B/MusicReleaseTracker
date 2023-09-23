@@ -14,7 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
 
-/*      MusicReleaseTrcker
+/*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by

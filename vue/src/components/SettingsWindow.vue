@@ -104,6 +104,7 @@ export default {
         'primaryColor',
     ]),
   },
+  //on open, load settings from HOCON
   created() {
     axios.get('http://localhost:8080/api/settingsOpened')
       .then(response => {
@@ -117,9 +118,15 @@ export default {
       this.accent = "Classic";
   },
   methods: {
+    //close settings, rebuild combview
     clickClose() {
+      axios.post('http://localhost:8080/api/fillCombview')
+        .catch((error) => {
+          console.error(error);
+        });
       this.$store.commit('SET_SETTINGS_OPEN', false);
     },
+    //write filter change to HOCON
     updateFilter(filter, value) {
       console.log(filter, value);
       axios.post(`http://localhost:8080/api/toggleFilter?filter=${filter}&value=${value}`)
@@ -127,9 +134,11 @@ export default {
           console.error(error);
         });
     },
+    //set theme in store
     updateTheme() {
       this.$store.commit('SET_PRIMARY_COLOR', this.theme);
     },
+    //set accent in store
     updateAccent() {
       this.$store.commit('SET_ACCENT_COLOR', this.accent);
     },

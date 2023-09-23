@@ -9,13 +9,13 @@
 
         <div class="maincontent">
           <!-- top bar -->
-          <div class="topbar">
-            <SourceMenu v-if="!previewvis"/>
+          <div v-if="!previewvis" class="topbar">
+            <SourceMenu/>
           </div>
           <!-- content -->
           <AddArtistDialog/>
           <SourceTable class="sourcetable"/>
-          <DialogsURL class="dialogsurl"/>
+          <DialogsURL v-if="!previewvis" class="dialogsurl"/>
         </div>
 
         <div class="progressbar">
@@ -81,14 +81,6 @@ export default {
     accentColor(accent) {
       this.accent = accent;
       this.applyTheme(this.theme, accent);
-    },
-    settingsOpen(open) {
-      if (!open) {
-        axios.post('http://localhost:8080/api/fillCombview')
-        .catch((error) => {
-          console.error(error);
-        });
-      }
     },
   },
   methods: {

@@ -5,11 +5,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import com.typesafe.config.ConfigValueFactory;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,8 +14,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+/*      MusicReleaseTracker
+        Copyright (C) 2023 BLCK
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 //class with methods called from ApiController
 @Service
@@ -28,6 +35,7 @@ public class GUIController {
     private String lastClickedArtist;
     private String selectedSource;
     private final List<TableModel> tableContent = new ArrayList<>();
+    private String tempUrl;
 
     public List<String> loadList() throws SQLException {
         List<String> dataList = new ArrayList<>();
@@ -86,6 +94,20 @@ public class GUIController {
             catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+    public void cleanArtistSource() {
+        //clean artist from source table
+        try {
+            Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, lastClickedArtist);
+            pstmt.executeUpdate();
+            conn.close();
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -174,84 +196,31 @@ public class GUIController {
         MainBackend.fillCombviewTable();
     }
 
-    public void AclickAddURL(String url) {
-        url = url.replace("=" , "").trim();
-        if (url.isEmpty() || url.isBlank())
-            return;
-
-        String sql = null;
-        int artistIndex;
-        //reduce to base form then modify
-        switch (selectedSource) {
-            case "musicbrainz" -> {
-                sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
-                artistIndex = url.indexOf("/artist/");
-                if (artistIndex != -1 && url.contains("musicbrainz.org")) {
-                    int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
-                    if (artistIdIndex != -1)
-                        url = url.substring(0, artistIdIndex);
-                }
-                else
-                    return;
-                //modify link to latest releases
-                if(!url.contains("page="))
-                    url += "/releases/?page=20";
-            }
-            case "beatport" -> {
-                sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
-                artistIndex = url.indexOf("/artist/");
-                if (artistIndex != -1 && url.contains("beatport.com")) {
-                    int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
-                    if (artistIdIndex != -1) {
-                        artistIdIndex = url.indexOf('/', artistIdIndex + 1); // skip one '/' and find the next '/'
-                        if (artistIdIndex != -1) {
-                            url = url.substring(0, artistIdIndex); // remove the trailing '/'
-                        }
-                    }
-                }
-                else
-                    return;
-                url += "/tracks";
-            }
-            case "junodownload" -> {
-                sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
-                artistIndex = url.indexOf("/artists/");
-                if (artistIndex != -1 && url.contains("junodownload.com")) {
-                    int artistIdIndex = url.indexOf('/', artistIndex + "/artists/".length());
-                    if (artistIdIndex != -1)
-                        url = url.substring(0, artistIdIndex + 1);
-                }
-                else
-                    return;
-                url += "releases/?music_product_type=single&laorder=date_down";
-            }
-        }
-        saveUrl(sql, url);
-    }
-
     public void clickAddURL(String url) {
+        tempUrl = null;
+        //processing user-pasted url
         url = url.replace("=" , "").trim();
         if (url.isEmpty() || url.isBlank())
             return;
 
-        String sql = null;
         int artistIndex;
         //reduce to base form then modify
         switch (selectedSource) {
             case "musicbrainz" -> {
-                sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
+                //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
                 artistIndex = url.indexOf("/artist/");
                 if (artistIndex != -1 && url.contains("musicbrainz.org")) {
                     int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
                     if (artistIdIndex != -1)
                         url = url.substring(0, artistIdIndex);
+                //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41
                 }
                 else
                     return;
-                //modify link to latest releases
+                //for latest releases
                 if(!url.contains("page="))
                     url += "/releases/?page=20";
-
+                //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/releases/?page=20
                 try {
                     MainBackend.scrapeBrainz(url, lastClickedArtist);
                 } catch (IOException e) {
@@ -259,20 +228,23 @@ public class GUIController {
                 }
             }
             case "beatport" -> {
-                sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
+                //https://beatport.com/artist/koven/245904/charts
                 artistIndex = url.indexOf("/artist/");
                 if (artistIndex != -1 && url.contains("beatport.com")) {
                     int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
                     if (artistIdIndex != -1) {
-                        artistIdIndex = url.indexOf('/', artistIdIndex + 1); // skip one '/' and find the next '/'
+                        artistIdIndex = url.indexOf('/', artistIdIndex + 1); //skip one '/' and find the next '/'
                         if (artistIdIndex != -1) {
-                            url = url.substring(0, artistIdIndex); // remove the trailing '/'
+                            url = url.substring(0, artistIdIndex); //remove the trailing '/'
                         }
+                //https://beatport.com/artist/koven/245904
                     }
                 }
                 else
                     return;
+                //necessary tab
                 url += "/tracks";
+                //https://beatport.com/artist/koven/245904/tracks
                 try {
                     MainBackend.scrapeBeatport(url, lastClickedArtist);
                 } catch (IOException e) {
@@ -280,17 +252,19 @@ public class GUIController {
                 }
             }
             case "junodownload" -> {
-                sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
+                //https://www.junodownload.com/artists/Koven/releases/
                 artistIndex = url.indexOf("/artists/");
                 if (artistIndex != -1 && url.contains("junodownload.com")) {
                     int artistIdIndex = url.indexOf('/', artistIndex + "/artists/".length());
                     if (artistIdIndex != -1)
                         url = url.substring(0, artistIdIndex + 1);
+                //https://www.junodownload.com/artists/Koven/
                 }
                 else
                     return;
+                //necessary filters
                 url += "releases/?music_product_type=single&laorder=date_down";
-
+                //https://www.junodownload.com/artists/Koven/releases/?music_product_type=single&laorder=date_down
                 try {
                     MainBackend.scrapeJunodownload(url, lastClickedArtist);
                 } catch (IOException e) {
@@ -298,63 +272,24 @@ public class GUIController {
                 }
             }
         }
-        //saveUrl(sql, url);
+        tempUrl = url;
     }
 
-    public void saveUrl(String sql, String url) {
-        //validation of links and saving to db
-        Document doc = null;
-        try {
-            doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
-        } catch (IOException e) {
-            System.out.println("link verification: task timed out");
-            return;
-        }
+    public void saveUrl() {
+        //save artist url to db
+        String sql;
         switch (selectedSource) {
-            case "musicbrainz" -> {
-                Elements songs = doc.select("[href*=/release/]");
-                String[] songsArray = songs.eachText().toArray(new String[0]);
-                songs.clear();
-                doc.empty();
-                if (songsArray.length == 0 || songsArray == null)
-                    return;
-            }
-            case "beatport" -> {
-                Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
-                String JSON = script.first().data();
-                Pattern pattern = Pattern.compile(
-                        "\"mix_name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
-                                "\"name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
-                                "\"new_release_date\"\\s*:\\s*\"([^\"]+)\""
-                );
-                Matcher matcher = pattern.matcher(JSON);
-                List<String> songsArray = new ArrayList<>();
-                while (matcher.find()) {
-                    songsArray.add(matcher.group(2));
-                }
-                doc.empty();
-                script.clear();
-                if (songsArray.isEmpty())
-                    return;
-            }
-
-            case "junodownload" -> {
-                Elements songs = doc.select("a.juno-title");
-                String[] songsArray = songs.eachText().toArray(new String[0]);
-                songs.clear();
-                doc.empty();
-                if (songsArray.length == 0 || songsArray == null)
-                    return;
-            }
+            case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
+            case "beatport" -> sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
+            case "junodownload" -> sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
             default -> {
                 return;
             }
         }
-
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, url);
+            pstmt.setString(1, tempUrl);
             pstmt.setString(2, lastClickedArtist);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -366,7 +301,6 @@ public class GUIController {
         try {
             MainBackend.scrapeData();
         } catch (Exception e) {
-            System.out.println("catastrophic error during scraping");
             e.printStackTrace();
         }
         try {

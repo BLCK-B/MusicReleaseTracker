@@ -1,10 +1,10 @@
 <template>
   <div class="wrapper">
     <div class="tabs">
-      <div @mousedown="handleSourceClick('combview')" :class="{ 'active': activeTab === 'combview' }" class="cvtab" id="combview">Combined view</div>
-      <div @mousedown="handleSourceClick('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="stab" id="beatport">BP</div>
-      <div @mousedown="handleSourceClick('musicbrainz')" :class="{ 'active': activeTab === 'musicbrainz' }" class="stab" id="musicbrainz">MB</div>
-      <div @mousedown="handleSourceClick('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab" id="junodownload">JD</div>
+      <div @mousedown="setStoreTab('combview')" :class="{ 'active': activeTab === 'combview' }" class="cvtab">Combined view</div>
+      <div @mousedown="setStoreTab('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="stab">BP</div>
+      <div @mousedown="setStoreTab('musicbrainz')" :class="{ 'active': activeTab === 'musicbrainz' }" class="stab">MB</div>
+      <div @mousedown="setStoreTab('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab">JD</div>
     </div>
     
     <button @click="openSettings()" class="imgbutton1" :disabled="!allowButtons">
@@ -39,6 +39,7 @@ export default {
       'primaryColor',
     ])
   },
+  //load combview as default
   created() {
     this.handleSourceClick("combview");
   },
@@ -49,18 +50,23 @@ export default {
     },
   },
   methods: {
+    //set store tab, trigger handleSourceClick
+    setStoreTab(source) {
+      this.$store.commit('SET_SOURCE_TAB', source);
+    },
+    //load respective table
     handleSourceClick(source) {
       this.activeTab = source;
       this.$store.commit('SET_ADD_VIS', false);
       axios.post('http://localhost:8080/api/sourceTabClick', { source })
         .then((response) => {
-          this.$store.commit('SET_SOURCE_TAB', source); //set data to vuex store
           this.$store.commit('SET_TABLE_CONTENT', response.data);
         })
         .catch((error) => {
           console.error(error);
         });
     },
+    //trigger scraping or cancel it, SSE listener for progressbar
     clickScrape() {
       const allowButtons = this.allowButtons;
       if (!allowButtons) {
@@ -92,6 +98,7 @@ export default {
           });
       }
     },
+    //open settings
     openSettings() {
       this.$store.commit('SET_SETTINGS_OPEN', true);
     },

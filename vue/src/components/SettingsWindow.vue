@@ -3,8 +3,8 @@
  <div class="settings">
 
     <button @click="clickClose()" class="imgbutton">
-      <img v-if="primaryColor !== 'Light'" class="image" src="src/components/icons/crossdark.png" alt="close"/>
-      <img v-if="primaryColor === 'Light'" class="image" src="src/components/icons/crosslight.png" alt="close"/>
+      <img v-if="primaryColor !== 'Light'" class="image" src="src/components/icons/crossdark.png" alt="X"/>
+      <img v-if="primaryColor === 'Light'" class="image" src="src/components/icons/crosslight.png" alt="X"/>
     </button>
 
     <section>
@@ -66,6 +66,15 @@
       </div>
     </section>
 
+    <section class="self">
+      <a href="https://blck-b.github.io">
+        <img class="blckimg" src="src/components/icons/blcktext.png" alt="logo"/>
+      </a>
+      <a href="https://github.com/BLCK-B/MusicReleaseTracker">
+        <img class="mrtimg" src="src/components/icons/MRTlogo.png" alt="logo"/>
+      </a>
+    </section>
+
  </div>
 
 </template>
@@ -113,17 +122,13 @@ export default {
       .catch((error) => {
         console.error(error);
       });
-      //this will be replaced once settings implementation is done
+      //this will be replaced once JSON implementation is done
       this.theme = "Black";
       this.accent = "Classic";
   },
   methods: {
-    //close settings, rebuild combview
+    //close settings, trigger rebuild combview in app
     clickClose() {
-      axios.post('http://localhost:8080/api/fillCombview')
-        .catch((error) => {
-          console.error(error);
-        });
       this.$store.commit('SET_SETTINGS_OPEN', false);
     },
     //write filter change to HOCON
@@ -204,6 +209,22 @@ section {
 }
 .imgbutton:hover {
   opacity: 60%;
+}
+.self {
+  text-align: center;
+  padding: 8px;
+}
+.blckimg {
+  height: 62px;
+  background-color: black;
+  border-radius: 5px;
+  padding: 12px;
+  margin-right: 20px;
+}
+.mrtimg {
+  height: 86px;
+  border-radius: 10px;
+  margin-right: 10px;
 }
 
 </style>

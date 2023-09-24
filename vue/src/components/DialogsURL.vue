@@ -73,6 +73,7 @@ export default {
         //send input to be processed, displays preview dialog with scraped source table
         clickURL() {
             const url = encodeURIComponent(this.input);
+            this.input = "";
             axios.post('http://localhost:8080/api/clickAddURL', url)
             .then(() => {
                 const artist = this.artist;

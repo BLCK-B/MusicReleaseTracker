@@ -3,19 +3,19 @@
   <div class="app" v-if="!settingsOpen">
       <!-- sidebar -->
       <div class="list">
-        <ArtistList v-if="!previewvis"/>
-        <PreviewDialog v-if="previewvis" class="preview"/>
+        <ArtistList v-if="!previewVis"/>
+        <PreviewDialog v-if="previewVis" class="preview"/>
       </div>
 
         <div class="maincontent">
           <!-- top bar -->
-          <div v-if="!previewvis" class="topbar">
+          <div v-if="!previewVis" class="topbar">
             <SourceMenu/>
           </div>
           <!-- content -->
           <AddArtistDialog/>
           <SourceTable class="sourcetable"/>
-          <DialogsURL v-if="!previewvis" class="dialogsurl"/>
+          <DialogsURL v-if="!previewVis" class="dialogsurl"/>
         </div>
 
         <div class="progressbar">
@@ -70,7 +70,7 @@ export default {
     "settingsOpen",
     "primaryColor",
     "accentColor",
-    "previewvis",
+    "previewVis",
     ])
   },
   watch: {

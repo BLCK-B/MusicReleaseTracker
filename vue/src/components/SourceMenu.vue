@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+
     <div class="tabs">
       <div @mousedown="setStoreTab('combview')" :class="{ 'active': activeTab === 'combview' }" class="cvtab">Combined view</div>
       <div @mousedown="setStoreTab('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="stab">BP</div>
@@ -26,7 +27,7 @@ import { mapState, mapMutations } from 'vuex';
 export default {
   data() {
      return {
-       activeTab: "combview",
+       activeTab: "",
        eventSource: null,
        scrapeColor: "var(--accent-color)",
      }
@@ -39,12 +40,23 @@ export default {
       'primaryColor',
     ])
   },
-  //load combview as default
+  //load last clicked tab, otherwise combview as default
   created() {
-    this.handleSourceClick("combview");
+    this.activeTab = this.sourceTab;
+    axios.post('http://localhost:8080/api/fillCombview')
+        .catch((error) => {
+          console.error(error);
+        })
+        .then(() => {
+          if (this.sourceTab === "")
+              this.setStoreTab("combview");
+          this.handleSourceClick(this.sourceTab);
+        });
   },
+  //on any change of sourceTab trigger handleSourceClick
   watch: {
     sourceTab(tabValue) {
+      this.activeTab = tabValue;
       if (tabValue)
         this.handleSourceClick(tabValue);
     },
@@ -56,7 +68,6 @@ export default {
     },
     //load respective table
     handleSourceClick(source) {
-      this.activeTab = source;
       this.$store.commit('SET_ADD_VIS', false);
       axios.post('http://localhost:8080/api/sourceTabClick', { source })
         .then((response) => {
@@ -89,7 +100,7 @@ export default {
           .then(() => {
             this.scrapeColor = "var(--accent-color)";
             this.$store.commit('SET_ALLOW_BUTTONS', true);
-            this.handleSourceClick("combview");
+            //this.handleSourceClick("combview");
             this.eventSource.close();
             this.$store.commit('SET_PROGRESS', 0);
           })

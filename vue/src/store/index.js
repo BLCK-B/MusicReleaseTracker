@@ -12,7 +12,7 @@ const state = {
   settingsOpen: false,
   primaryColor: "Black",
   accentColor: "Classic",
-  previewvis: false,
+  previewVis: false,
 };
 
 const mutations = {
@@ -47,8 +47,8 @@ const mutations = {
   SET_ACCENT_COLOR(state, color) {
     state.accentColor = color;
   },
-  SET_PREVIEW_VIS(state, previewvis) {
-    state.previewvis = previewvis;
+  SET_PREVIEW_VIS(state, previewVis) {
+    state.previewVis = previewVis;
   },
 };
 

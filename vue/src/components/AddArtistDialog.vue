@@ -23,7 +23,7 @@ import { mapMutations, mapActions, mapState } from 'vuex';
 
 export default {
     data: () => ({
-        input: '',
+        input: "",
         rules: [
         value => !!value.trim(),
         value => (value || '').length <= 30,
@@ -34,6 +34,7 @@ export default {
         clickAdd() {
             axios.post('http://localhost:8080/api/clickArtistAdd', this.input)
                 .then(() => {
+                    this.input = "";
                     this.$store.commit('SET_SELECTED_ARTIST', "");
                     this.$store.commit('SET_ADD_VIS', false);
                     this.$store.commit('SET_LOAD_REQUEST', true);

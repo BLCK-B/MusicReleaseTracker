@@ -197,6 +197,8 @@ public class GUIController {
     }
 
     public void clickAddURL(String url) {
+        if (lastClickedArtist == null || selectedSource == null)
+            return;
         tempUrl = null;
         //processing user-pasted url
         url = url.replace("=" , "").trim();

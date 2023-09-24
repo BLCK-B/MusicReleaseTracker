@@ -1,7 +1,8 @@
 <template>
     <div class="preview">
         <h1>preview</h1>
-        <p>Confirm only if the table has complete, recent information.</p>
+        <p v-if="!hideTable">Confirm only if the table has complete, recent information.</p>
+        <p v-if="hideTable">Link was for a different source than this one.</p>
         <button @click="clickConfirm" :disabled="hideTable">confirm</button>
         <button @click="clickCancel">cancel</button>
     </div>
@@ -17,8 +18,8 @@ export default {
         rules: [
         value => !!value.trim(),
         value => value.includes("musicbrainz.org/artist/") ||
-        value.includes("beatport.com/artist/") ||
-        value.includes("junodownload.com/artists/"),
+                 value.includes("beatport.com/artist/") ||
+                 value.includes("junodownload.com/artists/"),
         ],
     }),
     computed: {
@@ -53,7 +54,6 @@ export default {
 
 <style scoped>
     .preview {
-        padding: 8px;
         width: 100%;
         height: 100%;
         background-color: var(--subtle-color);
@@ -62,6 +62,10 @@ export default {
     h1 {
         font-size: 18px;
         color: var(--accent-color);
+    }
+    p, h1 {
+        position: relative;
+        left: 6px;
     }
     button {
         margin-left: 8px;

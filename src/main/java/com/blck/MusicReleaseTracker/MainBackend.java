@@ -119,6 +119,7 @@ public class MainBackend {
             RSeachArtistUrls.close();
             //calling scrapers
             int i = 1;
+            double startTime = System.currentTimeMillis();
             for (String oneUrl : eachArtistUrls) {
                 //if clicked cancel
                 if (scrapeCancel) {
@@ -151,9 +152,13 @@ public class MainBackend {
                         }
                     }
                 }
-                //delay at the end of every cycle
-                if (i == 3)
-                    Thread.sleep(1600);
+                //calculated delay at the end of every cycle
+                if (i == 3) {
+                    double endTime = System.currentTimeMillis();
+                    double elapsedTime = (endTime - startTime);
+                    if (2500 - elapsedTime >= 0)
+                        Thread.sleep((long) (2500 - elapsedTime));
+                }
                 //calculating progressbar value
                 progress++;
                 double state = progress / artistnameList.size() / 3;

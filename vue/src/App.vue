@@ -44,6 +44,7 @@ import { mapState, mapMutations } from 'vuex';
 import axios from 'axios';
 
 
+
 export default {
   data() {
       return {
@@ -91,14 +92,14 @@ export default {
       });
       this.appliedStyles = [];
 
-      let themePath = `/src/assets/primary${theme}.css`;
+      let themePath = `./primary${theme}.css`;
       let linkElement = document.createElement('link');
       linkElement.rel = 'stylesheet';
       linkElement.href = themePath;
       document.head.appendChild(linkElement);
       this.appliedStyles.push(linkElement);
 
-      themePath = `/src/assets/secondary${accent}.css`;
+      themePath = `./secondary${accent}.css`;
       linkElement = document.createElement('link');
       linkElement.rel = 'stylesheet';
       linkElement.href = themePath;
@@ -125,6 +126,7 @@ export default {
     height: 100%;
     background-color: var(--primary-color);
     color: var(--contrast-color);
+    transition: 0.15s;
   }
   .list {
     width: 170px;

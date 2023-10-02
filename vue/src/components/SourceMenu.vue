@@ -9,12 +9,12 @@
     </div>
     
     <button @click="openSettings()" class="imgbutton1" :disabled="!allowButtons">
-      <img v-if="primaryColor === 'Black'" class="image" src="src/components/icons/optionsblack.png" alt="Settings"/>
-      <img v-else-if="primaryColor === 'Dark'" class="image" src="src/components/icons/optionsdark.png" alt="Settings"/>
-      <img v-else-if="primaryColor === 'Light'" class="image" src="src/components/icons/optionslight.png" alt="Settings"/>
+      <img v-if="primaryColor === 'Black'" class="image" src="./icons/optionsblack.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Dark'" class="image" src="./icons/optionsdark.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Light'" class="image" src="./icons/optionslight.png" alt="Settings"/>
     </button>
     <button @click="clickScrape()" v-bind:style="{ 'background-color': scrapeColor }" class="imgbutton2">
-      <img class="image" src="src/components/icons/refreshuniversal.png" alt="Refresh"/>
+      <img class="image" src="./icons/refreshuniversal.png" alt="Refresh"/>
     </button>
 
   </div>

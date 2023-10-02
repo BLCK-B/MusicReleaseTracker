@@ -1,7 +1,7 @@
 <template>
   <div class="buttonspace">
     <button @mousedown="clickAddArtist" class="addbtn" :disabled="!allowButtons">add</button>
-    <button @mousedown="clickDeleteArtist" class="deletebtn" :disabled="!allowButtons">delete</button>
+    <button @click="clickDeleteArtist" class="deletebtn" :disabled="!allowButtons">delete</button>
   </div>
 
     <div class="artistlist">
@@ -125,6 +125,9 @@ export default {
   background-color: var(--accent-color);
   border: 2px solid var(--accent-color);
   color: var(--accent-contrast);
+}
+.addbtn:active, .deletebtn:active {
+  opacity: 75%;
 }
 .deletebtn {
   margin-left: 5px;

@@ -156,8 +156,8 @@ public class MainBackend {
                 if (i == 3) {
                     double endTime = System.currentTimeMillis();
                     double elapsedTime = (endTime - startTime);
-                    if (2500 - elapsedTime >= 0)
-                        Thread.sleep((long) (2500 - elapsedTime));
+                    if (2700 - elapsedTime >= 0)
+                        Thread.sleep((long) (2700 - elapsedTime));
                 }
                 //calculating progressbar value
                 progress++;

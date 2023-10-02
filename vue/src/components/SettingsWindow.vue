@@ -3,8 +3,8 @@
  <div class="settings">
 
     <button @click="clickClose()" class="imgbutton">
-      <img v-if="primaryColor !== 'Light'" class="image" src="src/components/icons/crossdark.png" alt="X"/>
-      <img v-if="primaryColor === 'Light'" class="image" src="src/components/icons/crosslight.png" alt="X"/>
+      <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="X"/>
+      <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
     </button>
 
     <section>
@@ -68,10 +68,10 @@
 
     <section class="self">
       <a href="https://blck-b.github.io">
-        <img class="blckimg" src="src/components/icons/blcktext.png" alt="logo"/>
+        <img class="blckimg" src="./icons/blcktext.png" alt="logo"/>
       </a>
       <a href="https://github.com/BLCK-B/MusicReleaseTracker">
-        <img class="mrtimg" src="src/components/icons/MRTlogo.png" alt="logo"/>
+        <img class="mrtimg" src="./icons/MRTlogo.png" alt="logo"/>
       </a>
     </section>
 
@@ -152,6 +152,9 @@ export default {
 </script>
 
 <style scoped>
+* {
+  transition: 0.15s;
+}
 .settings {
   font-family: 'arial', sans-serif;
   font-size: 14px;
@@ -203,9 +206,10 @@ section {
   padding: 1px 15px 10px 15px;
   background-color: var(--duller-color);
   border-radius: 5px;
+  transition: 0.15s;
 }
 .appearance {
-  border-right: 5px solid var(--accent-color);
+  border-right: 6px solid var(--accent-color);
 }
 .imgbutton:hover {
   opacity: 60%;

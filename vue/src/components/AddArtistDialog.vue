@@ -9,8 +9,8 @@
         <input v-model="input" :class="{ 'invalid': !isValid }"/>
         <button @click="clickAdd" :disabled="!isValid">insert</button>
         <button @click="clickClose" class="imgbutton">
-            <img v-if="primaryColor !== 'Light'" class="image" src="src/components/icons/crossdark.png" alt="insert"/>
-            <img v-if="primaryColor === 'Light'" class="image" src="src/components/icons/crosslight.png" alt="insert"/>
+            <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="insert"/>
+            <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="insert"/>
         </button>
     </div>
 

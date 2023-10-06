@@ -40,7 +40,15 @@ public class MainBackend {
         //on startup of springboot server
         @Override
         public void run(String... args) {
-            System.out.println("---------------SERVER STARTED----------------");
+            System.out.println("----------LOCAL SERVER STARTED----------");
+            System.out.println("  __  __ ____ _____ \n" +
+                    " |  \\/  |  _ \\_   _|\n" +
+                    " | |\\/| | |_) || |  \n" +
+                    " | |  | |  _ < | |  \n" +
+                    " |_|  |_|_| \\_\\|_|  \n" +
+                    "                    \n" +
+                    "\n");
+
             try {
                 DBtools.path();
             } catch (Exception e) {
@@ -55,6 +63,20 @@ public class MainBackend {
                 DBtools.updateSettingsDB();
             } catch (Exception e) {
                 System.out.println("error handling config file");
+                e.printStackTrace();
+            }
+            //open port in web browser
+            try {
+                String os = System.getProperty("os.name").toLowerCase();
+                if (os.contains("win")) {
+                    String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
+                    Runtime.getRuntime().exec(cmd);
+                }
+                else if (os.contains("nix")) {
+                    String[] cmd = {"/usr/bin/open", "http://localhost:8080"};
+                    Runtime.getRuntime().exec(cmd);
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

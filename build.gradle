@@ -5,18 +5,29 @@ plugins {
     id "com.github.johnrengelman.shadow" version "8.1.1"
     id 'org.springframework.boot' version '3.1.2'
     id 'io.spring.dependency-management' version '1.1.2'
+    id 'org.graalvm.buildtools.native' version '0.9.27'
 }
 
 group 'com.blck'
-version '5.1'
+version '5.5'
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
 
 configurations {
     runtime
     compile
+}
+
+graalvmNative {
+    binaries {
+        main {
+            imageName.set("MusicReleaseTracker")
+            buildArgs.add('--verbose')
+        }
+    }
 }
 
 java {
@@ -42,7 +53,7 @@ dependencies {
     implementation 'com.typesafe:config:1.4.2'
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher:1.9.2')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

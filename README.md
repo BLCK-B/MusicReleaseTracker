@@ -31,7 +31,7 @@ Vue.js preview screenshots
 Look at music releases from individual artists and see all songs ordered by date in "Combined view".
 You will no longer have to search social media or streaming services in fear of missing a new song. MusicReleaseTracker is a free, open-source, no-nonsense program for music discovery.
 
-Delays during scraping prevent excessive traffic. Currently available sources: Beatport, Musicbrainz, Junodownload.
+Currently available sources: Beatport, Musicbrainz, Junodownload.
 
 Setup
 -
@@ -46,7 +46,9 @@ Setup
 **In MRT:** Add artists you want to track and for each artist optionally insert links according to instructions.
 With links inserted, click refresh button to initiate the scraping process.
 
-**Responsibility**: To avoid granting admin permission, unzip the installer. You can run the exe, but ensure a folder *MusicReleaseTracker* exists in appdata. I have no affiliation with Musicbrainz, Beatport, Junodownload. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
+**Responsibility**: Delays during scraping prevent excessive traffic.
+To avoid granting admin permission, unzip the installer. You can run the exe, but ensure a folder *MusicReleaseTracker* exists in appdata. 
+I have no affiliation with Musicbrainz, Beatport, Junodownload. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
 
 ---
 

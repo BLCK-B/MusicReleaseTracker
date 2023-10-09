@@ -1,21 +1,21 @@
 <template>
     <div v-if="addDialogVis" class="wrapper">
 
-    <div class="card-text">
-        <p class="text--primary">Type artist's name and confirm.</p>
-    </div>
-  
-    <div class="diag-actions">
-        <input v-model="input" :class="{ 'invalid': !isValid }"/>
-        <button @click="clickAdd" :disabled="!isValid">insert</button>
-        <button @click="clickClose" class="imgbutton">
-            <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="insert"/>
-            <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="insert"/>
-        </button>
-    </div>
+        <div class="card-text">
+            <p class="text--primary">Type artist's name and confirm.</p>
+        </div>
+    
+        <div class="diag-actions">
+            <input v-model="input" :class="{ 'invalid': !isValid }"/>
+            <button @click="clickAdd" :disabled="!isValid">insert</button>
+            <button @click="clickClose" class="imgbutton">
+                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="insert"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="insert"/>
+            </button>
+        </div>
 
     </div>
-  </template>
+</template>
   
 <script>
 import axios from 'axios';
@@ -32,7 +32,8 @@ export default {
     methods: {
         //add artist to db
         clickAdd() {
-            axios.post('http://localhost:8080/api/clickArtistAdd', this.input)
+            const artistname = encodeURIComponent(this.input);
+            axios.post('http://localhost:8080/api/clickArtistAdd', artistname)
                 .then(() => {
                     this.input = "";
                     this.$store.commit('SET_SELECTED_ARTIST', "");

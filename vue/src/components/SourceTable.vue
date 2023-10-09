@@ -14,7 +14,7 @@
     <div class="table-body">
       <table>
         <tbody>
-          <tr v-for="(item, index) in tableData" :key="index">
+          <tr v-for="(item, index) in tableData" :key="index" :class="{'future-date': isDateInFuture(item.date)}">
             <td class="tdsong">{{ item.song }}</td>
             <td class="tdartist" v-if="!hideArtistColumn">{{ item.artist }}</td>
             <td class="tddate">{{ item.date }}</td>
@@ -30,6 +30,9 @@
 import { mapState } from 'vuex';
 
 export default {
+  mounted() {
+    this.isDateInFuture;
+  },
   computed: {
     ...mapState([
       'tableData'
@@ -42,13 +45,16 @@ export default {
     },
   },
   methods: {
-  
+    //get current date
+    isDateInFuture(dateString) {
+      const date = new Date(dateString);
+      return date > new Date();
+    },
   },
 };
 </script>
 
 <style scoped>
-
 .table-container {
   height: 92%;
   overflow-y: scroll;
@@ -101,5 +107,9 @@ th {
 .date, .tddate {
   width: 100px;
   min-width: 100px;
+}
+
+.future-date {
+  opacity: 40%;
 }
 </style>

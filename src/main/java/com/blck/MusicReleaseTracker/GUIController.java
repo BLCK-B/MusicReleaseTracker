@@ -52,8 +52,7 @@ public class GUIController {
     }
     public void artistAddConfirm(String input) {
         //add new artist typed by user
-        input = input.replace("=" , "").trim();
-        if (input.isEmpty() || input.isBlank() || input.length() > 30 || input.equals("[]"))
+        if (input.isEmpty() || input.isBlank())
             return;
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());

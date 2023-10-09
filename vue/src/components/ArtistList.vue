@@ -1,7 +1,8 @@
 <template>
   <div class="buttonspace">
     <button @mousedown="clickAddArtist" class="addbtn" :disabled="!allowButtons">add</button>
-    <button @click="clickDeleteArtist" class="deletebtn" :disabled="!allowButtons">delete</button>
+    <button v-if="deleteProtection" @click="clickDeleteArtist" class="deletebtn" :disabled="!allowButtons || lastClickedItem == null">delete</button>
+    <button v-if="!deleteProtection" @click="clickDeleteArtist" @mouseleave="resetProtection" class="deletebtn" :disabled="!allowButtons">confirm</button>
   </div>
 
     <div class="artistlist">
@@ -26,6 +27,7 @@ export default {
     return {
       artistsArrayList: [],
       lastClickedItem: null,
+      deleteProtection: true,
     };
   },
   created() {
@@ -74,18 +76,27 @@ export default {
     },
     //delete all (last selected) artist entries from db, rebuild combview
     clickDeleteArtist() {
-      if (this.lastClickedItem !== "") {
-        axios.get('http://localhost:8080/api/clickArtistDelete')
-        .then(() => {
-          this.$store.commit('SET_SELECTED_ARTIST', "");
-          this.$store.commit('SET_SOURCE_TAB', "combview");
-          this.loadList();
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      if (this.deleteProtection == true) {
+        this.deleteProtection = false;
+      }
+      else {
+        if (this.lastClickedItem !== "") {
+          axios.get('http://localhost:8080/api/clickArtistDelete')
+          .then(() => {
+            this.$store.commit('SET_SELECTED_ARTIST', "");
+            this.$store.commit('SET_SOURCE_TAB', "combview");
+            this.loadList();
+          })
+          .catch(error => {
+            console.error(error);
+          });
+        }
       }
     },
+    //reset delete protection on cursor off
+    resetProtection() {
+      this.deleteProtection = true;
+    }
   },
 };
 </script>

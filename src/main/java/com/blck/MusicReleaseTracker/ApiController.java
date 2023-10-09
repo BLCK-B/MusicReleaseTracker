@@ -52,8 +52,10 @@ public class ApiController {
     }
 
     @PostMapping("/clickArtistAdd")
-    public void clickArtistAdd(@RequestBody String input) {
-        sendRequest.artistAddConfirm(input);
+    public void clickArtistAdd(@RequestBody String artistname) {
+        artistname = URLDecoder.decode(artistname, StandardCharsets.UTF_8);
+        artistname = artistname.replace("=" , "").trim();
+        sendRequest.artistAddConfirm(artistname);
     }
 
     @RequestMapping ("/clickArtistDelete")
@@ -100,4 +102,5 @@ public class ApiController {
     public void fillCombview() {
         sendRequest.fillCombview();
     }
+
 }

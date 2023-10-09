@@ -41,6 +41,7 @@
     <section class="appearance">
       <p>Appearance</p>
       <div class="appearancecont">
+
         <div class="theme-buttons">
           <input type="radio" v-model="theme" value="Black" @change="updateTheme()">
           <label>Black</label>
@@ -48,7 +49,10 @@
           <label>Dark</label>
           <input type="radio" v-model="theme" value="Light" @change="updateTheme()">
           <label>Light</label>
+          
+          <div class="colorindicator"></div>
         </div>
+
         <div class="accent-buttons">
           <input type="radio" v-model="accent" value="Classic" @change="updateAccent()">
           <label>Classic</label>
@@ -63,6 +67,7 @@
           <input type="radio" value="None">
           <label>-</label>
         </div>
+
       </div>
     </section>
 
@@ -192,6 +197,7 @@ export default {
   margin: 10px;
   background-color: transparent;
   border: none;
+  transition: 0s;
 }
 .image {
   height: 33px;
@@ -207,9 +213,6 @@ section {
   background-color: var(--duller-color);
   border-radius: 5px;
   transition: 0.15s;
-}
-.appearance {
-  border-right: 6px solid var(--accent-color);
 }
 .imgbutton:hover {
   opacity: 60%;
@@ -229,6 +232,17 @@ section {
   height: 86px;
   border-radius: 10px;
   margin-right: 10px;
+}
+
+.colorindicator {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 6px;
+  background-color: var(--accent-color);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 </style>

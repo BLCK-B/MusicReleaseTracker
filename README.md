@@ -36,11 +36,11 @@ Currently available sources: Beatport, Musicbrainz, Junodownload.
 Setup
 -
 
-**dependencies:** A web browser. UI is rendered there.
+**dependencies:** A web browser: UI is rendered there. Linux: OpenJDK.
 
 **Windows:** Download and install. When launched, Spring terminal and browser window/tab will open.
 
-**Linux:** Not set up yet.
+**Linux:** Unzip tar. Run jar by ```java -jar XXX.jar```
 
 ---
 **In MRT:** Add artists you want to track and for each artist optionally insert links according to instructions.

@@ -24,6 +24,11 @@
     </div>
     
   </div>
+
+  <div class="emptynotice" v-if="!hideTable && !previewVis && artist">
+    <p>Table empty, but URL exists</p>
+  </div>
+  
 </template>
 
 <script>
@@ -35,7 +40,9 @@ export default {
   },
   computed: {
     ...mapState([
-      'tableData'
+      'tableData',
+      "previewVis",
+      "artist",
     ]),
     hideArtistColumn() {
       return this.tableData.some(item => item.artist === null);
@@ -111,5 +118,12 @@ th {
 
 .future-date {
   opacity: 40%;
+}
+
+.emptynotice {
+  position: absolute;
+  left: 45%;
+  top: 50%;
+  color: var(--dull-color);
 }
 </style>

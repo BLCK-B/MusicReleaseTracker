@@ -70,7 +70,7 @@ public class MainBackend {
                     String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
                     Runtime.getRuntime().exec(cmd);
                 }
-                else if (os.contains("nix")) {
+                else if (os.contains("nix") || os.contains("nux")) {
                     String[] cmd = {"/usr/bin/open", "http://localhost:8080"};
                     Runtime.getRuntime().exec(cmd);
                 }

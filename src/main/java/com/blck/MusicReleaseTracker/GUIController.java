@@ -298,6 +298,36 @@ public class GUIController {
         }
     }
 
+    public boolean checkExistURL() {
+        //check for existence of url to determine showing url dialog
+        boolean urlExists = false;
+        try {
+            Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            String sql = null;
+            switch (selectedSource) {
+                case "musicbrainz" -> sql = "SELECT urlbrainz FROM artists WHERE artistname = ?";
+                case "beatport" -> sql = "SELECT urlbeatport FROM artists WHERE artistname = ?";
+                case "junodownload" -> sql = "SELECT urljunodownload FROM artists WHERE artistname = ?";
+                default -> {
+                    return urlExists;
+                }
+            }
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, lastClickedArtist);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.getString(1) != null)
+                urlExists = true;
+
+            rs.close();
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return urlExists;
+    }
+
     public void clickScrape() {
         try {
             MainBackend.scrapeData();

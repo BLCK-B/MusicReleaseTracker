@@ -20,6 +20,9 @@ export default {
 </script>
 
 <style scoped>
+* {
+  transition: 0.25s;
+}
 .progress-container {
   background-color: var(--primary-color);
 }

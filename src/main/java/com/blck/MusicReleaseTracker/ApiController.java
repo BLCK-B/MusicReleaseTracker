@@ -103,4 +103,9 @@ public class ApiController {
         sendRequest.fillCombview();
     }
 
+    @GetMapping("/checkExistURL")
+    public boolean checkExistURL() {
+        return sendRequest.checkExistURL();
+    }
+
 }

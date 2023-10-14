@@ -1,5 +1,5 @@
 <template>
-    <div v-if="urlVisibility && allowButtons && artist.length !== 0 && !addDialogVis">
+    <div v-if="showUrlDiag && allowButtons && artist.length !== 0 && !addDialogVis">
 
         <div v-if="sourceTab === 'musicbrainz'" class="dialog">
             <h1>MusicBrainz source</h1>
@@ -35,6 +35,7 @@
         </div>
 
     </div>
+
 </template>
   
 <script>
@@ -44,6 +45,7 @@ import { mapState } from 'vuex';
 export default {
     data: () => ({
         input: "",
+        showUrlDiag: false,
         rules: [
         value => !!value.trim(),
         value => value.includes("musicbrainz.org/artist/") ||
@@ -59,11 +61,6 @@ export default {
         "artist",
         "addDialogVis",
         ]),
-        //only show when table is null
-        urlVisibility() {
-            const conditionMet = this.tableData.length === 0;
-            return conditionMet;
-        },
         //if no rules in data broken, enable insert button
         isValid() {
             return this.rules.every(rule => rule(this.input) === true);
@@ -87,8 +84,30 @@ export default {
                 console.error(error);
             });
         },
-    }
-
+        //only show dialog when table is null, and if URL does not exist
+        determineDiagShow() {
+            if (this.tableData.length === 0) {
+                axios.get("http://localhost:8080/api/checkExistURL")
+                .then(response => {
+                    if (response.data == true)
+                        this.showUrlDiag = false;
+                    else
+                        this.showUrlDiag = true;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            }
+            else
+                this.showUrlDiag = false;
+        },
+    },
+    watch: {
+        //trigger url check on every tableData change
+        tableData() {
+            this.determineDiagShow();
+        },
+    },
 };
 </script>
 

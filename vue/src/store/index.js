@@ -2,7 +2,7 @@
 import { createStore } from 'vuex'
 
 const state = {
-  artist: [],
+  artist: "",
   sourceTab: "",
   tableData: [],
   addDialogVis: false,
@@ -10,8 +10,8 @@ const state = {
   allowButtons: true,
   progress: 0,
   settingsOpen: false,
-  primaryColor: "Black",
-  accentColor: "Classic",
+  primaryColor: "",
+  accentColor: "",
   previewVis: false,
 };
 

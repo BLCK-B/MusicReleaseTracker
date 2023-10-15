@@ -1,10 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-import com.typesafe.config.ConfigRenderOptions;
-import com.typesafe.config.ConfigValueFactory;
+import com.typesafe.config.*;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,6 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -297,7 +295,6 @@ public class GUIController {
             e.printStackTrace();
         }
     }
-
     public boolean checkExistURL() {
         //check for existence of url to determine showing url dialog
         boolean urlExists = false;
@@ -384,6 +381,32 @@ public class GUIController {
             System.out.println("could not save filter change");
             e.printStackTrace();
         }
+    }
+    public void setTheme(String theme) {
+        //change config theme/accent
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
+        if (theme.equals("Black") || theme.equals("Dark") || theme.equals("Light"))
+            config = config.withValue("theme", ConfigValueFactory.fromAnyRef(theme));
+        else
+            config = config.withValue("accent", ConfigValueFactory.fromAnyRef(theme));
+
+        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
+            writer.write(config.root().render(renderOptions));
+        } catch (IOException e) {
+            System.out.println("could not save theme/accent change");
+            e.printStackTrace();
+        }
+    }
+    public Map<String,String> getThemeConfig() {
+        //read theme and accent
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
+        String theme = config.getString("theme");
+        String accent = config.getString("accent");
+        Map<String, String> themeConfigMap = new HashMap<>();
+        themeConfigMap.put("theme", theme);
+        themeConfigMap.put("accent", accent);
+        return themeConfigMap;
     }
 
 }

@@ -43,29 +43,29 @@
       <div class="appearancecont">
 
         <div class="theme-buttons">
-          <input type="radio" v-model="theme" value="Black" @change="updateTheme()">
+          <input type="radio" v-model="theme" value="Black" @change="setTheme('Black')">
           <label>Black</label>
-          <input type="radio" v-model="theme" value="Dark" @change="updateTheme()">
+          <input type="radio" v-model="theme" value="Dark" @change="setTheme('Dark')">
           <label>Dark</label>
-          <input type="radio" v-model="theme" value="Light" @change="updateTheme()">
+          <input type="radio" v-model="theme" value="Light" @change="setTheme('Light')">
           <label>Light</label>
           
           <div class="colorindicator"></div>
         </div>
 
         <div class="accent-buttons">
-          <input type="radio" v-model="accent" value="Classic" @change="updateAccent()">
+          <input type="radio" v-model="accent" value="Classic" @change="setTheme('Classic')">
           <label>Classic</label>
-          <input type="radio" v-model="accent" value="Rose" @change="updateAccent()">
+          <input type="radio" v-model="accent" value="Rose" @change="setTheme('Rose')">
           <label>Rose</label>
-          <input type="radio" v-model="accent" value="Cactus" @change="updateAccent()">
+          <input type="radio" v-model="accent" value="Cactus" @change="setTheme('Cactus')">
           <label>Cactus</label>
-          <input type="radio" value="None">
-          <label>-</label>
-          <input type="radio" value="None">
-          <label>-</label>
-          <input type="radio" value="None">
-          <label>-</label>
+          <input type="radio" v-model="accent" value="Cloud" @change="setTheme('Cloud')">
+          <label>Cloud</label>
+          <input type="radio" v-model="accent" value="Surge" @change="setTheme('Surge')">
+          <label>Surge</label>
+          <input type="radio" v-model="accent" value="Warm" @change="setTheme('Warm')">
+          <label>Warm</label>
         </div>
 
       </div>
@@ -102,12 +102,12 @@ export default {
         Remaster: false
       },
       theme: {
-        Black: true,
+        Black: false,
         Dark: false,
         Light: false,
       },
       accent: {
-        Classic: true,
+        Classic: false,
         Rose: false,
         Cactus: false,
       },
@@ -116,9 +116,10 @@ export default {
   computed: {
     ...mapState([
         'primaryColor',
+        'accentColor',
     ]),
   },
-  //on open, load settings from HOCON
+  //on open, load setting states from HOCON
   created() {
     axios.get('http://localhost:8080/api/settingsOpened')
       .then(response => {
@@ -127,9 +128,8 @@ export default {
       .catch((error) => {
         console.error(error);
       });
-      //this will be replaced once JSON implementation is done
-      this.theme = "Black";
-      this.accent = "Classic";
+      this.theme = this.primaryColor;
+      this.accent = this.accentColor;
   },
   methods: {
     //close settings, trigger rebuild combview in app
@@ -144,13 +144,17 @@ export default {
           console.error(error);
         });
     },
-    //set theme in store
-    updateTheme() {
-      this.$store.commit('SET_PRIMARY_COLOR', this.theme);
-    },
-    //set accent in store
-    updateAccent() {
-      this.$store.commit('SET_ACCENT_COLOR', this.accent);
+    //write theme/accent change to HOCON
+    setTheme(theme) {
+      if (theme === "Black" || theme === "Dark" || theme === "Light")
+        this.$store.commit('SET_PRIMARY_COLOR', this.theme);
+      else
+        this.$store.commit('SET_ACCENT_COLOR', this.accent);
+      
+      axios.post('http://localhost:8080/api/setTheme', { theme })
+      .catch(error => {
+        console.error(error);
+      });
     },
   },
 };
@@ -239,7 +243,7 @@ section {
   right: 0;
   top: 0;
   height: 100%;
-  width: 6px;
+  width: 8px;
   background-color: var(--accent-color);
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;

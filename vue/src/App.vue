@@ -49,8 +49,8 @@ export default {
   data() {
       return {
         appliedStyles: [],
-        theme: "Black",
-        accent: "Classic",
+        theme: "",
+        accent: "",
       };
   },
   components: {
@@ -62,9 +62,9 @@ export default {
     ProgressBar,
     SettingsWindow,
     PreviewDialog
-},
+  },
   created() {
-    this.applyTheme(this.theme, this.accent);
+    this.loadTheme();
   },
   computed: {
     ...mapState([
@@ -75,6 +75,7 @@ export default {
     ])
   },
   watch: {
+    //load themes whenever store theme/accent change
     primaryColor(theme) {
       this.theme = theme;
       this.applyTheme(theme, this.accent);
@@ -85,26 +86,43 @@ export default {
     },
   },
   methods: {
+    loadTheme() {
+      //on start, load themes from config
+      axios.get("http://localhost:8080/api/getThemeConfig")
+        .then(response => {
+          this.$store.commit('SET_PRIMARY_COLOR', response.data.theme);
+          this.$store.commit('SET_ACCENT_COLOR', response.data.accent);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     applyTheme(theme, accent) {
       //remove previously applied css
+      //console.log(`./primary${theme}.css`, `./secondary${accent}.css`);
       this.appliedStyles.forEach(style => {
       style.remove();
       });
       this.appliedStyles = [];
-
-      let themePath = `./primary${theme}.css`;
-      let linkElement = document.createElement('link');
-      linkElement.rel = 'stylesheet';
-      linkElement.href = themePath;
-      document.head.appendChild(linkElement);
-      this.appliedStyles.push(linkElement);
-
-      themePath = `./secondary${accent}.css`;
-      linkElement = document.createElement('link');
-      linkElement.rel = 'stylesheet';
-      linkElement.href = themePath;
-      document.head.appendChild(linkElement);
-      this.appliedStyles.push(linkElement);
+      let themePath;
+      let linkElement;
+      
+      if (theme !== "") {
+        themePath = `./primary${theme}.css`;
+        linkElement = document.createElement('link');
+        linkElement.rel = 'stylesheet';
+        linkElement.href = themePath;
+        document.head.appendChild(linkElement);
+        this.appliedStyles.push(linkElement);
+      }
+      if (accent !== "") {
+        themePath = `./secondary${accent}.css`;
+        linkElement = document.createElement('link');
+        linkElement.rel = 'stylesheet';
+        linkElement.href = themePath;
+        document.head.appendChild(linkElement);
+        this.appliedStyles.push(linkElement);
+      }
     },
   },
     

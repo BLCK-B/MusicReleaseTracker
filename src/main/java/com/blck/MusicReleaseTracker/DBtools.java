@@ -135,14 +135,16 @@ public class DBtools {
         String templateContent =
                 "version=4\n" +
                 "DBversion=" + DBversion + "\n" +
-                        "filters {\n" +
-                        "   Acoustic=false\n" +
-                        "   Extended=false\n" +
-                        "   Instrumental=false\n" +
-                        "   Remaster=false\n" +
-                        "   Remix=false\n" +
-                        "   VIP=false\n" +
-                        "}\n";
+                "filters {\n" +
+                "   Acoustic=false\n" +
+                "   Extended=false\n" +
+                "   Instrumental=false\n" +
+                "   Remaster=false\n" +
+                "   Remix=false\n" +
+                "   VIP=false\n" +
+                "}\n" +
+                "theme=Black\n" +
+                "accent=Classic\n";
 
         //create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");

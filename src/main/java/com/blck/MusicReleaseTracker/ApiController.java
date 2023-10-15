@@ -87,6 +87,15 @@ public class ApiController {
     public void toggleFilter(@RequestParam String filter, @RequestParam Boolean value) {
         sendRequest.toggleFilter(filter, value);
     }
+    @PostMapping("/setTheme")
+    public void setTheme(@RequestBody Map<String, String> themeMap) {
+        String theme = themeMap.get("theme");
+        sendRequest.setTheme(theme);
+    }
+    @GetMapping("/getThemeConfig")
+    public Map<String,String> getThemeConfig() {
+        return sendRequest.getThemeConfig();
+    }
 
     @GetMapping("/settingsOpened")
     public HashMap<String, Boolean> settingsOpened() {

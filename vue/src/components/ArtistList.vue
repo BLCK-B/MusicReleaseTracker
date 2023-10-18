@@ -103,7 +103,7 @@ export default {
 
 <style scoped>
 .listbtn {
-  width: 95%;
+  width: 92%;
   height: 28px;
   border-radius: 0px;
   margin: 0;

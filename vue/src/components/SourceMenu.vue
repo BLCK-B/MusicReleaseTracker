@@ -13,9 +13,15 @@
       <img v-else-if="primaryColor === 'Dark'" class="image" src="./icons/optionsdark.png" alt="Settings"/>
       <img v-else-if="primaryColor === 'Light'" class="image" src="./icons/optionslight.png" alt="Settings"/>
     </button>
-    <button @click="clickScrape()" v-bind:style="{ 'background-color': scrapeColor }" class="imgbutton2">
+    <button @click="clickScrape()" @mouseover="scrapeHover()" @mouseleave="scrapeMouseOff()" v-bind:style="{ 'background-color': scrapeColor }" class="imgbutton2">
       <img class="image" src="./icons/refreshuniversal.png" alt="Refresh"/>
     </button>
+
+    <transition name="fade">
+      <div class="scrapenotice" @mouseover="scrapeMouseOff()" v-if="scrapeNotice">
+        <p>Last scrape: {{ scrapeLast }}</p>
+      </div>
+    </transition>
 
   </div>
 </template>
@@ -30,6 +36,8 @@ export default {
        activeTab: "",
        eventSource: null,
        scrapeColor: "var(--accent-color)",
+       scrapeNotice: false,
+       scrapeLast: "-",
      }
   },
   computed: {
@@ -40,7 +48,7 @@ export default {
       'primaryColor',
     ])
   },
-  //load last clicked tab, otherwise combview as default
+  //load last clicked tab, otherwise combview as default, load scrapeLast time
   created() {
     this.activeTab = this.sourceTab;
     axios.post('http://localhost:8080/api/fillCombview')
@@ -49,9 +57,14 @@ export default {
         })
         .then(() => {
           if (this.sourceTab === "")
-              this.setStoreTab("combview");
-          this.handleSourceClick(this.sourceTab);
+            this.setStoreTab("combview");
+          else
+            this.handleSourceClick(this.sourceTab);
         });
+    axios.get('http://localhost:8080/api/getScrapeDate')
+    .then(response => {
+      this.scrapeLast = response.data;
+    })
   },
   //on any change of sourceTab trigger handleSourceClick
   watch: {
@@ -100,14 +113,33 @@ export default {
           .then(() => {
             this.scrapeColor = "var(--accent-color)";
             this.$store.commit('SET_ALLOW_BUTTONS', true);
-            //this.handleSourceClick("combview");
             this.eventSource.close();
             this.$store.commit('SET_PROGRESS', 0);
+            let time = new Date().toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            }).replace(/\//g, '.').replace(',', '').replace(/(\d{2})\.(\d{2})/, '\$1.\$2.');
+            this.scrapeLast = time;
+            this.scrapeNotice = true;
+            this.handleSourceClick("combview");
+            axios.post('http://localhost:8080/api/saveScrapeDate', time, {
+              headers: {
+                'Content-Type': 'text/plain'
+              }
+            })
           })
           .catch((error) => {
             console.error(error);
           });
       }
+    },
+    scrapeHover() {
+      this.scrapeNotice = true;
+    },
+    scrapeMouseOff() {
+      this.scrapeNotice = false;
     },
     //open settings
     openSettings() {
@@ -118,7 +150,6 @@ export default {
 </script>
 
 <style scoped>
- 
 .wrapper {
   min-width: 500px;
   width: 100%;
@@ -187,6 +218,24 @@ export default {
 }
 .active:hover {
   border-bottom: solid 3px var(--accent-color);
+}
+
+.scrapenotice {
+  position: absolute;
+  z-index: 50;
+  background-color: var(--duller-color);
+  border-radius: 5px;
+  padding-right: 10px;
+  padding-left: 10px;
+  right: 14px;
+  top: 42px;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: 0.15s;
 }
 
 </style>

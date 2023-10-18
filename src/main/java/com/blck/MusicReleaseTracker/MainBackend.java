@@ -423,7 +423,7 @@ public class MainBackend {
         //assembles table for combined view: filters unwanted words, looks for duplicates, sorts by date, other processing
         //load filterwords and entrieslimit
         try {
-            DBtools.readCombviewConfig();
+            DBtools.readConfig("filters");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -14,6 +14,7 @@
     <div class="table-body">
       <table>
         <tbody>
+          <td><br></td>
           <tr v-for="(item, index) in tableData" :key="index" :class="{'future-date': isDateInFuture(item.date)}">
             <td class="tdsong">{{ item.song }}</td>
             <td class="tdartist" v-if="!hideArtistColumn">{{ item.artist }}</td>
@@ -26,7 +27,7 @@
   </div>
 
   <div class="emptynotice" v-if="!hideTable && !previewVis && artist">
-    <p>Table empty, but URL exists</p>
+    <p>table empty, but URL exists</p>
   </div>
   
 </template>
@@ -62,14 +63,12 @@ export default {
 </script>
 
 <style scoped>
-.table-container {
-  height: 92%;
-  overflow-y: scroll;
-}
 .table-header {
   flex-shrink: 0;
   overflow: hidden;
   z-index: 3;
+  position: fixed;
+  width: calc(100% - 170px);
 }
 .table-body {
   flex-grow: 1;
@@ -77,24 +76,20 @@ export default {
   user-select: text;
   margin-bottom: 10vh;
 }
-
 table {
   width: 100%;
   min-width: 500px;
   border-collapse: collapse;
 }
-
 th, td {
   padding: 4px;
 }
-
 th {
   background-color: var(--primary-color);
   border: none;
   position: sticky;
   top: 0;
 }
-
 .song, .tdsong {
   width: 50%;
   max-width: 120px;
@@ -102,7 +97,6 @@ th {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .artist, .tdartist {
   width: 50%;
   max-width: 120px;
@@ -110,16 +104,13 @@ th {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .date, .tddate {
   width: 100px;
   min-width: 100px;
 }
-
 .future-date {
   opacity: 40%;
 }
-
 .emptynotice {
   position: absolute;
   left: 45%;

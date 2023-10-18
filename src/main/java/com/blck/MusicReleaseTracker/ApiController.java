@@ -117,4 +117,14 @@ public class ApiController {
         return sendRequest.checkExistURL();
     }
 
+    @PostMapping("/saveScrapeDate")
+    public void saveScrapeDate(@RequestBody String time) {
+        sendRequest.saveScrapeDate(time);
+    }
+
+    @GetMapping("/getScrapeDate")
+    public String getScrapeDate() {
+        return sendRequest.getScrapeDate();
+    }
+
 }

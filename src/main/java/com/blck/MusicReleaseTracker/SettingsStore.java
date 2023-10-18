@@ -14,6 +14,7 @@ package com.blck.MusicReleaseTracker;
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class SettingsStore {
 
@@ -21,6 +22,8 @@ public class SettingsStore {
     private String configPath;
     private String configFolder;
     private ArrayList<String> filterWords;
+    private Map<String,String> themesMap;
+    private String scrapeDate;
     private final int entriesLimit = 40;
 
     public SettingsStore() {
@@ -56,6 +59,18 @@ public class SettingsStore {
 
     public int getEntriesLimit() {
         return entriesLimit;
+    }
+    public void setThemes(Map<String,String> themesMap) {
+        this.themesMap = themesMap;
+    }
+    public Map<String,String> getThemes() {
+        return themesMap;
+    }
+    public void setScrapeDate(String scrapeDate) {
+        this.scrapeDate = scrapeDate;
+    }
+    public String getScrapeDate() {
+        return scrapeDate;
     }
 
     @Override

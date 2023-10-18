@@ -23,7 +23,7 @@ import java.util.*;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-//class for essential tasks
+//class for essential tasks (not only DB)
 public class DBtools {
 
     public final static SettingsStore settingsStore = new SettingsStore();
@@ -106,19 +106,36 @@ public class DBtools {
         stmt.close();
     }
 
-    public static void readCombviewConfig() {
-        ArrayList<String> filterWords = new ArrayList<>();
-        int entriesLimit = 0;
-        //read filters
+    public static void readConfig(String option) {
+        //any reading from HOCON
         Config config = ConfigFactory.parseFile(new File(settingsStore.getConfigPath()));
-        Config filtersConfig = config.getConfig("filters");
-        for (Map.Entry<String, ConfigValue> entry : filtersConfig.entrySet()) {
-            String filter = entry.getKey();
-            boolean enabled = entry.getValue().unwrapped().equals(true);
-            if (enabled)
-                filterWords.add(filter);
+
+        switch (option) {
+            case ("filters") -> {
+                ArrayList<String> filterWords = new ArrayList<>();
+                Config filtersConfig = config.getConfig("filters");
+                for (Map.Entry<String, ConfigValue> entry : filtersConfig.entrySet()) {
+                    String filter = entry.getKey();
+                    boolean enabled = entry.getValue().unwrapped().equals(true);
+                    if (enabled)
+                        filterWords.add(filter);
+                }
+                settingsStore.setFilterWords(filterWords);
+            }
+            case ("themes") -> {
+                String theme = config.getString("theme");
+                String accent = config.getString("accent");
+                Map<String, String> themesMap = new HashMap<>();
+                themesMap.put("theme", theme);
+                themesMap.put("accent", accent);
+                settingsStore.setThemes(themesMap);
+            }
+            case ("lastScrape") -> {
+                String scrapeDate = config.getString("lastScrape");
+                settingsStore.setScrapeDate(scrapeDate);
+            }
         }
-        settingsStore.setFilterWords(filterWords);
+        config = null;
     }
 
     public static void updateSettingsDB() {
@@ -144,7 +161,8 @@ public class DBtools {
                 "   VIP=false\n" +
                 "}\n" +
                 "theme=Black\n" +
-                "accent=Classic\n";
+                "accent=Classic\n" +
+                "lastScrape=0\n";
 
         //create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");

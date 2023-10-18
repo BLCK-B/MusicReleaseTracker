@@ -26,7 +26,7 @@ export default {
         input: "",
         rules: [
         value => !!value.trim(),
-        value => (value || '').length <= 30,
+        value => (value || '').length <= 25,
         ],
     }),
     methods: {

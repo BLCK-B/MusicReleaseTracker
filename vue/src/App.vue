@@ -14,8 +14,12 @@
           </div>
           <!-- content -->
           <AddArtistDialog/>
-          <SourceTable class="sourcetable"/>
-          <DialogsURL v-if="!previewVis" class="dialogsurl"/>
+          <div class ="sourcetable">
+            <SourceTable/>
+          </div>
+          <div class="dialogsurl" v-if="!previewVis">
+            <DialogsURL/>
+          </div>
         </div>
 
         <div class="progressbar">
@@ -23,7 +27,7 @@
         </div>
   
   </div>
-
+  
   <div class="app" v-if="settingsOpen">
     <SettingsWindow/>
   </div>
@@ -130,6 +134,12 @@ export default {
 </script>
 
 <style scoped>
+  * {
+    scrollbar-color: var(--dull-color) transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--dull-color);
+  }
   .app {
     font-family: 'arial', sans-serif;
     font-size: 14px;
@@ -172,6 +182,9 @@ export default {
   .sourcetable {
     position: relative;
     top: 6px;
+    height: 100%;
+    overflow-y: scroll;
+    margin-right: 4px;
   }
   .progressbar {
     position: absolute;
@@ -180,6 +193,7 @@ export default {
     z-index: 5;
     width: 100%;
   }
+
 
 </style>
 

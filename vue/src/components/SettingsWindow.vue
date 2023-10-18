@@ -1,5 +1,4 @@
 <template>
- 
  <div class="settings">
 
     <button @click="clickClose()" class="imgbutton">
@@ -81,7 +80,6 @@
     </section>
 
  </div>
-
 </template>
   
 <script>
@@ -248,5 +246,6 @@ section {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
+
 
 </style>

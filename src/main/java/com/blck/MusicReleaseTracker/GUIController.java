@@ -354,7 +354,7 @@ public class GUIController {
 
     public HashMap<String, Boolean> settingsOpened() {
         //gather all settings states and return them to frontend
-        DBtools.readCombviewConfig();
+        DBtools.readConfig("filters");
         HashMap<String, Boolean> configData = new HashMap<>();
 
         ArrayList<String> filterWords = DBtools.settingsStore.getFilterWords();
@@ -399,14 +399,26 @@ public class GUIController {
         }
     }
     public Map<String,String> getThemeConfig() {
-        //read theme and accent
-        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
-        String theme = config.getString("theme");
-        String accent = config.getString("accent");
-        Map<String, String> themeConfigMap = new HashMap<>();
-        themeConfigMap.put("theme", theme);
-        themeConfigMap.put("accent", accent);
-        return themeConfigMap;
+        DBtools.readConfig("themes");
+        return DBtools.settingsStore.getThemes();
     }
+
+    public void saveScrapeDate(String time) {
+        //change config lastScrape time
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
+        config = config.withValue("lastScrape", ConfigValueFactory.fromAnyRef(time));
+        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
+            writer.write(config.root().render(renderOptions));
+        } catch (IOException e) {
+            System.out.println("could not save last scrape time");
+            e.printStackTrace();
+        }
+    }
+    public String getScrapeDate() {
+        DBtools.readConfig("lastScrape");
+        return DBtools.settingsStore.getScrapeDate();
+    }
+
 
 }

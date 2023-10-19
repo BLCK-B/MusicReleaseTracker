@@ -87,6 +87,7 @@ public class GUIController {
                 pstmt.setString(1, lastClickedArtist);
                 pstmt.executeUpdate();
                 conn.close();
+                lastClickedArtist = null;
             }
             catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -384,19 +385,10 @@ public class GUIController {
     }
     public void setTheme(String theme) {
         //change config theme/accent
-        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
         if (theme.equals("Black") || theme.equals("Dark") || theme.equals("Light"))
-            config = config.withValue("theme", ConfigValueFactory.fromAnyRef(theme));
+            DBtools.writeSingleConfig("theme", theme);
         else
-            config = config.withValue("accent", ConfigValueFactory.fromAnyRef(theme));
-
-        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
-            writer.write(config.root().render(renderOptions));
-        } catch (IOException e) {
-            System.out.println("could not save theme/accent change");
-            e.printStackTrace();
-        }
+            DBtools.writeSingleConfig("accent", theme);
     }
     public Map<String,String> getThemeConfig() {
         DBtools.readConfig("themes");
@@ -405,19 +397,15 @@ public class GUIController {
 
     public void saveScrapeDate(String time) {
         //change config lastScrape time
-        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
-        config = config.withValue("lastScrape", ConfigValueFactory.fromAnyRef(time));
-        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
-            writer.write(config.root().render(renderOptions));
-        } catch (IOException e) {
-            System.out.println("could not save last scrape time");
-            e.printStackTrace();
-        }
+        DBtools.writeSingleConfig("lastScrape", time);
     }
     public String getScrapeDate() {
         DBtools.readConfig("lastScrape");
         return DBtools.settingsStore.getScrapeDate();
+    }
+
+    public String getLastArtist() {
+        return lastClickedArtist;
     }
 
 

@@ -19,7 +19,7 @@
   
 <script>
 import axios from 'axios';
-import { mapMutations, mapActions, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
     data: () => ({
@@ -67,8 +67,8 @@ export default {
 .wrapper {
     top: 25%;
     left: 35%;
-    width: 300px;
-    height: 230px;
+    width: 325px;
+    height: 240px;
     position: absolute;
     z-index: 3;
     background-color: var(--primary-color);
@@ -89,7 +89,8 @@ button {
 input {
     background-color: var(--duller-color);
     color: var(--contrast-color);
-    width: 225px;
+    width: 200px;
+    margin-right: 48px;
     border: none;
 }
 input:focus {

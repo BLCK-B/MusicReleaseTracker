@@ -31,7 +31,13 @@ export default {
     };
   },
   created() {
+    //load artist list, last clicked artist if not null
     this.loadList();
+    axios.get('http://localhost:8080/api/getLastArtist')
+    .then(response => {
+      if (response.data !== "")
+        this.handleItemClick(response.data);
+    })
   },
   computed: {
     ...mapState([

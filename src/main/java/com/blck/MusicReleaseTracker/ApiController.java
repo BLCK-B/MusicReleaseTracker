@@ -39,13 +39,13 @@ public class ApiController {
         return sendRequest.loadList();
     }
 
-    @RequestMapping("/artistListClick")
+    @PostMapping("/artistListClick")
     public List<TableModel> artistListClick(@RequestBody Map<String, String> requestData) {
         String artist = requestData.get("artist");
         return sendRequest.artistListClick(artist);
     }
 
-    @RequestMapping ("/sourceTabClick")
+    @PostMapping ("/sourceTabClick")
     public List<TableModel> sourceTabClick(@RequestBody Map<String, String> requestData) {
         String source = requestData.get("source");
         return sendRequest.sourceTabClick(source);
@@ -67,7 +67,7 @@ public class ApiController {
     public void cleanArtistSource() {
         sendRequest.cleanArtistSource();
     }
-    @RequestMapping("/saveUrl")
+    @RequestMapping ("/saveUrl")
     public void saveUrl() {
         sendRequest.saveUrl();
     }
@@ -125,6 +125,11 @@ public class ApiController {
     @GetMapping("/getScrapeDate")
     public String getScrapeDate() {
         return sendRequest.getScrapeDate();
+    }
+
+    @GetMapping("/getLastArtist")
+    public String getLastArtist() {
+        return sendRequest.getLastArtist();
     }
 
 }

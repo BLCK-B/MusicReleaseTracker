@@ -137,6 +137,18 @@ public class DBtools {
         }
         config = null;
     }
+    public static void writeSingleConfig(String name, String value) {
+        //save single option state in HOCON
+        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
+        config = config.withValue(name, ConfigValueFactory.fromAnyRef(value));
+        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
+        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
+            writer.write(config.root().render(renderOptions));
+        } catch (IOException e) {
+            System.out.println("could not save " + name + " in config");
+            e.printStackTrace();
+        }
+    }
 
     public static void updateSettingsDB() {
         //create config if it does not exist, change to latest structure and transfer data if a different structure is detected
@@ -162,7 +174,7 @@ public class DBtools {
                 "}\n" +
                 "theme=Black\n" +
                 "accent=Classic\n" +
-                "lastScrape=0\n";
+                "lastScrape=-\n";
 
         //create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");

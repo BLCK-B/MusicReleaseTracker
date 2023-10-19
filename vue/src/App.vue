@@ -7,24 +7,24 @@
         <PreviewDialog v-if="previewVis" class="preview"/>
       </div>
 
-        <div class="maincontent">
-          <!-- top bar -->
-          <div v-if="!previewVis" class="topbar">
-            <SourceMenu/>
-          </div>
-          <!-- content -->
-          <AddArtistDialog/>
-          <div class ="sourcetable">
-            <SourceTable/>
-          </div>
-          <div class="dialogsurl" v-if="!previewVis">
-            <DialogsURL/>
-          </div>
+      <div class="maincontent">
+        <!-- top bar -->
+        <div v-if="!previewVis" class="topbar">
+          <SourceMenu/>
         </div>
+        <!-- content -->
+        <AddArtistDialog/>
+        <div class ="sourcetable">
+          <SourceTable/>
+        </div>
+        <div class="dialogsurl" v-if="!previewVis">
+          <DialogsURL/>
+        </div>
+      </div>
 
-        <div class="progressbar">
-          <ProgressBar/>
-        </div>
+      <div class="progressbar">
+        <ProgressBar/>
+      </div>
   
   </div>
   
@@ -44,10 +44,8 @@ import AddArtistDialog from './components/AddArtistDialog.vue';
 import ProgressBar from './components/ProgressBar.vue';
 import SettingsWindow from './components/SettingsWindow.vue';
 import PreviewDialog from './components/PreviewDialog.vue';
-import { mapState, mapMutations } from 'vuex';
+import { mapState } from 'vuex';
 import axios from 'axios';
-
-
 
 export default {
   data() {

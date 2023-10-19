@@ -126,7 +126,7 @@ export default {
         border: none;
         width: 328px;
         position: absolute;
-        bottom: 3px;
+        bottom: 5px;
         left: 5px;
         font-size: 13px;
         height: 18px;
@@ -139,7 +139,7 @@ export default {
         border: none;
         position: absolute;
         right: 5px;
-        bottom: 3px;
+        bottom: 5px;
     }
     button:hover {
         opacity: 70%;

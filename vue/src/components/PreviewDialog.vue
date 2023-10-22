@@ -3,8 +3,14 @@
         <h1>preview</h1>
         <p v-if="!hideTable">Confirm only if the table has complete, recent information.</p>
         <p v-if="hideTable">Link was for a different source than this one.</p>
-        <button @click="clickConfirm" :disabled="hideTable">confirm</button>
-        <button @click="clickCancel">cancel</button>
+        <button @click="clickConfirm" class="imgbutton" :disabled="hideTable">
+            <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
+            <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+        </button>
+        <button @click="clickCancel" class="imgbutton">
+            <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="X"/>
+            <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
+        </button>
     </div>
 </template>
 
@@ -24,7 +30,8 @@ export default {
     }),
     computed: {
         ...mapState([
-        'tableData'
+        'tableData',
+        "primaryColor",
         ]),
         hideTable() {
             return this.tableData.length == 0;
@@ -72,5 +79,19 @@ export default {
         border: none;
         border-radius: 5px;
         width: 60px;
+    }
+    .imgbutton, .image {
+        margin-left: 22px;
+        height: 26px;
+        width: 26px;
+        padding: 0;
+        background-color: transparent;
+    }
+    .imgbutton:hover {
+        opacity: 50%;
+    }
+    :disabled {
+        opacity: 0.5;
+        pointer-events: none;
     }
 </style>

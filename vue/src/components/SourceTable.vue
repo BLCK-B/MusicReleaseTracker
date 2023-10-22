@@ -113,8 +113,8 @@ th {
 }
 .emptynotice {
   position: absolute;
-  left: 45%;
-  top: 50%;
+  left: 35%;
+  top: 40%;
   color: var(--dull-color);
 }
 </style>

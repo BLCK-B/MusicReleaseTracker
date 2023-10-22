@@ -7,10 +7,13 @@
     
         <div class="diag-actions">
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickAdd" :disabled="!isValid">insert</button>
             <button @click="clickClose" class="imgbutton">
-                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="insert"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="insert"/>
+                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="X"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
+            </button>
+            <button @click="clickAdd" class="imgbutton" :disabled="!isValid">
+                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
             </button>
         </div>
 
@@ -63,52 +66,53 @@ export default {
 </script>
 
 <style scoped>
-
-.wrapper {
-    top: 25%;
-    left: 35%;
-    width: 325px;
-    height: 240px;
-    position: absolute;
-    z-index: 3;
-    background-color: var(--primary-color);
-    border: 1px solid var(--contrast-color);
-    padding: 8px;
-}
-.diag-actions {
-    position: absolute;
-    bottom: 3px;
-    left: 5px;
-}
-button {
-    color: black;
-    border: none;
-    padding: 2px;
-    margin-left: 10px;
-}
-input {
-    background-color: var(--duller-color);
-    color: var(--contrast-color);
-    width: 200px;
-    margin-right: 48px;
-    border: none;
-}
-input:focus {
-    outline: none;
-}
-.imgbutton, .image {
-    height: 23px;
-    width: 23px;
-    padding: 0;
-    float: right;
-    margin-left: 5px;
-    background-color: transparent;
-}
-.imgbutton {
-    position: relative;
-}
-.imgbutton:hover {
-    opacity: 50%;
-}
-
+    .wrapper {
+        top: 25%;
+        left: 35%;
+        width: 325px;
+        height: 240px;
+        position: absolute;
+        z-index: 3;
+        background-color: var(--primary-color);
+        border: 1px solid var(--contrast-color);
+        padding: 8px;
+    }
+    .diag-actions {
+        position: absolute;
+        bottom: 3px;
+        left: 5px;
+    }
+    button {
+        border: none;
+    }
+    input {
+        background-color: var(--duller-color);
+        color: var(--contrast-color);
+        width: 200px;
+        margin-right: 58px;
+        margin-left: 10px;
+        border: none;
+    }
+    input:focus {
+        outline: none;
+    }
+    .imgbutton, .image {
+        height: 23px;
+        width: 23px;
+        padding: 0;
+        float: right;
+        margin-left: 5px;
+        margin-right: 2px;
+        background-color: transparent;
+    }
+    .imgbutton {
+        position: relative;
+    }
+    .imgbutton:hover {
+        opacity: 50%;
+    }
+    :disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 </style>

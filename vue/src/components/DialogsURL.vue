@@ -4,34 +4,43 @@
         <div v-if="sourceTab === 'musicbrainz'" class="dialog">
             <h1>MusicBrainz source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy url</p>
+            <p><a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy URL</p>
             <p>Only correct links will be accepted.</p><br>
             <p>Example link:</p>
             <p>https://musicbrainz.org/artist/<span class="variabletext">id/...</span></p>
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickURL" :disabled="!isValid">insert</button>
+            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+            </button>
         </div>
 
         <div v-else-if="sourceTab === 'beatport'" class="dialog">
             <h1>Beatport source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://beatport.com">https://beatport.com</a> > find artist > copy url</p>
+            <p><a href="https://beatport.com">https://beatport.com</a> > find artist > copy URL</p>
             <p>Only correct links will be accepted.</p><br>
             <p>Example link:</p>
             <p>https://beatport.com/artist/<span class="variabletext">artistname/id/...</span></p>
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickURL" :disabled="!isValid">insert</button>
+            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+            </button>
         </div>
 
         <div v-else-if="sourceTab === 'junodownload'" class="dialog">
             <h1>Junodownload source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://junodownload.com">https://junodownload.com</a> > find artist > copy url</p>
+            <p><a href="https://junodownload.com">https://junodownload.com</a> > find artist > copy URL</p>
             <p>Only correct links will be accepted.</p><br>
             <p>Example link:</p>
             <p>https://junodownload.com/artists/<span class="variabletext">artistname/...</span></p>
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickURL" :disabled="!isValid">insert</button>
+            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+            </button>
         </div>
 
     </div>
@@ -60,6 +69,7 @@ export default {
         "allowButtons",
         "artist",
         "addDialogVis",
+        'primaryColor',
         ]),
         //if no rules in data broken, enable insert button
         isValid() {
@@ -124,7 +134,7 @@ export default {
         background-color: var(--duller-color);
         color: var(--contrast-color);
         border: none;
-        width: 328px;
+        width: 345px;
         position: absolute;
         bottom: 5px;
         left: 5px;
@@ -162,6 +172,21 @@ export default {
     }
     .artist {
         user-select: text;
+    }
+    .imgbutton, .image {
+        height: 23px;
+        width: 23px;
+        padding: 0;
+        float: right;
+        margin-right: 2px;
+        background-color: transparent;
+    }
+    .imgbutton:hover {
+        opacity: 50%;
+    }
+    :disabled {
+        opacity: 0.5;
+        pointer-events: none;
     }
     
 </style>

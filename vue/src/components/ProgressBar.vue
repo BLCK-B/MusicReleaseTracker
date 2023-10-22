@@ -24,7 +24,7 @@ export default {
   transition: 0.25s;
 }
 .progress-container {
-  background-color: var(--primary-color);
+  background-color: transparent;
 }
 .progressbar {
   height: 5px;

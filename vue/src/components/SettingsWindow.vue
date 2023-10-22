@@ -55,16 +55,16 @@
         <div class="accent-buttons">
           <input type="radio" v-model="accent" value="Classic" @change="setTheme('Classic')">
           <label>Classic</label>
-          <input type="radio" v-model="accent" value="Rose" @change="setTheme('Rose')">
-          <label>Rose</label>
           <input type="radio" v-model="accent" value="Cactus" @change="setTheme('Cactus')">
           <label>Cactus</label>
+          <input type="radio" v-model="accent" value="Rose" @change="setTheme('Rose')">
+          <label>Rose</label>
+          <input type="radio" v-model="accent" value="Warm" @change="setTheme('Warm')">
+          <label>Warm</label>
           <input type="radio" v-model="accent" value="Cloud" @change="setTheme('Cloud')">
           <label>Cloud</label>
           <input type="radio" v-model="accent" value="Surge" @change="setTheme('Surge')">
           <label>Surge</label>
-          <input type="radio" v-model="accent" value="Warm" @change="setTheme('Warm')">
-          <label>Warm</label>
         </div>
 
       </div>
@@ -136,7 +136,6 @@ export default {
     },
     //write filter change to HOCON
     updateFilter(filter, value) {
-      console.log(filter, value);
       axios.post(`http://localhost:8080/api/toggleFilter?filter=${filter}&value=${value}`)
         .catch(error => {
           console.error(error);

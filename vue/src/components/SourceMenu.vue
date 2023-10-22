@@ -43,7 +43,6 @@ export default {
   computed: {
     ...mapState([
       'sourceTab',
-      'tableData',
       'allowButtons',
       'primaryColor',
     ])
@@ -150,92 +149,97 @@ export default {
 </script>
 
 <style scoped>
-.wrapper {
-  min-width: 500px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  height: 38px;
-}
-.tabs {
-  display: flex;
-  text-align: center;
-  font-weight: bold;
-  flex-grow: 1;
-  height: 38px;
-}
-.image {
-  height: 32px;
-  width: 32px;
-}
-.imgbutton1:hover, .imgbutton2:hover {
-  opacity: 70%;
-}
-.imgbutton1 {
-  padding: 0;
-  height: 32px;
-  width: 32px;
-  margin-left: 8px;
-  background-color: var(--accent-color);
-  border: none;
-  margin-top: 2px;
-  height: 32px;
-  width: 32px;
-}
-.imgbutton2 {
-  padding: 0;
-  margin-left: 8px;
-  margin-right: 20px;
-  border: none;
-  margin-top: 2px;
-  border-radius: 50px;
-  height: 32px;
-  width: 32px;
-}
-.cvtab {
-  width: 80%;
-  max-width: 400px;
-  padding: 8px;
-  border: solid 3px transparent;
-  border-bottom: solid 3px var(--accent-color);
-}
-.stab {
-  width: 20%;
-  max-width: 150px;
-  padding: 8px;
-  border: solid 3px transparent;
-  border-bottom: solid 3px var(--accent-color);
-}
-.tabs :hover {
-  border-bottom: solid 3px var(--dull-color);;
-}
-.active {
-  transition: 0.15s;
-  background-color: var(--accent-color);
-  color: var(--accent-contrast);
-  border-bottom: solid 3px var(--accent-color);
-  border-radius: 5px;
-}
-.active:hover {
-  border-bottom: solid 3px var(--accent-color);
-}
+  .wrapper {
+    min-width: 500px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    height: 38px;
+  }
+  .tabs {
+    display: flex;
+    text-align: center;
+    font-weight: bold;
+    flex-grow: 1;
+    height: 38px;
+  }
+  .image {
+    height: 32px;
+    width: 32px;
+  }
+  .imgbutton1:hover, .imgbutton2:hover {
+    opacity: 70%;
+  }
+  .imgbutton1 {
+    padding: 0;
+    height: 32px;
+    width: 32px;
+    margin-left: 8px;
+    background-color: var(--accent-color);
+    border: none;
+    margin-top: 2px;
+    height: 32px;
+    width: 32px;
+  }
+  .imgbutton2 {
+    padding: 0;
+    margin-left: 8px;
+    margin-right: 20px;
+    border: none;
+    margin-top: 2px;
+    border-radius: 50px;
+    height: 32px;
+    width: 32px;
+  }
+  .cvtab {
+    width: 80%;
+    max-width: 400px;
+    padding: 8px;
+    border: solid 3px transparent;
+    border-bottom: solid 3px var(--accent-color);
+  }
+  .stab {
+    width: 20%;
+    max-width: 150px;
+    padding: 8px;
+    border: solid 3px transparent;
+    border-bottom: solid 3px var(--accent-color);
+  }
+  .tabs :hover {
+    border-bottom: solid 3px var(--dull-color);;
+  }
+  .active {
+    transition: 0.15s;
+    background-color: var(--accent-color);
+    color: var(--accent-contrast);
+    border-bottom: solid 3px var(--accent-color);
+    border-radius: 5px;
+  }
+  .active:hover {
+    border-bottom: solid 3px var(--accent-color);
+  }
 
-.scrapenotice {
-  position: absolute;
-  z-index: 50;
-  background-color: var(--duller-color);
-  border-radius: 5px;
-  padding-right: 10px;
-  padding-left: 10px;
-  right: 14px;
-  top: 42px;
-}
+  .scrapenotice {
+    position: absolute;
+    z-index: 50;
+    background-color: var(--duller-color);
+    border-radius: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    right: 14px;
+    top: 42px;
+  }
 
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-.fade-enter-active, .fade-leave-active {
-  transition: 0.15s;
-}
+  .fade-enter-from, .fade-leave-to {
+    opacity: 0;
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: 0.15s;
+  }
+
+  :disabled {
+      opacity: 0.5;
+      pointer-events: none;
+  }
 
 </style>

@@ -36,7 +36,7 @@ export default {
     axios.get('http://localhost:8080/api/getLastArtist')
     .then(response => {
       if (response.data !== "")
-        this.handleItemClick(response.data);
+        this.lastClickedItem = response.data;
     })
   },
   computed: {
@@ -162,6 +162,11 @@ export default {
 }
 .highlighted:hover {
   background-color:  var(--accent-color);
+}
+
+:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 

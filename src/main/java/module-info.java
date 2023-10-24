@@ -1,12 +1,16 @@
 module com.blck.MusicReleaseTracker {
-    requires javafx.controls;
-    requires javafx.fxml;
     requires org.jsoup;
     requires java.sql;
     requires typesafe.config;
+    requires spring.web;
+    requires spring.context;
+    requires spring.beans;
+    requires spring.boot.autoconfigure;
+    requires spring.boot;
+    requires spring.webmvc;
 
-    opens com.blck.MusicReleaseTracker to javafx.fxml;
+    opens com.blck.MusicReleaseTracker;
+
     exports com.blck.MusicReleaseTracker;
-    exports com.blck.MusicReleaseTracker.ModelsEnums;
-    opens com.blck.MusicReleaseTracker.ModelsEnums to javafx.fxml;
 }
+

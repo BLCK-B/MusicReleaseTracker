@@ -1,15 +1,11 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.ModelsEnums.MonthNumbers;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
@@ -34,53 +30,62 @@ import java.util.stream.Collectors;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class RealMain extends Application {
+public class MainBackend {
 
+    private static final SSEController sseController = new SSEController();
     private static GUIController GUIController;
 
-    //preparing UI for start
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/blck/MusicReleaseTracker/mygui.fxml"));
-        Parent root = loader.load();
-        GUIController = loader.getController();
-        Scene scene = new Scene(root);
-        Image icon = new Image(getClass().getResourceAsStream("/MRTlogo.png"));
-        primaryStage.getIcons().add(icon);
-        primaryStage.setTitle("MusicReleaseTracker");
-        primaryStage.setHeight(680);
-        primaryStage.setWidth(800);
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+    @Component
+    public static class StartupRunner implements CommandLineRunner {
+        //on startup of springboot server
+        @Override
+        public void run(String... args) {
+            System.out.println("----------LOCAL SERVER STARTED----------");
+            System.out.println("  __  __ ____ _____ \n" +
+                    " |  \\/  |  _ \\_   _|\n" +
+                    " | |\\/| | |_) || |  \n" +
+                    " | |  | |  _ < | |  \n" +
+                    " |_|  |_|_| \\_\\|_|  \n");
 
-    public static void main(String[] args) {
-        try {
-            DBtools.path();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            try {
+                DBtools.path();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                DBtools.createTables();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                DBtools.updateSettingsDB();
+            } catch (Exception e) {
+                System.out.println("error handling config file");
+                e.printStackTrace();
+            }
+            //open port in web browser
+            try {
+                String os = System.getProperty("os.name").toLowerCase();
+                if (os.contains("win")) {
+                    String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
+                    Runtime.getRuntime().exec(cmd);
+                }
+                else if (os.contains("nix") || os.contains("nux")) {
+                    String[] cmd = {"/usr/bin/open", "http://localhost:8080"};
+                    Runtime.getRuntime().exec(cmd);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        try {
-            DBtools.createTables();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            DBtools.updateSettingsDB();
-        } catch (Exception e) {
-            System.out.println("error handling config file");
-            e.printStackTrace();
-        }
-        launch(args);
     }
 
     //entryLimit: how many entries per artist
     private static final int entryLimit = 15;
     public static boolean scrapeCancel = false;
 
-    //calling method for scrapers, based on artist URLs
     public static void scrapeData() throws SQLException, InterruptedException {
+        //calling method for scrapers, based on artist URLs
         scrapeCancel = false;
         //for each artistname: check all urls and load them into a list
         Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
@@ -112,7 +117,6 @@ public class RealMain extends Application {
         //list for source urls (incl null) - one artist at a time
         ArrayList<String> eachArtistUrls = new ArrayList<>();
         for (String songArtist : artistnameList) {
-            GUIController.currentlyScrapedArtist(songArtist);
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             eachArtistUrls.clear();
             sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
@@ -135,12 +139,13 @@ public class RealMain extends Application {
             RSeachArtistUrls.close();
             //calling scrapers
             int i = 1;
+            double startTime = System.currentTimeMillis();
             for (String oneUrl : eachArtistUrls) {
                 //if clicked cancel
                 if (scrapeCancel) {
+                    SSEController.sendProgress(1.0);
                     eachArtistUrls.clear();
                     artistnameList.clear();
-                    GUIController.removeScrapedCss();
                     System.gc();
                     return;
                 }
@@ -154,7 +159,7 @@ public class RealMain extends Application {
                         }
                     } catch (Exception e) {
                         //on fail, try once more
-                        System.out.println("error scraping source" + oneUrl + ",trying again");
+                        System.out.println("error scraping source " + oneUrl + ", trying again");
                         try {
                             switch(i) {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);
@@ -167,23 +172,26 @@ public class RealMain extends Application {
                         }
                     }
                 }
-                //delay at the end of every cycle
-                if (i == 3)
-                    Thread.sleep(1600);
+                //calculated delay at the end of every cycle
+                if (i == 3) {
+                    double endTime = System.currentTimeMillis();
+                    double elapsedTime = (endTime - startTime);
+                    if (2700 - elapsedTime >= 0)
+                        Thread.sleep((long) (2700 - elapsedTime));
+                }
                 //calculating progressbar value
                 progress++;
                 double state = progress / artistnameList.size() / 3;
-                GUIController.updateProgressBar(state);
                 i++;
+                SSEController.sendProgress(state);
             }
         }
-        GUIController.removeScrapedCss();
         eachArtistUrls.clear();
         artistnameList.clear();
         System.gc();
     }
 
-    private static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
         //scraper for musicbrainz
         Document doc = null;
         try {
@@ -211,9 +219,9 @@ public class RealMain extends Application {
                 continue;
             }
             else
-                insertedSongs.add(songsDirtyArray[i]);
+                insertedSongs.add(songsDirtyArray[i].replace("’", "'"));
 
-            songsArrayList.add(songsDirtyArray[i]);
+            songsArrayList.add(songsDirtyArray[i].replace("’", "'"));
             datesArrayList.add(datesDirtyArray[i]);
             i++;
         }
@@ -234,7 +242,7 @@ public class RealMain extends Application {
         datesArray = null;
     }
 
-    private static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {
         //scraper for beatport
         Document doc = null;
         try {
@@ -258,7 +266,7 @@ public class RealMain extends Application {
 
         while (matcher.find()) {
             typesArrayList.add(matcher.group(1));
-            songsArrayList.add(matcher.group(2).replace("\\u0026", "&"));
+            songsArrayList.add(matcher.group(2).replace("\\u0026", "&").replace("’", "'"));
             datesArrayList.add(matcher.group(3));
         }
         doc.empty();
@@ -279,7 +287,7 @@ public class RealMain extends Application {
         typesArray = null;
     }
 
-    private static void scrapeJunodownload(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeJunodownload(String oneUrl, String songArtist) throws IOException {
         //scraper for junodownload
         Document doc = null;
         try {
@@ -289,8 +297,11 @@ public class RealMain extends Application {
             return;
         }
         Elements songs = doc.select("a.juno-title");
-        Elements dates = doc.select("div.text-sm.mb-3.mb-lg-3");
+        Elements dates = doc.select("div.text-sm.text-muted.mt-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
+        for (int i = 0; i < songsArray.length; i++) {
+            songsArray[i] = songsArray[i].replace("’", "'");
+        }
         String[] datesArray = new String[dates.size()];
         String[] typesArray = null;
         doc.empty();
@@ -397,14 +408,11 @@ public class RealMain extends Application {
                     pstmt.setString(2, songObject.getArtist());
                     pstmt.setString(3, songObject.getDate());
                 }
-                pstmt.addBatch();
                 pstmt.executeUpdate();
             }
             conn.setAutoCommit(false);
-            pstmt.executeBatch();
             conn.commit();
             conn.setAutoCommit(true);
-            pstmt.clearBatch();
             conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -415,7 +423,7 @@ public class RealMain extends Application {
         //assembles table for combined view: filters unwanted words, looks for duplicates, sorts by date, other processing
         //load filterwords and entrieslimit
         try {
-            DBtools.readCombviewConfig();
+            DBtools.readConfig("filters");
         } catch (Exception e) {
             e.printStackTrace();
         }

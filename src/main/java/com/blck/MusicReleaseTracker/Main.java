@@ -1,5 +1,8 @@
 package com.blck.MusicReleaseTracker;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
         This program is free software: you can redistribute it and/or modify
@@ -13,10 +16,11 @@ package com.blck.MusicReleaseTracker;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+@SpringBootApplication
 public class Main {
 
     public static void main(String[] args) {
-        RealMain.main(args);
+        SpringApplication.run(Main.class, args);
     }
 
 }

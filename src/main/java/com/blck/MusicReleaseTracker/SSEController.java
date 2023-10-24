@@ -1,6 +1,8 @@
-package com.blck.MusicReleaseTracker.ModelsEnums;
-import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
-import javafx.beans.property.SimpleStringProperty;
+package com.blck.MusicReleaseTracker;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -15,16 +17,26 @@ import javafx.beans.property.SimpleStringProperty;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class TableModelCombview extends TableModel {
-    private final SimpleStringProperty column3;
+@RestController
+public class SSEController {
+    private static SseEmitter emitter;
 
-    public TableModelCombview(String column1, String column2, String column3) {
-        super(column1, column2);
-        this.column3 = new SimpleStringProperty(column3);
+    @GetMapping("/progress")
+    public SseEmitter eventStream() {
+        //timeout 5min
+        emitter = new SseEmitter(300000L);
+        return emitter;
     }
 
-    public String getColumn3() {
-        return column3.get();
+    public static void sendProgress(double state) {
+        try {
+            emitter.send(String.valueOf(state));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (state == 1.0)
+                emitter.complete();
+        }
     }
 
 }

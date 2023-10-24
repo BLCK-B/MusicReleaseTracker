@@ -159,7 +159,7 @@ public class MainBackend {
                         }
                     } catch (Exception e) {
                         //on fail, try once more
-                        System.out.println("error scraping source" + oneUrl + ",trying again");
+                        System.out.println("error scraping source " + oneUrl + ", trying again");
                         try {
                             switch(i) {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);
@@ -297,7 +297,7 @@ public class MainBackend {
             return;
         }
         Elements songs = doc.select("a.juno-title");
-        Elements dates = doc.select("div.text-sm.mb-3.mb-lg-3");
+        Elements dates = doc.select("div.text-sm.text-muted.mt-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
         for (int i = 0; i < songsArray.length; i++) {
             songsArray[i] = songsArray[i].replace("’", "'");

@@ -4,7 +4,7 @@
         <div v-if="sourceTab === 'musicbrainz'" class="dialog">
             <h1>MusicBrainz source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://musicbrainz.org">https://musicbrainz.org</a> > find artist > copy URL</p>
+            <p><a href="https://musicbrainz.org" target="_blank">https://musicbrainz.org</a> > find artist > copy URL</p>
             <p>Only correct links will be accepted.</p><br>
             <p>Example link:</p>
             <p>https://musicbrainz.org/artist/<span class="variabletext">id/...</span></p>
@@ -18,7 +18,7 @@
         <div v-else-if="sourceTab === 'beatport'" class="dialog">
             <h1>Beatport source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://beatport.com">https://beatport.com</a> > find artist > copy URL</p>
+            <p><a href="https://beatport.com" target="_blank">https://beatport.com</a> > find artist > copy URL</p>
             <p>Only correct links will be accepted.</p><br>
             <p>Example link:</p>
             <p>https://beatport.com/artist/<span class="variabletext">artistname/id/...</span></p>
@@ -32,7 +32,7 @@
         <div v-else-if="sourceTab === 'junodownload'" class="dialog">
             <h1>Junodownload source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://junodownload.com">https://junodownload.com</a> > find artist > copy URL</p>
+            <p><a href="https://junodownload.com" target="_blank">https://junodownload.com</a> > find artist > copy URL</p>
             <p>Only correct links will be accepted.</p><br>
             <p>Example link:</p>
             <p>https://junodownload.com/artists/<span class="variabletext">artistname/...</span></p>

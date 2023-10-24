@@ -71,10 +71,10 @@
     </section>
 
     <section class="self">
-      <a href="https://blck-b.github.io">
+      <a href="https://blck-b.github.io" target="_blank">
         <img class="blckimg" src="./icons/blcktext.png" alt="logo"/>
       </a>
-      <a href="https://github.com/BLCK-B/MusicReleaseTracker">
+      <a href="https://github.com/BLCK-B/MusicReleaseTracker" target="_blank">
         <img class="mrtimg" src="./icons/MRTlogo.png" alt="logo"/>
       </a>
     </section>

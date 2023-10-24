@@ -19,12 +19,9 @@ This program is in active development and is not quite there yet. If it does not
 
 ##
 
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/689c6c97-73b3-4482-9139-3d4107d1ae35" width="550px"/>
-
-Vue.js preview screenshots
--
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/415f0485-0673-45ff-a311-76cf05467516" width="480px"/>
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/25992cb1-ba9a-4107-90e3-44621291bdac" width="480px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/8901e4cf-1028-4bc4-ae55-9fadf16063b7" width="480px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/918a3454-2b0b-4e7c-9fc2-08364db0dc09" width="480px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/5983eeb6-b853-46c2-9970-f409f668f757" width="480px"/>
 
 ##
 
@@ -43,11 +40,9 @@ Setup
 **Linux:** Unzip tar. Run jar by ```java -jar XXX.jar```
 
 ---
-**In MRT:** Add artists you want to track and for each artist optionally insert links according to instructions.
-With links inserted, click refresh button to initiate the scraping process.
 
 **Responsibility**: Delays during scraping prevent excessive traffic.
-To avoid granting admin permission, unzip the installer. You can run the exe, but ensure a folder *MusicReleaseTracker* exists in appdata. 
+To avoid granting admin permission, can run the exe from unzipped installer, assuming a folder *MusicReleaseTracker* exists in appdata. 
 I have no affiliation with Musicbrainz, Beatport, Junodownload. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
 
 ---

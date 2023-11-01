@@ -29,6 +29,7 @@ public class DBtools {
     public final static SettingsStore settingsStore = new SettingsStore();
     public static void path() {
         String DBpath = null;
+        String DBtemplatePath = null;
         String configPath = null;
         String configFolder = null;
         String os = System.getProperty("os.name").toLowerCase();
@@ -36,74 +37,165 @@ public class DBtools {
         if (os.contains("win")) { //Windows
             String appDataPath = System.getenv("APPDATA");
             DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "musicdata.db";
+            DBtemplatePath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "DBTemplate.db";
             configPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
             configFolder = appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
-            settingsStore.setConfigFolder(configFolder);
-            settingsStore.setConfigPath(configPath);
-            settingsStore.setDBpath(DBpath);
         } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  //Linux
             String userHome = System.getProperty("user.home");
             File folder = new File(userHome + File.separator + ".MusicReleaseTracker");
             if (!folder.exists())
                 folder.mkdirs();
             DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "musicdata.db";
+            DBtemplatePath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "DBTemplate.db";
             configPath = userHome + File.separator + ".MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
             configFolder = userHome + File.separator + ".MusicReleaseTracker" + File.separator;
-            settingsStore.setConfigFolder(configFolder);
-            settingsStore.setConfigPath(configPath);
-            settingsStore.setDBpath(DBpath);
         }
         else
             throw new UnsupportedOperationException("unsupported OS");
+
+        settingsStore.setConfigFolder(configFolder);
+        settingsStore.setConfigPath(configPath);
+        settingsStore.setDBpath(DBpath);
+        settingsStore.setDBTemplatePath(DBtemplatePath);
     }
 
-    public static void createTables() throws SQLException {
-        Connection conn = DriverManager.getConnection(settingsStore.getDBpath());
+    public static void createTables() {
+        //on start: create DB if not exist, check DB structure, if different -> create new from template and refill with all data possible
+        createDB(settingsStore.getDBpath());
+        createDB(settingsStore.getDBTemplatePath());
 
-        String sql = "CREATE TABLE IF NOT EXISTS musicbrainz (\n"
-                + "	song text NOT NULL,\n"
-                + "	artist text NOT NULL,\n"
-                + "	date text NOT NULL\n"
-                + ");";
-        Statement stmt = conn.createStatement();
-        stmt.execute(sql);
+        //if different structure, fill template artist table data from musicdata and then rename/delete, make new template
+        //this only preserves "artists" data and assumes that the insertion logic will be adjusted on any changes
+        //  made to the "artists" table: change in order of columns, removing a column or changing a column's name
+        Map<String, ArrayList<String>> DBMap = getDBStructure(settingsStore.getDBpath());
+        Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(settingsStore.getDBTemplatePath());
+        if (!DBMap.equals(DBtemplateMap)) {
+            try {
+                Connection connDB = DriverManager.getConnection(settingsStore.getDBpath());
+                Connection connDBtemplate = DriverManager.getConnection(settingsStore.getDBTemplatePath());
 
-        sql = "CREATE TABLE IF NOT EXISTS beatport (\n"
-                + "	song text NOT NULL,\n"
-                + "	artist text NOT NULL,\n"
-                + "	date text NOT NULL,\n"
-                + " type text NOT NULL\n"
-                + ");";
-        stmt = conn.createStatement();
-        stmt.execute(sql);
+                //insert data from musicdata column to a template column
+                String sql = "SELECT * FROM artists";
+                Statement stmt = connDB.createStatement();
+                ResultSet rs = stmt.executeQuery(sql);
 
-        sql = "CREATE TABLE IF NOT EXISTS junodownload (\n"
-                + "	song text NOT NULL,\n"
-                + "	artist text NOT NULL,\n"
-                + "	date text NOT NULL\n"
-                + ");";
-        stmt = conn.createStatement();
-        stmt.execute(sql);
+                sql = "insert into artists(artistname, urlbrainz, urlbeatport, urljunodownload) values(?, ?, ?, ?)";
+                PreparedStatement pstmt = connDBtemplate.prepareStatement(sql);
+                ArrayList<String> columnList = DBMap.get("artists");
+                //cycling table rows
+                while (rs.next()) {
+                    //fill sql query row data and add to batch
+                    for (int i = 0; i < columnList.size(); i++) {
+                        String column = columnList.get(i);
+                        pstmt.setString(i + 1 , rs.getString(column));
+                    }
+                    pstmt.addBatch();
+                }
+                connDBtemplate.setAutoCommit(false);
+                pstmt.executeBatch();
+                connDBtemplate.commit();
+                connDBtemplate.setAutoCommit(true);
+                pstmt.clearBatch();
+                pstmt.close();
+                connDB.close();
+                connDBtemplate.close();
+            } catch(Exception e) {
+                System.out.println("error updating DB file");
+                e.printStackTrace();
+            }
+            try {
+                File oldFile = new File(settingsStore.getDBpath().substring(12));
+                File newFile = new File(settingsStore.getDBTemplatePath().substring(12));
+                //delete old musicdata
+                oldFile.delete();
+                //rename template to musicdata
+                newFile.renameTo(oldFile);
+            } catch(Exception e) {
+                System.out.println("error renaming/deleting DB files");
+                e.printStackTrace();
+            }
+        }
 
-        sql = "CREATE TABLE IF NOT EXISTS artists (\n"
-                + "	artistname text PRIMARY KEY,\n"
-                + "	urlbrainz text,\n"
-                + "	urlbeatport text,\n"
-                + "	urljunodownload text\n"
-                + ");";
-        stmt = conn.createStatement();
-        stmt.execute(sql);
+    }
 
-        sql = "CREATE TABLE IF NOT EXISTS combview (\n"
-                + "	song text NOT NULL,\n"
-                + "	artist text NOT NULL,\n"
-                + "	date text NOT NULL\n"
-                + ");";
-        stmt = conn.createStatement();
-        stmt.execute(sql);
+    private static void createDB(String path) {
+        try {
+            Connection conn = DriverManager.getConnection(path);
 
-        conn.close();
-        stmt.close();
+            String sql = "CREATE TABLE IF NOT EXISTS musicbrainz (\n"
+                    + "	song text NOT NULL,\n"
+                    + "	artist text NOT NULL,\n"
+                    + "	date text NOT NULL\n"
+                    + ");";
+            Statement stmt = conn.createStatement();
+            stmt.execute(sql);
+
+            sql = "CREATE TABLE IF NOT EXISTS beatport (\n"
+                    + "	song text NOT NULL,\n"
+                    + "	artist text NOT NULL,\n"
+                    + "	date text NOT NULL,\n"
+                    + " type text NOT NULL\n"
+                    + ");";
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+
+            sql = "CREATE TABLE IF NOT EXISTS junodownload (\n"
+                    + "	song text NOT NULL,\n"
+                    + "	artist text NOT NULL,\n"
+                    + "	date text NOT NULL\n"
+                    + ");";
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+
+            sql = "CREATE TABLE IF NOT EXISTS artists (\n"
+                    + "	artistname text PRIMARY KEY,\n"
+                    + "	urlbrainz text,\n"
+                    + "	urlbeatport text,\n"
+                    + "	urljunodownload text\n"
+                    + ");";
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+
+            sql = "CREATE TABLE IF NOT EXISTS combview (\n"
+                    + "	song text NOT NULL,\n"
+                    + "	artist text NOT NULL,\n"
+                    + "	date text NOT NULL\n"
+                    + ");";
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+
+            conn.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("error creating DB file");
+            e.printStackTrace();
+        }
+    }
+    private static Map<String, ArrayList<String>> getDBStructure(String path) {
+        HashMap<String, ArrayList<String>> tableMap = new HashMap<String, ArrayList<String>>();
+        try {
+            Connection conn = DriverManager.getConnection(path);
+            String sql = "SELECT name FROM sqlite_master WHERE type='table'";
+            Statement stmt = conn.createStatement();
+            ResultSet rsTables = stmt.executeQuery(sql);
+            ArrayList<String> tablesList = new ArrayList<String>();
+            while(rsTables.next())
+                tablesList.add(rsTables.getString(1));
+
+            for (String tableName : tablesList) {
+                ArrayList<String> tableColumnsList = new ArrayList<String>();
+                ResultSet rsColumns = stmt.executeQuery("PRAGMA table_info(" + tableName + ")");
+                while (rsColumns.next())
+                    tableColumnsList.add(rsColumns.getString("name"));
+                tableMap.put(tableName, tableColumnsList);
+            }
+            conn.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("error parsing DB structure");
+            e.printStackTrace();
+        }
+        return tableMap;
     }
 
     public static void readConfig(String option) {
@@ -152,18 +244,13 @@ public class DBtools {
 
     public static void updateSettingsDB() {
         //create config if it does not exist, change to latest structure and transfer data if a different structure is detected
-        //"version" is deprecated
-        //DBversion may be deprecated in future, currently serves for any structural changes of DB
 
         // appData/MusicReleaseTracker/MRTsettings.hocon
         String configPath = settingsStore.getConfigPath();
         // appData/MusicReleaseTracker/
         String configFolder = settingsStore.getConfigFolder();
         //a default settings structure for current version
-        final int DBversion = 1;
         String templateContent =
-                "version=4\n" +
-                "DBversion=" + DBversion + "\n" +
                 "filters {\n" +
                 "   Acoustic=false\n" +
                 "   Extended=false\n" +

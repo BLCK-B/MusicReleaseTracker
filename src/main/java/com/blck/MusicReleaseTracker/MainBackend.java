@@ -68,7 +68,7 @@ public class MainBackend {
                 String os = System.getProperty("os.name").toLowerCase();
                 if (os.contains("win")) {
                     String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
-                    Runtime.getRuntime().exec(cmd);
+                    //Runtime.getRuntime().exec(cmd);
                 }
                 else if (os.contains("nix") || os.contains("nux")) {
                     String[] cmd = {"/usr/bin/open", "http://localhost:8080"};
@@ -160,6 +160,7 @@ public class MainBackend {
                     } catch (Exception e) {
                         //on fail, try once more
                         System.out.println("error scraping source " + oneUrl + ", trying again");
+                        Thread.sleep(1200);
                         try {
                             switch(i) {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);

@@ -12,5 +12,7 @@ module com.blck.MusicReleaseTracker {
     opens com.blck.MusicReleaseTracker;
 
     exports com.blck.MusicReleaseTracker;
+    exports com.blck.MusicReleaseTracker.ModelsEnums;
+    opens com.blck.MusicReleaseTracker.ModelsEnums;
 }
 

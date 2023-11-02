@@ -19,12 +19,12 @@ import java.util.Map;
 public class SettingsStore {
 
     private String DBpath;
+    private String DBtemplatePath;
     private String configPath;
     private String configFolder;
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
-    private final int entriesLimit = 40;
 
     public SettingsStore() {
     }
@@ -34,6 +34,12 @@ public class SettingsStore {
     }
     public String getDBpath() {
         return DBpath;
+    }
+    public void setDBTemplatePath(String DBTemplatePath) {
+        this.DBtemplatePath = DBTemplatePath;
+    }
+    public String getDBTemplatePath() {
+        return DBtemplatePath;
     }
 
     public void setConfigPath(String configPath) {
@@ -58,7 +64,7 @@ public class SettingsStore {
     }
 
     public int getEntriesLimit() {
-        return entriesLimit;
+        return 40;
     }
     public void setThemes(Map<String,String> themesMap) {
         this.themesMap = themesMap;

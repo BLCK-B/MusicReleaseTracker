@@ -210,6 +210,8 @@ public class GUIController {
                 //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
                 artistIndex = url.indexOf("/artist/");
                 if (artistIndex != -1 && url.contains("musicbrainz.org")) {
+                    //index of following "/" after "/artist/" - starting from the index that is sum of artistIndex and the length of "/artist/"
+                    //"/artist/".length() is to skip the "/artist/" part and start the search from the beginning of the ID
                     int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
                     if (artistIdIndex != -1)
                         url = url.substring(0, artistIdIndex);
@@ -217,10 +219,6 @@ public class GUIController {
                 }
                 else
                     return;
-                //for latest releases
-                if(!url.contains("page="))
-                    url += "/releases/?page=20";
-                //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/releases/?page=20
                 try {
                     MainBackend.scrapeBrainz(url, lastClickedArtist);
                 } catch (IOException e) {

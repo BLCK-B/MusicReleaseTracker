@@ -11,6 +11,8 @@ import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -192,7 +194,7 @@ public class MainBackend {
         System.gc();
     }
 
-    public static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
+    /*ublic static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
         //scraper for musicbrainz
         Document doc = null;
         try {
@@ -241,6 +243,57 @@ public class MainBackend {
         dates.clear();
         songsArray = null;
         datesArray = null;
+    }*/
+
+    public static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
+        //scraper for musicbrainz
+        //extracting ID and creating link for API
+        int startIndex = oneUrl.indexOf("/artist/");
+        int endIndex = oneUrl.indexOf('/', startIndex + "/artist/".length());
+        String artistID = oneUrl.substring(startIndex + "/artist/".length(), endIndex);
+        System.out.println("ID IS: " + artistID);
+        oneUrl = "https://musicbrainz.org/ws/2/release-group?artist=" + artistID + "&type=single&limit=400";
+        //https://musicbrainz.org/ws/2/release-group?artist=773c3b3b-4368-4659-963a-4c8194ec9b1c&type=single&limit=400
+
+        System.out.println(oneUrl);
+
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+        } catch (SocketTimeoutException e) {
+            System.out.println("scrapeBrainz timed out " + oneUrl);
+            return;
+        }
+        Elements songs = doc.select("title");
+        Elements dates = doc.select("first-release-date");
+        String[] songsArray = songs.eachText().toArray(new String[0]);
+        String[] datesArray = dates.eachText().toArray(new String[0]);
+
+        //reference: song - date
+        Map<String, String> pairs = new HashMap<String, String>();
+        for (int i = 0; i < songsArray.length; i++)
+            pairs.put(datesArray[i], songsArray[i]);
+
+        //API does not have sorted songs: sort datesArray from most recent
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<LocalDate> dateList = Arrays.stream(datesArray)
+                .map(dateString -> LocalDate.parse(dateString, formatter))
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        for (int i = 0; i < dateList.size(); i++)
+            datesArray[i] = String.valueOf(dateList.get(i));
+
+        //assign paired songs to sorted dates
+        for (int i = 0; i < songsArray.length; i++)
+            songsArray[i] = pairs.get(datesArray[i]);
+
+        String[] typesArray = null;
+        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "musicbrainz");
+
+        doc.empty();
+        datesArray = null;
+        songsArray = null;
+        typesArray = null;
     }
 
     public static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {

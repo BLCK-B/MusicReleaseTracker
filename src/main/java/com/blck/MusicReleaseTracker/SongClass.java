@@ -14,6 +14,7 @@ package com.blck.MusicReleaseTracker;
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 public class SongClass {
+    //an object representing a song with following parameters:
     private final String songName;
     private String songArtist;
     private final String songDate;

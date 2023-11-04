@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -250,16 +251,18 @@ public class MainBackend {
         //extracting ID and creating link for API
         int startIndex = oneUrl.indexOf("/artist/");
         int endIndex = oneUrl.indexOf('/', startIndex + "/artist/".length());
-        String artistID = oneUrl.substring(startIndex + "/artist/".length(), endIndex);
-        System.out.println("ID IS: " + artistID);
+        String artistID = null;
+        if (endIndex != -1)
+            artistID = oneUrl.substring(startIndex + "/artist/".length(), endIndex);
+        else
+            artistID = oneUrl.substring(startIndex + "/artist/".length());
+
         oneUrl = "https://musicbrainz.org/ws/2/release-group?artist=" + artistID + "&type=single&limit=400";
         //https://musicbrainz.org/ws/2/release-group?artist=773c3b3b-4368-4659-963a-4c8194ec9b1c&type=single&limit=400
 
-        System.out.println(oneUrl);
-
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )").timeout(40000).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeBrainz timed out " + oneUrl);
             return;
@@ -269,31 +272,20 @@ public class MainBackend {
         String[] songsArray = songs.eachText().toArray(new String[0]);
         String[] datesArray = dates.eachText().toArray(new String[0]);
 
-        //reference: song - date
-        Map<String, String> pairs = new HashMap<String, String>();
-        for (int i = 0; i < songsArray.length; i++)
-            pairs.put(datesArray[i], songsArray[i]);
-
-        //API does not have sorted songs: sort datesArray from most recent
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        List<LocalDate> dateList = Arrays.stream(datesArray)
-                .map(dateString -> LocalDate.parse(dateString, formatter))
-                .sorted(Comparator.reverseOrder())
-                .toList();
-        for (int i = 0; i < dateList.size(); i++)
-            datesArray[i] = String.valueOf(dateList.get(i));
-
-        //assign paired songs to sorted dates
-        for (int i = 0; i < songsArray.length; i++)
-            songsArray[i] = pairs.get(datesArray[i]);
-
-        String[] typesArray = null;
-        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "musicbrainz");
+        //create arraylist of song objects
+        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
+            if (songsArray[i] != null && datesArray[i] != null)
+                songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
+        }
 
         doc.empty();
+        songs.clear();
+        dates.clear();
         datesArray = null;
         songsArray = null;
-        typesArray = null;
+
+        processInfo(songList, "musicbrainz");
     }
 
     public static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {
@@ -324,21 +316,21 @@ public class MainBackend {
             datesArrayList.add(matcher.group(3));
         }
         doc.empty();
-        //converting lists to arrays, to pass them to universal method
-        String[] typesArray = typesArrayList.toArray(new String[0]);
-        String[] songsArray = songsArrayList.toArray(new String[0]);
-        String[] datesArray = datesArrayList.toArray(new String[0]);
 
-        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "beatport");
+        //create arraylist of song objects
+        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        for (int i = 0; i < Math.min(songsArrayList.size(), datesArrayList.size()); i++) {
+            if (songsArrayList.get(i) != null && datesArrayList.get(i) != null && typesArrayList.get(i) != null)
+                songList.add(new SongClass(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
+        }
 
         script.clear();
         JSON = null;
         songsArrayList.clear();
         typesArrayList.clear();
         datesArrayList.clear();
-        datesArray = null;
-        songsArray = null;
-        typesArray = null;
+
+        processInfo(songList, "beatport");
     }
 
     public static void scrapeJunodownload(String oneUrl, String songArtist) throws IOException {
@@ -353,11 +345,10 @@ public class MainBackend {
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
-        for (int i = 0; i < songsArray.length; i++) {
+        for (int i = 0; i < songsArray.length; i++)
             songsArray[i] = songsArray[i].replace("’", "'");
-        }
+
         String[] datesArray = new String[dates.size()];
-        String[] typesArray = null;
         doc.empty();
         //processing dates into correct format
         /* example:
@@ -395,58 +386,66 @@ public class MainBackend {
             }
         }
 
-        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "junodownload");
+        //create arraylist of song objects
+        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
+            if (songsArray[i] != null && datesArray[i] != null)
+                songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
+        }
 
         songs.clear();
         dates.clear();
         songsArray = null;
         datesArray = null;
+
+        processInfo(songList, "junodownload");
     }
 
-    public static void fillSongClassList(String[] songsArray, String[] datesArray, String[] typesArray, String songArtist, String source) {
-        //fills SongClassList with song objects, up to entryLimit
-        ArrayList<SongClass> SongClassList = new ArrayList<>();
-        ArrayList<String> previousNames = new ArrayList<>();
-        int inserted = 0;
-        int i = 0;
-        while (inserted < entryLimit) {
-            if (i == songsArray.length)
-                break;
-            String songName = null;
-            String songDate = null;
-            String songType = null;
+    public static void processInfo(ArrayList<SongClass> songList, String source) {
+        //discard objects with an incorrect date format
+        songList.removeIf(obj -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            try {
+                LocalDate.parse(obj.getDate(), formatter);
+                return false;
+            } catch (DateTimeParseException e) {
+                return true;
+            }
+        });
+        //sort by date from newest
+        songList.sort(new Comparator<SongClass>() {
+            @Override
+            public int compare(SongClass obj1, SongClass obj2) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
+                LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
+                return date2.compareTo(date1);
+            }
+        });
+        //remove name duplicates
+        ArrayList<String> recordedNames = new ArrayList<String>();
+        songList.removeIf(obj -> {
+            String name = obj.getName().toLowerCase();
+            if (recordedNames.contains(name))
+                return true;
+            else {
+                recordedNames.add(name);
+                return false;
+            }
+        });
 
-            songName = songsArray[i];
-            songDate = datesArray[i];
-            if (typesArray != null)
-                songType = typesArray[i];
-            i++;
-            //avoid duplicates
-            if (previousNames.contains(songName.toLowerCase()))
-                continue;
-
-            if (typesArray == null)
-                SongClassList.add(new SongClass(songName, songArtist, songDate));
-            else if (typesArray != null)
-                SongClassList.add(new SongClass(songName, songArtist, songDate, songType));
-            //keep track of added
-            previousNames.add(songName.toLowerCase());
-            inserted++;
-        }
-        songsArray = null;
-        datesArray = null;
-        typesArray = null;
-
-        //pass objects to insert data into source table
-        insertSet(SongClassList, source);
+        insertSet(songList, source);
     }
 
-    public static void insertSet(ArrayList<SongClass> SongClassList, String source) {
+    public static void insertSet(ArrayList<SongClass> songList, String source) {
         PreparedStatement pstmt = null;
-        //insert set of songs to a source table
+        //insert a set of songs to a source table
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-            for (SongClass songObject : SongClassList) {
+            int i = 0;
+            for (SongClass songObject : songList) {
+                if (i == 15)
+                    break;
                 if (songObject.getType() != null) {
                     String sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
                     pstmt = conn.prepareStatement(sql);
@@ -463,6 +462,7 @@ public class MainBackend {
                     pstmt.setString(3, songObject.getDate());
                 }
                 pstmt.executeUpdate();
+                i++;
             }
             conn.setAutoCommit(false);
             conn.commit();

@@ -95,7 +95,7 @@ public class GUIController {
         }
     }
     public void cleanArtistSource() {
-        //clean artist from source table
+        //clear artist entries from a source table
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
@@ -156,6 +156,7 @@ public class GUIController {
             case "musicbrainz" -> sql = "SELECT song, date FROM musicbrainz WHERE artist = ? ORDER BY date DESC";
             case "beatport" -> sql = "SELECT song, date FROM beatport WHERE artist = ? ORDER BY date DESC";
             case "junodownload" -> sql = "SELECT song, date FROM junodownload WHERE artist = ? ORDER BY date DESC";
+            case "youtube" -> sql = "SELECT song, date FROM youtube WHERE artist = ? ORDER BY date DESC";
         }
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, lastClickedArtist);
@@ -269,6 +270,13 @@ public class GUIController {
                     throw new RuntimeException(e);
                 }
             }
+            case "youtube" -> {
+                try {
+                    MainBackend.scrapeYoutube(url, lastClickedArtist);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         tempUrl = url;
     }
@@ -280,6 +288,7 @@ public class GUIController {
             case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
             case "beatport" -> sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
             case "junodownload" -> sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
+            case "youtube" -> sql = "UPDATE artists SET urlyoutube = ? WHERE artistname = ?";
             default -> {
                 return;
             }
@@ -304,6 +313,7 @@ public class GUIController {
                 case "musicbrainz" -> sql = "SELECT urlbrainz FROM artists WHERE artistname = ?";
                 case "beatport" -> sql = "SELECT urlbeatport FROM artists WHERE artistname = ?";
                 case "junodownload" -> sql = "SELECT urljunodownload FROM artists WHERE artistname = ?";
+                case "youtube" -> sql = "SELECT urlyoutube FROM artists WHERE artistname = ?";
                 default -> {
                     return urlExists;
                 }

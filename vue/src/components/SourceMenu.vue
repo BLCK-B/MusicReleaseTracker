@@ -6,6 +6,7 @@
       <div @mousedown="setStoreTab('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="stab">BP</div>
       <div @mousedown="setStoreTab('musicbrainz')" :class="{ 'active': activeTab === 'musicbrainz' }" class="stab">MB</div>
       <div @mousedown="setStoreTab('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab">JD</div>
+      <div @mousedown="setStoreTab('youtube')" :class="{ 'active': activeTab === 'youtube' }" class="stab">YT (beta)</div>
     </div>
     
     <button @click="openSettings()" class="imgbutton1" :disabled="!allowButtons">
@@ -193,17 +194,19 @@ export default {
   }
   .cvtab {
     width: 80%;
-    max-width: 400px;
+    max-width: 390px;
     padding: 8px;
     border: solid 3px transparent;
     border-bottom: solid 3px var(--accent-color);
   }
   .stab {
     width: 20%;
-    max-width: 150px;
+    max-width: 110px;
     padding: 8px;
     border: solid 3px transparent;
     border-bottom: solid 3px var(--accent-color);
+    white-space: nowrap;
+    overflow: hidden;
   }
   .tabs :hover {
     border-bottom: solid 3px var(--dull-color);;

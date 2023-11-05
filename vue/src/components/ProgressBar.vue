@@ -2,7 +2,7 @@
     <div class="progress-container">
       <div class="progressbar" :style="{ width: `${progress}%` }"></div>
     </div>
-  </template>
+</template>
   
 <script>
 import { mapState, mapMutations } from 'vuex';

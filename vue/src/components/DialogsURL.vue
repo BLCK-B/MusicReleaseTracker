@@ -4,8 +4,7 @@
         <div v-if="sourceTab === 'musicbrainz'" class="dialog">
             <h1>MusicBrainz source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://musicbrainz.org" target="_blank">https://musicbrainz.org</a> > find artist > copy URL</p>
-            <p>Only correct links will be accepted.</p><br>
+            <p><a href="https://musicbrainz.org" target="_blank">https://musicbrainz.org</a> > find artist > copy URL</p><br>
             <p>Example link:</p>
             <p>https://musicbrainz.org/artist/<span class="variabletext">id/...</span></p>
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
@@ -18,8 +17,7 @@
         <div v-else-if="sourceTab === 'beatport'" class="dialog">
             <h1>Beatport source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://beatport.com" target="_blank">https://beatport.com</a> > find artist > copy URL</p>
-            <p>Only correct links will be accepted.</p><br>
+            <p><a href="https://beatport.com" target="_blank">https://beatport.com</a> > find artist > copy URL</p><br>
             <p>Example link:</p>
             <p>https://beatport.com/artist/<span class="variabletext">artistname/id/...</span></p>
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
@@ -32,10 +30,28 @@
         <div v-else-if="sourceTab === 'junodownload'" class="dialog">
             <h1>Junodownload source</h1>
             <p class="artist">{{ artist }}</p><br>
-            <p><a href="https://junodownload.com" target="_blank">https://junodownload.com</a> > find artist > copy URL</p>
-            <p>Only correct links will be accepted.</p><br>
+            <p><a href="https://junodownload.com" target="_blank">https://junodownload.com</a> > find artist > copy URL</p><br>
             <p>Example link:</p>
             <p>https://junodownload.com/artists/<span class="variabletext">artistname/...</span></p>
+            <input v-model="input" :class="{ 'invalid': !isValid }"/>
+            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+            </button>
+        </div>
+
+        <div v-else-if="sourceTab === 'youtube'" class="dialog">
+            <h1>Youtube source</h1>
+            <p class="artist">{{ artist }}</p><br>
+            <p><a href="https://youtube.com" target="_blank">https://youtube.com</a></p>
+            <p>
+                Find an auto-generated channel with "Topic" in its name.
+                <br>ID can be obtained in various ways.
+                <br>For example: About tab > share > Copy channel ID
+            </p>
+            
+            <p>Example ID of "Koven - Topic":</p>
+            <p><span class="variabletext">UCWaKvFOf-a7vENyuEsZkNqg</span></p>
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
             <button @click="clickURL" class="imgbutton" :disabled="!isValid">
                 <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
@@ -56,10 +72,10 @@ export default {
         input: "",
         showUrlDiag: false,
         rules: [
-        value => !!value.trim(),
-        value => value.includes("musicbrainz.org/artist/") ||
-        value.includes("beatport.com/artist/") ||
-        value.includes("junodownload.com/artists/"),
+        //value => !!value.trim(),
+        //value => value.includes("musicbrainz.org/artist/") ||
+        //value.includes("beatport.com/artist/") ||
+        //value.includes("junodownload.com/artists/"),
         ],
     }),
     computed: {

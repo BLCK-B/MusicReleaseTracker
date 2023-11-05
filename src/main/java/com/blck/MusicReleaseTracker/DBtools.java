@@ -61,12 +61,14 @@ public class DBtools {
 
     public static void createTables() {
         //on start: create DB if not exist, check DB structure, if different -> create new from template and refill with all data possible
+        File templateFile = new File(settingsStore.getDBTemplatePath().substring(12));
+        templateFile.delete();
         createDB(settingsStore.getDBpath());
         createDB(settingsStore.getDBTemplatePath());
 
         //if different structure, fill template artist table data from musicdata and then rename/delete, make new template
-        //this only preserves "artists" data and assumes that the insertion logic will be adjusted on any changes
-        //  made to the "artists" table: change in order of columns, removing a column or changing a column's name
+        //this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes...
+        //made to the "artists" table: change in order of columns, adding/removing a column or changing a column's name
         Map<String, ArrayList<String>> DBMap = getDBStructure(settingsStore.getDBpath());
         Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(settingsStore.getDBTemplatePath());
         if (!DBMap.equals(DBtemplateMap)) {
@@ -79,7 +81,7 @@ public class DBtools {
                 Statement stmt = connDB.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 
-                sql = "insert into artists(artistname, urlbrainz, urlbeatport, urljunodownload) values(?, ?, ?, ?)";
+                sql = "insert into artists(artistname, urlbrainz, urlbeatport, urljunodownload, urlyoutube) values(?, ?, ?, ?, ?)";
                 PreparedStatement pstmt = connDBtemplate.prepareStatement(sql);
                 ArrayList<String> columnList = DBMap.get("artists");
                 //cycling table rows
@@ -147,11 +149,20 @@ public class DBtools {
             stmt = conn.createStatement();
             stmt.execute(sql);
 
+            sql = "CREATE TABLE IF NOT EXISTS youtube (\n"
+                    + "	song text NOT NULL,\n"
+                    + "	artist text NOT NULL,\n"
+                    + "	date text NOT NULL\n"
+                    + ");";
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+
             sql = "CREATE TABLE IF NOT EXISTS artists (\n"
                     + "	artistname text PRIMARY KEY,\n"
                     + "	urlbrainz text,\n"
                     + "	urlbeatport text,\n"
-                    + "	urljunodownload text\n"
+                    + "	urljunodownload text,\n"
+                    + "	urlyoutube text\n"
                     + ");";
             stmt = conn.createStatement();
             stmt.execute(sql);
@@ -242,7 +253,7 @@ public class DBtools {
         }
     }
 
-    public static void updateSettingsDB() {
+    public static void updateSettings() {
         //create config if it does not exist, change to latest structure and transfer data if a different structure is detected
 
         // appData/MusicReleaseTracker/MRTsettings.hocon

@@ -7,8 +7,8 @@
             <p><a href="https://musicbrainz.org" target="_blank">https://musicbrainz.org</a> > find artist > copy URL</p><br>
             <p>Example link:</p>
             <p>https://musicbrainz.org/artist/<span class="variabletext">id/...</span></p>
-            <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+            <input v-model="input"/>
+            <button @click="clickURL" class="imgbutton">
                 <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
                 <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
             </button>
@@ -20,8 +20,8 @@
             <p><a href="https://beatport.com" target="_blank">https://beatport.com</a> > find artist > copy URL</p><br>
             <p>Example link:</p>
             <p>https://beatport.com/artist/<span class="variabletext">artistname/id/...</span></p>
-            <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+            <input v-model="input"/>
+            <button @click="clickURL" class="imgbutton">
                 <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
                 <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
             </button>
@@ -33,8 +33,8 @@
             <p><a href="https://junodownload.com" target="_blank">https://junodownload.com</a> > find artist > copy URL</p><br>
             <p>Example link:</p>
             <p>https://junodownload.com/artists/<span class="variabletext">artistname/...</span></p>
-            <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+            <input v-model="input"/>
+            <button @click="clickURL" class="imgbutton">
                 <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
                 <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
             </button>
@@ -52,8 +52,8 @@
             
             <p>Example ID of "Koven - Topic":</p>
             <p><span class="variabletext">UCWaKvFOf-a7vENyuEsZkNqg</span></p>
-            <input v-model="input" :class="{ 'invalid': !isValid }"/>
-            <button @click="clickURL" class="imgbutton" :disabled="!isValid">
+            <input v-model="input"/>
+            <button @click="clickURL" class="imgbutton">
                 <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
                 <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
             </button>
@@ -71,12 +71,6 @@ export default {
     data: () => ({
         input: "",
         showUrlDiag: false,
-        rules: [
-        //value => !!value.trim(),
-        //value => value.includes("musicbrainz.org/artist/") ||
-        //value.includes("beatport.com/artist/") ||
-        //value.includes("junodownload.com/artists/"),
-        ],
     }),
     computed: {
         ...mapState([
@@ -87,10 +81,6 @@ export default {
         "addDialogVis",
         'primaryColor',
         ]),
-        //if no rules in data broken, enable insert button
-        isValid() {
-            return this.rules.every(rule => rule(this.input) === true);
-        },
     },
     methods: {
         //send input to be processed, displays preview dialog with scraped source table

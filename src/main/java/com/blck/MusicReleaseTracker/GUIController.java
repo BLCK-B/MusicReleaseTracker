@@ -86,6 +86,10 @@ public class GUIController {
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, lastClickedArtist);
                 pstmt.executeUpdate();
+                sql = "DELETE FROM youtube WHERE artist = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, lastClickedArtist);
+                pstmt.executeUpdate();
                 conn.close();
                 lastClickedArtist = null;
             }
@@ -150,14 +154,8 @@ public class GUIController {
     public void loadTable() throws SQLException {
         tableContent.clear();
         //adding data to tableContent
-        String sql = null;
         Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-        switch (selectedSource) {
-            case "musicbrainz" -> sql = "SELECT song, date FROM musicbrainz WHERE artist = ? ORDER BY date DESC";
-            case "beatport" -> sql = "SELECT song, date FROM beatport WHERE artist = ? ORDER BY date DESC";
-            case "junodownload" -> sql = "SELECT song, date FROM junodownload WHERE artist = ? ORDER BY date DESC";
-            case "youtube" -> sql = "SELECT song, date FROM youtube WHERE artist = ? ORDER BY date DESC";
-        }
+        String sql = "SELECT song, date FROM " + selectedSource + " WHERE artist = ? ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, lastClickedArtist);
         ResultSet rs = pstmt.executeQuery();
@@ -223,7 +221,7 @@ public class GUIController {
                 try {
                     MainBackend.scrapeBrainz(url, lastClickedArtist);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("incorrect link");
                 }
             }
             case "beatport" -> {
@@ -247,7 +245,7 @@ public class GUIController {
                 try {
                     MainBackend.scrapeBeatport(url, lastClickedArtist);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("incorrect link");
                 }
             }
             case "junodownload" -> {
@@ -267,14 +265,14 @@ public class GUIController {
                 try {
                     MainBackend.scrapeJunodownload(url, lastClickedArtist);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("incorrect link");
                 }
             }
             case "youtube" -> {
                 try {
                     MainBackend.scrapeYoutube(url, lastClickedArtist);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("incorrect link");
                 }
             }
         }
@@ -283,7 +281,7 @@ public class GUIController {
 
     public void saveUrl() {
         //save artist url to db
-        String sql;
+        String sql = null;
         switch (selectedSource) {
             case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
             case "beatport" -> sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
@@ -416,5 +414,11 @@ public class GUIController {
         return lastClickedArtist;
     }
 
+    public void resetSettings() {
+        DBtools.resetSettings();
+    }
+    public void resetDB() {
+        DBtools.resetDB();
+    }
 
 }

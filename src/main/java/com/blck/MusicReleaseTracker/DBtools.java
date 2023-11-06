@@ -364,6 +364,19 @@ public class DBtools {
        }
        return structure;
    }
+
+   public static void resetSettings() {
+       //default settings
+       File configFile = new File(settingsStore.getConfigPath());
+       configFile.delete();
+       updateSettings();
+   }
+   public static void resetDB() {
+       //default musicdata
+       File musicdata = new File(settingsStore.getDBpath().substring(12));
+       musicdata.delete();
+       createDB(settingsStore.getDBpath());
+   }
 }
 
 

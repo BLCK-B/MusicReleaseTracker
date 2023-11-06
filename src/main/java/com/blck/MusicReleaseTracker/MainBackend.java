@@ -112,6 +112,9 @@ public class MainBackend {
         sql = "DELETE FROM junodownload";
         stmt = conn.createStatement();
         stmt.executeUpdate(sql);
+        sql = "DELETE FROM youtube";
+        stmt = conn.createStatement();
+        stmt.executeUpdate(sql);
         pstmt.close();
         artistnameResults.close();
         conn.close();

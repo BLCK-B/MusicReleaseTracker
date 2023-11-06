@@ -6,7 +6,7 @@
       <div @mousedown="setStoreTab('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="stab">BP</div>
       <div @mousedown="setStoreTab('musicbrainz')" :class="{ 'active': activeTab === 'musicbrainz' }" class="stab">MB</div>
       <div @mousedown="setStoreTab('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab">JD</div>
-      <div @mousedown="setStoreTab('youtube')" :class="{ 'active': activeTab === 'youtube' }" class="stab">YT (beta)</div>
+      <div @mousedown="setStoreTab('youtube')" :class="{ 'active': activeTab === 'youtube' }" class="stab">YT</div>
     </div>
     
     <button @click="openSettings()" class="imgbutton1" :disabled="!allowButtons">

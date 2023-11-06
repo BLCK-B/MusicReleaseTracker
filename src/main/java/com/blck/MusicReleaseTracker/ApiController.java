@@ -132,4 +132,13 @@ public class ApiController {
         return sendRequest.getLastArtist();
     }
 
+    @PostMapping("/resetSettings")
+    public void resetSettings() {
+        sendRequest.resetSettings();
+    }
+    @PostMapping("/resetDB")
+    public void resetDB() {
+        sendRequest.resetDB();
+    }
+
 }

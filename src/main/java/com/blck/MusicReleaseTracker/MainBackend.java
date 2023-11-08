@@ -11,6 +11,9 @@ import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -58,7 +61,7 @@ public class MainBackend {
                 throw new RuntimeException(e);
             }
             try {
-                DBtools.updateSettingsDB();
+                DBtools.updateSettings();
             } catch (Exception e) {
                 System.out.println("error handling config file");
                 e.printStackTrace();
@@ -109,6 +112,9 @@ public class MainBackend {
         sql = "DELETE FROM junodownload";
         stmt = conn.createStatement();
         stmt.executeUpdate(sql);
+        sql = "DELETE FROM youtube";
+        stmt = conn.createStatement();
+        stmt.executeUpdate(sql);
         pstmt.close();
         artistnameResults.close();
         conn.close();
@@ -122,21 +128,26 @@ public class MainBackend {
             sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, songArtist);
-            ResultSet RSeachArtistUrls = pstmt.executeQuery();
-            eachArtistUrls.add(RSeachArtistUrls.getString("urlbrainz"));
+            ResultSet rs = pstmt.executeQuery();
+            eachArtistUrls.add(rs.getString("urlbrainz"));
             sql = "SELECT urlbeatport FROM artists WHERE artistname = ? ";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, songArtist);
-            RSeachArtistUrls = pstmt.executeQuery();
-            eachArtistUrls.add(RSeachArtistUrls.getString("urlbeatport"));
+            rs = pstmt.executeQuery();
+            eachArtistUrls.add(rs.getString("urlbeatport"));
             sql = "SELECT urljunodownload FROM artists WHERE artistname = ? ";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, songArtist);
-            RSeachArtistUrls = pstmt.executeQuery();
-            eachArtistUrls.add(RSeachArtistUrls.getString("urljunodownload"));
+            rs = pstmt.executeQuery();
+            eachArtistUrls.add(rs.getString("urljunodownload"));
+            sql = "SELECT urlyoutube FROM artists WHERE artistname = ? ";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, songArtist);
+            rs = pstmt.executeQuery();
+            eachArtistUrls.add(rs.getString("urlyoutube"));
             conn.close();
             pstmt.close();
-            RSeachArtistUrls.close();
+            rs.close();
             //calling scrapers
             int i = 1;
             double startTime = System.currentTimeMillis();
@@ -156,6 +167,7 @@ public class MainBackend {
                             case 1 -> scrapeBrainz(oneUrl, songArtist);
                             case 2 -> scrapeBeatport(oneUrl, songArtist);
                             case 3 -> scrapeJunodownload(oneUrl, songArtist);
+                            case 4 -> scrapeYoutube(oneUrl,songArtist);
                         }
                     } catch (Exception e) {
                         //on fail, try once more
@@ -166,6 +178,7 @@ public class MainBackend {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);
                                 case 2 -> scrapeBeatport(oneUrl, songArtist);
                                 case 3 -> scrapeJunodownload(oneUrl, songArtist);
+                                case 4 -> scrapeYoutube(oneUrl,songArtist);
                             }
                         } catch (Exception e2) {
                             System.out.println("error re-scraping, moving on");
@@ -174,15 +187,16 @@ public class MainBackend {
                     }
                 }
                 //calculated delay at the end of every cycle
-                if (i == 3) {
+                if (i == 4) {
                     double endTime = System.currentTimeMillis();
                     double elapsedTime = (endTime - startTime);
-                    if (2700 - elapsedTime >= 0)
-                        Thread.sleep((long) (2700 - elapsedTime));
+                    if (2800 - elapsedTime >= 0)
+                        Thread.sleep((long) (2800 - elapsedTime));
                 }
                 //calculating progressbar value
                 progress++;
-                double state = progress / artistnameList.size() / 3;
+                //40 cycles (10 artists * 4 sources) / 20 total artists / 4 sources = 50%
+                double state = progress / artistnameList.size() / 4;
                 i++;
                 SSEController.sendProgress(state);
             }
@@ -194,53 +208,44 @@ public class MainBackend {
 
     public static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
         //scraper for musicbrainz
+        //extracting ID and creating link for API
+        int startIndex = oneUrl.indexOf("/artist/");
+        int endIndex = oneUrl.indexOf('/', startIndex + "/artist/".length());
+        String artistID = null;
+        if (endIndex != -1)
+            artistID = oneUrl.substring(startIndex + "/artist/".length(), endIndex);
+        else
+            artistID = oneUrl.substring(startIndex + "/artist/".length());
+
+        oneUrl = "https://musicbrainz.org/ws/2/release-group?artist=" + artistID + "&type=single&limit=400";
+        //https://musicbrainz.org/ws/2/release-group?artist=773c3b3b-4368-4659-963a-4c8194ec9b1c&type=single&limit=400
+
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )").timeout(40000).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeBrainz timed out " + oneUrl);
             return;
         }
-        Elements songs = doc.select("[href*=/release/]");
-        Elements dates = doc.select("ul.release-events > li:first-child").select("span.release-date");
+        Elements songs = doc.select("title");
+        Elements dates = doc.select("first-release-date");
+        String[] songsArray = songs.eachText().toArray(new String[0]);
+        String[] datesArray = dates.eachText().toArray(new String[0]);
 
-        String[] songsDirtyArray = songs.eachText().toArray(new String[0]);
-        String[] datesDirtyArray = dates.eachText().toArray(new String[0]);
-        String[] typesArray = null;
-
-        ArrayList<String> songsArrayList = new ArrayList<>();
-        ArrayList<String> datesArrayList = new ArrayList<>();
-
-        //avoid songs without a date - and preliminarily duplicates while ensuring newer rereleases dont make the cut
-        ArrayList<String> insertedSongs = new ArrayList<>();
-        int i = 0;
-        while (i < datesDirtyArray.length) {
-            if (datesDirtyArray[i].length() != 10 || insertedSongs.contains(songsDirtyArray[i])) {
-                i++;
-                continue;
-            }
-            else
-                insertedSongs.add(songsDirtyArray[i].replace("’", "'"));
-
-            songsArrayList.add(songsDirtyArray[i].replace("’", "'"));
-            datesArrayList.add(datesDirtyArray[i]);
-            i++;
+        //create arraylist of song objects
+        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
+            if (songsArray[i] != null && datesArray[i] != null)
+                songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
         }
 
         doc.empty();
-        insertedSongs.clear();
-
-        Collections.reverse(songsArrayList);
-        Collections.reverse(datesArrayList);
-        String[] songsArray = songsArrayList.toArray(new String[0]);
-        String[] datesArray = datesArrayList.toArray(new String[0]);
-
-        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "musicbrainz");
-
         songs.clear();
         dates.clear();
-        songsArray = null;
         datesArray = null;
+        songsArray = null;
+
+        processInfo(songList, "musicbrainz");
     }
 
     public static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {
@@ -271,21 +276,21 @@ public class MainBackend {
             datesArrayList.add(matcher.group(3));
         }
         doc.empty();
-        //converting lists to arrays, to pass them to universal method
-        String[] typesArray = typesArrayList.toArray(new String[0]);
-        String[] songsArray = songsArrayList.toArray(new String[0]);
-        String[] datesArray = datesArrayList.toArray(new String[0]);
 
-        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "beatport");
+        //create arraylist of song objects
+        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        for (int i = 0; i < Math.min(songsArrayList.size(), datesArrayList.size()); i++) {
+            if (songsArrayList.get(i) != null && datesArrayList.get(i) != null && typesArrayList.get(i) != null)
+                songList.add(new SongClass(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
+        }
 
         script.clear();
         JSON = null;
         songsArrayList.clear();
         typesArrayList.clear();
         datesArrayList.clear();
-        datesArray = null;
-        songsArray = null;
-        typesArray = null;
+
+        processInfo(songList, "beatport");
     }
 
     public static void scrapeJunodownload(String oneUrl, String songArtist) throws IOException {
@@ -300,11 +305,10 @@ public class MainBackend {
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
-        for (int i = 0; i < songsArray.length; i++) {
+        for (int i = 0; i < songsArray.length; i++)
             songsArray[i] = songsArray[i].replace("’", "'");
-        }
+
         String[] datesArray = new String[dates.size()];
-        String[] typesArray = null;
         doc.empty();
         //processing dates into correct format
         /* example:
@@ -342,58 +346,98 @@ public class MainBackend {
             }
         }
 
-        fillSongClassList(songsArray, datesArray, typesArray, songArtist, "junodownload");
+        //create arraylist of song objects
+        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
+            if (songsArray[i] != null && datesArray[i] != null)
+                songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
+        }
 
         songs.clear();
         dates.clear();
         songsArray = null;
         datesArray = null;
+
+        processInfo(songList, "junodownload");
     }
 
-    public static void fillSongClassList(String[] songsArray, String[] datesArray, String[] typesArray, String songArtist, String source) {
-        //fills SongClassList with song objects, up to entryLimit
-        ArrayList<SongClass> SongClassList = new ArrayList<>();
-        ArrayList<String> previousNames = new ArrayList<>();
-        int inserted = 0;
-        int i = 0;
-        while (inserted < entryLimit) {
-            if (i == songsArray.length)
-                break;
-            String songName = null;
-            String songDate = null;
-            String songType = null;
+    public static void scrapeYoutube(String oneUrl, String songArtist) throws IOException {
+        //scraper for youtube
+        oneUrl = "https://www.youtube.com/feeds/videos.xml?channel_id=" + oneUrl;
 
-            songName = songsArray[i];
-            songDate = datesArray[i];
-            if (typesArray != null)
-                songType = typesArray[i];
-            i++;
-            //avoid duplicates
-            if (previousNames.contains(songName.toLowerCase()))
-                continue;
-
-            if (typesArray == null)
-                SongClassList.add(new SongClass(songName, songArtist, songDate));
-            else if (typesArray != null)
-                SongClassList.add(new SongClass(songName, songArtist, songDate, songType));
-            //keep track of added
-            previousNames.add(songName.toLowerCase());
-            inserted++;
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+        } catch (SocketTimeoutException e) {
+            System.out.println("scrapeJunodownload timed out " + oneUrl);
+            return;
         }
-        songsArray = null;
-        datesArray = null;
-        typesArray = null;
 
-        //pass objects to insert data into source table
-        insertSet(SongClassList, source);
+        Elements songs = doc.select("title");
+        Elements dates = doc.select("published");
+        String[] songsArray = songs.eachText().toArray(new String[0]);
+        String[] datesDirtyArray = dates.eachText().toArray(new String[0]);
+
+        //cut date to yyyy-MM-dd
+        String[] datesArray = Arrays.stream(datesDirtyArray)
+                .map(date -> date.substring(0, 10))
+                .toArray(String[]::new);
+        //first index is channel name
+        songsArray = Arrays.copyOfRange(songsArray, 1, songsArray.length);
+        datesArray = Arrays.copyOfRange(datesArray, 1, datesArray.length);
+
+        //create arraylist of song objects
+        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
+            if (songsArray[i] != null && datesArray[i] != null)
+                songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
+        }
+
+        processInfo(songList, "youtube");
     }
 
-    public static void insertSet(ArrayList<SongClass> SongClassList, String source) {
+    public static void processInfo(ArrayList<SongClass> songList, String source) {
+        //discard objects with an incorrect date format
+        songList.removeIf(obj -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            try {
+                LocalDate.parse(obj.getDate(), formatter);
+                return false;
+            } catch (DateTimeParseException e) {
+                return true;
+            }
+        });
+        //sort by date from newest
+        songList.sort((obj1, obj2) -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
+            LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
+            return date2.compareTo(date1);
+        });
+        //remove name duplicates
+        ArrayList<String> recordedNames = new ArrayList<String>();
+        songList.removeIf(obj -> {
+            String name = obj.getName().toLowerCase();
+            if (recordedNames.contains(name))
+                return true;
+            else {
+                recordedNames.add(name);
+                return false;
+            }
+        });
+
+        insertSet(songList, source);
+    }
+
+    public static void insertSet(ArrayList<SongClass> songList, String source) {
         PreparedStatement pstmt = null;
-        //insert set of songs to a source table
+        //insert a set of songs to a source table
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-            for (SongClass songObject : SongClassList) {
+            int i = 0;
+            for (SongClass songObject : songList) {
+                if (i == 15)
+                    break;
                 if (songObject.getType() != null) {
                     String sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
                     pstmt = conn.prepareStatement(sql);
@@ -410,6 +454,7 @@ public class MainBackend {
                     pstmt.setString(3, songObject.getDate());
                 }
                 pstmt.executeUpdate();
+                i++;
             }
             conn.setAutoCommit(false);
             conn.commit();
@@ -428,8 +473,6 @@ public class MainBackend {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        int entriesInserted = 0;
-        int entriesLimit = DBtools.settingsStore.getEntriesLimit();
         //clear table
         Connection conn = null;
         String sql = null;
@@ -444,7 +487,7 @@ public class MainBackend {
             e.printStackTrace();
         }
 
-        String[] sourceTables = {"beatport", "musicbrainz", "junodownload"};
+        String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
 
         //creating song object list from all sources
         ArrayList<SongClass> songObjectList = new ArrayList<>();
@@ -452,7 +495,7 @@ public class MainBackend {
         try {
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             for (String source : sourceTables) {
-                sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT " + entriesLimit * 5;
+                sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 
@@ -477,7 +520,7 @@ public class MainBackend {
 
                     switch (source) {
                         case "beatport" -> songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
-                        case "musicbrainz", "junodownload" -> songObjectList.add(new SongClass(songName, songArtist, songDate));
+                        case "musicbrainz", "junodownload", "youtube" -> songObjectList.add(new SongClass(songName, songArtist, songDate));
                     }
                 }
             }
@@ -535,7 +578,7 @@ public class MainBackend {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             int i = 0;
             for (SongClass item : finalSortedList) {
-                if (i == entriesLimit * sourceTables.length)
+                if (i == 115)
                     break;
                 pstmt.setString(1, item.getName());
                 pstmt.setString(2, item.getArtist());

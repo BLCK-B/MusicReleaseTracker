@@ -62,6 +62,10 @@ public class ApiController {
     public void clickArtistDelete() {
         sendRequest.artistClickDelete();
     }
+    @PostMapping("/deleteUrl")
+    public void deleteUrl() {
+        sendRequest.deleteUrl();
+    }
 
     @RequestMapping ("/cleanArtistSource")
     public void cleanArtistSource() {
@@ -130,6 +134,15 @@ public class ApiController {
     @GetMapping("/getLastArtist")
     public String getLastArtist() {
         return sendRequest.getLastArtist();
+    }
+
+    @PostMapping("/resetSettings")
+    public void resetSettings() {
+        sendRequest.resetSettings();
+    }
+    @PostMapping("/resetDB")
+    public void resetDB() {
+        sendRequest.resetDB();
     }
 
 }

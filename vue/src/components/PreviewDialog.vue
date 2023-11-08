@@ -2,7 +2,7 @@
     <div class="preview">
         <h1>preview</h1>
         <p v-if="!hideTable">Confirm only if the table has usable information.</p>
-        <p v-if="hideTable">Link was probably for a different source. No songs were found.</p>
+        <p v-if="hideTable">Incorrect link.</p>
         <button @click="clickConfirm" class="imgbutton" :disabled="hideTable">
             <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
             <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>

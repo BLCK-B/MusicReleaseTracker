@@ -6,7 +6,7 @@
       <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
     </button>
 
-    <section>
+    <section class="filterscont">
       <p>Exclusion filters<br>Select types of songs to be hidden in Combined view.</p>
 
       <div class="filters-buttons">
@@ -70,6 +70,19 @@
       </div>
     </section>
 
+    <section class="danger">
+      <p>Danger zone</p>
+      <div class="dangercont">
+
+        <button v-if="settingsProtection" @click="resetSettings()">Reset settings</button>
+        <button v-if="!settingsProtection" @click="resetSettings()" @mouseleave="resetProtection()">confirm</button>
+       
+        <button v-if="dbProtection" @click="resetDB()">Reset database</button>
+        <button v-if="!dbProtection" @click="resetDB()" @mouseleave="resetProtection()">confirm</button>
+         
+      </div>
+    </section>
+
     <section class="self">
       <a href="https://blck-b.github.io" target="_blank">
         <img class="blckimg" src="./icons/blcktext.png" alt="logo"/>
@@ -91,6 +104,8 @@ export default {
     return {
       theme: "",
       accent: "",
+      settingsProtection: true,
+      dbProtection: true,
       filters: {
         Remix: false,
         VIP: false,
@@ -153,6 +168,40 @@ export default {
         console.error(error);
       });
     },
+    //default settings
+    resetSettings() {
+      if (this.settingsProtection == true) {
+        this.settingsProtection = false;
+      }
+      else {
+        axios.post('http://localhost:8080/api/resetSettings')
+        .then(() => {
+          this.clickClose();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+      }
+    },
+    //default database
+    resetDB() {
+      if (this.dbProtection == true) {
+        this.dbProtection = false;
+      }
+      else {
+        axios.post('http://localhost:8080/api/resetDB')
+        .then(() => {
+          this.clickClose();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+      }
+    },
+    resetProtection() {
+      this.settingsProtection = true;
+      this.dbProtection = true;
+    }
   },
 };
 </script>
@@ -167,14 +216,30 @@ export default {
   user-select: none;
   background-color: var(--primary-color);
   color: var(--contrast-color);
+  overflow-y: scroll;
+  display: grid;
+  align-content: start;
+  width: 100%;
 }
+@media screen and (min-width: 950px) {
+  .settings {
+    display: grid;
+    grid-template-columns: repeat(2, 0fr);
+  }
+  section {
+    margin-right: 50px;
+  }
+}
+
 .filters-buttons {
   margin-top: 10px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 10px;
   accent-color: var(--contrast-color);
+  max-height: 80px;
 }
+
 .appearancecont {
   display:flex;
   accent-color: var(--dull-color);
@@ -200,6 +265,9 @@ export default {
   border: none;
   transition: 0s;
 }
+.imgbutton:hover {
+  opacity: 60%;
+}
 .image {
   height: 33px;
 }
@@ -209,14 +277,12 @@ input {
 section {
   position: relative;
   margin-top: 20px;
-  left: 20px;
+  left: 40px;
   padding: 1px 15px 10px 15px;
   background-color: var(--duller-color);
   border-radius: 5px;
   transition: 0.15s;
-}
-.imgbutton:hover {
-  opacity: 60%;
+  width: 345px;
 }
 .self {
   text-align: center;
@@ -244,6 +310,19 @@ section {
   background-color: var(--accent-color);
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
+}
+
+.danger button {
+  border-radius: 5px;
+  background-color: transparent;
+  color: var(--contrast-color);
+  border: 2px solid red;
+  padding: 4px;
+  margin-left: 30px;
+  width: 120px;
+}
+.danger button:hover {
+  background-color: red;
 }
 
 

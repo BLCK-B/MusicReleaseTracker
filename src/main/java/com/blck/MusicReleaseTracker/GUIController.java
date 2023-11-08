@@ -86,6 +86,10 @@ public class GUIController {
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, lastClickedArtist);
                 pstmt.executeUpdate();
+                sql = "DELETE FROM youtube WHERE artist = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, lastClickedArtist);
+                pstmt.executeUpdate();
                 conn.close();
                 lastClickedArtist = null;
             }
@@ -94,8 +98,37 @@ public class GUIController {
             }
         }
     }
+    public void deleteUrl() {
+        //set null specific URL, delete related set
+        if (lastClickedArtist != null && selectedSource != null) {
+            try {
+                Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                String sql = null;
+                switch (selectedSource) {
+                    case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = NULL WHERE artistname = ?";
+                    case "beatport" -> sql = "UPDATE artists SET urlbeatport = NULL WHERE artistname = ?";
+                    case "junodownload" -> sql = "UPDATE artists SET urljunodownload = NULL WHERE artistname = ?";
+                    case "youtube" -> sql = "UPDATE artists SET urlyoutube = NULL WHERE artistname = ?";
+                    default -> {
+                        return;
+                    }
+                }
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, lastClickedArtist);
+                pstmt.executeUpdate();
+                sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, lastClickedArtist);
+                pstmt.execute();
+                conn.close();
+            }
+            catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     public void cleanArtistSource() {
-        //clean artist from source table
+        //clear artist entries from a source table
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
@@ -150,13 +183,8 @@ public class GUIController {
     public void loadTable() throws SQLException {
         tableContent.clear();
         //adding data to tableContent
-        String sql = null;
         Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-        switch (selectedSource) {
-            case "musicbrainz" -> sql = "SELECT song, date FROM musicbrainz WHERE artist = ? ORDER BY date DESC";
-            case "beatport" -> sql = "SELECT song, date FROM beatport WHERE artist = ? ORDER BY date DESC";
-            case "junodownload" -> sql = "SELECT song, date FROM junodownload WHERE artist = ? ORDER BY date DESC";
-        }
+        String sql = "SELECT song, date FROM " + selectedSource + " WHERE artist = ? ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, lastClickedArtist);
         ResultSet rs = pstmt.executeQuery();
@@ -210,6 +238,8 @@ public class GUIController {
                 //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
                 artistIndex = url.indexOf("/artist/");
                 if (artistIndex != -1 && url.contains("musicbrainz.org")) {
+                    //index of following "/" after "/artist/" - starting from the index that is sum of artistIndex and the length of "/artist/"
+                    //"/artist/".length() is to skip the "/artist/" part and start the search from the beginning of the ID
                     int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
                     if (artistIdIndex != -1)
                         url = url.substring(0, artistIdIndex);
@@ -217,14 +247,10 @@ public class GUIController {
                 }
                 else
                     return;
-                //for latest releases
-                if(!url.contains("page="))
-                    url += "/releases/?page=20";
-                //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/releases/?page=20
                 try {
                     MainBackend.scrapeBrainz(url, lastClickedArtist);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("incorrect link");
                 }
             }
             case "beatport" -> {
@@ -248,7 +274,7 @@ public class GUIController {
                 try {
                     MainBackend.scrapeBeatport(url, lastClickedArtist);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("incorrect link");
                 }
             }
             case "junodownload" -> {
@@ -268,7 +294,14 @@ public class GUIController {
                 try {
                     MainBackend.scrapeJunodownload(url, lastClickedArtist);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("incorrect link");
+                }
+            }
+            case "youtube" -> {
+                try {
+                    MainBackend.scrapeYoutube(url, lastClickedArtist);
+                } catch (IOException e) {
+                    System.out.println("incorrect link");
                 }
             }
         }
@@ -277,11 +310,12 @@ public class GUIController {
 
     public void saveUrl() {
         //save artist url to db
-        String sql;
+        String sql = null;
         switch (selectedSource) {
             case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
             case "beatport" -> sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
             case "junodownload" -> sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
+            case "youtube" -> sql = "UPDATE artists SET urlyoutube = ? WHERE artistname = ?";
             default -> {
                 return;
             }
@@ -306,6 +340,7 @@ public class GUIController {
                 case "musicbrainz" -> sql = "SELECT urlbrainz FROM artists WHERE artistname = ?";
                 case "beatport" -> sql = "SELECT urlbeatport FROM artists WHERE artistname = ?";
                 case "junodownload" -> sql = "SELECT urljunodownload FROM artists WHERE artistname = ?";
+                case "youtube" -> sql = "SELECT urlyoutube FROM artists WHERE artistname = ?";
                 default -> {
                     return urlExists;
                 }
@@ -408,5 +443,11 @@ public class GUIController {
         return lastClickedArtist;
     }
 
+    public void resetSettings() {
+        DBtools.resetSettings();
+    }
+    public void resetDB() {
+        DBtools.resetDB();
+    }
 
 }

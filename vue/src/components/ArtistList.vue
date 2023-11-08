@@ -1,8 +1,12 @@
 <template>
   <div class="buttonspace">
-    <button @mousedown="clickAddArtist" class="addbtn" :disabled="!allowButtons">add</button>
-    <button v-if="deleteProtection" @click="clickDeleteArtist" class="deletebtn" :disabled="!allowButtons || lastClickedItem == null">delete</button>
-    <button v-if="!deleteProtection" @click="clickDeleteArtist" @mouseleave="resetProtection" class="deletebtn" :disabled="!allowButtons">confirm</button>
+    <button @mousedown="clickAddArtist()" class="addbtn" :disabled="!allowButtons">add</button>
+    <button @click="showMore()" class="morebtn">more</button>
+    <div class="dropdown" v-if="showDrop">
+      <button @click="deleteUrl()" :disabled="sourceTab == null || sourceTab == 'combview' || artist == '' || !allowButtons" class="deletebtn">delete selected URL</button>
+      <button @click="clickDeleteArtist()" :disabled="artist == '' || !allowButtons" class="deletebtn">delete artist</button>
+    </div>
+
   </div>
 
     <div class="artistlist">
@@ -20,14 +24,14 @@
 
 <script>
 import axios from 'axios';
-import { mapState, mapMutations } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   data() {
     return {
       artistsArrayList: [],
       lastClickedItem: null,
-      deleteProtection: true,
+      showDrop: false,
     };
   },
   created() {
@@ -42,6 +46,8 @@ export default {
   computed: {
     ...mapState([
       "allowButtons",
+      "sourceTab",
+      "artist",
     ])
   },
   watch: {
@@ -82,27 +88,28 @@ export default {
     },
     //delete all (last selected) artist entries from db, rebuild combview
     clickDeleteArtist() {
-      if (this.deleteProtection == true) {
-        this.deleteProtection = false;
-      }
-      else {
-        if (this.lastClickedItem !== "") {
-          axios.get('http://localhost:8080/api/clickArtistDelete')
-          .then(() => {
-            this.$store.commit('SET_SELECTED_ARTIST', "");
-            this.$store.commit('SET_SOURCE_TAB', "combview");
-            this.loadList();
-          })
-          .catch(error => {
-            console.error(error);
-          });
-        }
+      if (this.lastClickedItem !== "") {
+        axios.get('http://localhost:8080/api/clickArtistDelete')
+        .then(() => {
+          this.$store.commit('SET_SELECTED_ARTIST', "");
+          this.$store.commit('SET_SOURCE_TAB', "combview");
+          this.loadList();
+        })
+        .catch(error => {
+          console.error(error);
+        });
       }
     },
-    //reset delete protection on cursor off
-    resetProtection() {
-      this.deleteProtection = true;
-    }
+    showMore() {
+      this.showDrop = !this.showDrop;
+    },
+    deleteUrl() {
+      //set null specific URL, trigger table reload
+      axios.post('http://localhost:8080/api/deleteUrl')
+        .then(() => {
+          this.handleItemClick(this.lastClickedItem);
+        })
+    },
   },
 };
 </script>
@@ -126,7 +133,7 @@ export default {
 .buttonspace {
   margin-bottom: 5px;
 }
-.addbtn, .deletebtn {
+.addbtn, .morebtn {
   font-size: 12px;
   width: 75px;
   height: 28px;
@@ -138,16 +145,33 @@ export default {
 .addbtn {
   margin-left: 5px;
 }
-.addbtn:hover {
+.addbtn:hover, .morebtn:hover {
   background-color: var(--accent-color);
   border: 2px solid var(--accent-color);
   color: var(--accent-contrast);
 }
-.addbtn:active, .deletebtn:active {
+.addbtn:active, .morebtn:active {
   opacity: 75%;
 }
-.deletebtn {
+.morebtn {
   margin-left: 5px;
+}
+.dropdown {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  background-color: var(--subtle-color);
+  padding-right: 10px;
+  padding-left: 6px;
+}
+.dropdown .deletebtn {
+  font-size: 12px;
+  height: 25px;
+  margin-top: 3px;
+  border: 2px solid var(--dull-color);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--contrast-color);
 }
 .deletebtn:hover {
   background-color: red;
@@ -168,6 +192,7 @@ export default {
   opacity: 0.5;
   pointer-events: none;
 }
+
 
 
 </style>

@@ -63,9 +63,6 @@ public class SettingsStore {
         return filterWords;
     }
 
-    public int getEntriesLimit() {
-        return 40;
-    }
     public void setThemes(Map<String,String> themesMap) {
         this.themesMap = themesMap;
     }

@@ -7,13 +7,10 @@
 <p align="center">
 Efficient multi-source scraper that helps you find new music and follow latest songs. Available for windows, linux.
 </p>
-<p align="center">
-This program is in active development and is not quite there yet. If it does not work as expected, file an issue or check back later, thanks.
-</p>
 
 <p align="center">
   <a href="https://github.com/BLCK-B/MusicReleaseTracker/releases/latest">
-    <img src="https://img.shields.io/github/v/release/BLCK-B/MusicReleaseTracker?label=Download%20Latest%20Release&sort=semver" alt="Download Latest Release">
+    <img src="https://img.shields.io/github/v/release/BLCK-B/MusicReleaseTracker?label=Download%20Latest%20Release" alt="Download Latest Release">
   </a>
 </p>
 
@@ -28,7 +25,7 @@ This program is in active development and is not quite there yet. If it does not
 Look at music releases from individual artists and see all songs ordered by date in "Combined view".
 You will no longer have to search social media or streaming services in fear of missing a new song. MusicReleaseTracker is a free, open-source, no-nonsense program for music discovery.
 
-Currently available sources: Beatport, Musicbrainz, Junodownload.
+Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
 
 Setup
 -

@@ -62,6 +62,10 @@ public class ApiController {
     public void clickArtistDelete() {
         sendRequest.artistClickDelete();
     }
+    @PostMapping("/deleteUrl")
+    public void deleteUrl() {
+        sendRequest.deleteUrl();
+    }
 
     @RequestMapping ("/cleanArtistSource")
     public void cleanArtistSource() {

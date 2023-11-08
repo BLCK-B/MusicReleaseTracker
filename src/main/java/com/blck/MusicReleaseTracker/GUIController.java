@@ -98,6 +98,35 @@ public class GUIController {
             }
         }
     }
+    public void deleteUrl() {
+        //set null specific URL, delete related set
+        if (lastClickedArtist != null && selectedSource != null) {
+            try {
+                Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                String sql = null;
+                switch (selectedSource) {
+                    case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = NULL WHERE artistname = ?";
+                    case "beatport" -> sql = "UPDATE artists SET urlbeatport = NULL WHERE artistname = ?";
+                    case "junodownload" -> sql = "UPDATE artists SET urljunodownload = NULL WHERE artistname = ?";
+                    case "youtube" -> sql = "UPDATE artists SET urlyoutube = NULL WHERE artistname = ?";
+                    default -> {
+                        return;
+                    }
+                }
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, lastClickedArtist);
+                pstmt.executeUpdate();
+                sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, lastClickedArtist);
+                pstmt.execute();
+                conn.close();
+            }
+            catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     public void cleanArtistSource() {
         //clear artist entries from a source table
         try {

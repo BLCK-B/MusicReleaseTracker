@@ -115,6 +115,13 @@ export default {
 </script>
 
 <style scoped>
+*::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--dull-color);
+}
 .listbtn {
   width: 92%;
   height: 28px;
@@ -129,6 +136,9 @@ export default {
 .artistlist {
   height: 100vh;
   overflow-y: scroll;
+}
+.artistlist li {
+  list-style-type: none;
 }
 .buttonspace {
   margin-bottom: 5px;

@@ -71,7 +71,7 @@ public class MainBackend {
                 String os = System.getProperty("os.name").toLowerCase();
                 if (os.contains("win")) {
                     String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
-                    //Runtime.getRuntime().exec(cmd);
+                    Runtime.getRuntime().exec(cmd);
                 }
                 else if (os.contains("nix") || os.contains("nux")) {
                     String[] cmd = {"/usr/bin/open", "http://localhost:8080"};

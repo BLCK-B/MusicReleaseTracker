@@ -138,6 +138,11 @@ export default {
   *::-webkit-scrollbar-thumb {
     background-color: var(--dull-color);
   }
+  *::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+  }
+
   .app {
     font-family: 'arial', sans-serif;
     font-size: 14px;

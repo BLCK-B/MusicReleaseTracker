@@ -219,7 +219,7 @@ public class GUIController {
         rs.close();
     }
     public void fillCombview() {
-        MainBackend.fillCombviewTable();
+        MainBackend.fillCombviewTable(null);
     }
 
     public void clickAddURL(String url) {
@@ -368,7 +368,7 @@ public class GUIController {
             e.printStackTrace();
         }
         try {
-            MainBackend.fillCombviewTable();
+            MainBackend.fillCombviewTable(null);
         } catch (Exception e) {
             e.printStackTrace();
         }

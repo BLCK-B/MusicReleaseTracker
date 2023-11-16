@@ -1,15 +1,20 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.beryx.jlink' version '2.26.0'
+    // https://plugins.gradle.org/plugin/org.beryx.jlink
+    id("org.beryx.jlink") version "3.0.1"
+    // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
     id "com.github.johnrengelman.shadow" version "8.1.1"
-    id 'org.springframework.boot' version '3.1.2'
-    id 'io.spring.dependency-management' version '1.1.2'
-    id 'org.graalvm.buildtools.native' version '0.9.27'
+    // https://plugins.gradle.org/plugin/org.springframework.boot
+    id("org.springframework.boot") version "3.1.5"
+    // https://plugins.gradle.org/plugin/io.spring.dependency-management
+    id("io.spring.dependency-management") version "1.1.4"
+    // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#_adding_the_plugin
+    id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
 group 'com.blck'
-version '6'
+version '7'
 
 repositories {
     mavenCentral()
@@ -46,14 +51,22 @@ application {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'org.xerial:sqlite-jdbc:3.44.0.0'
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
-    implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'org.jsoup:jsoup:1.16.2'
     // https://mvnrepository.com/artifact/com.typesafe/config
-    implementation 'com.typesafe:config:1.4.2'
+    implementation 'com.typesafe:config:1.4.3'
+
+    // https://mvnrepository.com/artifact/org.junit/junit-bom
+    testImplementation(platform("org.junit:junit-bom:5.10.1"))
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testRuntimeOnly('org.junit.platform:junit-platform-launcher:1.9.2')
+    //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+    //testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.1'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -103,13 +116,7 @@ tasks.jar {
 shadowJar {
     exclude 'org/sqlite/native/Linux-Musl/**'
     exclude 'org/sqlite/native/Linux-Android/**'
-    exclude 'org/sqlite/native/FreeBSD/**'
     exclude 'org/sqlite/native/Mac/**'
-    exclude 'org/sqlite/native/Linux/aarch64/**'
-    exclude 'org/sqlite/native/Linux/arm/**'
-    exclude 'org/sqlite/native/Linux/armv6/**'
-    exclude 'org/sqlite/native/Linux/ppc64/**'
-    exclude 'org/sqlite/native/Linux/x86/**'
     exclude 'org/sqlite/native/Windows/aarch64/**'
     exclude 'org/sqlite/native/Windows/x86/**'
     configurations = [project.configurations.runtimeClasspath, project.configurations.shadow]
@@ -119,3 +126,8 @@ shadowJar {
     }
     mergeServiceFiles()
 }
+
+test {
+    useJUnitPlatform()
+}
+

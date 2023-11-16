@@ -106,8 +106,8 @@ export default {
     deleteUrl() {
       //set null specific URL, trigger table reload
       axios.post('http://localhost:8080/api/deleteUrl')
-        .then(() => {
-          this.handleItemClick(this.lastClickedItem);
+      .then(() => {
+        this.handleItemClick(this.lastClickedItem);
         })
     },
   },

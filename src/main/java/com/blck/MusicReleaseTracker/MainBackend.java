@@ -414,8 +414,9 @@ public class MainBackend {
             LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
             return date2.compareTo(date1);
         });
+
         //remove name duplicates
-        ArrayList<String> recordedNames = new ArrayList<String>();
+        Set<String> recordedNames = new HashSet<>();
         songList.removeIf(obj -> {
             String name = obj.getName().toLowerCase();
             if (recordedNames.contains(name))
@@ -426,7 +427,8 @@ public class MainBackend {
             }
         });
 
-        insertSet(songList, source);
+        if (!source.equals("test"))
+            insertSet(songList, source);
     }
 
     public static void insertSet(ArrayList<SongClass> songList, String source) {
@@ -465,20 +467,25 @@ public class MainBackend {
         }
     }
 
-    public static void fillCombviewTable() {
+    public static void fillCombviewTable(String testPath) {
         //assembles table for combined view: filters unwanted words, looks for duplicates, sorts by date, other processing
         //load filterwords and entrieslimit
-        try {
-            DBtools.readConfig("filters");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (testPath == null) {
+            try {
+                DBtools.readConfig("filters");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         //clear table
         Connection conn = null;
         String sql = null;
         Statement stmt = null;
         try {
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            if (testPath == null)
+                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            else
+                conn = DriverManager.getConnection(testPath);
             sql = "DELETE FROM combview";
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
@@ -493,7 +500,10 @@ public class MainBackend {
         ArrayList<SongClass> songObjectList = new ArrayList<>();
 
         try {
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            if (testPath == null)
+                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            else
+                conn = DriverManager.getConnection(testPath);
             for (String source : sourceTables) {
                 sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
@@ -509,13 +519,24 @@ public class MainBackend {
                     }
 
                     //filtering user-defined keywords
-                    for (String checkword : DBtools.settingsStore.getFilterWords()) {
-                        if (songType != null) {
-                            if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                    if (testPath == null) {
+                        for (String checkword : DBtools.settingsStore.getFilterWords()) {
+                            if (songType != null) {
+                                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                                    continue RScycle;
+                            }
+                            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
                                 continue RScycle;
                         }
+                    }
+                    else {
+                        String checkword = "XXXXX";
+                        if (songType != null) {
+                            if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                                continue;
+                        }
                         if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                            continue RScycle;
+                            continue;
                     }
 
                     switch (source) {
@@ -528,8 +549,7 @@ public class MainBackend {
         }  catch (Exception e) {
             e.printStackTrace();
         }
-
-        //map songObjectList to get rid of name-date duplicates, example key: ascension2023-06-13
+        //map songObjectList to merge name-date duplicates, example key: ascension2023-06-13
         //eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
         Map<String, SongClass> nameDateMap = songObjectList.stream()
                 .collect(Collectors.toMap(
@@ -561,7 +581,6 @@ public class MainBackend {
                             }
                         }
                 ));
-
         //create a list of SongClass objects sorted by date from map
         List<SongClass> finalSortedList = nameArtistMap.values().stream()
                 .sorted(Comparator.comparing(SongClass::getDate, Comparator.reverseOrder()))
@@ -573,7 +592,10 @@ public class MainBackend {
         //insert data into table
         try {
             //precomitting batch insert is way faster
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            if (testPath == null)
+                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            else
+                conn = DriverManager.getConnection(testPath);
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             int i = 0;

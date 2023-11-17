@@ -17,7 +17,7 @@ import java.util.Objects;
 
 public class SongClass {
     //an object representing a song with following parameters:
-    private final String songName;
+    private String songName;
     private String songArtist;
     private final String songDate;
     private String songType;
@@ -46,6 +46,10 @@ public class SongClass {
     }
     public String getType() {
         return songType;
+    }
+
+    public void setName(String songName) {
+        this.songName = songName;
     }
 
     public void appendArtist(String artist) {

@@ -272,7 +272,7 @@ public class MainBackend {
 
         while (matcher.find()) {
             typesArrayList.add(matcher.group(1));
-            songsArrayList.add(matcher.group(2).replace("\\u0026", "&").replace("’", "'"));
+            songsArrayList.add(matcher.group(2).replace("\\u0026", "&"));
             datesArrayList.add(matcher.group(3));
         }
         doc.empty();
@@ -305,8 +305,6 @@ public class MainBackend {
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
-        for (int i = 0; i < songsArray.length; i++)
-            songsArray[i] = songsArray[i].replace("’", "'");
 
         String[] datesArray = new String[dates.size()];
         doc.empty();
@@ -372,7 +370,6 @@ public class MainBackend {
             System.out.println("scrapeJunodownload timed out " + oneUrl);
             return;
         }
-
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");
         String[] songsArray = songs.eachText().toArray(new String[0]);
@@ -397,6 +394,11 @@ public class MainBackend {
     }
 
     public static void processInfo(ArrayList<SongClass> songList, String source) {
+        //unify apostrophes
+        for (SongClass object : songList) {
+            String songName = object.getName().replace("’", "'");
+            object.setName(songName);
+        }
         //discard objects with an incorrect date format
         songList.removeIf(obj -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -549,22 +551,10 @@ public class MainBackend {
         }  catch (Exception e) {
             e.printStackTrace();
         }
-        //map songObjectList to merge name-date duplicates, example key: ascension2023-06-13
-        //eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
-        Map<String, SongClass> nameDateMap = songObjectList.stream()
-                .collect(Collectors.toMap(
-                        song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
-                        song -> song,
-                        (existingValue, newValue) -> {
-                            //append artist from duplicate song to the already existing object in map
-                            existingValue.appendArtist(newValue.getArtist());
-                            return existingValue;
-                        }
-                ));
-        //map nameDateMap.values to get rid of name-artist duplicates, example key: ascensionkoansound
+        //map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         //eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Map<String, SongClass> nameArtistMap = nameDateMap.values().stream()
+        Map<String, SongClass> nameArtistMap = songObjectList.stream()
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getArtist().replaceAll("\\s+", "").toLowerCase(),
                         song -> song,
@@ -581,8 +571,22 @@ public class MainBackend {
                             }
                         }
                 ));
+        //map nameArtistMap.values to merge name-date duplicates, example key: theoutlines2023-06-23
+        //eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
+        Map<String, SongClass> nameDateMap = nameArtistMap.values().stream()
+                .collect(Collectors.toMap(
+                        song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
+                        song -> song,
+                        (existingValue, newValue) -> {
+                            //append artist from duplicate song to the already existing object in map
+                            String newArtist = newValue.getArtist();
+                            if (!existingValue.getArtist().contains(newArtist))
+                                existingValue.appendArtist(newArtist);
+                            return existingValue;
+                        }
+                ));
         //create a list of SongClass objects sorted by date from map
-        List<SongClass> finalSortedList = nameArtistMap.values().stream()
+        List<SongClass> finalSortedList = nameDateMap.values().stream()
                 .sorted(Comparator.comparing(SongClass::getDate, Comparator.reverseOrder()))
                 .toList();
 

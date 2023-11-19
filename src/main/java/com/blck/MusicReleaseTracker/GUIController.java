@@ -389,7 +389,7 @@ public class GUIController {
     }
 
     public HashMap<String, Boolean> settingsOpened() {
-        //gather all settings states and return them to frontend
+        //gather all settings states and return them to frontend when settings are opened
         DBtools.readConfig("filters");
         HashMap<String, Boolean> configData = new HashMap<>();
 
@@ -405,49 +405,25 @@ public class GUIController {
         return configData;
     }
 
-    public void toggleFilter(String filter, Boolean value) {
-        //change config filter state
-        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
-        config = config.withValue("filters." + filter, ConfigValueFactory.fromAnyRef(value));
-        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
-
-        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
-            writer.write(config.root().render(renderOptions));
-        } catch (IOException e) {
-            System.out.println("could not save filter change");
-            e.printStackTrace();
-        }
-    }
-    public void setTheme(String theme) {
-        //change config theme/accent
-        if (theme.equals("Black") || theme.equals("Dark") || theme.equals("Light"))
-            DBtools.writeSingleConfig("theme", theme);
-        else
-            DBtools.writeSingleConfig("accent", theme);
+    public void setSetting(String name, String value) {
+        //write any setting in config, note: "name" = config name
+        DBtools.writeSingleConfig(name, value);
     }
     public Map<String,String> getThemeConfig() {
         DBtools.readConfig("themes");
         return DBtools.settingsStore.getThemes();
     }
-
-    public void saveScrapeDate(String time) {
-        //change config lastScrape time
-        DBtools.writeSingleConfig("lastScrape", time);
-    }
     public String getScrapeDate() {
         DBtools.readConfig("lastScrape");
         return DBtools.settingsStore.getScrapeDate();
     }
-
     public String getLastArtist() {
         return lastClickedArtist;
     }
-
     public void resetSettings() {
         DBtools.resetSettings();
     }
     public void resetDB() {
         DBtools.resetDB();
     }
-
 }

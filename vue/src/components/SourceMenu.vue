@@ -124,15 +124,12 @@ export default {
             this.scrapeLast = time;
             this.scrapeNotice = true;
             this.handleSourceClick("combview");
-            axios.post('http://localhost:8080/api/saveScrapeDate', time, {
-              headers: {
-                'Content-Type': 'text/plain'
-              }
-            })
+
+            axios.post(`http://localhost:8080/api/setSetting`, { name: 'lastScrape', value: time })
+            .catch(error => {
+              console.error(error);
+            });
           })
-          .catch((error) => {
-            console.error(error);
-          });
       }
     },
     scrapeHover() {

@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
@@ -122,6 +123,11 @@ public class MainBackend {
         double progress = 0;
         //list for source urls (incl null) - one artist at a time
         ArrayList<String> eachArtistUrls = new ArrayList<>();
+        //after 2 fail-try-again, dont scrape source anymore
+        int brainzFails = 0;
+        int beatportFails = 0;
+        int junoFails = 0;
+        int youtubeFails = 0;
         for (String songArtist : artistnameList) {
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             eachArtistUrls.clear();
@@ -164,15 +170,27 @@ public class MainBackend {
                 if (oneUrl != null) {
                     try {
                         switch(i) {
-                            case 1 -> scrapeBrainz(oneUrl, songArtist);
-                            case 2 -> scrapeBeatport(oneUrl, songArtist);
-                            case 3 -> scrapeJunodownload(oneUrl, songArtist);
-                            case 4 -> scrapeYoutube(oneUrl,songArtist);
+                            case 1 -> {
+                                if (brainzFails != 2)
+                                    scrapeBrainz(oneUrl, songArtist);
+                            }
+                            case 2 -> {
+                                if (beatportFails != 2)
+                                    scrapeBeatport(oneUrl, songArtist);
+                            }
+                            case 3 -> {
+                                if (junoFails != 2)
+                                    scrapeJunodownload(oneUrl, songArtist);
+                            }
+                            case 4 -> {
+                                if (youtubeFails != 2)
+                                    scrapeYoutube(oneUrl,songArtist);
+                            }
                         }
                     } catch (Exception e) {
                         //on fail, try once more
                         System.out.println("error scraping source " + oneUrl + ", trying again");
-                        Thread.sleep(1200);
+                        Thread.sleep(1400);
                         try {
                             switch(i) {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);
@@ -182,7 +200,13 @@ public class MainBackend {
                             }
                         } catch (Exception e2) {
                             System.out.println("error re-scraping, moving on");
-                            e2.printStackTrace();
+                            switch(i) {
+                                case 1 -> brainzFails++;
+                                case 2 -> beatportFails++;
+                                case 3 -> junoFails++;
+                                case 4 -> youtubeFails++;
+                            }
+                            //e2.printStackTrace();
                         }
                     }
                 }
@@ -222,10 +246,10 @@ public class MainBackend {
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeBrainz timed out " + oneUrl);
-            return;
+            throw new IOException("scrapeBrainz timed out " + oneUrl);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("first-release-date");
@@ -252,10 +276,10 @@ public class MainBackend {
         //scraper for beatport
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeBeatport timed out " + oneUrl);
-            return;
+            throw new IOException("scrapeBeatport timed out " + oneUrl);
         }
         //pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
@@ -297,10 +321,10 @@ public class MainBackend {
         //scraper for junodownload
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeJunodownload timed out " + oneUrl);
-            return;
+            throw new IOException("scrapeJunodownload timed out " + oneUrl);
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
@@ -365,10 +389,10 @@ public class MainBackend {
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeJunodownload timed out " + oneUrl);
-            return;
+            throw new IOException("scrapeYoutube timed out " + oneUrl);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");
@@ -409,14 +433,13 @@ public class MainBackend {
                 return true;
             }
         });
-        //sort by date from newest
+        //sort by date from oldest
         songList.sort((obj1, obj2) -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
             LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
-            return date2.compareTo(date1);
+            return date1.compareTo(date2);
         });
-
         //remove name duplicates
         Set<String> recordedNames = new HashSet<>();
         songList.removeIf(obj -> {
@@ -428,6 +451,8 @@ public class MainBackend {
                 return false;
             }
         });
+        //reverse to newest-oldest
+        Collections.reverse(songList);
 
         if (!source.equals("test"))
             insertSet(songList, source);
@@ -498,7 +523,7 @@ public class MainBackend {
 
         String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
 
-        //creating song object list from all sources
+        //creating song object list with data from all sources
         ArrayList<SongClass> songObjectList = new ArrayList<>();
 
         try {
@@ -553,6 +578,7 @@ public class MainBackend {
         }
         //map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         //eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Map<String, SongClass> nameArtistMap = songObjectList.stream()
                 .collect(Collectors.toMap(

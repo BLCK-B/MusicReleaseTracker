@@ -237,13 +237,22 @@ public class DBtools {
                 String scrapeDate = config.getString("lastScrape");
                 settingsStore.setScrapeDate(scrapeDate);
             }
+            case ("longTimeout") -> {
+                boolean longTimeout = config.getBoolean("longTimeout");
+                settingsStore.setLongTimeout(longTimeout);
+            }
         }
         config = null;
     }
     public static void writeSingleConfig(String name, String value) {
-        //save single option state in HOCON
+        //save single string option state in HOCON
         Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
-        config = config.withValue(name, ConfigValueFactory.fromAnyRef(value));
+        ConfigValue configValue;
+        if (value.equals("true") || value.equals("false"))
+            configValue = ConfigValueFactory.fromAnyRef(Boolean.parseBoolean(value));
+        else
+            configValue = ConfigValueFactory.fromAnyRef(value);
+        config = config.withValue(name, configValue);
         ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
         try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
             writer.write(config.root().render(renderOptions));
@@ -272,7 +281,8 @@ public class DBtools {
                 "}\n" +
                 "theme=Black\n" +
                 "accent=Classic\n" +
-                "lastScrape=-\n";
+                "lastScrape=-\n" +
+                "longTimeout=false\n";
 
         //create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");

@@ -25,6 +25,7 @@ public class SettingsStore {
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
+    private boolean longTimeout = false;
 
     public SettingsStore() {
     }
@@ -75,6 +76,16 @@ public class SettingsStore {
     public String getScrapeDate() {
         return scrapeDate;
     }
+    public void setLongTimeout(boolean longTimeout) {
+       this.longTimeout = longTimeout;
+    }
+    public int getTimeout() {
+        if (!longTimeout)
+            return 20000;
+        else
+            return 80000;
+    }
+
 
     @Override
     public String toString() {

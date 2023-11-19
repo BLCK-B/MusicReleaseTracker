@@ -87,14 +87,12 @@ public class ApiController {
         sendRequest.clickScrape();
     }
 
-    @PostMapping("/toggleFilter")
-    public void toggleFilter(@RequestParam String filter, @RequestParam Boolean value) {
-        sendRequest.toggleFilter(filter, value);
-    }
-    @PostMapping("/setTheme")
-    public void setTheme(@RequestBody Map<String, String> themeMap) {
-        String theme = themeMap.get("theme");
-        sendRequest.setTheme(theme);
+    @PostMapping("/setSetting")
+    public void setSetting(@RequestBody Map<String, String> params) {
+        String name = params.get("name");
+        String value = params.get("value");
+        System.out.println(name + " " + value);
+        sendRequest.setSetting(name, value);
     }
     @GetMapping("/getThemeConfig")
     public Map<String,String> getThemeConfig() {
@@ -119,11 +117,6 @@ public class ApiController {
     @GetMapping("/checkExistURL")
     public boolean checkExistURL() {
         return sendRequest.checkExistURL();
-    }
-
-    @PostMapping("/saveScrapeDate")
-    public void saveScrapeDate(@RequestBody String time) {
-        sendRequest.saveScrapeDate(time);
     }
 
     @GetMapping("/getScrapeDate")

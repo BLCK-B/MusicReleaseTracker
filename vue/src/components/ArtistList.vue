@@ -134,7 +134,7 @@ export default {
   padding-left: 7px;
 }
 .artistlist {
-  height: 100vh;
+  height: calc(100vh - 40px);
   overflow-y: scroll;
 }
 .artistlist li {
@@ -197,12 +197,9 @@ export default {
 .highlighted:hover {
   background-color:  var(--accent-color);
 }
-
 :disabled {
   opacity: 0.5;
   pointer-events: none;
 }
-
-
 
 </style>

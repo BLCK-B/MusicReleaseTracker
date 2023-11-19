@@ -12,19 +12,19 @@ public class MainBackendTest {
     void processInfo() {
         ArrayList<SongClass> songList = new ArrayList<>();
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
+        songList.add(new SongClass("Son’g3", "artistName", "2023-03-01"));
         songList.add(new SongClass("Song2", "artistName", "2023-02-01"));
-        songList.add(new SongClass("Song3", "artistName", "2023-03-01"));
         MainBackend.processInfo(songList, "test");
-        //expected values in all cases
+        //expected values: sort by date
         ArrayList<SongClass> expectedSongList = new ArrayList<>();
-        expectedSongList.add(new SongClass("Song3","artistName", "2023-03-01"));
+        expectedSongList.add(new SongClass("Son'g3", "artistName", "2023-03-01"));
         expectedSongList.add(new SongClass("Song2","artistName", "2023-02-01"));
         expectedSongList.add(new SongClass("Song1","artistName", "2023-01-01"));
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
 
-        //incorrect dates
+        //incorrect dates: discard
         songList.add(new SongClass("Song4", "artistName", "2023"));
         songList.add(new SongClass("Song5", "artistName", "-"));
         songList.add(new SongClass("Song6", "artistName", "08-05-2023"));
@@ -33,7 +33,10 @@ public class MainBackendTest {
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
 
-        //duplicates
+        expectedSongList.remove(expectedSongList.size() - 1);
+        expectedSongList.add(new SongClass("Song1","artistName", "2005-05-05"));
+
+        //duplicates: prefer older
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
         songList.add(new SongClass("Song1", "artistName", "2019-19-19"));
         songList.add(new SongClass("Song1", "artistName", "2005-05-05"));

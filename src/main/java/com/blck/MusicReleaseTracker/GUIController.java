@@ -62,7 +62,7 @@ public class GUIController {
             pstmt.close();
             lastClickedArtist = null;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("artist already exists");
         }
     }
     public void artistClickDelete() {
@@ -401,6 +401,13 @@ public class GUIController {
             else
                 configData.put(filter, false);
         }
+        DBtools.readConfig("longTimeout");
+        if (DBtools.settingsStore.getTimeout() > 20000)
+            configData.put("longTimeout", true);
+        else
+            configData.put("longTimeout", false);
+        DBtools.readConfig("isoDates");
+        configData.put("isoDates", DBtools.settingsStore.getIsoDates());
 
         return configData;
     }

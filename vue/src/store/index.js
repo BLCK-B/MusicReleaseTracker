@@ -13,6 +13,7 @@ const state = {
   primaryColor: "",
   accentColor: "",
   previewVis: false,
+  isoDates: false,
 };
 
 const mutations = {
@@ -50,6 +51,9 @@ const mutations = {
   SET_PREVIEW_VIS(state, previewVis) {
     state.previewVis = previewVis;
   },
+  SET_ISODATES(state, isoDates) {
+    state.isoDates = isoDates;
+  }
 };
 
 const actions = {

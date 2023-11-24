@@ -18,7 +18,7 @@
           <tr v-for="(item, index) in tableData" :key="index" :class="{'future-date': isDateInFuture(item.date)}">
             <td class="tdsong">{{ item.song }}</td>
             <td class="tdartist" v-if="!hideArtistColumn">{{ item.artist }}</td>
-            <td class="tddate">{{ item.date }}</td>
+            <td class="tddate">{{ formatDate(item.date) }}</td>
           </tr>
         </tbody>
       </table>
@@ -44,6 +44,7 @@ export default {
       'tableData',
       "previewVis",
       "artist",
+      "isoDates",
     ]),
     hideArtistColumn() {
       return this.tableData.some(item => item.artist === null);
@@ -57,6 +58,17 @@ export default {
     isDateInFuture(dateString) {
       const date = new Date(dateString);
       return date > new Date();
+    },
+    formatDate(dateString) {
+      if (!this.isoDates) {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${day}. ${month}. ${year}`;
+      }
+      else
+        return dateString;
     },
   },
 };
@@ -116,5 +128,10 @@ th {
   left: 35%;
   top: 40%;
   color: var(--dull-color);
+}
+.tddate  {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 30px;
 }
 </style>

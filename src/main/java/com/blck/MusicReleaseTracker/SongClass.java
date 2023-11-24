@@ -60,9 +60,9 @@ public class SongClass {
     @Override
     public String toString() {
         if (this.songType != null)
-            return songName +" "+ songArtist +" "+ songDate +" "+ songType;
+            return songName + " " + songArtist + " " + songDate + " " + songType;
         if (this.songType == null)
-            return songName +" "+ songArtist +" "+ songDate;
+            return songName + " " + songArtist + " " + songDate;
 
         return null;
     }

@@ -241,6 +241,10 @@ public class DBtools {
                 boolean longTimeout = config.getBoolean("longTimeout");
                 settingsStore.setLongTimeout(longTimeout);
             }
+            case("isoDates") -> {
+                boolean isoDates = config.getBoolean("isoDates");
+                settingsStore.setIsoDates(isoDates);
+            }
         }
         config = null;
     }
@@ -282,7 +286,8 @@ public class DBtools {
                 "theme=Black\n" +
                 "accent=Classic\n" +
                 "lastScrape=-\n" +
-                "longTimeout=false\n";
+                "longTimeout=false\n" +
+                "isoDates=false\n";
 
         //create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");

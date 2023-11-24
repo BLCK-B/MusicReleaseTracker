@@ -89,6 +89,7 @@ public class MainBackend {
     public static boolean scrapeCancel = false;
 
     public static void scrapeData() throws SQLException, InterruptedException {
+        DBtools.readConfig("longTimeout");
         //calling method for scrapers, based on artist URLs
         scrapeCancel = false;
         //for each artistname: check all urls and load them into a list
@@ -159,6 +160,8 @@ public class MainBackend {
             double startTime = System.currentTimeMillis();
             for (String oneUrl : eachArtistUrls) {
                 //if clicked cancel
+                if (brainzFails == 2 && beatportFails == 2 && junoFails == 2 && youtubeFails == 2)
+                    scrapeCancel = true;
                 if (scrapeCancel) {
                     SSEController.sendProgress(1.0);
                     eachArtistUrls.clear();
@@ -190,7 +193,7 @@ public class MainBackend {
                     } catch (Exception e) {
                         //on fail, try once more
                         System.out.println("error scraping source " + oneUrl + ", trying again");
-                        Thread.sleep(1400);
+                        Thread.sleep(2000);
                         try {
                             switch(i) {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);
@@ -206,7 +209,7 @@ public class MainBackend {
                                 case 3 -> junoFails++;
                                 case 4 -> youtubeFails++;
                             }
-                            //e2.printStackTrace();
+                            e2.printStackTrace();
                         }
                     }
                 }
@@ -249,7 +252,8 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            throw new IOException("scrapeBrainz timed out " + oneUrl);
+            System.out.println("scrapeBrainz timed out " + oneUrl);
+            throw new IOException();
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("first-release-date");
@@ -279,7 +283,8 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            throw new IOException("scrapeBeatport timed out " + oneUrl);
+            System.out.println("scrapeBeatport timed out " + oneUrl);
+            throw new IOException();
         }
         //pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
@@ -324,7 +329,8 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            throw new IOException("scrapeJunodownload timed out " + oneUrl);
+            System.out.println("scrapeJunodownload timed out " + oneUrl);
+            throw new IOException();
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
@@ -392,7 +398,8 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            throw new IOException("scrapeYoutube timed out " + oneUrl);
+            System.out.println("scrapeYoutube timed out " + oneUrl);
+            throw new IOException();
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");

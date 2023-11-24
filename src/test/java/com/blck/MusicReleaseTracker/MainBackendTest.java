@@ -1,9 +1,13 @@
 package com.blck.MusicReleaseTracker;
 
 import org.junit.jupiter.api.Test;
+import org.sqlite.core.DB;
+
 import java.io.File;
+import java.sql.*;
 import java.util.ArrayList;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MainBackendTest {
@@ -62,7 +66,37 @@ public class MainBackendTest {
             throw new UnsupportedOperationException("unsupported OS");
 
         MainBackend.fillCombviewTable(DBpath);
-        assertEquals(1,1);
+
+        ArrayList<SongClass> songList = new ArrayList<>();
+        ArrayList<SongClass> expectedSongList = new ArrayList<>();
+        expectedSongList.add(new SongClass("Collab", "B, L, K", "2023-11-10"));
+        expectedSongList.add(new SongClass("duplicates", "K", "2023-07-27"));
+        expectedSongList.add(new SongClass("DiffDates", "B", "2000-30-30"));
+
+        try {
+            Connection conn = DriverManager.getConnection(DBpath);
+            String sql = "SELECT * FROM combview ORDER BY date DESC";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String song = rs.getString("song");
+                String artist = rs.getString("artist");
+                String date = rs.getString("date");
+                songList.add(new SongClass(song, artist, date));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        for (int i = 0; i < expectedSongList.size(); i++) {
+            SongClass obj1 = expectedSongList.get(i);
+            SongClass obj2 = songList.get(i);
+            assertAll("Combview table rows",
+                () -> assertEquals(obj1.getName(), obj2.getName()),
+                () -> assertEquals(obj1.getArtist(), obj2.getArtist()),
+                () -> assertEquals(obj1.getDate(), obj2.getDate())
+            );
+        }
+
     }
 
 }

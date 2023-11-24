@@ -91,7 +91,6 @@ public class ApiController {
     public void setSetting(@RequestBody Map<String, String> params) {
         String name = params.get("name");
         String value = params.get("value");
-        System.out.println(name + " " + value);
         sendRequest.setSetting(name, value);
     }
     @GetMapping("/getThemeConfig")

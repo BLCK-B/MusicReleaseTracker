@@ -16,9 +16,9 @@ Efficient multi-source scraper that helps you find new music and follow latest s
 
 ##
 
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/8901e4cf-1028-4bc4-ae55-9fadf16063b7" width="480px"/>
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/918a3454-2b0b-4e7c-9fc2-08364db0dc09" width="480px"/>
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/5983eeb6-b853-46c2-9970-f409f668f757" width="480px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/82621c39-73fb-43c0-b5b9-eab7313eb417" width="480px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/3de8e98a-eee8-4eca-baf3-06fa56a9543e" width="480px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/b9120ff1-e74a-4eae-b702-699fcf2b769d" width="480px"/>
 
 ##
 
@@ -30,7 +30,7 @@ Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
 Setup
 -
 
-**dependencies:** A web browser: UI is rendered there. Linux: OpenJDK.
+**dependencies:** A web browser: UI is rendered there. Works best with firefox. Linux: OpenJDK.
 
 **Windows:** Download and install. When launched, Spring terminal and browser window/tab will open.
 
@@ -40,7 +40,7 @@ Setup
 
 **Responsibility**: Delays during scraping prevent excessive traffic.
 To avoid granting admin permission, can run the exe from unzipped installer, assuming a folder *MusicReleaseTracker* exists in appdata. 
-I have no affiliation with Musicbrainz, Beatport, Junodownload. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
+I have no affiliation with Musicbrainz, Beatport, Junodownload, Youtube. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
 
 ---
 

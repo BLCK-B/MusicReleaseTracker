@@ -1,12 +1,9 @@
 package com.blck.MusicReleaseTracker;
 
 import org.junit.jupiter.api.Test;
-import org.sqlite.core.DB;
-
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -182,7 +182,7 @@ public class DBtools {
             e.printStackTrace();
         }
     }
-    private static Map<String, ArrayList<String>> getDBStructure(String path) {
+    public static Map<String, ArrayList<String>> getDBStructure(String path) {
         HashMap<String, ArrayList<String>> tableMap = new HashMap<String, ArrayList<String>>();
         try {
             Connection conn = DriverManager.getConnection(path);

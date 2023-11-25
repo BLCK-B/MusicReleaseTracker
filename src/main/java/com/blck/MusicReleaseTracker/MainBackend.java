@@ -74,7 +74,7 @@ public class MainBackend {
                     String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
                     Runtime.getRuntime().exec(cmd);
                 }
-                else if (os.contains("nix") || os.contains("nux")) {
+                else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
                     String[] cmd = {"/usr/bin/open", "http://localhost:8080"};
                     Runtime.getRuntime().exec(cmd);
                 }
@@ -132,29 +132,17 @@ public class MainBackend {
         for (String songArtist : artistnameList) {
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             eachArtistUrls.clear();
-            sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            ResultSet rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urlbrainz"));
-            sql = "SELECT urlbeatport FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urlbeatport"));
-            sql = "SELECT urljunodownload FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urljunodownload"));
-            sql = "SELECT urlyoutube FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urlyoutube"));
+            String[] urlSources = {"urlbrainz", "urlbeatport", "urljunodownload", "urlyoutube"};
+            for (String urlName : urlSources) {
+                sql = "SELECT * FROM artists WHERE artistname = ? ";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, songArtist);
+                ResultSet rs = pstmt.executeQuery();
+                eachArtistUrls.add(rs.getString(urlName));
+            }
             conn.close();
             pstmt.close();
-            rs.close();
+            //rs.close();
             //calling scrapers
             int i = 1;
             double startTime = System.currentTimeMillis();
@@ -502,7 +490,7 @@ public class MainBackend {
     }
 
     public static void fillCombviewTable(String testPath) {
-        //assembles table for combined view: filters unwanted words, looks for duplicates, sorts by date, other processing
+        //assembles table for combined view: filters unwanted words, looks for duplicates
         //load filterwords and entrieslimit
         if (testPath == null) {
             try {
@@ -552,7 +540,7 @@ public class MainBackend {
                         songType = rs.getString("type");
                     }
 
-                    //filtering user-defined keywords
+                    //filtering user-selected keywords
                     if (testPath == null) {
                         for (String checkword : DBtools.settingsStore.getFilterWords()) {
                             if (songType != null) {
@@ -585,7 +573,6 @@ public class MainBackend {
         }
         //map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         //eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Map<String, SongClass> nameArtistMap = songObjectList.stream()
                 .collect(Collectors.toMap(

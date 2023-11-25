@@ -1,12 +1,9 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
-import com.typesafe.config.*;
 import org.springframework.stereotype.Service;
-import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,27 +66,18 @@ public class GUIController {
         //delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
             try {
+                Map<String, ArrayList<String>> tableMap = DBtools.getDBStructure(DBtools.settingsStore.getDBpath());
                 Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-                String sql = "DELETE FROM artists WHERE artistname = ?";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM musicbrainz WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM beatport WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM junodownload WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM youtube WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
+                String sql;
+                for (String tableName : tableMap.keySet()) {
+                    if (tableName.equals("artists"))
+                        sql = "DELETE FROM artists WHERE artistname = ?";
+                    else
+                        sql = "DELETE FROM " + tableName + " WHERE artist = ?";
+                    PreparedStatement pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, lastClickedArtist);
+                    pstmt.executeUpdate();
+                }
                 conn.close();
                 lastClickedArtist = null;
             }
@@ -128,7 +116,7 @@ public class GUIController {
         }
     }
     public void cleanArtistSource() {
-        //clear artist entries from a source table
+        //clear artist entries from a source table, used by scrape preview
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
@@ -143,6 +131,7 @@ public class GUIController {
     }
 
     public List<TableModel> artistListClick(String artist) {
+        //when artist and source selected, load respective table
         lastClickedArtist = artist;
         if (selectedSource.equals("combview")) {
             try {
@@ -162,6 +151,7 @@ public class GUIController {
     }
 
     public List<TableModel> sourceTabClick(String source) {
+        //when source and artist selected, load respective table
         selectedSource = source;
         if (!selectedSource.equals("combview")) {
             try {
@@ -362,6 +352,7 @@ public class GUIController {
     }
 
     public void clickScrape() {
+        //launch scraping in backend, then fill and load table
         try {
             MainBackend.scrapeData();
         } catch (Exception e) {

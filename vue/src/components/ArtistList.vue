@@ -106,8 +106,8 @@ export default {
     deleteUrl() {
       //set null specific URL, trigger table reload
       axios.post('http://localhost:8080/api/deleteUrl')
-        .then(() => {
-          this.handleItemClick(this.lastClickedItem);
+      .then(() => {
+        this.handleItemClick(this.lastClickedItem);
         })
     },
   },
@@ -115,6 +115,13 @@ export default {
 </script>
 
 <style scoped>
+*::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--dull-color);
+}
 .listbtn {
   width: 92%;
   height: 28px;
@@ -127,8 +134,11 @@ export default {
   padding-left: 7px;
 }
 .artistlist {
-  height: 100vh;
+  height: calc(100vh - 40px);
   overflow-y: scroll;
+}
+.artistlist li {
+  list-style-type: none;
 }
 .buttonspace {
   margin-bottom: 5px;
@@ -187,12 +197,9 @@ export default {
 .highlighted:hover {
   background-color:  var(--accent-color);
 }
-
 :disabled {
   opacity: 0.5;
   pointer-events: none;
 }
-
-
 
 </style>

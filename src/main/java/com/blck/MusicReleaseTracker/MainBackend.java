@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
@@ -71,9 +72,9 @@ public class MainBackend {
                 String os = System.getProperty("os.name").toLowerCase();
                 if (os.contains("win")) {
                     String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
-                    //Runtime.getRuntime().exec(cmd);
+                    Runtime.getRuntime().exec(cmd);
                 }
-                else if (os.contains("nix") || os.contains("nux")) {
+                else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
                     String[] cmd = {"/usr/bin/open", "http://localhost:8080"};
                     Runtime.getRuntime().exec(cmd);
                 }
@@ -88,6 +89,7 @@ public class MainBackend {
     public static boolean scrapeCancel = false;
 
     public static void scrapeData() throws SQLException, InterruptedException {
+        DBtools.readConfig("longTimeout");
         //calling method for scrapers, based on artist URLs
         scrapeCancel = false;
         //for each artistname: check all urls and load them into a list
@@ -122,37 +124,32 @@ public class MainBackend {
         double progress = 0;
         //list for source urls (incl null) - one artist at a time
         ArrayList<String> eachArtistUrls = new ArrayList<>();
+        //after 2 fail-try-again, dont scrape source anymore
+        int brainzFails = 0;
+        int beatportFails = 0;
+        int junoFails = 0;
+        int youtubeFails = 0;
         for (String songArtist : artistnameList) {
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             eachArtistUrls.clear();
-            sql = "SELECT urlbrainz FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            ResultSet rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urlbrainz"));
-            sql = "SELECT urlbeatport FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urlbeatport"));
-            sql = "SELECT urljunodownload FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urljunodownload"));
-            sql = "SELECT urlyoutube FROM artists WHERE artistname = ? ";
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, songArtist);
-            rs = pstmt.executeQuery();
-            eachArtistUrls.add(rs.getString("urlyoutube"));
+            String[] urlSources = {"urlbrainz", "urlbeatport", "urljunodownload", "urlyoutube"};
+            for (String urlName : urlSources) {
+                sql = "SELECT * FROM artists WHERE artistname = ? ";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, songArtist);
+                ResultSet rs = pstmt.executeQuery();
+                eachArtistUrls.add(rs.getString(urlName));
+            }
             conn.close();
             pstmt.close();
-            rs.close();
+            //rs.close();
             //calling scrapers
             int i = 1;
             double startTime = System.currentTimeMillis();
             for (String oneUrl : eachArtistUrls) {
                 //if clicked cancel
+                if (brainzFails == 2 && beatportFails == 2 && junoFails == 2 && youtubeFails == 2)
+                    scrapeCancel = true;
                 if (scrapeCancel) {
                     SSEController.sendProgress(1.0);
                     eachArtistUrls.clear();
@@ -164,15 +161,27 @@ public class MainBackend {
                 if (oneUrl != null) {
                     try {
                         switch(i) {
-                            case 1 -> scrapeBrainz(oneUrl, songArtist);
-                            case 2 -> scrapeBeatport(oneUrl, songArtist);
-                            case 3 -> scrapeJunodownload(oneUrl, songArtist);
-                            case 4 -> scrapeYoutube(oneUrl,songArtist);
+                            case 1 -> {
+                                if (brainzFails != 2)
+                                    scrapeBrainz(oneUrl, songArtist);
+                            }
+                            case 2 -> {
+                                if (beatportFails != 2)
+                                    scrapeBeatport(oneUrl, songArtist);
+                            }
+                            case 3 -> {
+                                if (junoFails != 2)
+                                    scrapeJunodownload(oneUrl, songArtist);
+                            }
+                            case 4 -> {
+                                if (youtubeFails != 2)
+                                    scrapeYoutube(oneUrl,songArtist);
+                            }
                         }
                     } catch (Exception e) {
                         //on fail, try once more
                         System.out.println("error scraping source " + oneUrl + ", trying again");
-                        Thread.sleep(1200);
+                        Thread.sleep(2000);
                         try {
                             switch(i) {
                                 case 1 -> scrapeBrainz(oneUrl, songArtist);
@@ -182,6 +191,12 @@ public class MainBackend {
                             }
                         } catch (Exception e2) {
                             System.out.println("error re-scraping, moving on");
+                            switch(i) {
+                                case 1 -> brainzFails++;
+                                case 2 -> beatportFails++;
+                                case 3 -> junoFails++;
+                                case 4 -> youtubeFails++;
+                            }
                             e2.printStackTrace();
                         }
                     }
@@ -222,10 +237,11 @@ public class MainBackend {
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeBrainz timed out " + oneUrl);
-            return;
+            throw new IOException();
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("first-release-date");
@@ -252,10 +268,11 @@ public class MainBackend {
         //scraper for beatport
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeBeatport timed out " + oneUrl);
-            return;
+            throw new IOException();
         }
         //pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
@@ -272,7 +289,7 @@ public class MainBackend {
 
         while (matcher.find()) {
             typesArrayList.add(matcher.group(1));
-            songsArrayList.add(matcher.group(2).replace("\\u0026", "&").replace("’", "'"));
+            songsArrayList.add(matcher.group(2).replace("\\u0026", "&"));
             datesArrayList.add(matcher.group(3));
         }
         doc.empty();
@@ -297,16 +314,15 @@ public class MainBackend {
         //scraper for junodownload
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
             System.out.println("scrapeJunodownload timed out " + oneUrl);
-            return;
+            throw new IOException();
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
         String[] songsArray = songs.eachText().toArray(new String[0]);
-        for (int i = 0; i < songsArray.length; i++)
-            songsArray[i] = songsArray[i].replace("’", "'");
 
         String[] datesArray = new String[dates.size()];
         doc.empty();
@@ -367,12 +383,12 @@ public class MainBackend {
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/").timeout(40000).get();
+            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeJunodownload timed out " + oneUrl);
-            return;
+            System.out.println("scrapeYoutube timed out " + oneUrl);
+            throw new IOException();
         }
-
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");
         String[] songsArray = songs.eachText().toArray(new String[0]);
@@ -397,6 +413,11 @@ public class MainBackend {
     }
 
     public static void processInfo(ArrayList<SongClass> songList, String source) {
+        //unify apostrophes
+        for (SongClass object : songList) {
+            String songName = object.getName().replace("’", "'");
+            object.setName(songName);
+        }
         //discard objects with an incorrect date format
         songList.removeIf(obj -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -407,15 +428,15 @@ public class MainBackend {
                 return true;
             }
         });
-        //sort by date from newest
+        //sort by date from oldest
         songList.sort((obj1, obj2) -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
             LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
-            return date2.compareTo(date1);
+            return date1.compareTo(date2);
         });
         //remove name duplicates
-        ArrayList<String> recordedNames = new ArrayList<String>();
+        Set<String> recordedNames = new HashSet<>();
         songList.removeIf(obj -> {
             String name = obj.getName().toLowerCase();
             if (recordedNames.contains(name))
@@ -425,8 +446,11 @@ public class MainBackend {
                 return false;
             }
         });
+        //reverse to newest-oldest
+        Collections.reverse(songList);
 
-        insertSet(songList, source);
+        if (!source.equals("test"))
+            insertSet(songList, source);
     }
 
     public static void insertSet(ArrayList<SongClass> songList, String source) {
@@ -465,20 +489,25 @@ public class MainBackend {
         }
     }
 
-    public static void fillCombviewTable() {
-        //assembles table for combined view: filters unwanted words, looks for duplicates, sorts by date, other processing
+    public static void fillCombviewTable(String testPath) {
+        //assembles table for combined view: filters unwanted words, looks for duplicates
         //load filterwords and entrieslimit
-        try {
-            DBtools.readConfig("filters");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (testPath == null) {
+            try {
+                DBtools.readConfig("filters");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         //clear table
         Connection conn = null;
         String sql = null;
         Statement stmt = null;
         try {
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            if (testPath == null)
+                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            else
+                conn = DriverManager.getConnection(testPath);
             sql = "DELETE FROM combview";
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
@@ -489,11 +518,14 @@ public class MainBackend {
 
         String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
 
-        //creating song object list from all sources
+        //creating song object list with data from all sources
         ArrayList<SongClass> songObjectList = new ArrayList<>();
 
         try {
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            if (testPath == null)
+                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            else
+                conn = DriverManager.getConnection(testPath);
             for (String source : sourceTables) {
                 sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
@@ -508,14 +540,25 @@ public class MainBackend {
                         songType = rs.getString("type");
                     }
 
-                    //filtering user-defined keywords
-                    for (String checkword : DBtools.settingsStore.getFilterWords()) {
-                        if (songType != null) {
-                            if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                    //filtering user-selected keywords
+                    if (testPath == null) {
+                        for (String checkword : DBtools.settingsStore.getFilterWords()) {
+                            if (songType != null) {
+                                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                                    continue RScycle;
+                            }
+                            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
                                 continue RScycle;
                         }
+                    }
+                    else {
+                        String checkword = "XXXXX";
+                        if (songType != null) {
+                            if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                                continue;
+                        }
                         if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                            continue RScycle;
+                            continue;
                     }
 
                     switch (source) {
@@ -528,23 +571,10 @@ public class MainBackend {
         }  catch (Exception e) {
             e.printStackTrace();
         }
-
-        //map songObjectList to get rid of name-date duplicates, example key: ascension2023-06-13
-        //eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
-        Map<String, SongClass> nameDateMap = songObjectList.stream()
-                .collect(Collectors.toMap(
-                        song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
-                        song -> song,
-                        (existingValue, newValue) -> {
-                            //append artist from duplicate song to the already existing object in map
-                            existingValue.appendArtist(newValue.getArtist());
-                            return existingValue;
-                        }
-                ));
-        //map nameDateMap.values to get rid of name-artist duplicates, example key: ascensionkoansound
+        //map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         //eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Map<String, SongClass> nameArtistMap = nameDateMap.values().stream()
+        Map<String, SongClass> nameArtistMap = songObjectList.stream()
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getArtist().replaceAll("\\s+", "").toLowerCase(),
                         song -> song,
@@ -561,9 +591,22 @@ public class MainBackend {
                             }
                         }
                 ));
-
+        //map nameArtistMap.values to merge name-date duplicates, example key: theoutlines2023-06-23
+        //eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
+        Map<String, SongClass> nameDateMap = nameArtistMap.values().stream()
+                .collect(Collectors.toMap(
+                        song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
+                        song -> song,
+                        (existingValue, newValue) -> {
+                            //append artist from duplicate song to the already existing object in map
+                            String newArtist = newValue.getArtist();
+                            if (!existingValue.getArtist().contains(newArtist))
+                                existingValue.appendArtist(newArtist);
+                            return existingValue;
+                        }
+                ));
         //create a list of SongClass objects sorted by date from map
-        List<SongClass> finalSortedList = nameArtistMap.values().stream()
+        List<SongClass> finalSortedList = nameDateMap.values().stream()
                 .sorted(Comparator.comparing(SongClass::getDate, Comparator.reverseOrder()))
                 .toList();
 
@@ -573,7 +616,10 @@ public class MainBackend {
         //insert data into table
         try {
             //precomitting batch insert is way faster
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            if (testPath == null)
+                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            else
+                conn = DriverManager.getConnection(testPath);
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             int i = 0;

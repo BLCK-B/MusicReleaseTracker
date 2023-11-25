@@ -7,71 +7,85 @@
     </button>
 
     <section class="filterscont">
-      <p>Exclusion filters<br>Select types of songs to be hidden in Combined view.</p>
+      <p><span class="title">Exclusion filters</span><br>Select types of songs to be hidden in Combined view.</p>
 
       <div class="filters-buttons">
-        <div class="grid-item">
-          <input type="checkbox" v-model="filters.Remix" @change="updateFilter('Remix', $event.target.checked)">
+        <div>
+          <input type="checkbox" v-model="filters.Remix" @change="setSetting('filters.Remix', $event.target.checked)">
           <label>Remix</label>
         </div>
-        <div class="grid-item">
-          <input type="checkbox" v-model="filters.VIP" @change="updateFilter('VIP', $event.target.checked)">
+        <div>
+          <input type="checkbox" v-model="filters.VIP" @change="setSetting('filters.VIP', $event.target.checked)">
           <label>VIP</label>
         </div>
-        <div class="grid-item">
-          <input type="checkbox" v-model="filters.Instrumental" @change="updateFilter('Instrumental', $event.target.checked)">
+        <div>
+          <input type="checkbox" v-model="filters.Instrumental" @change="setSetting('filters.Instrumental', $event.target.checked)">
           <label>Instrumental</label>
         </div>
-        <div class="grid-item">
-          <input type="checkbox" v-model="filters.Acoustic" @change="updateFilter('Acoustic', $event.target.checked)">
+        <div>
+          <input type="checkbox" v-model="filters.Acoustic" @change="setSetting('filters.Acoustic', $event.target.checked)">
           <label>Acoustic</label>
         </div>
-        <div class="grid-item">
-          <input type="checkbox" v-model="filters.Extended" @change="updateFilter('Extended', $event.target.checked)">
+        <div>
+          <input type="checkbox" v-model="filters.Extended" @change="setSetting('filters.Extended', $event.target.checked)">
           <label>Extended</label>
         </div>
-        <div class="grid-item">
-          <input type="checkbox" v-model="filters.Remaster" @change="updateFilter('Remaster', $event.target.checked)">
+        <div>
+          <input type="checkbox" v-model="filters.Remaster" @change="setSetting('filters.Remaster', $event.target.checked)">
           <label>Remaster</label>
         </div>
       </div>
     </section>
 
     <section class="appearance">
-      <p>Appearance</p>
+      <p class="title">Appearance</p>
       <div class="appearancecont">
 
         <div class="theme-buttons">
-          <input type="radio" v-model="theme" value="Black" @change="setTheme('Black')">
+          <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')">
           <label>Black</label>
-          <input type="radio" v-model="theme" value="Dark" @change="setTheme('Dark')">
+          <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')">
           <label>Dark</label>
-          <input type="radio" v-model="theme" value="Light" @change="setTheme('Light')">
+          <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')">
           <label>Light</label>
           
           <div class="colorindicator"></div>
         </div>
 
         <div class="accent-buttons">
-          <input type="radio" v-model="accent" value="Classic" @change="setTheme('Classic')">
+          <input type="radio" v-model="accent" value="Classic" @change="setSetting('accent', 'Classic')">
           <label>Classic</label>
-          <input type="radio" v-model="accent" value="Cactus" @change="setTheme('Cactus')">
+          <input type="radio" v-model="accent" value="Cactus" @change="setSetting('accent', 'Cactus')">
           <label>Cactus</label>
-          <input type="radio" v-model="accent" value="Rose" @change="setTheme('Rose')">
+          <input type="radio" v-model="accent" value="Rose" @change="setSetting('accent', 'Rose')">
           <label>Rose</label>
-          <input type="radio" v-model="accent" value="Warm" @change="setTheme('Warm')">
+          <input type="radio" v-model="accent" value="Warm" @change="setSetting('accent', 'Warm')">
           <label>Warm</label>
-          <input type="radio" v-model="accent" value="Cloud" @change="setTheme('Cloud')">
+          <input type="radio" v-model="accent" value="Cloud" @change="setSetting('accent', 'Cloud')">
           <label>Cloud</label>
-          <input type="radio" v-model="accent" value="Surge" @change="setTheme('Surge')">
+          <input type="radio" v-model="accent" value="Surge" @change="setSetting('accent', 'Surge')">
           <label>Surge</label>
         </div>
 
       </div>
     </section>
 
+    <section class="other">
+      <p class="title">Other</p>
+      <div class="flex-items">
+        <div class="flex-padding">
+          <input type="checkbox" v-model="longTimeout" @change="setSetting('longTimeout', $event.target.checked)">
+              <label>Longer timeout for unreliable internet</label>
+        </div>
+        <div class="flex-padding">
+          <input type="checkbox" v-model="isoDates" @change="setSetting('isoDates', $event.target.checked)">
+              <label>Dates in yyyy-MM-dd (ISO 8601)</label>
+        </div>
+      </div>
+    </section>
+
     <section class="danger">
-      <p>Danger zone</p>
+      <p class="title">Danger zone</p>
       <div class="dangercont">
 
         <button v-if="settingsProtection" @click="resetSettings()">Reset settings</button>
@@ -124,6 +138,8 @@ export default {
         Rose: false,
         Cactus: false,
       },
+      longTimeout: false,
+      isoDates: false,
     }
   },
   computed: {
@@ -137,6 +153,8 @@ export default {
     axios.get('http://localhost:8080/api/settingsOpened')
       .then(response => {
         this.filters = response.data;
+        this.longTimeout = response.data.longTimeout;
+        this.isoDates = response.data.isoDates;
       })
       .catch((error) => {
         console.error(error);
@@ -149,26 +167,19 @@ export default {
     clickClose() {
       this.$store.commit('SET_SETTINGS_OPEN', false);
     },
-    //write filter change to HOCON
-    updateFilter(filter, value) {
-      axios.post(`http://localhost:8080/api/toggleFilter?filter=${filter}&value=${value}`)
-        .catch(error => {
-          console.error(error);
-        });
-    },
-    //write theme/accent change to HOCON
-    setTheme(theme) {
-      if (theme === "Black" || theme === "Dark" || theme === "Light")
-        this.$store.commit('SET_PRIMARY_COLOR', this.theme);
-      else
-        this.$store.commit('SET_ACCENT_COLOR', this.accent);
-      
-      axios.post('http://localhost:8080/api/setTheme', { theme })
+    //write single setting in config
+    setSetting(name, value) {
+      switch(name) {
+        case ("theme"): this.$store.commit('SET_PRIMARY_COLOR', this.theme);
+        case ("accent"): this.$store.commit('SET_ACCENT_COLOR', this.accent);
+        case ("isoDates"): this.$store.commit("SET_ISODATES", this.isoDates);
+      }
+      axios.post(`http://localhost:8080/api/setSetting`, { name: name, value: value })
       .catch(error => {
         console.error(error);
       });
     },
-    //default settings
+    //default the settings
     resetSettings() {
       if (this.settingsProtection == true) {
         this.settingsProtection = false;
@@ -210,6 +221,9 @@ export default {
 * {
   transition: 0.15s;
 }
+.title {
+  font-weight: bold;
+}
 .settings {
   font-family: 'arial', sans-serif;
   font-size: 14px;
@@ -220,6 +234,7 @@ export default {
   display: grid;
   align-content: start;
   width: 100%;
+  justify-content: center;
 }
 @media screen and (min-width: 950px) {
   .settings {
@@ -227,7 +242,7 @@ export default {
     grid-template-columns: repeat(2, 0fr);
   }
   section {
-    margin-right: 50px;
+    margin-right: 90px;
   }
 }
 
@@ -238,6 +253,13 @@ export default {
   grid-gap: 10px;
   accent-color: var(--contrast-color);
   max-height: 80px;
+}
+.flex-items {
+  display: flex;
+  flex-direction: column;
+}
+.flex-padding {
+  padding: 5px;
 }
 
 .appearancecont {
@@ -300,7 +322,6 @@ section {
   border-radius: 10px;
   margin-right: 10px;
 }
-
 .colorindicator {
   position: absolute;
   right: 0;
@@ -311,14 +332,19 @@ section {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-
+.other {
+  accent-color: var(--contrast-color);
+}
+.dangercont {
+  display: flex;
+  justify-content: space-evenly;
+}
 .danger button {
   border-radius: 5px;
   background-color: transparent;
   color: var(--contrast-color);
   border: 2px solid red;
   padding: 4px;
-  margin-left: 30px;
   width: 120px;
 }
 .danger button:hover {

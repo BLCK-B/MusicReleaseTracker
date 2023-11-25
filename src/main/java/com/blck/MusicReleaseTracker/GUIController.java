@@ -1,12 +1,9 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
-import com.typesafe.config.*;
 import org.springframework.stereotype.Service;
-import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,34 +59,25 @@ public class GUIController {
             pstmt.close();
             lastClickedArtist = null;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("artist already exists");
         }
     }
     public void artistClickDelete() {
         //delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
             try {
+                Map<String, ArrayList<String>> tableMap = DBtools.getDBStructure(DBtools.settingsStore.getDBpath());
                 Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-                String sql = "DELETE FROM artists WHERE artistname = ?";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM musicbrainz WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM beatport WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM junodownload WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM youtube WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
+                String sql;
+                for (String tableName : tableMap.keySet()) {
+                    if (tableName.equals("artists"))
+                        sql = "DELETE FROM artists WHERE artistname = ?";
+                    else
+                        sql = "DELETE FROM " + tableName + " WHERE artist = ?";
+                    PreparedStatement pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, lastClickedArtist);
+                    pstmt.executeUpdate();
+                }
                 conn.close();
                 lastClickedArtist = null;
             }
@@ -128,7 +116,7 @@ public class GUIController {
         }
     }
     public void cleanArtistSource() {
-        //clear artist entries from a source table
+        //clear artist entries from a source table, used by scrape preview
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
@@ -143,6 +131,7 @@ public class GUIController {
     }
 
     public List<TableModel> artistListClick(String artist) {
+        //when artist and source selected, load respective table
         lastClickedArtist = artist;
         if (selectedSource.equals("combview")) {
             try {
@@ -162,6 +151,7 @@ public class GUIController {
     }
 
     public List<TableModel> sourceTabClick(String source) {
+        //when source and artist selected, load respective table
         selectedSource = source;
         if (!selectedSource.equals("combview")) {
             try {
@@ -219,7 +209,7 @@ public class GUIController {
         rs.close();
     }
     public void fillCombview() {
-        MainBackend.fillCombviewTable();
+        MainBackend.fillCombviewTable(null);
     }
 
     public void clickAddURL(String url) {
@@ -362,13 +352,14 @@ public class GUIController {
     }
 
     public void clickScrape() {
+        //launch scraping in backend, then fill and load table
         try {
             MainBackend.scrapeData();
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            MainBackend.fillCombviewTable();
+            MainBackend.fillCombviewTable(null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -389,7 +380,7 @@ public class GUIController {
     }
 
     public HashMap<String, Boolean> settingsOpened() {
-        //gather all settings states and return them to frontend
+        //gather all settings states and return them to frontend when settings are opened
         DBtools.readConfig("filters");
         HashMap<String, Boolean> configData = new HashMap<>();
 
@@ -401,53 +392,36 @@ public class GUIController {
             else
                 configData.put(filter, false);
         }
+        DBtools.readConfig("longTimeout");
+        if (DBtools.settingsStore.getTimeout() > 20000)
+            configData.put("longTimeout", true);
+        else
+            configData.put("longTimeout", false);
+        DBtools.readConfig("isoDates");
+        configData.put("isoDates", DBtools.settingsStore.getIsoDates());
 
         return configData;
     }
 
-    public void toggleFilter(String filter, Boolean value) {
-        //change config filter state
-        Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
-        config = config.withValue("filters." + filter, ConfigValueFactory.fromAnyRef(value));
-        ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
-
-        try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
-            writer.write(config.root().render(renderOptions));
-        } catch (IOException e) {
-            System.out.println("could not save filter change");
-            e.printStackTrace();
-        }
-    }
-    public void setTheme(String theme) {
-        //change config theme/accent
-        if (theme.equals("Black") || theme.equals("Dark") || theme.equals("Light"))
-            DBtools.writeSingleConfig("theme", theme);
-        else
-            DBtools.writeSingleConfig("accent", theme);
+    public void setSetting(String name, String value) {
+        //write any setting in config, note: "name" = config name
+        DBtools.writeSingleConfig(name, value);
     }
     public Map<String,String> getThemeConfig() {
         DBtools.readConfig("themes");
         return DBtools.settingsStore.getThemes();
     }
-
-    public void saveScrapeDate(String time) {
-        //change config lastScrape time
-        DBtools.writeSingleConfig("lastScrape", time);
-    }
     public String getScrapeDate() {
         DBtools.readConfig("lastScrape");
         return DBtools.settingsStore.getScrapeDate();
     }
-
     public String getLastArtist() {
         return lastClickedArtist;
     }
-
     public void resetSettings() {
         DBtools.resetSettings();
     }
     public void resetDB() {
         DBtools.resetDB();
     }
-
 }

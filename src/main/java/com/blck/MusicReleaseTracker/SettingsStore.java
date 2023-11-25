@@ -25,6 +25,8 @@ public class SettingsStore {
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
+    private boolean longTimeout = false;
+    private boolean isoDates = false;
 
     public SettingsStore() {
     }
@@ -75,11 +77,25 @@ public class SettingsStore {
     public String getScrapeDate() {
         return scrapeDate;
     }
+    public void setLongTimeout(boolean longTimeout) {
+       this.longTimeout = longTimeout;
+    }
+    public int getTimeout() {
+        if (!longTimeout)
+            return 20000;
+        else
+            return 80000;
+    }
+    public void setIsoDates(boolean isoDates) {
+        this.isoDates = isoDates;
+    }
+    public boolean getIsoDates() {
+        return isoDates;
+    }
 
     @Override
     public String toString() {
         return null;
     }
-
 
 }

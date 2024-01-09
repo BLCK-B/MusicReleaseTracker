@@ -1,10 +1,8 @@
 package com.blck.MusicReleaseTracker;
 
 import com.typesafe.config.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
@@ -36,8 +34,9 @@ public class DBtools {
 
         if (os.contains("win")) { //Windows
             String appDataPath = System.getenv("APPDATA");
-            DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "musicdata.db";
-            DBtemplatePath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "DBTemplate.db";
+            String basePath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
+            DBpath = basePath + "musicdata.db";
+            DBtemplatePath = basePath + "DBTemplate.db";
             configPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
             configFolder = appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
         } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  //Linux
@@ -45,8 +44,9 @@ public class DBtools {
             File folder = new File(userHome + File.separator + ".MusicReleaseTracker");
             if (!folder.exists())
                 folder.mkdirs();
-            DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "musicdata.db";
-            DBtemplatePath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "DBTemplate.db";
+            String basePath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator;
+            DBpath = basePath + "musicdata.db";
+            DBtemplatePath = basePath + "DBTemplate.db";
             configPath = userHome + File.separator + ".MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
             configFolder = userHome + File.separator + ".MusicReleaseTracker" + File.separator;
         }
@@ -178,8 +178,11 @@ public class DBtools {
             conn.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("error creating DB file");
-            e.printStackTrace();
+            try {
+                throw new FileNotFoundException("error creating DB file, appdata folder likely missing");
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
     public static Map<String, ArrayList<String>> getDBStructure(String path) {

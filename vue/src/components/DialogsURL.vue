@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showUrlDiag && allowButtons && artist.length !== 0 && !addDialogVis">
+    <div v-if="!urlExists && allowButtons && artist && !addDialogVis">
 
         <div v-if="sourceTab === 'musicbrainz'" class="dialog">
             <h1>MusicBrainz source</h1>
@@ -70,7 +70,6 @@ import { mapState } from 'vuex';
 export default {
     data: () => ({
         input: "",
-        showUrlDiag: false,
     }),
     computed: {
         ...mapState([
@@ -80,6 +79,7 @@ export default {
         "artist",
         "addDialogVis",
         'primaryColor',
+        "urlExists",
         ]),
     },
     methods: {
@@ -105,17 +105,16 @@ export default {
             if (this.tableData.length === 0) {
                 axios.get("http://localhost:8080/api/checkExistURL")
                 .then(response => {
-                    if (response.data == true)
-                        this.showUrlDiag = false;
-                    else
-                        this.showUrlDiag = true;
+                    console.log(response.data);
+                    this.$store.commit('SET_URL_EXISTS', response.data);
                 })
                 .catch(error => {
                     console.error(error);
                 });
             }
-            else
-                this.showUrlDiag = false;
+            else {
+                this.$store.commit('SET_URL_EXISTS', true);
+            }
         },
     },
     watch: {
@@ -171,7 +170,6 @@ export default {
     h1 {
         font-size: 17px;
         font-weight: normal;
-        
     }
     .variabletext {
         color: var(--accent-color);

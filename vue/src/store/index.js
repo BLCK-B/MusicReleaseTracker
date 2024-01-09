@@ -14,6 +14,7 @@ const state = {
   accentColor: "",
   previewVis: false,
   isoDates: false,
+  urlExists: false,
 };
 
 const mutations = {
@@ -53,6 +54,9 @@ const mutations = {
   },
   SET_ISODATES(state, isoDates) {
     state.isoDates = isoDates;
+  },
+  SET_URL_EXISTS(state, urlExists) {
+    state.urlExists = urlExists;
   }
 };
 

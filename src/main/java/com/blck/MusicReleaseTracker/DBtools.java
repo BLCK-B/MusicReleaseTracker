@@ -3,10 +3,13 @@ package com.blck.MusicReleaseTracker;
 import com.typesafe.config.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -25,38 +28,60 @@ import java.util.*;
 public class DBtools {
 
     public final static SettingsStore settingsStore = new SettingsStore();
-    public static void path() {
-        String DBpath = null;
-        String DBtemplatePath = null;
-        String configPath = null;
-        String configFolder = null;
-        String os = System.getProperty("os.name").toLowerCase();
-
-        if (os.contains("win")) { //Windows
-            String appDataPath = System.getenv("APPDATA");
-            String basePath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
-            DBpath = basePath + "musicdata.db";
-            DBtemplatePath = basePath + "DBTemplate.db";
-            configPath = appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
-            configFolder = appDataPath + File.separator + "MusicReleaseTracker" + File.separator;
-        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  //Linux
-            String userHome = System.getProperty("user.home");
-            File folder = new File(userHome + File.separator + ".MusicReleaseTracker");
-            if (!folder.exists())
-                folder.mkdirs();
-            String basePath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator;
-            DBpath = basePath + "musicdata.db";
-            DBtemplatePath = basePath + "DBTemplate.db";
-            configPath = userHome + File.separator + ".MusicReleaseTracker" + File.separator + "MRTsettings.hocon";
-            configFolder = userHome + File.separator + ".MusicReleaseTracker" + File.separator;
+    public static void logError(Exception e, String level, String message) {
+        Logger logger = Logger.getLogger(ErrorLogging.class.getName());
+        String errorLogs = settingsStore.getErrorLogs();
+        try {
+            //filehandler logging the error
+            FileHandler fileHandler = new FileHandler(errorLogs, true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            //clear log when it reaches approx 0.3 MB
+            long logFileSize = Files.size(Paths.get(errorLogs));
+            long sizeLimit = 300000;
+            if (logFileSize > sizeLimit) {
+                Files.write(Paths.get(errorLogs), new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
+            }
+            //log the error
+            logger.addHandler(fileHandler);
+            switch (level) {
+                case ("SEVERE") -> logger.log(Level.SEVERE, message, e);
+                case ("WARNING") -> logger.log(Level.WARNING, message, e);
+                case ("INFO") -> logger.log(Level.INFO, message);
+            }
+            fileHandler.close();
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
         }
+        if (level.equals("SEVERE")) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void path() {
+        String appData = null;
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) //Windows
+            appData = System.getenv("APPDATA");
+        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  //Linux
+            appData = System.getProperty("user.home");
         else
             throw new UnsupportedOperationException("unsupported OS");
-
+        //assemble paths for all appdata files
+        File folder = new File(appData + File.separator + "MusicReleaseTracker");
+        if (!folder.exists())
+            folder.mkdirs();
+        String basePath = appData + File.separator + "MusicReleaseTracker" + File.separator;
+        String DBpath =             "jdbc:sqlite:" + basePath + "musicdata.db";
+        String DBtemplatePath =     "jdbc:sqlite:" + basePath + "DBTemplate.db";
+        String configPath =         basePath + "MRTsettings.hocon";
+        String configFolder =       basePath + File.separator;
+        String errorLogs =          basePath + "errorlogs.txt";
+        //save paths to settingsStore
         settingsStore.setConfigFolder(configFolder);
         settingsStore.setConfigPath(configPath);
         settingsStore.setDBpath(DBpath);
         settingsStore.setDBTemplatePath(DBtemplatePath);
+        settingsStore.setErrorLogs(errorLogs);
     }
 
     public static void createTables() {
@@ -102,8 +127,7 @@ public class DBtools {
                 connDB.close();
                 connDBtemplate.close();
             } catch(Exception e) {
-                System.out.println("error updating DB file");
-                e.printStackTrace();
+                logError(e, "SEVERE", "error updating DB file");
             }
             try {
                 File oldFile = new File(settingsStore.getDBpath().substring(12));
@@ -113,8 +137,7 @@ public class DBtools {
                 //rename template to musicdata
                 newFile.renameTo(oldFile);
             } catch(Exception e) {
-                System.out.println("error renaming/deleting DB files");
-                e.printStackTrace();
+                logError(e, "SEVERE", "error renaming/deleting DB files");
             }
         }
 
@@ -178,11 +201,7 @@ public class DBtools {
             conn.close();
             stmt.close();
         } catch (SQLException e) {
-            try {
-                throw new FileNotFoundException("error creating DB file, appdata folder likely missing");
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
+           logError(e, "SEVERE", "error creating DB file");
         }
     }
     public static Map<String, ArrayList<String>> getDBStructure(String path) {
@@ -206,8 +225,7 @@ public class DBtools {
             conn.close();
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("error parsing DB structure");
-            e.printStackTrace();
+            logError(e, "SEVERE", "error parsing DB structure");
         }
         return tableMap;
     }
@@ -264,8 +282,7 @@ public class DBtools {
         try (PrintWriter writer = new PrintWriter(new FileWriter(DBtools.settingsStore.getConfigPath()))) {
             writer.write(config.root().render(renderOptions));
         } catch (IOException e) {
-            System.out.println("could not save " + name + " in config");
-            e.printStackTrace();
+            logError(e, "WARNING", "could not save " + name + " in config");
         }
     }
 
@@ -297,7 +314,7 @@ public class DBtools {
         try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
             writer.write(templateContent);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logError(e, "SEVERE", "could not overwrite templatecontent");
         }
         //create config file if not exist > write templateContent
         File configFile = new File(configPath);
@@ -305,7 +322,7 @@ public class DBtools {
             try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
                 writer.write(templateContent);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logError(e, "SEVERE", "could not overwrite configfile");
             }
         }
         //comparing structure of existing config file and template
@@ -357,19 +374,19 @@ public class DBtools {
                 String renderedConfig = templateConfig.root().render(renderOptions);
                 writer.write(renderedConfig);
             } catch (IOException e) {
-                throw new RuntimeException("Error while saving MRTsettingsTemplate.hocon", e);
+                logError(e, "SEVERE", "error while saving MRTsettingsTemplate.hocon");
             }
             //overwrite MRTsettings with MRTsettingsTemplate
             try {
                 Files.copy(templateFile.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                throw new RuntimeException("Error while replacing MRTsettings with MRTsettingsTemplate", e);
+                logError(e, "SEVERE", "error while replacing MRTsettings with MRTsettingsTemplate");
             }
             //default templateContent again
             try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
                 writer.write(templateContent);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logError(e, "WARNING", "error defaulting MRTsettingsTemplate.hocon");
             }
         }
     }

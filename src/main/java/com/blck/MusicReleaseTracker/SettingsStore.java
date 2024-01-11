@@ -22,6 +22,7 @@ public class SettingsStore {
     private String DBtemplatePath;
     private String configPath;
     private String configFolder;
+    private String errorLogs;
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
@@ -56,6 +57,12 @@ public class SettingsStore {
     }
     public String getConfigFolder() {
         return configFolder;
+    }
+    public void setErrorLogs(String errorLogs) {
+        this.errorLogs = errorLogs;
+    }
+    public String getErrorLogs() {
+        return errorLogs;
     }
 
     public void setFilterWords(ArrayList<String> filterWords) {

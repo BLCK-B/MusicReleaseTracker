@@ -32,7 +32,7 @@ public class SSEController {
         try {
             emitter.send(String.valueOf(state));
         } catch (Exception e) {
-            e.printStackTrace();
+            DBtools.logError(e, "WARNING", "error in progress emitter");
         } finally {
             if (state == 1.0)
                 emitter.complete();

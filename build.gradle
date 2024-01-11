@@ -6,7 +6,7 @@ plugins {
     // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
     id "com.github.johnrengelman.shadow" version "8.1.1"
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.2.0"
+    id("org.springframework.boot") version "3.2.1"
     // https://plugins.gradle.org/plugin/io.spring.dependency-management
     id("io.spring.dependency-management") version "1.1.4"
     // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#_adding_the_plugin
@@ -14,7 +14,7 @@ plugins {
 }
 
 group 'com.blck'
-version '7.1'
+version '7.2'
 
 repositories {
     mavenCentral()
@@ -51,9 +51,9 @@ application {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-    implementation 'org.xerial:sqlite-jdbc:3.44.0.0'
+    implementation 'org.xerial:sqlite-jdbc:3.44.1.0'
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
-    implementation 'org.jsoup:jsoup:1.16.2'
+    implementation 'org.jsoup:jsoup:1.17.2'
     // https://mvnrepository.com/artifact/com.typesafe/config
     implementation 'com.typesafe:config:1.4.3'
 

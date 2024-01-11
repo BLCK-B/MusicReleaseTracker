@@ -1,6 +1,6 @@
 ; UI settings
 !include "MUI2.nsh"
-!define VERSION "7.1"
+!define VERSION "7.2"
 !define MUI_ABORTWARNING
 !define MUI_ICON "MRTicon.ico"
 !insertmacro MUI_PAGE_LICENSE "license.txt"
@@ -30,8 +30,9 @@ Section
     
     NoUninstallOldVersion:
 
-    ; Create the installation directory
+    ; Create the installation directory and appdata folder
     SetOutPath "$INSTDIR"
+	CreateDirectory "$APPDATA\MusicReleaseTracker"
 
     ; Install the new version
     File "MusicReleaseTracker.exe"

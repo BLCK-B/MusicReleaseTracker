@@ -26,8 +26,16 @@
     
   </div>
 
-  <div class="emptynotice" v-if="!hideTable && !previewVis && artist">
+  <div class="emptynotice" v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'">
     <p>table empty, but URL exists</p>
+  </div>
+  <div class="quickstart" v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'">
+    <p><span class="title">Quickstart guide</span> <br>
+    1. click "add" and add an artist <br>
+    2. click on any BP / MB / JD / YT button at the top to select a source <br>
+    3. find the artist on the website, copy & paste link or ID <br>
+    4. to scrape, click refresh button in the top right corner <br>
+    </p>
   </div>
   
 </template>
@@ -45,6 +53,8 @@ export default {
       "previewVis",
       "artist",
       "isoDates",
+      "sourceTab",
+      "urlExists",
     ]),
     hideArtistColumn() {
       return this.tableData.some(item => item.artist === null);
@@ -128,6 +138,16 @@ th {
   left: 35%;
   top: 40%;
   color: var(--dull-color);
+}
+.quickstart {
+  position: relative;
+  font-size: 15px;
+  line-height: 22px;
+  left: 5%;
+  top: 5%;
+}
+.quickstart .title {
+  font-weight: bold;
 }
 .tddate  {
   display: flex;

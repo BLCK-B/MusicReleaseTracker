@@ -54,18 +54,17 @@ public class MainBackend {
             try {
                 DBtools.path();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("error in DBtools path method", e);
             }
             try {
                 DBtools.createTables();
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                DBtools.logError(e, "SEVERE", "error in DBtools createTables method");
             }
             try {
                 DBtools.updateSettings();
             } catch (Exception e) {
-                System.out.println("error handling config file");
-                e.printStackTrace();
+                DBtools.logError(e, "WARNING", "error handling config file");
             }
             //open port in web browser
             try {
@@ -79,15 +78,12 @@ public class MainBackend {
                     Runtime.getRuntime().exec(cmd);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                DBtools.logError(e, "WARNING", "could not open port in browser");
             }
         }
     }
 
-    //entryLimit: how many entries per artist
-    private static final int entryLimit = 15;
     public static boolean scrapeCancel = false;
-
     public static void scrapeData() throws SQLException, InterruptedException {
         DBtools.readConfig("longTimeout");
         //calling method for scrapers, based on artist URLs
@@ -180,7 +176,7 @@ public class MainBackend {
                         }
                     } catch (Exception e) {
                         //on fail, try once more
-                        System.out.println("error scraping source " + oneUrl + ", trying again");
+                        DBtools.logError(e, "INFO", "error scraping source " + i +", trying again");
                         Thread.sleep(2000);
                         try {
                             switch(i) {
@@ -190,14 +186,13 @@ public class MainBackend {
                                 case 4 -> scrapeYoutube(oneUrl,songArtist);
                             }
                         } catch (Exception e2) {
-                            System.out.println("error re-scraping, moving on");
                             switch(i) {
                                 case 1 -> brainzFails++;
                                 case 2 -> beatportFails++;
                                 case 3 -> junoFails++;
                                 case 4 -> youtubeFails++;
                             }
-                            e2.printStackTrace();
+                            DBtools.logError(e2, "WARNING", "error re-scraping, moving on");
                         }
                     }
                 }
@@ -240,8 +235,7 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeBrainz timed out " + oneUrl);
-            throw new IOException();
+            DBtools.logError(e, "INFO", "scrapeBrainz timed out " + oneUrl);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("first-release-date");
@@ -271,8 +265,7 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeBeatport timed out " + oneUrl);
-            throw new IOException();
+            DBtools.logError(e, "INFO", "scrapeBeatport timed out " + oneUrl);
         }
         //pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
@@ -317,8 +310,7 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeJunodownload timed out " + oneUrl);
-            throw new IOException();
+            DBtools.logError(e, "INFO", "scrapeJunodownload timed out " + oneUrl);
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
@@ -358,7 +350,7 @@ public class MainBackend {
                 datesArray[i] = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
                 //datesArray[i]: 2023-06-28
             } catch (Exception e) {
-                e.printStackTrace();
+                DBtools.logError(e,"WARNING", "error processing junodownload date");
             }
         }
 
@@ -386,8 +378,7 @@ public class MainBackend {
             doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            System.out.println("scrapeYoutube timed out " + oneUrl);
-            throw new IOException();
+            DBtools.logError(e, "INFO", "scrapeYoutube timed out " + oneUrl);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");
@@ -485,7 +476,7 @@ public class MainBackend {
             conn.setAutoCommit(true);
             conn.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            DBtools.logError(e, "SEVERE", "error inserting a set of songs");
         }
     }
 
@@ -513,7 +504,7 @@ public class MainBackend {
             stmt.executeUpdate(sql);
             conn.close();
         }  catch (Exception e) {
-            e.printStackTrace();
+            DBtools.logError(e, "SEVERE", "error cleaning combview table");
         }
 
         String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
@@ -569,7 +560,7 @@ public class MainBackend {
             }
             conn.close();
         }  catch (Exception e) {
-            e.printStackTrace();
+            DBtools.logError(e, "WARNING", "error in filtering keywords");
         }
         //map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         //eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
@@ -587,7 +578,8 @@ public class MainBackend {
                                 else
                                     return  newValue;
                             } catch (ParseException e) {
-                                throw new RuntimeException(e);
+                                DBtools.logError(e, "WARNING", "error in parsing dates");
+                                return existingValue;
                             }
                         }
                 ));
@@ -643,7 +635,7 @@ public class MainBackend {
             pstmt.close();
             conn.close();
         }  catch (Exception e) {
-            e.printStackTrace();
+            DBtools.logError(e, "SEVERE", "error inserting data to combview");
         }
         System.gc();
     }

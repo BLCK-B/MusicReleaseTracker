@@ -74,7 +74,7 @@ public class MainBackend {
                     Runtime.getRuntime().exec(cmd);
                 }
                 else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-                    String[] cmd = {"/usr/bin/open", "http://localhost:8080"};
+                    String[] cmd = {"xdg-open", "http://localhost:8080"};
                     Runtime.getRuntime().exec(cmd);
                 }
             } catch (Exception e) {

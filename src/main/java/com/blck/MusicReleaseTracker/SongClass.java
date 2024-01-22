@@ -13,8 +13,6 @@ package com.blck.MusicReleaseTracker;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-import java.util.Objects;
-
 public class SongClass {
     //an object representing a song with following parameters:
     private String songName;

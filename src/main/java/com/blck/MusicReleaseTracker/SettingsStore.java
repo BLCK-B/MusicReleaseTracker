@@ -28,6 +28,8 @@ public class SettingsStore {
     private String scrapeDate;
     private boolean longTimeout = false;
     private boolean isoDates = false;
+    //array of all available sources
+    final private String[] sourceTables = {"musicbrainz", "beatport", "junodownload", "youtube"};
 
     public SettingsStore() {
     }
@@ -98,6 +100,10 @@ public class SettingsStore {
     }
     public boolean getIsoDates() {
         return isoDates;
+    }
+
+    public String[] getSourceTables() {
+        return this.sourceTables;
     }
 
     @Override

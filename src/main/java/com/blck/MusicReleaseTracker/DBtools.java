@@ -35,10 +35,9 @@ public class DBtools {
             //filehandler logging the error
             FileHandler fileHandler = new FileHandler(errorLogs, true);
             fileHandler.setFormatter(new SimpleFormatter());
-            //clear log when it reaches approx 0.3 MB
-            long logFileSize = Files.size(Paths.get(errorLogs));
-            long sizeLimit = 300000;
-            if (logFileSize > sizeLimit) {
+            //clear log when it reaches approx 0.1 MB
+            final long logFileSize = Files.size(Paths.get(errorLogs));
+            if (logFileSize > 100000) {
                 Files.write(Paths.get(errorLogs), new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
             }
             //log the error
@@ -92,7 +91,7 @@ public class DBtools {
         createDB(settingsStore.getDBTemplatePath());
 
         //if different structure, fill template artist table data from musicdata and then rename/delete, make new template
-        //this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes...
+        //this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes
         //made to the "artists" table: change in order of columns, adding/removing a column or changing a column's name
         Map<String, ArrayList<String>> DBMap = getDBStructure(settingsStore.getDBpath());
         Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(settingsStore.getDBTemplatePath());
@@ -106,7 +105,7 @@ public class DBtools {
                 Statement stmt = connDB.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 
-                sql = "insert into artists(artistname, urlbrainz, urlbeatport, urljunodownload, urlyoutube) values(?, ?, ?, ?, ?)";
+                sql = "insert into artists(artistname, urlmusicbrainz, urlbeatport, urljunodownload, urlyoutube) values(?, ?, ?, ?, ?)";
                 PreparedStatement pstmt = connDBtemplate.prepareStatement(sql);
                 ArrayList<String> columnList = DBMap.get("artists");
                 //cycling table rows
@@ -147,54 +146,66 @@ public class DBtools {
         try {
             Connection conn = DriverManager.getConnection(path);
 
-            String sql = "CREATE TABLE IF NOT EXISTS musicbrainz (\n"
-                    + "	song text NOT NULL,\n"
-                    + "	artist text NOT NULL,\n"
-                    + "	date text NOT NULL\n"
-                    + ");";
+            String sql = """
+                CREATE TABLE IF NOT EXISTS musicbrainz (
+                song text NOT NULL,
+                artist text NOT NULL,
+                date text NOT NULL
+                );
+                """;
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
 
-            sql = "CREATE TABLE IF NOT EXISTS beatport (\n"
-                    + "	song text NOT NULL,\n"
-                    + "	artist text NOT NULL,\n"
-                    + "	date text NOT NULL,\n"
-                    + " type text NOT NULL\n"
-                    + ");";
+            sql = """
+                CREATE TABLE IF NOT EXISTS beatport (
+                song text NOT NULL,
+                artist text NOT NULL,
+                date text NOT NULL,
+                type text NOT NULL
+                );
+                """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
-            sql = "CREATE TABLE IF NOT EXISTS junodownload (\n"
-                    + "	song text NOT NULL,\n"
-                    + "	artist text NOT NULL,\n"
-                    + "	date text NOT NULL\n"
-                    + ");";
+            sql = """
+                CREATE TABLE IF NOT EXISTS junodownload (
+                song text NOT NULL,
+                artist text NOT NULL,
+                date text NOT NULL
+                );
+                """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
-            sql = "CREATE TABLE IF NOT EXISTS youtube (\n"
-                    + "	song text NOT NULL,\n"
-                    + "	artist text NOT NULL,\n"
-                    + "	date text NOT NULL\n"
-                    + ");";
+            sql = """
+                CREATE TABLE IF NOT EXISTS youtube (
+                song text NOT NULL,
+                artist text NOT NULL,
+                date text NOT NULL
+                );
+                """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
-            sql = "CREATE TABLE IF NOT EXISTS artists (\n"
-                    + "	artistname text PRIMARY KEY,\n"
-                    + "	urlbrainz text,\n"
-                    + "	urlbeatport text,\n"
-                    + "	urljunodownload text,\n"
-                    + "	urlyoutube text\n"
-                    + ");";
+            sql = """
+                CREATE TABLE IF NOT EXISTS artists (
+                artistname text PRIMARY KEY,
+                urlmusicbrainz text,
+                urlbeatport text,
+                urljunodownload text,
+                urlyoutube text
+                );
+                """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
-            sql = "CREATE TABLE IF NOT EXISTS combview (\n"
-                    + "	song text NOT NULL,\n"
-                    + "	artist text NOT NULL,\n"
-                    + "	date text NOT NULL\n"
-                    + ");";
+            sql = """
+                CREATE TABLE IF NOT EXISTS combview (
+                song text NOT NULL,
+                artist text NOT NULL,
+                date text NOT NULL
+                );
+                """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
@@ -254,18 +265,9 @@ public class DBtools {
                 themesMap.put("accent", accent);
                 settingsStore.setThemes(themesMap);
             }
-            case ("lastScrape") -> {
-                String scrapeDate = config.getString("lastScrape");
-                settingsStore.setScrapeDate(scrapeDate);
-            }
-            case ("longTimeout") -> {
-                boolean longTimeout = config.getBoolean("longTimeout");
-                settingsStore.setLongTimeout(longTimeout);
-            }
-            case("isoDates") -> {
-                boolean isoDates = config.getBoolean("isoDates");
-                settingsStore.setIsoDates(isoDates);
-            }
+            case ("lastScrape") -> settingsStore.setScrapeDate(config.getString("lastScrape"));
+            case ("longTimeout") -> settingsStore.setLongTimeout(config.getBoolean("longTimeout"));
+            case ("isoDates") -> settingsStore.setIsoDates(config.getBoolean("isoDates"));
         }
         config = null;
     }
@@ -294,21 +296,21 @@ public class DBtools {
         // appData/MusicReleaseTracker/
         String configFolder = settingsStore.getConfigFolder();
         //a default settings structure for current version
-        String templateContent =
-                "filters {\n" +
-                "   Acoustic=false\n" +
-                "   Extended=false\n" +
-                "   Instrumental=false\n" +
-                "   Remaster=false\n" +
-                "   Remix=false\n" +
-                "   VIP=false\n" +
-                "}\n" +
-                "theme=Black\n" +
-                "accent=Classic\n" +
-                "lastScrape=-\n" +
-                "longTimeout=false\n" +
-                "isoDates=false\n";
-
+        String templateContent = """
+            filters {
+                Acoustic=false
+                Extended=false
+                Instrumental=false
+                Remaster=false
+                Remix=false
+                VIP=false
+            }
+            theme=Black
+            accent=Classic
+            lastScrape=-
+            longTimeout=false
+            isoDates=false
+            """;
         //create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");
         try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
@@ -332,24 +334,8 @@ public class DBtools {
         ArrayList<String> configStructure = extractStructure(config);
         ArrayList<String> templateStructure = extractStructure(templateConfig);
 
-        boolean different = false;
-        //checking divergence
-        for (String option : templateStructure) {
-            if (!configStructure.contains(option)) {
-                different = true;
-                break;
-            }
-        }
-        if (!different) {
-            for (String option : configStructure) {
-                if (!templateStructure.contains(option)) {
-                    different = true;
-                    break;
-                }
-            }
-        }
-
-        if (different) {
+        //if the settings and template options differ
+        if (!templateStructure.containsAll(configStructure) || !configStructure.containsAll(templateStructure)) {
             //different structure > transfer all possible data from config to template
             // > overwrite old config with renamed template > create new template
 
@@ -401,13 +387,13 @@ public class DBtools {
    }
 
    public static void resetSettings() {
-       //default settings
+       //default the settings
        File configFile = new File(settingsStore.getConfigPath());
        configFile.delete();
        updateSettings();
    }
    public static void resetDB() {
-       //default musicdata
+       //default the musicdata
        File musicdata = new File(settingsStore.getDBpath().substring(12));
        musicdata.delete();
        createDB(settingsStore.getDBpath());

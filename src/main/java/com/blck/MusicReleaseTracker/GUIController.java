@@ -118,16 +118,7 @@ public class GUIController {
                     conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
                 else
                     conn = DriverManager.getConnection(testPath);
-                String sql = null;
-                switch (selectedSource) {
-                    case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = NULL WHERE artistname = ?";
-                    case "beatport" -> sql = "UPDATE artists SET urlbeatport = NULL WHERE artistname = ?";
-                    case "junodownload" -> sql = "UPDATE artists SET urljunodownload = NULL WHERE artistname = ?";
-                    case "youtube" -> sql = "UPDATE artists SET urlyoutube = NULL WHERE artistname = ?";
-                    default -> {
-                        return;
-                    }
-                }
+                String sql = "UPDATE artists SET url" + selectedSource +  " = NULL WHERE artistname = ?";;
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, lastClickedArtist);
                 pstmt.executeUpdate();
@@ -327,21 +318,12 @@ public class GUIController {
 
     public void saveUrl(String testPath) {
         //save artist url to db
-        String sql = null;
         if (!testPath.isBlank()) {
             selectedSource = "beatport";
             lastClickedArtist = "Joe";
             tempUrl = "testingUrl";
         }
-        switch (selectedSource) {
-            case "musicbrainz" -> sql = "UPDATE artists SET urlbrainz = ? WHERE artistname = ?";
-            case "beatport" -> sql = "UPDATE artists SET urlbeatport = ? WHERE artistname = ?";
-            case "junodownload" -> sql = "UPDATE artists SET urljunodownload = ? WHERE artistname = ?";
-            case "youtube" -> sql = "UPDATE artists SET urlyoutube = ? WHERE artistname = ?";
-            default -> {
-                return;
-            }
-        }
+        String sql = "UPDATE artists SET url" + selectedSource + " = ? WHERE artistname = ?";
         try {
             Connection conn;
             if (testPath.isBlank())
@@ -369,15 +351,10 @@ public class GUIController {
                 lastClickedArtist = "Joe";
             }
             String sql = null;
-            switch (selectedSource) {
-                case "musicbrainz" -> sql = "SELECT urlbrainz FROM artists WHERE artistname = ?";
-                case "beatport" -> sql = "SELECT urlbeatport FROM artists WHERE artistname = ?";
-                case "junodownload" -> sql = "SELECT urljunodownload FROM artists WHERE artistname = ?";
-                case "youtube" -> sql = "SELECT urlyoutube FROM artists WHERE artistname = ?";
-                default -> {
-                    return urlExists;
-                }
-            }
+            if (!selectedSource.equals("combview"))
+                sql = "SELECT url" + selectedSource + " FROM artists WHERE artistname = ?";
+            else
+                return urlExists;
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, lastClickedArtist);
             ResultSet rs = pstmt.executeQuery();

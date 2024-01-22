@@ -6,9 +6,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.security.Key;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,11 +45,13 @@ public class MainBackend {
         @Override
         public void run(String... args) {
             System.out.println("----------LOCAL SERVER STARTED----------");
-            System.out.println("  __  __ ____ _____ \n" +
-                    " |  \\/  |  _ \\_   _|\n" +
-                    " | |\\/| | |_) || |  \n" +
-                    " | |  | |  _ < | |  \n" +
-                    " |_|  |_|_| \\_\\|_|  \n");
+            System.out.println("""
+                 __  __ ____ _____
+                |  \\/  |  _ \\_   _|
+                | |\\/| | |_) || |
+                | |  | |  _ < | |
+                |_|  |_|_| \\_\\|_|
+            """);
 
             try {
                 DBtools.path();
@@ -93,111 +95,106 @@ public class MainBackend {
         String sql = "SELECT artistname FROM artists";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet artistnameResults = pstmt.executeQuery();
-        ArrayList<String> artistnameList = new ArrayList<>();
+        ArrayList<String> artistNameList = new ArrayList<>();
         while (artistnameResults.next()) {
-            artistnameList.add(artistnameResults.getString("artistname"));
+            artistNameList.add(artistnameResults.getString("artistname"));
         }
         //in case of no URLs
-        if (artistnameList.isEmpty())
+        if (artistNameList.isEmpty())
             return;
         //clear tables to prepare for new data
-        sql = "DELETE FROM musicbrainz";
-        Statement stmt = conn.createStatement();
-        stmt.executeUpdate(sql);
-        sql = "DELETE FROM beatport";
-        stmt = conn.createStatement();
-        stmt.executeUpdate(sql);
-        sql = "DELETE FROM junodownload";
-        stmt = conn.createStatement();
-        stmt.executeUpdate(sql);
-        sql = "DELETE FROM youtube";
-        stmt = conn.createStatement();
-        stmt.executeUpdate(sql);
+        for (String sourceTable : DBtools.settingsStore.getSourceTables()) {
+            sql = "DELETE FROM " + sourceTable;
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
         pstmt.close();
         artistnameResults.close();
         conn.close();
-        stmt.close();
         double progress = 0;
         //list for source urls (incl null) - one artist at a time
-        ArrayList<String> eachArtistUrls = new ArrayList<>();
-        //after 2 fail-try-again, dont scrape source anymore
+        HashMap<String, String> artistUrls = new HashMap<String, String>();
+        //after 2 fail-try-agains, dont scrape source anymore
         int brainzFails = 0;
         int beatportFails = 0;
         int junoFails = 0;
         int youtubeFails = 0;
-        for (String songArtist : artistnameList) {
+        //cycling each artist
+        for (String songArtist : artistNameList) {
+            artistUrls.clear();
             conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-            eachArtistUrls.clear();
-            String[] urlSources = {"urlbrainz", "urlbeatport", "urljunodownload", "urlyoutube"};
-            for (String urlName : urlSources) {
-                sql = "SELECT * FROM artists WHERE artistname = ? ";
+            //assembling list of url/ids of the artist
+            for (String webSource : DBtools.settingsStore.getSourceTables()) {
+                //selecting entire row
+                sql = "SELECT * FROM artists WHERE artistname = ?";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, songArtist);
                 ResultSet rs = pstmt.executeQuery();
-                eachArtistUrls.add(rs.getString(urlName));
+                //including empty ids, useful for progress tracking
+                artistUrls.put(webSource, rs.getString("url" + webSource));
             }
             conn.close();
             pstmt.close();
-            //rs.close();
             //calling scrapers
-            int i = 1;
             double startTime = System.currentTimeMillis();
-            for (String oneUrl : eachArtistUrls) {
-                //if clicked cancel
+            //cycling each url/id of the artist
+            for (String webSource : artistUrls.keySet()) {
                 if (brainzFails == 2 && beatportFails == 2 && junoFails == 2 && youtubeFails == 2)
                     scrapeCancel = true;
+                //if clicked cancel
                 if (scrapeCancel) {
                     SSEController.sendProgress(1.0);
-                    eachArtistUrls.clear();
-                    artistnameList.clear();
+                    artistUrls.clear();
+                    artistNameList.clear();
                     System.gc();
                     return;
                 }
-                //cycling scrapers
-                if (oneUrl != null) {
+                //cycling sources with associated ids
+                String id = artistUrls.get(webSource);
+                if (id != null) {
                     try {
-                        switch(i) {
-                            case 1 -> {
+                        switch(webSource) {
+                            case "musicbrainz" -> {
                                 if (brainzFails != 2)
-                                    scrapeBrainz(oneUrl, songArtist);
+                                    scrapeBrainz(id, songArtist);
                             }
-                            case 2 -> {
+                            case "beatport" -> {
                                 if (beatportFails != 2)
-                                    scrapeBeatport(oneUrl, songArtist);
+                                    scrapeBeatport(id, songArtist);
                             }
-                            case 3 -> {
+                            case "junodownload" -> {
                                 if (junoFails != 2)
-                                    scrapeJunodownload(oneUrl, songArtist);
+                                    scrapeJunodownload(id, songArtist);
                             }
-                            case 4 -> {
+                            case "youtube" -> {
                                 if (youtubeFails != 2)
-                                    scrapeYoutube(oneUrl,songArtist);
+                                    scrapeYoutube(id,songArtist);
                             }
                         }
                     } catch (Exception e) {
                         //on fail, try once more
-                        DBtools.logError(e, "INFO", "error scraping source " + i +", trying again");
+                        DBtools.logError(e, "INFO", "error scraping source " + webSource +", trying again");
                         Thread.sleep(2000);
                         try {
-                            switch(i) {
-                                case 1 -> scrapeBrainz(oneUrl, songArtist);
-                                case 2 -> scrapeBeatport(oneUrl, songArtist);
-                                case 3 -> scrapeJunodownload(oneUrl, songArtist);
-                                case 4 -> scrapeYoutube(oneUrl,songArtist);
+                            switch(webSource) {
+                                case "musicbrainz" -> scrapeBrainz(id, songArtist);
+                                case "beatport" -> scrapeBeatport(id, songArtist);
+                                case "junodownload" -> scrapeJunodownload(id, songArtist);
+                                case "youtube" -> scrapeYoutube(id,songArtist);
                             }
                         } catch (Exception e2) {
-                            switch(i) {
-                                case 1 -> brainzFails++;
-                                case 2 -> beatportFails++;
-                                case 3 -> junoFails++;
-                                case 4 -> youtubeFails++;
+                            switch(webSource) {
+                                case "musicbrainz" -> brainzFails++;
+                                case "beatport" -> beatportFails++;
+                                case "junodownload" -> junoFails++;
+                                case "youtube" -> youtubeFails++;
                             }
-                            DBtools.logError(e2, "WARNING", "error re-scraping, moving on");
+                            DBtools.logError(e2, "WARNING", "error re-scraping source " + webSource + " moving on");
                         }
                     }
                 }
                 //calculated delay at the end of every cycle
-                if (i == 4) {
+                if (webSource.equals("youtube")) {
                     double endTime = System.currentTimeMillis();
                     double elapsedTime = (endTime - startTime);
                     if (2800 - elapsedTime >= 0)
@@ -206,13 +203,11 @@ public class MainBackend {
                 //calculating progressbar value
                 progress++;
                 //40 cycles (10 artists * 4 sources) / 20 total artists / 4 sources = 50%
-                double state = progress / artistnameList.size() / 4;
-                i++;
+                double state = progress / artistNameList.size() / 4;
                 SSEController.sendProgress(state);
             }
         }
-        eachArtistUrls.clear();
-        artistnameList.clear();
+        artistNameList.clear();
         System.gc();
     }
 
@@ -226,7 +221,6 @@ public class MainBackend {
             artistID = oneUrl.substring(startIndex + "/artist/".length(), endIndex);
         else
             artistID = oneUrl.substring(startIndex + "/artist/".length());
-
         oneUrl = "https://musicbrainz.org/ws/2/release-group?artist=" + artistID + "&type=single&limit=400";
         //https://musicbrainz.org/ws/2/release-group?artist=773c3b3b-4368-4659-963a-4c8194ec9b1c&type=single&limit=400
 
@@ -507,8 +501,6 @@ public class MainBackend {
             DBtools.logError(e, "SEVERE", "error cleaning combview table");
         }
 
-        String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
-
         //creating song object list with data from all sources
         ArrayList<SongClass> songObjectList = new ArrayList<>();
 
@@ -517,7 +509,7 @@ public class MainBackend {
                 conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             else
                 conn = DriverManager.getConnection(testPath);
-            for (String source : sourceTables) {
+            for (String source : DBtools.settingsStore.getSourceTables()) {
                 sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
@@ -576,7 +568,7 @@ public class MainBackend {
                                 if (existingDate.compareTo(newDate) < 0)
                                     return existingValue;
                                 else
-                                    return  newValue;
+                                    return newValue;
                             } catch (ParseException e) {
                                 DBtools.logError(e, "WARNING", "error in parsing dates");
                                 return existingValue;

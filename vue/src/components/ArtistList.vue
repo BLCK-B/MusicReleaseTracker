@@ -73,7 +73,7 @@ export default {
     handleItemClick(artist) {
       this.$store.commit('SET_ADD_VIS', false);
       this.lastClickedItem = artist;
-      axios.post('http://localhost:8080/api/artistListClick', { artist })
+      axios.post('http://localhost:8080/api/listOrTabClick', { item: artist, origin: "list" })
         .then(response => {
           this.$store.commit('SET_SELECTED_ARTIST', artist);
           this.$store.commit('SET_TABLE_CONTENT', response.data);

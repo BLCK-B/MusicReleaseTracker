@@ -82,7 +82,7 @@ export default {
     //load respective table
     handleSourceClick(source) {
       this.$store.commit('SET_ADD_VIS', false);
-      axios.post('http://localhost:8080/api/sourceTabClick', { source })
+      axios.post('http://localhost:8080/api/listOrTabClick', { item: source, origin: "tab" })
         .then((response) => {
           this.$store.commit('SET_TABLE_CONTENT', response.data);
         })

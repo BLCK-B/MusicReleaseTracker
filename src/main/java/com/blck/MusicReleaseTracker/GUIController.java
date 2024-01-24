@@ -2,7 +2,6 @@ package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class GUIController {
     private String lastClickedArtist;
     private String selectedSource;
     private final List<TableModel> tableContent = new ArrayList<>();
-    private String tempUrl;
+    private String tempID;
 
     public List<String> loadList(String testPath) throws SQLException {
         List<String> dataList = new ArrayList<>();
@@ -118,7 +117,7 @@ public class GUIController {
                     conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
                 else
                     conn = DriverManager.getConnection(testPath);
-                String sql = "UPDATE artists SET url" + selectedSource +  " = NULL WHERE artistname = ?";;
+                String sql = "UPDATE artists SET url" + selectedSource +  " = NULL WHERE artistname = ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, lastClickedArtist);
                 pstmt.executeUpdate();
@@ -148,41 +147,25 @@ public class GUIController {
         }
     }
 
-    public List<TableModel> artistListClick(String artist) {
-        //when artist and source selected, load respective table
-        lastClickedArtist = artist;
-        if (selectedSource.equals("combview")) {
-            try {
-                loadCombviewTable();
-            } catch (SQLException e) {
-                DBtools.logError(e, "WARNING", "error loading combview");
-            }
-        }
-        else {
-            try {
-                loadTable();
-            } catch (SQLException e) {
-                DBtools.logError(e, "WARNING", "error loading a table");
-            }
-        }
-        return tableContent;
-    }
+    public List<TableModel> listOrTabClick(String item, String origin) {
+        //when source or artist selected, load respective table
+        if (origin.equals("list"))
+            lastClickedArtist = item;
+        else if (origin.equals("tab"))
+            selectedSource = item;
 
-    public List<TableModel> sourceTabClick(String source) {
-        //when source and artist selected, load respective table
-        selectedSource = source;
-        if (!selectedSource.equals("combview")) {
-            try {
-                loadTable();
-            } catch (SQLException e) {
-                DBtools.logError(e, "WARNING", "error loading a table");
-            }
-        }
         if (selectedSource.equals("combview")) {
             try {
                 loadCombviewTable();
             } catch (SQLException e) {
                 DBtools.logError(e, "WARNING", "error loading combview");
+            }
+        }
+        else if (selectedSource != null &&lastClickedArtist != null) {
+            try {
+                loadTable();
+            } catch (SQLException e) {
+                DBtools.logError(e, "WARNING", "error loading a table");
             }
         }
         return tableContent;
@@ -233,87 +216,28 @@ public class GUIController {
     public void clickAddURL(String url) {
         if (lastClickedArtist == null || selectedSource == null)
             return;
-        tempUrl = null;
-        //processing user-pasted url
+        tempID = null;
+
         url = url.replace("=" , "").trim();
         if (url.isEmpty() || url.isBlank())
             return;
 
-        int artistIndex;
-        //reduce to base form then modify
-        switch (selectedSource) {
-            case "musicbrainz" -> {
-                //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
-                artistIndex = url.indexOf("/artist/");
-                if (artistIndex != -1 && url.contains("musicbrainz.org")) {
-                    //index of following "/" after "/artist/" - starting from the index that is sum of artistIndex and the length of "/artist/"
-                    //"/artist/".length() is to skip the "/artist/" part and start the search from the beginning of the ID
-                    int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
-                    if (artistIdIndex != -1)
-                        url = url.substring(0, artistIdIndex);
-                //https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41
-                }
-                else
-                    return;
-                try {
-                    MainBackend.scrapeBrainz(url, lastClickedArtist);
-                } catch (IOException e) {
-                    DBtools.logError(e, "WARNING", "error in scrapeBrainz, perhaps an incorrect link");
-                }
+        String id = MainBackend.reduceToID(url, selectedSource);
+        if (id == null)
+            return;
+
+        try {
+            switch(selectedSource) {
+                case "musicbrainz" -> MainBackend.scrapeBrainz(id, lastClickedArtist);
+                case "beatport" -> MainBackend.scrapeBeatport(id, lastClickedArtist);
+                case "junodownload" -> MainBackend.scrapeJunodownload(id, lastClickedArtist);
+                case "youtube" -> MainBackend.scrapeYoutube(id, lastClickedArtist);
             }
-            case "beatport" -> {
-                //https://beatport.com/artist/koven/245904/charts
-                artistIndex = url.indexOf("/artist/");
-                if (artistIndex != -1 && url.contains("beatport.com")) {
-                    int artistIdIndex = url.indexOf('/', artistIndex + "/artist/".length());
-                    if (artistIdIndex != -1) {
-                        artistIdIndex = url.indexOf('/', artistIdIndex + 1); //skip one '/' and find the next '/'
-                        if (artistIdIndex != -1) {
-                            url = url.substring(0, artistIdIndex); //remove the trailing '/'
-                        }
-                //https://beatport.com/artist/koven/245904
-                    }
-                }
-                else
-                    return;
-                //necessary tab
-                url += "/tracks";
-                //https://beatport.com/artist/koven/245904/tracks
-                try {
-                    MainBackend.scrapeBeatport(url, lastClickedArtist);
-                } catch (IOException e) {
-                    DBtools.logError(e, "WARNING", "error in scrapeBeatport, perhaps an incorrect link");
-                }
-            }
-            case "junodownload" -> {
-                //https://www.junodownload.com/artists/Koven/releases/
-                artistIndex = url.indexOf("/artists/");
-                if (artistIndex != -1 && url.contains("junodownload.com")) {
-                    int artistIdIndex = url.indexOf('/', artistIndex + "/artists/".length());
-                    if (artistIdIndex != -1)
-                        url = url.substring(0, artistIdIndex + 1);
-                //https://www.junodownload.com/artists/Koven/
-                }
-                else
-                    return;
-                //necessary filters
-                url += "releases/?music_product_type=single&laorder=date_down";
-                //https://www.junodownload.com/artists/Koven/releases/?music_product_type=single&laorder=date_down
-                try {
-                    MainBackend.scrapeJunodownload(url, lastClickedArtist);
-                } catch (IOException e) {
-                    DBtools.logError(e, "WARNING", "error in scrapeJunodownload, perhaps an incorrect link");
-                }
-            }
-            case "youtube" -> {
-                try {
-                    MainBackend.scrapeYoutube(url, lastClickedArtist);
-                } catch (IOException e) {
-                    DBtools.logError(e, "WARNING", "error in scrapeYoutube, perhaps an incorrect link");
-                }
-            }
+        } catch (IOException e) {
+            DBtools.logError(e, "WARNING", "error scraping " + selectedSource + ", perhaps an incorrect link");
         }
-        tempUrl = url;
+
+        tempID = id;
     }
 
     public void saveUrl(String testPath) {
@@ -321,7 +245,7 @@ public class GUIController {
         if (!testPath.isBlank()) {
             selectedSource = "beatport";
             lastClickedArtist = "Joe";
-            tempUrl = "testingUrl";
+            tempID = "testingUrl";
         }
         String sql = "UPDATE artists SET url" + selectedSource + " = ? WHERE artistname = ?";
         try {
@@ -331,7 +255,7 @@ public class GUIController {
             else
                 conn = DriverManager.getConnection(testPath);
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, tempUrl);
+            pstmt.setString(1, tempID);
             pstmt.setString(2, lastClickedArtist);
             pstmt.executeUpdate();
         } catch (SQLException e) {

@@ -39,16 +39,11 @@ public class ApiController {
         return sendRequest.loadList("");
     }
 
-    @PostMapping("/artistListClick")
-    public List<TableModel> artistListClick(@RequestBody Map<String, String> requestData) {
-        String artist = requestData.get("artist");
-        return sendRequest.artistListClick(artist);
-    }
-
-    @PostMapping ("/sourceTabClick")
-    public List<TableModel> sourceTabClick(@RequestBody Map<String, String> requestData) {
-        String source = requestData.get("source");
-        return sendRequest.sourceTabClick(source);
+    @PostMapping ("/listOrTabClick")
+    public List<TableModel> listOrTabClick(@RequestBody Map<String, String> requestData) {
+        String item = requestData.get("item");
+        String origin = requestData.get("origin");
+        return sendRequest.listOrTabClick(item, origin);
     }
 
     @PostMapping("/clickArtistAdd")

@@ -8,7 +8,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.security.Key;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -150,7 +149,9 @@ public class MainBackend {
                     return;
                 }
                 //cycling sources with associated ids
+                //id is sent to be reduced since table can contain more
                 String id = artistUrls.get(webSource);
+                id = reduceToID(id, webSource);
                 if (id != null) {
                     try {
                         switch(webSource) {
@@ -211,25 +212,18 @@ public class MainBackend {
         System.gc();
     }
 
-    public static void scrapeBrainz(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeBrainz(String id, String songArtist) throws IOException {
         //scraper for musicbrainz
-        //extracting ID and creating link for API
-        int startIndex = oneUrl.indexOf("/artist/");
-        int endIndex = oneUrl.indexOf('/', startIndex + "/artist/".length());
-        String artistID = null;
-        if (endIndex != -1)
-            artistID = oneUrl.substring(startIndex + "/artist/".length(), endIndex);
-        else
-            artistID = oneUrl.substring(startIndex + "/artist/".length());
-        oneUrl = "https://musicbrainz.org/ws/2/release-group?artist=" + artistID + "&type=single&limit=400";
+        //creating link for API
+        String url = "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
         //https://musicbrainz.org/ws/2/release-group?artist=773c3b3b-4368-4659-963a-4c8194ec9b1c&type=single&limit=400
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
+            doc = Jsoup.connect(url).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeBrainz timed out " + oneUrl);
+            DBtools.logError(e, "INFO", "scrapeBrainz timed out " + url);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("first-release-date");
@@ -252,14 +246,18 @@ public class MainBackend {
         processInfo(songList, "musicbrainz");
     }
 
-    public static void scrapeBeatport(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeBeatport(String id, String songArtist) throws IOException {
         //scraper for beatport
+        //creating link
+        String url = "https://www.beatport.com/artist/" + id + "/tracks";
+        //https://beatport.com/artist/koven/245904/tracks
+
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeBeatport timed out " + oneUrl);
+            DBtools.logError(e, "INFO", "scrapeBeatport timed out " + url);
         }
         //pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
@@ -297,14 +295,16 @@ public class MainBackend {
         processInfo(songList, "beatport");
     }
 
-    public static void scrapeJunodownload(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeJunodownload(String id, String songArtist) throws IOException {
         //scraper for junodownload
+        String url = "https://www.junodownload.com/artists/" + id + "/releases/?music_product_type=single&laorder=date_down";
+        //https://www.junodownload.com/artists/Koven/releases/?music_product_type=single&laorder=date_down
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeJunodownload timed out " + oneUrl);
+            DBtools.logError(e, "INFO", "scrapeJunodownload timed out " + url);
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
@@ -363,16 +363,17 @@ public class MainBackend {
         processInfo(songList, "junodownload");
     }
 
-    public static void scrapeYoutube(String oneUrl, String songArtist) throws IOException {
+    public static void scrapeYoutube(String id, String songArtist) throws IOException {
         //scraper for youtube
-        oneUrl = "https://www.youtube.com/feeds/videos.xml?channel_id=" + oneUrl;
+        //creating link
+        String url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(oneUrl).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+            doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
             .timeout(DBtools.settingsStore.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeYoutube timed out " + oneUrl);
+            DBtools.logError(e, "INFO", "scrapeYoutube timed out " + url);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");
@@ -395,6 +396,76 @@ public class MainBackend {
         }
 
         processInfo(songList, "youtube");
+    }
+
+    public static String reduceToID(String url, String source) {
+        //reduce url to only the identifier
+        int idStartIndex;
+        int idEndIndex;
+        String id = null;
+        switch (source) {
+            case "musicbrainz" -> {
+                // https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
+                int artistIndex = url.indexOf("/artist/");
+                if (artistIndex != -1 && url.contains("musicbrainz.org")) {
+                    idStartIndex = artistIndex + "/artist/".length();
+                    //the next '/' after /artist/
+                    idEndIndex = url.indexOf('/', idStartIndex);
+                    if (idEndIndex != -1)
+                        id = url.substring(idStartIndex, idEndIndex);
+                    else //if no other '/'
+                        id = url.substring(idStartIndex);
+                    // ad110705-cbe6-4c47-9b99-8526e6db0f41
+                }
+            }
+            case "beatport" -> {
+                // https://beatport.com/artist/koven/245904/charts
+                int artistIndex = url.indexOf("/artist/");
+                if (artistIndex != -1 && url.contains("beatport.com")) {
+                    idStartIndex = artistIndex + "/artist/".length();
+                    int firstSlash = url.indexOf('/', idStartIndex) + 1;
+                    //the second '/' after /artist/
+                    idEndIndex = url.indexOf('/', firstSlash);
+                    if (idEndIndex != -1)
+                        id = url.substring(idStartIndex, idEndIndex);
+                    else //if no other '/'
+                        id = url.substring(idStartIndex);
+                // koven/245904
+                }
+            }
+            case "junodownload" -> {
+                // https://www.junodownload.com/artists/Koven/releases/
+                int artistsIndex = url.indexOf("/artists/");
+                if (artistsIndex != -1 && url.contains("junodownload.com")) {
+                    idStartIndex = artistsIndex + "/artists/".length();
+                    //the next '/' after /artists/
+                    idEndIndex = url.indexOf('/', idStartIndex);
+                    if (idEndIndex != -1)
+                        id = url.substring(idStartIndex, idEndIndex);
+                    else //if no other '/'
+                        id = url.substring(idStartIndex);
+                    // Koven
+                }
+            }
+            case "youtube" -> {
+                // https://www.youtube.com/channel/UCWaKvFOf-a7vENyuEsZkNqg
+                int channelIndex = url.indexOf("/channel/");
+                //url
+                if (channelIndex != -1) {
+                    idStartIndex = channelIndex + "/channel/".length();
+                    //the next '/' after /artists/
+                    idEndIndex = url.indexOf('/', idStartIndex);
+                    if (idEndIndex != -1)
+                        id = url.substring(idStartIndex, idEndIndex);
+                    else //if no other '/'
+                        id = url.substring(idStartIndex);
+                    // Koven
+                }
+                else //ID
+                    id = url;
+            }
+        }
+        return id;
     }
 
     public static void processInfo(ArrayList<SongClass> songList, String source) {

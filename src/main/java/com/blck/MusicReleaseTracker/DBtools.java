@@ -69,6 +69,16 @@ public class DBtools {
         File folder = new File(appData + File.separator + "MusicReleaseTracker");
         if (!folder.exists())
             folder.mkdirs();
+        //junk folder because sqlite did not delete temp files in "temp"
+        File tempfolder = new File(appData + File.separator + "MusicReleaseTracker" + File.separator + "temp");
+        if (!tempfolder.exists())
+            tempfolder.mkdirs();
+        File[] tempfiles = tempfolder.listFiles();
+        for (File file : tempfiles) {
+            file.delete();
+        }
+        System.setProperty("org.sqlite.tmpdir", appData + File.separator + "MusicReleaseTracker" + File.separator + "temp");
+
         String basePath = appData + File.separator + "MusicReleaseTracker" + File.separator;
         String DBpath =             "jdbc:sqlite:" + basePath + "musicdata.db";
         String DBtemplatePath =     "jdbc:sqlite:" + basePath + "DBTemplate.db";
@@ -209,8 +219,8 @@ public class DBtools {
             stmt = conn.createStatement();
             stmt.execute(sql);
 
-            conn.close();
             stmt.close();
+            conn.close();
         } catch (SQLException e) {
            logError(e, "SEVERE", "error creating DB file");
         }
@@ -233,8 +243,8 @@ public class DBtools {
                     tableColumnsList.add(rsColumns.getString("name"));
                 tableMap.put(tableName, tableColumnsList);
             }
-            conn.close();
             stmt.close();
+            conn.close();
         } catch (SQLException e) {
             logError(e, "SEVERE", "error parsing DB structure");
         }

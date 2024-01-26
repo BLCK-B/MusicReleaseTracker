@@ -258,6 +258,7 @@ public class GUIController {
             pstmt.setString(1, tempID);
             pstmt.setString(2, lastClickedArtist);
             pstmt.executeUpdate();
+            conn.close();
         } catch (SQLException e) {
             DBtools.logError(e, "WARNING", "could not save URL");
         }

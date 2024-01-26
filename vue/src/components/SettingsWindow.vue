@@ -231,6 +231,7 @@ export default {
   background-color: var(--primary-color);
   color: var(--contrast-color);
   overflow-y: scroll;
+  overflow-x: hidden;
   display: grid;
   align-content: start;
   width: 100%;
@@ -307,20 +308,20 @@ section {
   width: 345px;
 }
 .self {
-  text-align: center;
+  justify-self: center;
   padding: 8px;
+  width: 290px;
 }
 .blckimg {
-  height: 62px;
+  height: 48px;
   background-color: black;
   border-radius: 5px;
   padding: 12px;
-  margin-right: 20px;
+  margin-right: 22px;
 }
 .mrtimg {
-  height: 86px;
+  height: 72px;
   border-radius: 10px;
-  margin-right: 10px;
 }
 .colorindicator {
   position: absolute;

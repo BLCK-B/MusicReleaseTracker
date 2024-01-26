@@ -75,8 +75,13 @@ public class MainBackend {
                     Runtime.getRuntime().exec(cmd);
                 }
                 else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-                    String[] cmd = {"xdg-open", "http://localhost:8080"};
-                    Runtime.getRuntime().exec(cmd);
+                    try {
+                        String[] cmd = {"xdg-open", "http://localhost:8080"};
+                        Runtime.getRuntime().exec(cmd);
+                    } catch (Exception e) {
+                        String [] cmd = new String[]{"open", "http://localhost:8080"};
+                        Runtime.getRuntime().exec(cmd);
+                    }
                 }
             } catch (Exception e) {
                 DBtools.logError(e, "WARNING", "could not open port in browser");
@@ -151,7 +156,8 @@ public class MainBackend {
                 //cycling sources with associated ids
                 //id is sent to be reduced since table can contain more
                 String id = artistUrls.get(webSource);
-                id = reduceToID(id, webSource);
+                if (id != null)
+                    id = reduceToID(id, webSource);
                 if (id != null) {
                     try {
                         switch(webSource) {

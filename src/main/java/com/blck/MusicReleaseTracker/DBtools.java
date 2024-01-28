@@ -24,7 +24,7 @@ import java.util.logging.SimpleFormatter;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-//class for essential tasks (not only DB)
+// class for essential tasks (not only DB)
 public class DBtools {
 
     public final static SettingsStore settingsStore = new SettingsStore();
@@ -32,15 +32,15 @@ public class DBtools {
         Logger logger = Logger.getLogger(ErrorLogging.class.getName());
         String errorLogs = settingsStore.getErrorLogs();
         try {
-            //filehandler logging the error
+            // filehandler logging the error
             FileHandler fileHandler = new FileHandler(errorLogs, true);
             fileHandler.setFormatter(new SimpleFormatter());
-            //clear log when it reaches approx 0.1 MB
+            // clear log when it reaches approx 0.1 MB
             final long logFileSize = Files.size(Paths.get(errorLogs));
             if (logFileSize > 100000) {
                 Files.write(Paths.get(errorLogs), new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
             }
-            //log the error
+            // log the error
             logger.addHandler(fileHandler);
             switch (level) {
                 case ("SEVERE") -> logger.log(Level.SEVERE, message, e);
@@ -59,17 +59,17 @@ public class DBtools {
     public static void path() {
         String appData = null;
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) //Windows
+        if (os.contains("win")) // Windows
             appData = System.getenv("APPDATA");
-        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  //Linux
+        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  // Linux
             appData = System.getProperty("user.home");
         else
             throw new UnsupportedOperationException("unsupported OS");
-        //assemble paths for all appdata files
+        // assemble paths for all appdata files
         File folder = new File(appData + File.separator + "MusicReleaseTracker");
         if (!folder.exists())
             folder.mkdirs();
-        //junk folder because sqlite did not delete temp files in "temp"
+        // junk folder because sqlite did not delete temp files in "temp"
         File tempfolder = new File(appData + File.separator + "MusicReleaseTracker" + File.separator + "temp");
         if (!tempfolder.exists())
             tempfolder.mkdirs();
@@ -85,7 +85,7 @@ public class DBtools {
         String configPath =         basePath + "MRTsettings.hocon";
         String configFolder =       basePath + File.separator;
         String errorLogs =          basePath + "errorlogs.txt";
-        //save paths to settingsStore
+        // save paths to settingsStore
         settingsStore.setConfigFolder(configFolder);
         settingsStore.setConfigPath(configPath);
         settingsStore.setDBpath(DBpath);
@@ -94,15 +94,15 @@ public class DBtools {
     }
 
     public static void createTables() {
-        //on start: create DB if not exist, check DB structure, if different -> create new from template and refill with all data possible
+        // on start: create DB if not exist, check DB structure, if different -> create new from template and refill with all data possible
         File templateFile = new File(settingsStore.getDBTemplatePath().substring(12));
         templateFile.delete();
         createDB(settingsStore.getDBpath());
         createDB(settingsStore.getDBTemplatePath());
 
-        //if different structure, fill template artist table data from musicdata and then rename/delete, make new template
-        //this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes
-        //made to the "artists" table: change in order of columns, adding/removing a column or changing a column's name
+        // if different structure, fill template artist table data from musicdata and then rename/delete, make new template
+        // this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes
+        // made to the "artists" table: change in order of columns, adding/removing a column or changing a column's name
         Map<String, ArrayList<String>> DBMap = getDBStructure(settingsStore.getDBpath());
         Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(settingsStore.getDBTemplatePath());
         if (!DBMap.equals(DBtemplateMap)) {
@@ -110,7 +110,7 @@ public class DBtools {
                 Connection connDB = DriverManager.getConnection(settingsStore.getDBpath());
                 Connection connDBtemplate = DriverManager.getConnection(settingsStore.getDBTemplatePath());
 
-                //insert data from musicdata column to a template column
+                // insert data from musicdata column to a template column
                 String sql = "SELECT * FROM artists";
                 Statement stmt = connDB.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
@@ -118,9 +118,9 @@ public class DBtools {
                 sql = "insert into artists(artistname, urlmusicbrainz, urlbeatport, urljunodownload, urlyoutube) values(?, ?, ?, ?, ?)";
                 PreparedStatement pstmt = connDBtemplate.prepareStatement(sql);
                 ArrayList<String> columnList = DBMap.get("artists");
-                //cycling table rows
+                // cycling table rows
                 while (rs.next()) {
-                    //fill sql query row data and add to batch
+                    // fill sql query row data and add to batch
                     for (int i = 0; i < columnList.size(); i++) {
                         String column = columnList.get(i);
                         pstmt.setString(i + 1 , rs.getString(column));
@@ -141,9 +141,9 @@ public class DBtools {
             try {
                 File oldFile = new File(settingsStore.getDBpath().substring(12));
                 File newFile = new File(settingsStore.getDBTemplatePath().substring(12));
-                //delete old musicdata
+                // delete old musicdata
                 oldFile.delete();
-                //rename template to musicdata
+                // rename template to musicdata
                 newFile.renameTo(oldFile);
             } catch(Exception e) {
                 logError(e, "SEVERE", "error renaming/deleting DB files");
@@ -252,7 +252,7 @@ public class DBtools {
     }
 
     public static void readConfig(String option) {
-        //any reading from HOCON
+        // any reading from HOCON
         Config config = ConfigFactory.parseFile(new File(settingsStore.getConfigPath()));
 
         switch (option) {
@@ -278,11 +278,12 @@ public class DBtools {
             case ("lastScrape") -> settingsStore.setScrapeDate(config.getString("lastScrape"));
             case ("longTimeout") -> settingsStore.setLongTimeout(config.getBoolean("longTimeout"));
             case ("isoDates") -> settingsStore.setIsoDates(config.getBoolean("isoDates"));
+            case ("systemTheme") -> settingsStore.setSystemTheme(config.getBoolean("systemTheme"));
         }
         config = null;
     }
     public static void writeSingleConfig(String name, String value) {
-        //save single string option state in HOCON
+        // save single string option state in HOCON
         Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
         ConfigValue configValue;
         if (value.equals("true") || value.equals("false"))
@@ -299,13 +300,13 @@ public class DBtools {
     }
 
     public static void updateSettings() {
-        //create config if it does not exist, change to latest structure and transfer data if a different structure is detected
+        // create config if it does not exist, change to latest structure and transfer data if a different structure is detected
 
         // appData/MusicReleaseTracker/MRTsettings.hocon
         String configPath = settingsStore.getConfigPath();
         // appData/MusicReleaseTracker/
         String configFolder = settingsStore.getConfigFolder();
-        //a default settings structure for current version
+        // a default settings structure for current version
         String templateContent = """
             filters {
                 Acoustic=false
@@ -320,15 +321,16 @@ public class DBtools {
             lastScrape=-
             longTimeout=false
             isoDates=false
+            systemTheme=true
             """;
-        //create template file / overwrite templateContent
+        // create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");
         try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
             writer.write(templateContent);
         } catch (IOException e) {
             logError(e, "SEVERE", "could not overwrite templatecontent");
         }
-        //create config file if not exist > write templateContent
+        // create config file if not exist > write templateContent
         File configFile = new File(configPath);
         if (!configFile.exists()) {
             try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
@@ -337,34 +339,34 @@ public class DBtools {
                 logError(e, "SEVERE", "could not overwrite configfile");
             }
         }
-        //comparing structure of existing config file and template
+        // comparing structure of existing config file and template
         Config config = ConfigFactory.parseFile(new File(configPath));
         Config templateConfig = ConfigFactory.parseFile(new File(configFolder + "/MRTsettingsTemplate.hocon"));
 
         ArrayList<String> configStructure = extractStructure(config);
         ArrayList<String> templateStructure = extractStructure(templateConfig);
 
-        //if the settings and template options differ
+        // if the settings and template options differ
         if (!templateStructure.containsAll(configStructure) || !configStructure.containsAll(templateStructure)) {
-            //different structure > transfer all possible data from config to template
+            // different structure > transfer all possible data from config to template
             // > overwrite old config with renamed template > create new template
 
-            //transfer the states of options from MRTsettings to MRTsettingsTemplate
+            // transfer the states of options from MRTsettings to MRTsettingsTemplate
             for (Map.Entry<String, ConfigValue> configEntry : config.entrySet()) {
                 String option = configEntry.getKey();
                 ConfigValue value = configEntry.getValue();
-                //string
+                // string
                 if (value.valueType() == ConfigValueType.BOOLEAN && templateConfig.hasPath(option)) {
                     boolean state = config.getBoolean(option);
                     templateConfig = templateConfig.withValue(option, ConfigValueFactory.fromAnyRef(state));
                 }
-                //boolean
+                // boolean
                 else if (value.valueType() == ConfigValueType.STRING && templateConfig.hasPath(option)) {
                     String stringValue = config.getString(option);
                     templateConfig = templateConfig.withValue(option, ConfigValueFactory.fromAnyRef(stringValue));
                 }
             }
-            //save the updated template config to MRTsettingsTemplate.hocon
+            // save the updated template config to MRTsettingsTemplate.hocon
             try (PrintWriter writer = new PrintWriter(new FileWriter(configFolder + "MRTsettingsTemplate.hocon"))) {
                 ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
                 String renderedConfig = templateConfig.root().render(renderOptions);
@@ -372,13 +374,13 @@ public class DBtools {
             } catch (IOException e) {
                 logError(e, "SEVERE", "error while saving MRTsettingsTemplate.hocon");
             }
-            //overwrite MRTsettings with MRTsettingsTemplate
+            // overwrite MRTsettings with MRTsettingsTemplate
             try {
                 Files.copy(templateFile.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 logError(e, "SEVERE", "error while replacing MRTsettings with MRTsettingsTemplate");
             }
-            //default templateContent again
+            // default templateContent again
             try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
                 writer.write(templateContent);
             } catch (IOException e) {
@@ -397,13 +399,13 @@ public class DBtools {
    }
 
    public static void resetSettings() {
-       //default the settings
+       // default the settings
        File configFile = new File(settingsStore.getConfigPath());
        configFile.delete();
        updateSettings();
    }
    public static void resetDB() {
-       //default the musicdata
+       // default the musicdata
        File musicdata = new File(settingsStore.getDBpath().substring(12));
        musicdata.delete();
        createDB(settingsStore.getDBpath());

@@ -23,7 +23,7 @@ public class SSEController {
 
     @GetMapping("/progress")
     public SseEmitter eventStream() {
-        //timeout 5min
+        // timeout 5min
         emitter = new SseEmitter(300000L);
         return emitter;
     }

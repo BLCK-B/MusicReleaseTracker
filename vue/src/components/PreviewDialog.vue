@@ -38,7 +38,7 @@ export default {
         },
     },
     methods: {
-        //close dialog, delete scraped preview from db
+        // close dialog, delete scraped preview from db
         clickCancel() {
             axios.request('http://localhost:8080/api/cleanArtistSource')
             .catch(error => {
@@ -46,7 +46,7 @@ export default {
             });
             this.$store.commit('SET_PREVIEW_VIS', false);
         },
-        //close dialog, save url used for preview
+        // close dialog, save url used for preview
         clickConfirm() {
             axios.request('http://localhost:8080/api/saveUrl')
             .catch(error => {

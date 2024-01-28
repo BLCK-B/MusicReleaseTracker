@@ -83,7 +83,7 @@ export default {
         ]),
     },
     methods: {
-        //send input to be processed, displays preview dialog with scraped source table
+        // send input to be processed, displays preview dialog with scraped source table
         clickURL() {
             const url = encodeURIComponent(this.input);
             this.input = "";
@@ -100,7 +100,7 @@ export default {
                 console.error(error);
             });
         },
-        //only show dialog when table is null, and if URL does not exist
+        // only show dialog when table is null, and if URL does not exist
         determineDiagShow() {
             if (this.tableData.length === 0) {
                 axios.get("http://localhost:8080/api/checkExistURL")
@@ -117,7 +117,7 @@ export default {
         },
     },
     watch: {
-        //trigger url check on every tableData change
+        // trigger url check on every tableData change
         tableData() {
             this.determineDiagShow();
         },

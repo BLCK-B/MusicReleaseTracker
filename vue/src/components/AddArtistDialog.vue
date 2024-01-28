@@ -33,7 +33,7 @@ export default {
         ],
     }),
     methods: {
-        //add artist to db
+        // add artist to db
         clickAdd() {
             const artistname = encodeURIComponent(this.input);
             axios.post('http://localhost:8080/api/clickArtistAdd', artistname)
@@ -47,7 +47,7 @@ export default {
                     console.error(error);
                 });
         },
-        //close dialog
+        // close dialog
         clickClose() {
             this.$store.commit('SET_ADD_VIS', false);
         },
@@ -57,7 +57,7 @@ export default {
             'addDialogVis',
             "primaryColor",
         ]),
-        //if no rules in data broken, enable add button
+        // if no rules in data broken, enable add button
         isValid() {
             return this.rules.every(rule => rule(this.input) === true);
         },

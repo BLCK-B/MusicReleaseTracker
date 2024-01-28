@@ -42,11 +42,11 @@
       <div class="appearancecont">
 
         <div class="theme-buttons">
-          <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')">
+          <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')" :disabled="systemTheme">
           <label>Black</label>
-          <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')">
+          <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')" :disabled="systemTheme">
           <label>Dark</label>
-          <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')">
+          <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')" :disabled="systemTheme">
           <label>Light</label>
           
           <div class="colorindicator"></div>
@@ -66,8 +66,11 @@
           <input type="radio" v-model="accent" value="Surge" @change="setSetting('accent', 'Surge')">
           <label>Surge</label>
         </div>
-
       </div>
+
+      <input type="checkbox" v-model="systemTheme" @change="setSetting('systemTheme', $event.target.checked)">
+          <label>Match system theme</label>
+      
     </section>
 
     <section class="other">
@@ -140,6 +143,7 @@ export default {
       },
       longTimeout: false,
       isoDates: false,
+      systemTheme: false,
     }
   },
   computed: {
@@ -148,13 +152,14 @@ export default {
         'accentColor',
     ]),
   },
-  //on open, load setting states from HOCON
+  // on open, load setting states from HOCON
   created() {
     axios.get('http://localhost:8080/api/settingsOpened')
       .then(response => {
         this.filters = response.data;
         this.longTimeout = response.data.longTimeout;
         this.isoDates = response.data.isoDates;
+        this.systemTheme = response.data.systemTheme;
       })
       .catch((error) => {
         console.error(error);
@@ -163,15 +168,16 @@ export default {
       this.accent = this.accentColor;
   },
   methods: {
-    //close settings, trigger rebuild combview in app
+    // close settings, trigger rebuild combview in app
     clickClose() {
       this.$store.commit('SET_SETTINGS_OPEN', false);
     },
-    //write single setting in config
+    // write single setting in config
     setSetting(name, value) {
       switch(name) {
         case ("theme"): this.$store.commit('SET_PRIMARY_COLOR', this.theme);
         case ("accent"): this.$store.commit('SET_ACCENT_COLOR', this.accent);
+        case ("systemTheme"): this.$store.commit('SET_SYSTEM_THEME', this.systemTheme);
         case ("isoDates"): this.$store.commit("SET_ISODATES", this.isoDates);
       }
       axios.post(`http://localhost:8080/api/setSetting`, { name: name, value: value })
@@ -179,7 +185,7 @@ export default {
         console.error(error);
       });
     },
-    //default the settings
+    // default the settings
     resetSettings() {
       if (this.settingsProtection == true) {
         this.settingsProtection = false;
@@ -194,7 +200,7 @@ export default {
         });
       }
     },
-    //default database
+    // default database
     resetDB() {
       if (this.dbProtection == true) {
         this.dbProtection = false;
@@ -278,6 +284,7 @@ export default {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
+
 .imgbutton {
   position: absolute;
   right: 0;

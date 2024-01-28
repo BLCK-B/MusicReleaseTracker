@@ -71,6 +71,19 @@ export default {
   },
   created() {
     this.loadTheme();
+    // detecting system theme on load
+    axios.get('http://localhost:8080/api/settingsOpened')
+      .then(response => {
+        this.$store.commit('SET_SYSTEM_THEME', response.data.systemTheme);
+        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+        if (prefersDarkMode.matches && this.systemTheme)
+          this.$store.commit('SET_PRIMARY_COLOR', "Black");
+        else
+          this.$store.commit('SET_PRIMARY_COLOR', "Light");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   },
   computed: {
     ...mapState([
@@ -78,10 +91,11 @@ export default {
     "primaryColor",
     "accentColor",
     "previewVis",
+    "systemTheme"
     ])
   },
   watch: {
-    //load themes whenever store theme/accent change
+    // load themes whenever store theme/accent change
     primaryColor(theme) {
       this.theme = theme;
       this.applyTheme(theme, this.accent);
@@ -93,7 +107,7 @@ export default {
   },
   methods: {
     loadTheme() {
-      //on start, load themes from config
+      // on start, load themes from config
       axios.get("http://localhost:8080/api/getThemeConfig")
         .then(response => {
           this.$store.commit('SET_PRIMARY_COLOR', response.data.theme);
@@ -104,8 +118,7 @@ export default {
         });
     },
     applyTheme(theme, accent) {
-      //remove previously applied css
-      //console.log(`./primary${theme}.css`, `./secondary${accent}.css`);
+      // remove previously applied css
       this.appliedStyles.forEach(style => {
       style.remove();
       });
@@ -129,6 +142,9 @@ export default {
         document.head.appendChild(linkElement);
         this.appliedStyles.push(linkElement);
       }
+    },
+    detectTheme() {
+
     },
   },
     

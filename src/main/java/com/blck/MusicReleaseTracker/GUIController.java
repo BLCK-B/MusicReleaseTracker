@@ -22,7 +22,7 @@ import java.util.Map;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-//class with methods called from ApiController
+// class with methods called from ApiController
 @Service
 public class GUIController {
 
@@ -49,7 +49,7 @@ public class GUIController {
         return dataList;
     }
     public void artistAddConfirm(String input, String testPath) {
-        //add new artist typed by user
+        // add new artist typed by user
         if (input.isEmpty() || input.isBlank())
             return;
         try {
@@ -70,7 +70,7 @@ public class GUIController {
         }
     }
     public void artistClickDelete(String testPath) {
-        //delete last selected artist and all entries from artist
+        // delete last selected artist and all entries from artist
         if (!testPath.isBlank())
             lastClickedArtist = "Joe";
 
@@ -109,7 +109,7 @@ public class GUIController {
             selectedSource = "beatport";
             lastClickedArtist = "Joe";
         }
-        //set null specific URL, delete related set
+        // set null specific URL, delete related set
         if (lastClickedArtist != null && selectedSource != null) {
             try {
                 Connection conn = null;
@@ -133,7 +133,7 @@ public class GUIController {
         }
     }
     public void cleanArtistSource() {
-        //clear artist entries from a source table, used by scrape preview
+        // clear artist entries from a source table, used by scrape preview
         try {
             Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
             String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
@@ -148,7 +148,7 @@ public class GUIController {
     }
 
     public List<TableModel> listOrTabClick(String item, String origin) {
-        //when source or artist selected, load respective table
+        // when source or artist selected, load respective table
         if (origin.equals("list"))
             lastClickedArtist = item;
         else if (origin.equals("tab"))
@@ -173,13 +173,13 @@ public class GUIController {
 
     public void loadTable() throws SQLException {
         tableContent.clear();
-        //adding data to tableContent
+        // adding data to tableContent
         Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
         String sql = "SELECT song, date FROM " + selectedSource + " WHERE artist = ? ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, lastClickedArtist);
         ResultSet rs = pstmt.executeQuery();
-        //loop through the result set and add each row to the data list
+        // loop through the result set and add each row to the data list
         while (rs.next()) {
             String col1Value = rs.getString("song");
             String col2Value = null;
@@ -194,11 +194,11 @@ public class GUIController {
     public void loadCombviewTable() throws SQLException {
         tableContent.clear();
         Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
-        //populating combview table
+        // populating combview table
         String sql = "SELECT * FROM combview ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet rs = pstmt.executeQuery();
-        //loop through the result set and add each row to the data list
+        // loop through the result set and add each row to the data list
         while (rs.next()) {
             String col1Value = rs.getString("song");
             String col2Value = rs.getString("artist");
@@ -241,7 +241,7 @@ public class GUIController {
     }
 
     public void saveUrl(String testPath) {
-        //save artist url to db
+        // save artist url to db
         if (!testPath.isBlank()) {
             selectedSource = "beatport";
             lastClickedArtist = "Joe";
@@ -264,7 +264,7 @@ public class GUIController {
         }
     }
     public boolean checkExistURL(String testPath) {
-        //check for existence of url to determine showing url dialog
+        // check for existence of url to determine showing url dialog
         boolean urlExists = false;
         try {
             Connection conn;
@@ -297,7 +297,7 @@ public class GUIController {
     }
 
     public void clickScrape() {
-        //launch scraping in backend, then fill and load table
+        // launch scraping in backend, then fill and load table
         try {
             MainBackend.scrapeData();
         } catch (Exception e) {
@@ -325,10 +325,10 @@ public class GUIController {
     }
 
     public HashMap<String, Boolean> settingsOpened() {
-        //gather all settings states and return them to frontend when settings are opened
-        DBtools.readConfig("filters");
+        // gather all settings states and return them to frontend when settings are opened
         HashMap<String, Boolean> configData = new HashMap<>();
 
+        DBtools.readConfig("filters");
         ArrayList<String> filterWords = DBtools.settingsStore.getFilterWords();
         String[] allFilters = new String[]{"Acoustic", "Extended", "Instrumental", "Remaster", "Remix", "VIP"};
         for (String filter : allFilters) {
@@ -337,19 +337,23 @@ public class GUIController {
             else
                 configData.put(filter, false);
         }
+
         DBtools.readConfig("longTimeout");
-        if (DBtools.settingsStore.getTimeout() > 20000)
+        if (DBtools.settingsStore.getTimeout() > 25000)
             configData.put("longTimeout", true);
         else
             configData.put("longTimeout", false);
+
         DBtools.readConfig("isoDates");
         configData.put("isoDates", DBtools.settingsStore.getIsoDates());
+        DBtools.readConfig("systemTheme");
+        configData.put("systemTheme", DBtools.settingsStore.getSystemTheme());
 
         return configData;
     }
 
     public void setSetting(String name, String value) {
-        //write any setting in config, note: "name" = config name
+        // write any setting in config, note: "name" = config name
         DBtools.writeSingleConfig(name, value);
     }
     public Map<String,String> getThemeConfig() {

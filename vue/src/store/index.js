@@ -1,4 +1,4 @@
-//vuex store
+// vuex store
 import { createStore } from 'vuex'
 
 const state = {
@@ -15,10 +15,11 @@ const state = {
   previewVis: false,
   isoDates: false,
   urlExists: false,
+  systemTheme: false,
 };
 
 const mutations = {
-  //synchronous updates of states
+  // synchronous updates of states
   SET_SOURCE_TAB(state, sourceTab) {
     state.sourceTab = sourceTab;
   },
@@ -57,16 +58,19 @@ const mutations = {
   },
   SET_URL_EXISTS(state, urlExists) {
     state.urlExists = urlExists;
-  }
+  },
+  SET_SYSTEM_THEME(state, systemTheme) {
+    state.systemTheme = systemTheme;
+  },
 };
 
 const actions = {
-  //actions to perform async operations
+  // actions to perform async operations
   
 };
 
 const getters = {
-  //getters to retrieve computed state values
+  // getters to retrieve computed state values
 };
 
 export default createStore({

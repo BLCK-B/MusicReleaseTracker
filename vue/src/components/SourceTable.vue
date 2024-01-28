@@ -64,7 +64,7 @@ export default {
     },
   },
   methods: {
-    //get current date
+    // get current date
     isDateInFuture(dateString) {
       const date = new Date(dateString);
       return date > new Date();

@@ -1,6 +1,6 @@
 ; UI settings
 !include "MUI2.nsh"
-!define VERSION "7.2"
+!define VERSION "8"
 !define MUI_ABORTWARNING
 !define MUI_ICON "MRTicon.ico"
 !insertmacro MUI_PAGE_LICENSE "license.txt"
@@ -11,12 +11,23 @@ Var JDKPath
 
 Section "Uninstall"
 
-    Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
-    Delete "$INSTDIR\MusicReleaseTracker.exe"
-    Delete "$INSTDIR\Uninstall.exe"
-    RMDir "$INSTDIR"
-    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MusicReleaseTracker"
+    MessageBox MB_YESNO "Delete MRT AppData folder? This will delete its data." IDYES DeleteFolders IDNO SkipDeletion
 
+    DeleteFolders:
+        Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
+        Delete "$INSTDIR\MusicReleaseTracker.exe"
+        RMDir /r /REBOOTOK "$INSTDIR"
+        RMDir /r /REBOOTOK "$APPDATA\MusicReleaseTracker"
+        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MusicReleaseTracker"
+        goto End
+
+    SkipDeletion:
+        Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
+        Delete "$INSTDIR\MusicReleaseTracker.exe"
+		RMDir /r /REBOOTOK "$INSTDIR"
+        DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MusicReleaseTracker"
+
+    End:
 SectionEnd
 
 ; Installer section

@@ -10,9 +10,8 @@
 Var JDKPath
 
 Section "Uninstall"
-
     MessageBox MB_YESNO "Delete MRT AppData folder? This will delete its data." IDYES DeleteFolders IDNO SkipDeletion
-
+	
     DeleteFolders:
         Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
         Delete "$INSTDIR\MusicReleaseTracker.exe"
@@ -32,23 +31,15 @@ SectionEnd
 
 ; Installer section
 Section
-    ; Remove the old version if it's installed
-    ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MusicReleaseTracker" "DisplayVersion"
-    StrCmp $R0 "${VERSION}" NoUninstallOldVersion
-    
-    ; Uninstall old version
-    ExecWait '"$INSTDIR\Uninstall.exe" /S' ; Silent uninstall
-    
-    NoUninstallOldVersion:
+    ; Uninstall previous version
+	Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
+	Delete "$INSTDIR\MusicReleaseTracker.exe"
 
-    ; Create the installation directory and appdata folder
+    ; Create the installation directory and appdata folder (if not exist)
     SetOutPath "$INSTDIR"
 	CreateDirectory "$APPDATA\MusicReleaseTracker"
-
-    ; Install the new version
+    ; Install the new version and create Start Menu shortcut
     File "MusicReleaseTracker.exe"
-    
-    ; Create Start Menu shortcut
     CreateDirectory "$SMPrograms\MusicReleaseTracker"
     CreateShortCut "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk" "$INSTDIR\MusicReleaseTracker.exe"
 
@@ -62,17 +53,18 @@ Section
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MusicReleaseTracker" "DisplayIcon" "$INSTDIR\MusicReleaseTracker.exe,0"
 SectionEnd
 
-; Installer details
-Name "MusicReleaseTracker"
+; Name in installer window
+Name "MusicReleaseTracker installer"
+; Name of output file
 Outfile "MRT-${VERSION}-win.exe"
 Icon "MRTicon.ico"
+; Default installation directory
 InstallDir $PROGRAMFILES\MusicReleaseTracker
-ShowInstDetails show
+ShowInstDetails hide
 
 ; Uninstaller details
 UninstallCaption "Uninstall MusicReleaseTracker"
 UninstallIcon "MRTicon.ico"
-
-; This line is important to include for creating the uninstaller executable
+; Confirm uninstallation and progress
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES

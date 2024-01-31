@@ -92,7 +92,7 @@ public class SettingsStore {
     }
     public int getTimeout() {
         if (!longTimeout)
-            return 25;
+            return 25000;
         else
             return 80000;
     }

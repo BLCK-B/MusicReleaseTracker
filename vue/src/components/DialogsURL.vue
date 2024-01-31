@@ -85,20 +85,22 @@ export default {
     methods: {
         // send input to be processed, displays preview dialog with scraped source table
         clickURL() {
-            const url = encodeURIComponent(this.input);
+            const url = this.input;
             this.input = "";
-            axios.post('http://localhost:8080/api/clickAddURL', url)
-            .then(() => {
-                const artist = this.artist;
-                axios.post('http://localhost:8080/api/listOrTabClick', { item: artist, origin: "list" })
-                    .then(response => {
-                        this.$store.commit('SET_TABLE_CONTENT', response.data);
-                        this.$store.commit('SET_PREVIEW_VIS', true);
-                    })
-            })
-            .catch(error => {
-                console.error(error);
-            });
+            if (url) {
+                axios.post('http://localhost:8080/api/clickAddURL', url)
+                .then(() => {
+                    const artist = this.artist;
+                    axios.post('http://localhost:8080/api/listOrTabClick', { item: artist, origin: "list" })
+                        .then(response => {
+                            this.$store.commit('SET_TABLE_CONTENT', response.data);
+                            this.$store.commit('SET_PREVIEW_VIS', true);
+                        })
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+            }
         },
         // only show dialog when table is null, and if URL does not exist
         determineDiagShow() {
@@ -133,7 +135,8 @@ export default {
         width: 375px;
         height: 280px;
         background-color: var(--primary-color);
-        border: 1px solid var(--contrast-color);
+        border: 2px solid var(--contrast-color);
+        border-radius: 3px;
         color: var(--contrast-color);
         padding: 8px;
     }

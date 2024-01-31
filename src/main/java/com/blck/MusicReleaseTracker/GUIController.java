@@ -214,13 +214,9 @@ public class GUIController {
     }
 
     public void clickAddURL(String url) {
-        if (lastClickedArtist == null || selectedSource == null)
+        if (lastClickedArtist == null || selectedSource == null || url.isBlank())
             return;
         tempID = null;
-
-        url = url.replace("=" , "").trim();
-        if (url.isEmpty() || url.isBlank())
-            return;
 
         String id = MainBackend.reduceToID(url, selectedSource);
         if (id == null)

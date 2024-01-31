@@ -71,19 +71,7 @@ export default {
   },
   created() {
     this.loadTheme();
-    // detecting system theme on load
-    axios.get('http://localhost:8080/api/settingsOpened')
-      .then(response => {
-        this.$store.commit('SET_SYSTEM_THEME', response.data.systemTheme);
-        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-        if (prefersDarkMode.matches && this.systemTheme)
-          this.$store.commit('SET_PRIMARY_COLOR', "Black");
-        else
-          this.$store.commit('SET_PRIMARY_COLOR', "Light");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    this.detectTheme();
   },
   computed: {
     ...mapState([
@@ -117,6 +105,21 @@ export default {
           console.error(error);
         });
     },
+    detectTheme() {
+      // detecting system theme on load
+      axios.get('http://localhost:8080/api/settingsOpened')
+        .then(response => {
+          this.$store.commit('SET_SYSTEM_THEME', response.data.systemTheme);
+          const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+          if (prefersDarkMode.matches && this.systemTheme)
+            this.$store.commit('SET_PRIMARY_COLOR', "Black");
+          else
+            this.$store.commit('SET_PRIMARY_COLOR', "Light");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     applyTheme(theme, accent) {
       // remove previously applied css
       this.appliedStyles.forEach(style => {
@@ -142,9 +145,6 @@ export default {
         document.head.appendChild(linkElement);
         this.appliedStyles.push(linkElement);
       }
-    },
-    detectTheme() {
-
     },
   },
     

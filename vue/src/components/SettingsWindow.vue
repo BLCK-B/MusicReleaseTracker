@@ -43,11 +43,11 @@
 
         <div class="theme-buttons">
           <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')" :disabled="systemTheme">
-          <label>Black</label>
+          <label :class="{ 'disabled': systemTheme }">Black</label>
           <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')" :disabled="systemTheme">
-          <label>Dark</label>
+          <label :class="{ 'disabled': systemTheme }">Dark</label>
           <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')" :disabled="systemTheme">
-          <label>Light</label>
+          <label :class="{ 'disabled': systemTheme }">Light</label>
           
           <div class="colorindicator"></div>
         </div>
@@ -68,8 +68,10 @@
         </div>
       </div>
 
-      <input type="checkbox" v-model="systemTheme" @change="setSetting('systemTheme', $event.target.checked)">
-          <label>Match system theme</label>
+      <div class="belowAppearance">
+        <input type="checkbox" v-model="systemTheme" @change="setSetting('systemTheme', $event.target.checked)">
+            <label>Match system theme</label>
+      </div>
       
     </section>
 
@@ -225,7 +227,7 @@ export default {
 
 <style scoped>
 * {
-  transition: 0.15s;
+  transition: 0.1s;
 }
 .title {
   font-weight: bold;
@@ -242,6 +244,7 @@ export default {
   align-content: start;
   width: 100%;
   justify-content: center;
+  accent-color: var(--contrast-color);
 }
 @media screen and (min-width: 950px) {
   .settings {
@@ -258,7 +261,6 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 10px;
-  accent-color: var(--contrast-color);
   max-height: 80px;
 }
 .flex-items {
@@ -283,6 +285,10 @@ export default {
 .accent-buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+}
+.belowAppearance {
+  margin-left: 15px;
+  margin-top: 6px;
 }
 
 .imgbutton {
@@ -316,8 +322,8 @@ section {
 }
 .self {
   justify-self: center;
-  padding: 8px;
-  width: 290px;
+  width: 280px;
+  background-color: transparent;
 }
 .blckimg {
   height: 48px;
@@ -340,9 +346,6 @@ section {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-.other {
-  accent-color: var(--contrast-color);
-}
 .dangercont {
   display: flex;
   justify-content: space-evenly;
@@ -359,5 +362,8 @@ section {
   background-color: red;
 }
 
+.disabled {
+  opacity: 0.3;
+}
 
 </style>

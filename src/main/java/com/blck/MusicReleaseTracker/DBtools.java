@@ -1,7 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
 import com.typesafe.config.*;
-
 import java.io.*;
 import java.nio.file.*;
 import java.sql.*;
@@ -252,7 +251,7 @@ public class DBtools {
     }
 
     public static void readConfig(String option) {
-        // any reading from HOCON
+        // any reading from config file
         Config config = ConfigFactory.parseFile(new File(settingsStore.getConfigPath()));
 
         switch (option) {
@@ -283,7 +282,7 @@ public class DBtools {
         config = null;
     }
     public static void writeSingleConfig(String name, String value) {
-        // save single string option state in HOCON
+        // save single string option state in config file
         Config config = ConfigFactory.parseFile(new File(DBtools.settingsStore.getConfigPath()));
         ConfigValue configValue;
         if (value.equals("true") || value.equals("false"))
@@ -300,7 +299,7 @@ public class DBtools {
     }
 
     public static void updateSettings() {
-        // create config if it does not exist, change to latest structure and transfer data if a different structure is detected
+        // create config if it does not exist, change to latest structure and transfer data if structure is different
 
         // appData/MusicReleaseTracker/MRTsettings.hocon
         String configPath = settingsStore.getConfigPath();

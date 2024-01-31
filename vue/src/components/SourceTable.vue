@@ -27,7 +27,7 @@
   </div>
 
   <div class="emptynotice" v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'">
-    <p>table empty, but URL exists</p>
+    <p>table empty</p>
   </div>
   <div class="quickstart" v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'">
     <p><span class="title">Quickstart guide</span> <br>
@@ -135,7 +135,7 @@ th {
 }
 .emptynotice {
   position: absolute;
-  left: 35%;
+  left: 40%;
   top: 40%;
   color: var(--dull-color);
 }

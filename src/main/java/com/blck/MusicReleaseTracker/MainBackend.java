@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
@@ -123,6 +124,7 @@ public class MainBackend {
         int beatportFails = 0;
         int junoFails = 0;
         int youtubeFails = 0;
+
         // cycling each artist
         for (String songArtist : artistNameList) {
             artistUrls.clear();
@@ -134,7 +136,7 @@ public class MainBackend {
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, songArtist);
                 ResultSet rs = pstmt.executeQuery();
-                // including empty ids, useful for progress tracking
+                // including empty ids for progress tracking
                 artistUrls.put(webSource, rs.getString("url" + webSource));
             }
             conn.close();
@@ -143,8 +145,6 @@ public class MainBackend {
             double startTime = System.currentTimeMillis();
             // cycling each url/id of the artist
             for (String webSource : artistUrls.keySet()) {
-                if (brainzFails == 2 && beatportFails == 2 && junoFails == 2 && youtubeFails == 2)
-                    scrapeCancel = true;
                 // if clicked cancel
                 if (scrapeCancel) {
                     SSEController.sendProgress(1.0);
@@ -159,44 +159,39 @@ public class MainBackend {
                 if (id != null)
                     id = reduceToID(id, webSource);
                 if (id != null) {
-                    try {
-                        switch(webSource) {
-                            case "musicbrainz" -> {
-                                if (brainzFails != 2)
-                                    scrapeBrainz(id, songArtist);
-                            }
-                            case "beatport" -> {
-                                if (beatportFails != 2)
-                                    scrapeBeatport(id, songArtist);
-                            }
-                            case "junodownload" -> {
-                                if (junoFails != 2)
-                                    scrapeJunodownload(id, songArtist);
-                            }
-                            case "youtube" -> {
-                                if (youtubeFails != 2)
-                                    scrapeYoutube(id,songArtist);
-                            }
-                        }
-                    } catch (Exception e) {
-                        // on fail, try once more
-                        DBtools.logError(e, "INFO", "error scraping source " + webSource +", trying again");
-                        Thread.sleep(2000);
+                    for (int i = 0; i < 2; i++) {
                         try {
-                            switch(webSource) {
-                                case "musicbrainz" -> scrapeBrainz(id, songArtist);
-                                case "beatport" -> scrapeBeatport(id, songArtist);
-                                case "junodownload" -> scrapeJunodownload(id, songArtist);
-                                case "youtube" -> scrapeYoutube(id,songArtist);
+                            switch (webSource) {
+                                case "musicbrainz" -> {
+                                    if (brainzFails != 2)
+                                        scrapeBrainz(id, songArtist);
+                                }
+                                case "beatport" -> {
+                                    if (beatportFails != 2)
+                                        scrapeBeatport(id, songArtist);
+                                }
+                                case "junodownload" -> {
+                                    if (junoFails != 2)
+                                        scrapeJunodownload(id, songArtist);
+                                }
+                                case "youtube" -> {
+                                    if (youtubeFails != 2)
+                                        scrapeYoutube(id, songArtist);
+                                }
                             }
-                        } catch (Exception e2) {
-                            switch(webSource) {
+                            break;
+                        } catch (Exception e) {
+                            if (i == 1)
+                                DBtools.logError(e, "INFO", "error scraping source " + webSource + ", trying again");
+                            else
+                                DBtools.logError(e, "WARNING", "error re-scraping source " + webSource + " moving on");
+                            Thread.sleep(2000);
+                            switch (webSource) {
                                 case "musicbrainz" -> brainzFails++;
                                 case "beatport" -> beatportFails++;
                                 case "junodownload" -> junoFails++;
                                 case "youtube" -> youtubeFails++;
                             }
-                            DBtools.logError(e2, "WARNING", "error re-scraping source " + webSource + " moving on");
                         }
                     }
                 }
@@ -219,7 +214,6 @@ public class MainBackend {
     }
 
     public static void scrapeBrainz(String id, String songArtist) throws IOException {
-        // scraper for musicbrainz
         // creating link for API
         String url = "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
         // https://musicbrainz.org/ws/2/release-group?artist=773c3b3b-4368-4659-963a-4c8194ec9b1c&type=single&limit=400
@@ -253,7 +247,6 @@ public class MainBackend {
     }
 
     public static void scrapeBeatport(String id, String songArtist) throws IOException {
-        // scraper for beatport
         // creating link
         String url = "https://www.beatport.com/artist/" + id + "/tracks";
         // https://beatport.com/artist/koven/245904/tracks
@@ -302,7 +295,6 @@ public class MainBackend {
     }
 
     public static void scrapeJunodownload(String id, String songArtist) throws IOException {
-        // scraper for junodownload
         String url = "https://www.junodownload.com/artists/" + id + "/releases/?music_product_type=single&laorder=date_down";
         // https://www.junodownload.com/artists/Koven/releases/?music_product_type=single&laorder=date_down
         Document doc = null;
@@ -370,7 +362,6 @@ public class MainBackend {
     }
 
     public static void scrapeYoutube(String id, String songArtist) throws IOException {
-        // scraper for youtube
         // creating link
         String url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
 

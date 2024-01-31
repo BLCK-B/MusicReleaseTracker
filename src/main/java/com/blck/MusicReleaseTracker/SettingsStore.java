@@ -29,8 +29,8 @@ public class SettingsStore {
     private boolean longTimeout = false;
     private boolean isoDates = false;
     private boolean systemTheme = false;
-    // array of all available sources
-    final private String[] sourceTables = {"musicbrainz", "beatport", "junodownload", "youtube"};
+    // array of all available sources, in order that fillCombviewTable uses
+    final private String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
 
     public SettingsStore() {
     }
@@ -92,7 +92,7 @@ public class SettingsStore {
     }
     public int getTimeout() {
         if (!longTimeout)
-            return 25000;
+            return 25;
         else
             return 80000;
     }

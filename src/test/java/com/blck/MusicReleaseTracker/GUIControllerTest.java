@@ -20,9 +20,9 @@ public class GUIControllerTest {
         String os = System.getProperty("os.name").toLowerCase();
         String DBpath = null;
         String appDataPath = null;
-        if (os.contains("win")) //Windows
+        if (os.contains("win")) // Windows
             appDataPath = System.getenv("APPDATA");
-        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  //Linux
+        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  // Linux
             appDataPath = System.getProperty("user.home");
         else
             throw new UnsupportedOperationException("unsupported OS");
@@ -35,9 +35,9 @@ public class GUIControllerTest {
     @Order(1)
     void AddLoadArtist() {
         String DBpath = getDBpath();
-        //artistAddConfirm
+        // artistAddConfirm
         GUIController.artistAddConfirm("Joe", DBpath);
-        //verify with loadList
+        // verify with loadList
         try {
             String oneArtist = GUIController.loadList(DBpath).get(0);
             assertEquals(oneArtist, "Joe");
@@ -50,9 +50,9 @@ public class GUIControllerTest {
     @Order(2)
     void AddVerifyUrl() {
         String DBpath = getDBpath();
-        //saveUrl
+        // saveUrl
         GUIController.saveUrl(DBpath);
-        //verify with checkExistUrl
+        // verify with checkExistUrl
         try {
             boolean exists = GUIController.checkExistURL(DBpath);
             assertTrue(exists);
@@ -66,9 +66,9 @@ public class GUIControllerTest {
     @Order(3)
     void DeleteVerifyUrl() {
         String DBpath = getDBpath();
-        //deleteUrl
+        // deleteUrl
         GUIController.deleteUrl(DBpath);
-        //verify with checkExistUrl
+        // verify with checkExistUrl
         try {
             boolean exists = GUIController.checkExistURL(DBpath);
             assertFalse(exists);
@@ -82,9 +82,9 @@ public class GUIControllerTest {
     @Order(4)
     void DeleteArtist() {
         String DBpath = getDBpath();
-        //artistClickDelete
+        // artistClickDelete
         GUIController.artistClickDelete(DBpath);
-        //verify with loadList
+        // verify with loadList
         try {
             assertTrue(GUIController.loadList(DBpath).isEmpty());
         } catch (SQLException e) {

@@ -28,6 +28,9 @@ public class SettingsStore {
     private String scrapeDate;
     private boolean longTimeout = false;
     private boolean isoDates = false;
+    private boolean systemTheme = false;
+    // array of all available sources, in order that fillCombviewTable uses
+    final private String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
 
     public SettingsStore() {
     }
@@ -89,7 +92,7 @@ public class SettingsStore {
     }
     public int getTimeout() {
         if (!longTimeout)
-            return 20000;
+            return 25000;
         else
             return 80000;
     }
@@ -98,6 +101,16 @@ public class SettingsStore {
     }
     public boolean getIsoDates() {
         return isoDates;
+    }
+    public void setSystemTheme(boolean systemTheme) {
+        this.systemTheme = systemTheme;
+    }
+    public boolean getSystemTheme() {
+        return systemTheme;
+    }
+
+    public String[] getSourceTables() {
+        return this.sourceTables;
     }
 
     @Override

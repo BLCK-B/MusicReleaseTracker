@@ -32,9 +32,20 @@ export default {
         value => (value || '').length <= 25,
         ],
     }),
+    computed: {
+        ...mapState([
+            'addDialogVis',
+            "primaryColor",
+        ]),
+        // if no rules in data broken, enable add button
+        isValid() {
+            return this.rules.every(rule => rule(this.input) === true);
+        },
+    },
     methods: {
-        //add artist to db
+        // add artist to db
         clickAdd() {
+            // it needs be encoded decoded trimmed ... because axios is changing symbols
             const artistname = encodeURIComponent(this.input);
             axios.post('http://localhost:8080/api/clickArtistAdd', artistname)
                 .then(() => {
@@ -47,19 +58,9 @@ export default {
                     console.error(error);
                 });
         },
-        //close dialog
+        // close dialog
         clickClose() {
             this.$store.commit('SET_ADD_VIS', false);
-        },
-    },
-    computed: {
-        ...mapState([
-            'addDialogVis',
-            "primaryColor",
-        ]),
-        //if no rules in data broken, enable add button
-        isValid() {
-            return this.rules.every(rule => rule(this.input) === true);
         },
     },
 }
@@ -74,7 +75,8 @@ export default {
         position: absolute;
         z-index: 3;
         background-color: var(--primary-color);
-        border: 1px solid var(--contrast-color);
+        border: 2px solid var(--contrast-color);
+        border-radius: 3px;
         padding: 8px;
     }
     .diag-actions {
@@ -112,7 +114,7 @@ export default {
         opacity: 50%;
     }
     :disabled {
-        opacity: 0.5;
+        opacity: 0.3;
         pointer-events: none;
     }
 </style>

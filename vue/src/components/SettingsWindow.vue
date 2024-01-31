@@ -42,12 +42,12 @@
       <div class="appearancecont">
 
         <div class="theme-buttons">
-          <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')">
-          <label>Black</label>
-          <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')">
-          <label>Dark</label>
-          <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')">
-          <label>Light</label>
+          <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')" :disabled="systemTheme">
+          <label :class="{ 'disabled': systemTheme }">Black</label>
+          <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')" :disabled="systemTheme">
+          <label :class="{ 'disabled': systemTheme }">Dark</label>
+          <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')" :disabled="systemTheme">
+          <label :class="{ 'disabled': systemTheme }">Light</label>
           
           <div class="colorindicator"></div>
         </div>
@@ -66,8 +66,13 @@
           <input type="radio" v-model="accent" value="Surge" @change="setSetting('accent', 'Surge')">
           <label>Surge</label>
         </div>
-
       </div>
+
+      <div class="belowAppearance">
+        <input type="checkbox" v-model="systemTheme" @change="setSetting('systemTheme', $event.target.checked)">
+            <label>Match system theme</label>
+      </div>
+      
     </section>
 
     <section class="other">
@@ -140,6 +145,7 @@ export default {
       },
       longTimeout: false,
       isoDates: false,
+      systemTheme: false,
     }
   },
   computed: {
@@ -148,13 +154,14 @@ export default {
         'accentColor',
     ]),
   },
-  //on open, load setting states from HOCON
+  // on open, load setting states from HOCON
   created() {
     axios.get('http://localhost:8080/api/settingsOpened')
       .then(response => {
         this.filters = response.data;
         this.longTimeout = response.data.longTimeout;
         this.isoDates = response.data.isoDates;
+        this.systemTheme = response.data.systemTheme;
       })
       .catch((error) => {
         console.error(error);
@@ -163,15 +170,16 @@ export default {
       this.accent = this.accentColor;
   },
   methods: {
-    //close settings, trigger rebuild combview in app
+    // close settings, trigger rebuild combview in app
     clickClose() {
       this.$store.commit('SET_SETTINGS_OPEN', false);
     },
-    //write single setting in config
+    // write single setting in config
     setSetting(name, value) {
       switch(name) {
         case ("theme"): this.$store.commit('SET_PRIMARY_COLOR', this.theme);
         case ("accent"): this.$store.commit('SET_ACCENT_COLOR', this.accent);
+        case ("systemTheme"): this.$store.commit('SET_SYSTEM_THEME', this.systemTheme);
         case ("isoDates"): this.$store.commit("SET_ISODATES", this.isoDates);
       }
       axios.post(`http://localhost:8080/api/setSetting`, { name: name, value: value })
@@ -179,7 +187,7 @@ export default {
         console.error(error);
       });
     },
-    //default the settings
+    // default the settings
     resetSettings() {
       if (this.settingsProtection == true) {
         this.settingsProtection = false;
@@ -194,7 +202,7 @@ export default {
         });
       }
     },
-    //default database
+    // default database
     resetDB() {
       if (this.dbProtection == true) {
         this.dbProtection = false;
@@ -219,7 +227,7 @@ export default {
 
 <style scoped>
 * {
-  transition: 0.15s;
+  transition: 0.1s;
 }
 .title {
   font-weight: bold;
@@ -231,10 +239,12 @@ export default {
   background-color: var(--primary-color);
   color: var(--contrast-color);
   overflow-y: scroll;
+  overflow-x: hidden;
   display: grid;
   align-content: start;
   width: 100%;
   justify-content: center;
+  accent-color: var(--contrast-color);
 }
 @media screen and (min-width: 950px) {
   .settings {
@@ -251,7 +261,6 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 10px;
-  accent-color: var(--contrast-color);
   max-height: 80px;
 }
 .flex-items {
@@ -277,6 +286,11 @@ export default {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 }
+.belowAppearance {
+  margin-left: 15px;
+  margin-top: 6px;
+}
+
 .imgbutton {
   position: absolute;
   right: 0;
@@ -307,20 +321,20 @@ section {
   width: 345px;
 }
 .self {
-  text-align: center;
-  padding: 8px;
+  justify-self: center;
+  width: 280px;
+  background-color: transparent;
 }
 .blckimg {
-  height: 62px;
+  height: 48px;
   background-color: black;
   border-radius: 5px;
   padding: 12px;
-  margin-right: 20px;
+  margin-right: 22px;
 }
 .mrtimg {
-  height: 86px;
+  height: 72px;
   border-radius: 10px;
-  margin-right: 10px;
 }
 .colorindicator {
   position: absolute;
@@ -331,9 +345,6 @@ section {
   background-color: var(--accent-color);
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-}
-.other {
-  accent-color: var(--contrast-color);
 }
 .dangercont {
   display: flex;
@@ -351,5 +362,8 @@ section {
   background-color: red;
 }
 
+.disabled {
+  opacity: 0.3;
+}
 
 </style>

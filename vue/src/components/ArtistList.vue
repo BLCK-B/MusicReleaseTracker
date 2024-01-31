@@ -35,7 +35,7 @@ export default {
     };
   },
   created() {
-    //load artist list, last clicked artist if not null
+    // load artist list, last clicked artist if not null
     this.loadList();
     axios.get('http://localhost:8080/api/getLastArtist')
     .then(response => {
@@ -59,7 +59,7 @@ export default {
     }
   },
   methods: {
-    //populate list from backend
+    // populate list from backend
     loadList() {
       axios.get('http://localhost:8080/api/loadList')
         .then(response => {
@@ -69,11 +69,11 @@ export default {
           console.error(error);
         });
     },
-    //load respective table when artist selected
+    // load respective table when artist selected
     handleItemClick(artist) {
       this.$store.commit('SET_ADD_VIS', false);
       this.lastClickedItem = artist;
-      axios.post('http://localhost:8080/api/artistListClick', { artist })
+      axios.post('http://localhost:8080/api/listOrTabClick', { item: artist, origin: "list" })
         .then(response => {
           this.$store.commit('SET_SELECTED_ARTIST', artist);
           this.$store.commit('SET_TABLE_CONTENT', response.data);
@@ -82,11 +82,11 @@ export default {
           console.error(error);
         });
     },
-    //show AddArtistDialog
+    // show AddArtistDialog
     clickAddArtist() {
       this.$store.commit('SET_ADD_VIS', true);
     },
-    //delete all (last selected) artist entries from db, rebuild combview
+    // delete all (last selected) artist entries from db, rebuild combview
     clickDeleteArtist() {
       if (this.lastClickedItem !== "") {
         axios.get('http://localhost:8080/api/clickArtistDelete')
@@ -104,7 +104,7 @@ export default {
       this.showDrop = !this.showDrop;
     },
     deleteUrl() {
-      //set null specific URL, trigger table reload
+      // set null specific URL, trigger table reload
       axios.post('http://localhost:8080/api/deleteUrl')
       .then(() => {
         this.handleItemClick(this.lastClickedItem);

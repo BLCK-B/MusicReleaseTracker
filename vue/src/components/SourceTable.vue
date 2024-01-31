@@ -27,13 +27,13 @@
   </div>
 
   <div class="emptynotice" v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'">
-    <p>table empty, but URL exists</p>
+    <p>table empty</p>
   </div>
   <div class="quickstart" v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'">
     <p><span class="title">Quickstart guide</span> <br>
-    1. click "add" and add an artist <br>
+    1. click "add" to add an artist, select the artist <br>
     2. click on any BP / MB / JD / YT button at the top to select a source <br>
-    3. find the artist on the website, copy & paste link or ID <br>
+    3. find the artist on the website, copy & paste the link or ID <br>
     4. to scrape, click refresh button in the top right corner <br>
     </p>
   </div>
@@ -64,7 +64,7 @@ export default {
     },
   },
   methods: {
-    //get current date
+    // get current date
     isDateInFuture(dateString) {
       const date = new Date(dateString);
       return date > new Date();
@@ -135,7 +135,7 @@ th {
 }
 .emptynotice {
   position: absolute;
-  left: 35%;
+  left: 40%;
   top: 40%;
   color: var(--dull-color);
 }

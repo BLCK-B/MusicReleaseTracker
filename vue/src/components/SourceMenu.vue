@@ -48,7 +48,7 @@ export default {
       'primaryColor',
     ])
   },
-  //load last clicked tab, otherwise combview as default, load scrapeLast time
+  // load last clicked tab, otherwise combview as default, load scrapeLast time
   created() {
     this.activeTab = this.sourceTab;
     axios.post('http://localhost:8080/api/fillCombview')
@@ -66,7 +66,7 @@ export default {
       this.scrapeLast = response.data;
     })
   },
-  //on any change of sourceTab trigger handleSourceClick
+  // on any change of sourceTab trigger handleSourceClick
   watch: {
     sourceTab(tabValue) {
       this.activeTab = tabValue;
@@ -75,14 +75,14 @@ export default {
     },
   },
   methods: {
-    //set store tab, trigger handleSourceClick
+    // set store tab, trigger handleSourceClick
     setStoreTab(source) {
       this.$store.commit('SET_SOURCE_TAB', source);
     },
-    //load respective table
+    // load respective table
     handleSourceClick(source) {
       this.$store.commit('SET_ADD_VIS', false);
-      axios.post('http://localhost:8080/api/sourceTabClick', { source })
+      axios.post('http://localhost:8080/api/listOrTabClick', { item: source, origin: "tab" })
         .then((response) => {
           this.$store.commit('SET_TABLE_CONTENT', response.data);
         })
@@ -90,7 +90,7 @@ export default {
           console.error(error);
         });
     },
-    //trigger scraping or cancel it, SSE listener for progressbar
+    // trigger scraping or cancel it, SSE listener for progressbar
     clickScrape() {
       const allowButtons = this.allowButtons;
       if (!allowButtons) {
@@ -138,7 +138,7 @@ export default {
     scrapeMouseOff() {
       this.scrapeNotice = false;
     },
-    //open settings
+    // open settings
     openSettings() {
       this.$store.commit('SET_SETTINGS_OPEN', true);
     },

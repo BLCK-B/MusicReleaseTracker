@@ -5,7 +5,7 @@
 <h2 align="center">MusicReleaseTracker</h2>
 
 <p align="center">
-Efficient multi-source scraper that helps you find new music and follow latest songs. Available for windows, linux.
+No-nonsense multi-source scraper that helps you find new music and follow latest songs. Available for Windows, Linux, macOS*.
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@ Efficient multi-source scraper that helps you find new music and follow latest s
 ##
 
 Look at music releases from individual artists and see all songs ordered by date in "Combined view".
-You will no longer have to search social media or streaming services in fear of missing a new song. MusicReleaseTracker is a free, open-source, no-nonsense program for music discovery.
+You will no longer have to search social media or streaming services in fear of missing a new song. MusicReleaseTracker is a free open-source tool for music discovery.
 
 Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
 
@@ -36,10 +36,15 @@ Setup
 
 **Linux:** Unzip tar. Run jar by ```java -jar XXX.jar```
 
+**macOS:** *Should be same as Linux. Not tested. Could someone please confirm?
+
 ---
 
-**Responsibility**: Delays during scraping prevent excessive traffic.
-To avoid granting admin permission, can run the exe from unzipped installer, assuming a folder *MusicReleaseTracker* exists in appdata. 
+**Responsibility**:
+
+Delays during scraping prevent excessive traffic.
+To avoid granting admin permission, can run the exe from unzipped installer.
+
 I have no affiliation with Musicbrainz, Beatport, Junodownload, Youtube. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
 
 ---

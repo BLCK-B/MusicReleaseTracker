@@ -85,7 +85,8 @@ export default {
     methods: {
         // send input to be processed, displays preview dialog with scraped source table
         clickURL() {
-            const url = this.input;
+            // it needs be encoded decoded trimmed ... because axios is changing symbols
+            const url = encodeURIComponent(this.input);
             this.input = "";
             if (url) {
                 axios.post('http://localhost:8080/api/clickAddURL', url)

@@ -45,7 +45,8 @@ export default {
     methods: {
         // add artist to db
         clickAdd() {
-            const artistname = this.input;
+            // it needs be encoded decoded trimmed ... because axios is changing symbols
+            const artistname = encodeURIComponent(this.input);
             axios.post('http://localhost:8080/api/clickArtistAdd', artistname)
                 .then(() => {
                     this.input = "";

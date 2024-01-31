@@ -3,6 +3,9 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +49,7 @@ public class ApiController {
 
     @PostMapping("/clickArtistAdd")
     public void clickArtistAdd(@RequestBody String artistname) {
+        artistname = URLDecoder.decode(artistname, StandardCharsets.UTF_8).replace("=" , "").trim();
         sendRequest.artistAddConfirm(artistname, "");
     }
 
@@ -69,6 +73,7 @@ public class ApiController {
 
     @PostMapping ("/clickAddURL")
     public void clickAddURL(@RequestBody String url) {
+        url = URLDecoder.decode(url, StandardCharsets.UTF_8).replace("=" , "").trim();
         sendRequest.clickAddURL(url);
     }
 

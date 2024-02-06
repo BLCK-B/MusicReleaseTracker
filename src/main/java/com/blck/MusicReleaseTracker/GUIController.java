@@ -1,7 +1,8 @@
 package com.blck.MusicReleaseTracker;
 
-import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
-import org.springframework.stereotype.Service;
+import com.blck.MusicReleaseTracker.Simple.TableModel;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,19 +24,32 @@ import java.util.Map;
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 // class with methods called from ApiController
-@Service
+//@Service
 public class GUIController {
+
+    private final ValueStore store;
+    private final ScrapeProcess scrapeProcess;
+    private final ConfigTools config;
+    private final DBtools DB;
+
+    @Autowired
+    public GUIController(ValueStore valueStore, ScrapeProcess scrapeProcess, ConfigTools config, DBtools DB) {
+        this.store = valueStore;
+        this.scrapeProcess = scrapeProcess;
+        this.config = config;
+        this.DB = DB;
+    }
 
     private String lastClickedArtist;
     private String selectedSource;
     private final List<TableModel> tableContent = new ArrayList<>();
     private String tempID;
 
-    public List<String> loadList(String testPath) throws SQLException {
+   public List<String> loadList(String testPath) throws SQLException {
         List<String> dataList = new ArrayList<>();
         Connection conn = null;
         if (testPath.isBlank())
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            conn = DriverManager.getConnection(store.getDBpath());
         else
             conn = DriverManager.getConnection(testPath);
         Statement stmt = conn.createStatement();
@@ -48,6 +62,7 @@ public class GUIController {
         rs.close();
         return dataList;
     }
+
     public void artistAddConfirm(String input, String testPath) {
         // add new artist typed by user
         if (input.isEmpty() || input.isBlank())
@@ -55,7 +70,7 @@ public class GUIController {
         try {
             Connection conn = null;
             if (testPath.isBlank())
-                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                conn = DriverManager.getConnection(store.getDBpath());
             else
                 conn = DriverManager.getConnection(testPath);
             String sql = "INSERT INTO artists (artistname) values(?)";
@@ -69,6 +84,7 @@ public class GUIController {
             System.out.println("artist already exists");
         }
     }
+
     public void artistClickDelete(String testPath) {
         // delete last selected artist and all entries from artist
         if (!testPath.isBlank())
@@ -79,11 +95,11 @@ public class GUIController {
                 Map<String, ArrayList<String>> tableMap = null;
                 Connection conn = null;
                 if (testPath.isBlank()) {
-                    tableMap = DBtools.getDBStructure(DBtools.settingsStore.getDBpath());
-                    conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                    tableMap = DB.getDBStructure(store.getDBpath());
+                    conn = DriverManager.getConnection(store.getDBpath());
                 }
                 else {
-                    tableMap = DBtools.getDBStructure(testPath);
+                    tableMap = DB.getDBStructure(testPath);
                     conn = DriverManager.getConnection(testPath);
                 }
                 String sql;
@@ -100,10 +116,11 @@ public class GUIController {
                 lastClickedArtist = null;
             }
             catch (SQLException e) {
-                DBtools.logError(e, "WARNING", "error deleting an artist");
+                DB.logError(e, "WARNING", "error deleting an artist");
             }
         }
     }
+
     public void deleteUrl(String testPath) {
         if (!testPath.isBlank()) {
             selectedSource = "beatport";
@@ -114,7 +131,7 @@ public class GUIController {
             try {
                 Connection conn = null;
                 if (testPath.isBlank())
-                    conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                    conn = DriverManager.getConnection(store.getDBpath());
                 else
                     conn = DriverManager.getConnection(testPath);
                 String sql = "UPDATE artists SET url" + selectedSource +  " = NULL WHERE artistname = ?";
@@ -126,24 +143,23 @@ public class GUIController {
                 pstmt.setString(1, lastClickedArtist);
                 pstmt.execute();
                 conn.close();
-            }
-            catch (SQLException e) {
-                DBtools.logError(e, "SEVERE", "error deleting an URL");
+            } catch (SQLException e) {
+                DB.logError(e, "SEVERE", "error deleting an URL");
             }
         }
     }
+
     public void cleanArtistSource() {
         // clear artist entries from a source table, used by scrape preview
         try {
-            Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            Connection conn = DriverManager.getConnection(store.getDBpath());
             String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, lastClickedArtist);
             pstmt.executeUpdate();
             conn.close();
-        }
-        catch (SQLException e) {
-            DBtools.logError(e, "SEVERE", "error deleting a source URL");
+        } catch (SQLException e) {
+            DB.logError(e, "SEVERE", "error deleting a source URL");
         }
     }
 
@@ -158,14 +174,14 @@ public class GUIController {
             try {
                 loadCombviewTable();
             } catch (SQLException e) {
-                DBtools.logError(e, "WARNING", "error loading combview");
+                DB.logError(e, "WARNING", "error loading combview");
             }
         }
         else if (selectedSource != null &&lastClickedArtist != null) {
             try {
                 loadTable();
             } catch (SQLException e) {
-                DBtools.logError(e, "WARNING", "error loading a table");
+                DB.logError(e, "WARNING", "error loading a table");
             }
         }
         return tableContent;
@@ -174,7 +190,7 @@ public class GUIController {
     public void loadTable() throws SQLException {
         tableContent.clear();
         // adding data to tableContent
-        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+        Connection conn = DriverManager.getConnection(store.getDBpath());
         String sql = "SELECT song, date FROM " + selectedSource + " WHERE artist = ? ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, lastClickedArtist);
@@ -193,7 +209,7 @@ public class GUIController {
 
     public void loadCombviewTable() throws SQLException {
         tableContent.clear();
-        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+        Connection conn = DriverManager.getConnection(store.getDBpath());
         // populating combview table
         String sql = "SELECT * FROM combview ORDER BY date DESC";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -210,7 +226,7 @@ public class GUIController {
         rs.close();
     }
     public void fillCombview() {
-        MainBackend.fillCombviewTable(null);
+        scrapeProcess.fillCombviewTable(null);
     }
 
     public void clickAddURL(String url) {
@@ -218,19 +234,19 @@ public class GUIController {
             return;
         tempID = null;
 
-        String id = MainBackend.reduceToID(url, selectedSource);
+        String id = scrapeProcess.reduceToID(url, selectedSource);
         if (id == null)
             return;
 
         try {
             switch(selectedSource) {
-                case "musicbrainz" -> MainBackend.scrapeBrainz(id, lastClickedArtist);
-                case "beatport" -> MainBackend.scrapeBeatport(id, lastClickedArtist);
-                case "junodownload" -> MainBackend.scrapeJunodownload(id, lastClickedArtist);
-                case "youtube" -> MainBackend.scrapeYoutube(id, lastClickedArtist);
+                case "musicbrainz" -> scrapeProcess.scrapeBrainz(id, lastClickedArtist);
+                case "beatport" -> scrapeProcess.scrapeBeatport(id, lastClickedArtist);
+                case "junodownload" -> scrapeProcess.scrapeJunodownload(id, lastClickedArtist);
+                case "youtube" -> scrapeProcess.scrapeYoutube(id, lastClickedArtist);
             }
         } catch (IOException e) {
-            DBtools.logError(e, "WARNING", "error scraping " + selectedSource + ", perhaps an incorrect link");
+            DB.logError(e, "WARNING", "error scraping " + selectedSource + ", perhaps an incorrect link");
         }
 
         tempID = id;
@@ -247,7 +263,7 @@ public class GUIController {
         try {
             Connection conn;
             if (testPath.isBlank())
-                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                conn = DriverManager.getConnection(store.getDBpath());
             else
                 conn = DriverManager.getConnection(testPath);
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -256,7 +272,7 @@ public class GUIController {
             pstmt.executeUpdate();
             conn.close();
         } catch (SQLException e) {
-            DBtools.logError(e, "WARNING", "could not save URL");
+            DB.logError(e, "WARNING", "could not save URL");
         }
     }
     public boolean checkExistURL(String testPath) {
@@ -265,7 +281,7 @@ public class GUIController {
         try {
             Connection conn;
             if (testPath.isBlank())
-                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                conn = DriverManager.getConnection(store.getDBpath());
             else {
                 conn = DriverManager.getConnection(testPath);
                 selectedSource = "beatport";
@@ -287,7 +303,7 @@ public class GUIController {
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
-            DBtools.logError(e, "SEVERE", "error checking whether URL exists");
+            DB.logError(e, "SEVERE", "error checking whether URL exists");
         }
         return urlExists;
     }
@@ -295,37 +311,37 @@ public class GUIController {
     public void clickScrape() {
         // launch scraping in backend, then fill and load table
         try {
-            MainBackend.scrapeData();
+            scrapeProcess.scrapeData();
         } catch (Exception e) {
-            DBtools.logError(e, "WARNING", "scrapeData error: clickScrape");
+            DB.logError(e, "WARNING", "scrapeData error: clickScrape");
         }
         try {
-            MainBackend.fillCombviewTable(null);
+            scrapeProcess.fillCombviewTable(null);
         } catch (Exception e) {
-            DBtools.logError(e, "WARNING", "fillCombviewTable error: clickScrape");
+            DB.logError(e, "WARNING", "fillCombviewTable error: clickScrape");
         }
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            conn = DriverManager.getConnection(store.getDBpath());
             String sql = "VACUUM;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.execute();
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
-            DBtools.logError(e, "WARNING", "vacuum error: clickScrape");
+            DB.logError(e, "WARNING", "vacuum error: clickScrape");
         }
     }
     public void cancelScrape() {
-        MainBackend.scrapeCancel = true;
+        scrapeProcess.scrapeCancel = true;
     }
 
     public HashMap<String, Boolean> settingsOpened() {
         // gather all settings states and return them to frontend when settings are opened
         HashMap<String, Boolean> configData = new HashMap<>();
 
-        DBtools.readConfig("filters");
-        ArrayList<String> filterWords = DBtools.settingsStore.getFilterWords();
+        config.readConfig("filters");
+        ArrayList<String> filterWords = store.getFilterWords();
         String[] allFilters = new String[]{"Acoustic", "Extended", "Instrumental", "Remaster", "Remix", "VIP"};
         for (String filter : allFilters) {
             if (filterWords.contains(filter))
@@ -334,39 +350,39 @@ public class GUIController {
                 configData.put(filter, false);
         }
 
-        DBtools.readConfig("longTimeout");
-        if (DBtools.settingsStore.getTimeout() > 25000)
+        config.readConfig("longTimeout");
+        if (store.getTimeout() > 25000)
             configData.put("longTimeout", true);
         else
             configData.put("longTimeout", false);
 
-        DBtools.readConfig("isoDates");
-        configData.put("isoDates", DBtools.settingsStore.getIsoDates());
-        DBtools.readConfig("systemTheme");
-        configData.put("systemTheme", DBtools.settingsStore.getSystemTheme());
+        config.readConfig("isoDates");
+        configData.put("isoDates", store.getIsoDates());
+        config.readConfig("systemTheme");
+        configData.put("systemTheme", store.getSystemTheme());
 
         return configData;
     }
 
     public void setSetting(String name, String value) {
         // write any setting in config, note: "name" = config name
-        DBtools.writeSingleConfig(name, value);
+        config.writeSingleConfig(name, value);
     }
     public Map<String,String> getThemeConfig() {
-        DBtools.readConfig("themes");
-        return DBtools.settingsStore.getThemes();
+        config.readConfig("themes");
+        return store.getThemes();
     }
     public String getScrapeDate() {
-        DBtools.readConfig("lastScrape");
-        return DBtools.settingsStore.getScrapeDate();
+        config.readConfig("lastScrape");
+        return store.getScrapeDate();
     }
     public String getLastArtist() {
         return lastClickedArtist;
     }
     public void resetSettings() {
-        DBtools.resetSettings();
+        config.resetSettings();
     }
     public void resetDB() {
-        DBtools.resetDB();
+        DB.resetDB();
     }
 }

@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker.ModelsEnums;
+package com.blck.MusicReleaseTracker.Simple;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK

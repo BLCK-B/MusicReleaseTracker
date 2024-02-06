@@ -19,15 +19,6 @@ import axios from 'axios';
 import { mapState } from 'vuex';
 
 export default {
-    data: () => ({
-        input: "",
-        rules: [
-        value => !!value.trim(),
-        value => value.includes("musicbrainz.org/artist/") ||
-                 value.includes("beatport.com/artist/") ||
-                 value.includes("junodownload.com/artists/"),
-        ],
-    }),
     computed: {
         ...mapState([
         'tableData',

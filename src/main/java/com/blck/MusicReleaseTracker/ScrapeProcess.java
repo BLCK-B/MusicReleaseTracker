@@ -1,12 +1,13 @@
 package com.blck.MusicReleaseTracker;
 
-import com.blck.MusicReleaseTracker.ModelsEnums.MonthNumbers;
+import com.blck.MusicReleaseTracker.Simple.MonthNumbers;
+import com.blck.MusicReleaseTracker.Simple.SSEController;
+import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.sql.*;
@@ -34,69 +35,30 @@ import java.util.stream.Collectors;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class MainBackend {
+// class with scraping and data processing logic
+@Component
+public class ScrapeProcess {
 
-    private static final SSEController sseController = new SSEController();
-    private static GUIController GUIController;
+    private final ValueStore store;
+    private final ConfigTools config;
+    private final DBtools DB;
+    private final SSEController SSE;
 
-    @Component
-    public static class StartupRunner implements CommandLineRunner {
-        // on startup of springboot server
-        @Override
-        public void run(String... args) {
-            System.out.println("----------LOCAL SERVER STARTED----------");
-            System.out.println("""
-                 __  __ ____ _____
-                |  \\/  |  _ \\_   _|
-                | |\\/| | |_) || |
-                | |  | |  _ < | |
-                |_|  |_|_| \\_\\|_|
-            """);
-
-            try {
-                DBtools.path();
-            } catch (Exception e) {
-                throw new RuntimeException("error in DBtools path method", e);
-            }
-            try {
-                DBtools.createTables();
-            } catch (Exception e) {
-                DBtools.logError(e, "SEVERE", "error in DBtools createTables method");
-            }
-            try {
-                DBtools.updateSettings();
-            } catch (Exception e) {
-                DBtools.logError(e, "WARNING", "error handling config file");
-            }
-            // open port in web browser
-            try {
-                String os = System.getProperty("os.name").toLowerCase();
-                if (os.contains("win")) {
-                    String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
-                    Runtime.getRuntime().exec(cmd);
-                }
-                else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-                    try {
-                        String[] cmd = {"xdg-open", "http://localhost:8080"};
-                        Runtime.getRuntime().exec(cmd);
-                    } catch (Exception e) {
-                        String [] cmd = new String[]{"open", "http://localhost:8080"};
-                        Runtime.getRuntime().exec(cmd);
-                    }
-                }
-            } catch (Exception e) {
-                DBtools.logError(e, "WARNING", "could not open port in browser");
-            }
-        }
+    @Autowired
+    public ScrapeProcess(ValueStore valueStore, ConfigTools configTools, DBtools DB, SSEController sseController) {
+        this.store = valueStore;
+        this.config = configTools;
+        this.DB = DB;
+        this.SSE = sseController;
     }
 
-    public static boolean scrapeCancel = false;
-    public static void scrapeData() throws SQLException, InterruptedException {
-        DBtools.readConfig("longTimeout");
+    public boolean scrapeCancel = false;
+    public void scrapeData() throws SQLException, InterruptedException {
+        config.readConfig("longTimeout");
         // calling method for scrapers, based on artist URLs
         scrapeCancel = false;
         // for each artistname: check all urls and load them into a list
-        Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+        Connection conn = DriverManager.getConnection(store.getDBpath());
         String sql = "SELECT artistname FROM artists";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet artistnameResults = pstmt.executeQuery();
@@ -108,7 +70,7 @@ public class MainBackend {
         if (artistNameList.isEmpty())
             return;
         // clear tables to prepare for new data
-        for (String sourceTable : DBtools.settingsStore.getSourceTables()) {
+        for (String sourceTable : store.getSourceTables()) {
             sql = "DELETE FROM " + sourceTable;
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(sql);
@@ -119,18 +81,15 @@ public class MainBackend {
         double progress = 0;
         // list for source urls (incl null) - one artist at a time
         HashMap<String, String> artistUrls = new HashMap<String, String>();
-        // after 2 fail-try-agains, dont scrape source anymore
-        int brainzFails = 0;
-        int beatportFails = 0;
-        int junoFails = 0;
-        int youtubeFails = 0;
+        // after 2 fail-try-agains, don't scrape source anymore
+        int[] failArray = {0, 0, 0, 0};
 
         // cycling each artist
         for (String songArtist : artistNameList) {
             artistUrls.clear();
-            conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            conn = DriverManager.getConnection(store.getDBpath());
             // assembling list of url/ids of the artist
-            for (String webSource : DBtools.settingsStore.getSourceTables()) {
+            for (String webSource : store.getSourceTables()) {
                 // selecting entire row
                 sql = "SELECT * FROM artists WHERE artistname = ?";
                 pstmt = conn.prepareStatement(sql);
@@ -147,50 +106,48 @@ public class MainBackend {
             for (String webSource : artistUrls.keySet()) {
                 // if clicked cancel
                 if (scrapeCancel) {
-                    SSEController.sendProgress(1.0);
+                    SSE.sendProgress(1.0);
                     artistUrls.clear();
                     artistNameList.clear();
                     System.gc();
                     return;
                 }
-                // cycling sources with associated ids
-                // id is sent to be reduced since table can contain more
                 String id = artistUrls.get(webSource);
-                if (id != null)
-                    id = reduceToID(id, webSource);
                 if (id != null) {
+                    // id is sent to be reduced since table can contain impure ids
+                    id = reduceToID(id, webSource);
                     for (int i = 0; i < 2; i++) {
                         try {
                             switch (webSource) {
                                 case "musicbrainz" -> {
-                                    if (brainzFails != 2)
+                                    if (failArray[0] != 2)
                                         scrapeBrainz(id, songArtist);
                                 }
                                 case "beatport" -> {
-                                    if (beatportFails != 2)
+                                    if (failArray[1] != 2)
                                         scrapeBeatport(id, songArtist);
                                 }
                                 case "junodownload" -> {
-                                    if (junoFails != 2)
+                                    if (failArray[2] != 2)
                                         scrapeJunodownload(id, songArtist);
                                 }
                                 case "youtube" -> {
-                                    if (youtubeFails != 2)
+                                    if (failArray[3] != 2)
                                         scrapeYoutube(id, songArtist);
                                 }
                             }
                             break;
                         } catch (Exception e) {
                             if (i == 1)
-                                DBtools.logError(e, "INFO", "error scraping source " + webSource + ", trying again");
+                                DB.logError(e, "INFO", "error scraping source " + webSource + ", trying again");
                             else
-                                DBtools.logError(e, "WARNING", "error re-scraping source " + webSource + " moving on");
+                                DB.logError(e, "WARNING", "error re-scraping source " + webSource + " moving on");
                             Thread.sleep(2000);
                             switch (webSource) {
-                                case "musicbrainz" -> brainzFails++;
-                                case "beatport" -> beatportFails++;
-                                case "junodownload" -> junoFails++;
-                                case "youtube" -> youtubeFails++;
+                                case "musicbrainz" -> failArray[0]++;
+                                case "beatport" -> failArray[1]++;
+                                case "junodownload" -> failArray[2]++;
+                                case "youtube" -> failArray[3]++;
                             }
                         }
                     }
@@ -206,24 +163,24 @@ public class MainBackend {
                 progress++;
                 // 40 cycles (10 artists * 4 sources) / 20 total artists / 4 sources = 50%
                 double state = progress / artistNameList.size() / 4;
-                SSEController.sendProgress(state);
+                SSE.sendProgress(state);
             }
         }
+        artistUrls.clear();
         artistNameList.clear();
         System.gc();
     }
 
-    public static void scrapeBrainz(String id, String songArtist) throws IOException {
+    public void scrapeBrainz(String id, String songArtist) throws IOException {
         // creating link for API
         String url = "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
-        // https://musicbrainz.org/ws/2/release-group?artist=773c3b3b-4368-4659-963a-4c8194ec9b1c&type=single&limit=400
 
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
-            .timeout(DBtools.settingsStore.getTimeout()).get();
+            .timeout(store.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeBrainz timed out " + url);
+            DB.logError(e, "INFO", "scrapeBrainz timed out " + url);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("first-release-date");
@@ -246,17 +203,16 @@ public class MainBackend {
         processInfo(songList, "musicbrainz");
     }
 
-    public static void scrapeBeatport(String id, String songArtist) throws IOException {
+    public void scrapeBeatport(String id, String songArtist) throws IOException {
         // creating link
         String url = "https://www.beatport.com/artist/" + id + "/tracks";
-        // https://beatport.com/artist/koven/245904/tracks
 
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
-            .timeout(DBtools.settingsStore.getTimeout()).get();
+            .timeout(store.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeBeatport timed out " + url);
+            DB.logError(e, "INFO", "scrapeBeatport timed out " + url);
         }
         // pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
@@ -294,15 +250,15 @@ public class MainBackend {
         processInfo(songList, "beatport");
     }
 
-    public static void scrapeJunodownload(String id, String songArtist) throws IOException {
+    public void scrapeJunodownload(String id, String songArtist) throws IOException {
         String url = "https://www.junodownload.com/artists/" + id + "/releases/?music_product_type=single&laorder=date_down";
-        // https://www.junodownload.com/artists/Koven/releases/?music_product_type=single&laorder=date_down
+
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
-            .timeout(DBtools.settingsStore.getTimeout()).get();
+            .timeout(store.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeJunodownload timed out " + url);
+            DB.logError(e, "INFO", "scrapeJunodownload timed out " + url);
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
@@ -342,7 +298,7 @@ public class MainBackend {
                 datesArray[i] = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
                 // datesArray[i]: 2023-06-28
             } catch (Exception e) {
-                DBtools.logError(e,"WARNING", "error processing junodownload date");
+                DB.logError(e,"WARNING", "error processing junodownload date");
             }
         }
 
@@ -361,16 +317,16 @@ public class MainBackend {
         processInfo(songList, "junodownload");
     }
 
-    public static void scrapeYoutube(String id, String songArtist) throws IOException {
+    public void scrapeYoutube(String id, String songArtist) throws IOException {
         // creating link
         String url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
 
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
-            .timeout(DBtools.settingsStore.getTimeout()).get();
+            .timeout(store.getTimeout()).get();
         } catch (SocketTimeoutException e) {
-            DBtools.logError(e, "INFO", "scrapeYoutube timed out " + url);
+            DB.logError(e, "INFO", "scrapeYoutube timed out " + url);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");
@@ -395,11 +351,12 @@ public class MainBackend {
         processInfo(songList, "youtube");
     }
 
-    public static String reduceToID(String url, String source) {
+    public String reduceToID(String url, String source) {
         // reduce url to only the identifier
+        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
-        String id = null;
+        String id = url;
         switch (source) {
             case "musicbrainz" -> {
                 // https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
@@ -412,7 +369,7 @@ public class MainBackend {
                         id = url.substring(idStartIndex, idEndIndex);
                     else // if no other '/'
                         id = url.substring(idStartIndex);
-                    // ad110705-cbe6-4c47-9b99-8526e6db0f41
+                // ad110705-cbe6-4c47-9b99-8526e6db0f41
                 }
             }
             case "beatport" -> {
@@ -441,7 +398,7 @@ public class MainBackend {
                         id = url.substring(idStartIndex, idEndIndex);
                     else // if no other '/'
                         id = url.substring(idStartIndex);
-                    // Koven
+                // Koven
                 }
             }
             case "youtube" -> {
@@ -456,19 +413,17 @@ public class MainBackend {
                         id = url.substring(idStartIndex, idEndIndex);
                     else // if no other '/'
                         id = url.substring(idStartIndex);
-                    // Koven
+                // UCWaKvFOf-a7vENyuEsZkNqg
                 }
-                else // ID
-                    id = url;
             }
         }
         return id;
     }
 
-    public static void processInfo(ArrayList<SongClass> songList, String source) {
-        // unify apostrophes
+    public void processInfo(ArrayList<SongClass> songList, String source) {
+        // unify apostrophes/grave accents/backticks/quotes...
         for (SongClass object : songList) {
-            String songName = object.getName().replace("’", "'");
+            String songName = object.getName().replace("’", "'").replace("`", "'").replace("´", "'");
             object.setName(songName);
         }
         // discard objects with an incorrect date format
@@ -506,11 +461,11 @@ public class MainBackend {
             insertSet(songList, source);
     }
 
-    public static void insertSet(ArrayList<SongClass> songList, String source) {
+    public void insertSet(ArrayList<SongClass> songList, String source) {
         PreparedStatement pstmt = null;
         // insert a set of songs to a source table
         try {
-            Connection conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+            Connection conn = DriverManager.getConnection(store.getDBpath());
             int i = 0;
             for (SongClass songObject : songList) {
                 if (i == 15)
@@ -538,16 +493,16 @@ public class MainBackend {
             conn.setAutoCommit(true);
             conn.close();
         } catch (SQLException e) {
-            DBtools.logError(e, "SEVERE", "error inserting a set of songs");
+            DB.logError(e, "SEVERE", "error inserting a set of songs");
         }
     }
 
-    public static void fillCombviewTable(String testPath) {
+    public void fillCombviewTable(String testPath) {
         // assembles table for combined view: filters unwanted words, looks for duplicates
         // load filterwords and entrieslimit
         if (testPath == null) {
             try {
-                DBtools.readConfig("filters");
+                config.readConfig("filters");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -558,7 +513,7 @@ public class MainBackend {
         Statement stmt = null;
         try {
             if (testPath == null)
-                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                conn = DriverManager.getConnection(store.getDBpath());
             else
                 conn = DriverManager.getConnection(testPath);
             sql = "DELETE FROM combview";
@@ -566,7 +521,7 @@ public class MainBackend {
             stmt.executeUpdate(sql);
             conn.close();
         }  catch (Exception e) {
-            DBtools.logError(e, "SEVERE", "error cleaning combview table");
+            DB.logError(e, "SEVERE", "error cleaning combview table");
         }
 
         // creating song object list with data from all sources
@@ -574,10 +529,10 @@ public class MainBackend {
 
         try {
             if (testPath == null)
-                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                conn = DriverManager.getConnection(store.getDBpath());
             else
                 conn = DriverManager.getConnection(testPath);
-            for (String source : DBtools.settingsStore.getSourceTables()) {
+            for (String source : store.getSourceTables()) {
                 sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
@@ -593,7 +548,7 @@ public class MainBackend {
 
                     // filtering user-selected keywords
                     if (testPath == null) {
-                        for (String checkword : DBtools.settingsStore.getFilterWords()) {
+                        for (String checkword : store.getFilterWords()) {
                             if (songType != null) {
                                 if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
                                     continue RScycle;
@@ -620,7 +575,7 @@ public class MainBackend {
             }
             conn.close();
         }  catch (Exception e) {
-            DBtools.logError(e, "WARNING", "error in filtering keywords");
+            DB.logError(e, "WARNING", "error in filtering keywords");
         }
         // map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         // eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
@@ -638,7 +593,7 @@ public class MainBackend {
                                 else
                                     return newValue;
                             } catch (ParseException e) {
-                                DBtools.logError(e, "WARNING", "error in parsing dates");
+                                DB.logError(e, "WARNING", "error in parsing dates");
                                 return existingValue;
                             }
                         }
@@ -669,7 +624,7 @@ public class MainBackend {
         try {
             // precomitting batch insert is way faster
             if (testPath == null)
-                conn = DriverManager.getConnection(DBtools.settingsStore.getDBpath());
+                conn = DriverManager.getConnection(store.getDBpath());
             else
                 conn = DriverManager.getConnection(testPath);
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
@@ -694,8 +649,8 @@ public class MainBackend {
             stmt.close();
             pstmt.close();
             conn.close();
-        }  catch (Exception e) {
-            DBtools.logError(e, "SEVERE", "error inserting data to combview");
+        } catch (Exception e) {
+            DB.logError(e, "SEVERE", "error inserting data to combview");
         }
         System.gc();
     }

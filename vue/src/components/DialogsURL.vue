@@ -82,6 +82,12 @@ export default {
         "urlExists",
         ]),
     },
+    watch: {
+        // trigger url check on every tableData change
+        tableData() {
+            this.determineDiagShow();
+        },
+    },
     methods: {
         // send input to be processed, displays preview dialog with scraped source table
         clickURL() {
@@ -114,15 +120,8 @@ export default {
                     console.error(error);
                 });
             }
-            else {
+            else
                 this.$store.commit('SET_URL_EXISTS', true);
-            }
-        },
-    },
-    watch: {
-        // trigger url check on every tableData change
-        tableData() {
-            this.determineDiagShow();
         },
     },
 };

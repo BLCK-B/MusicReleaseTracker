@@ -71,7 +71,6 @@ export default {
     },
     // load respective table when artist selected
     handleItemClick(artist) {
-      this.$store.commit('SET_ADD_VIS', false);
       this.lastClickedItem = artist;
       axios.post('http://localhost:8080/api/listOrTabClick', { item: artist, origin: "list" })
         .then(response => {

@@ -1,7 +1,10 @@
 package com.blck.MusicReleaseTracker;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -16,11 +19,72 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+// entry point class with startup logic
 @SpringBootApplication
 public class Main {
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
+    }
+
+    private final ConfigTools config;
+    private final DBtools DB;
+
+    @Autowired
+    public Main(ConfigTools configTools, DBtools DB) {
+        this.config = configTools;
+        this.DB = DB;
+    }
+
+    @Component
+    public class StartupRunner implements CommandLineRunner {
+
+        // on startup of springboot server
+        @Override
+        public void run(String... args) {
+            System.out.println("----------LOCAL SERVER STARTED----------");
+            System.out.println("""
+                 __  __ ____ _____
+                |  \\/  |  _ \\_   _|
+                | |\\/| | |_) || |
+                | |  | |  _ < | |
+                |_|  |_|_| \\_\\|_|
+            """);
+            try {
+                DB.path();
+            } catch (Exception e) {
+                throw new RuntimeException("error in DB path method", e);
+            }
+            try {
+                DB.createTables();
+            } catch (Exception e) {
+                DB.logError(e, "SEVERE", "error in DBtools createTables method");
+            }
+            try {
+                config.updateSettings();
+            } catch (Exception e) {
+                DB.logError(e, "WARNING", "error handling config file");
+            }
+            // open port in web browser
+            try {
+                String os = System.getProperty("os.name").toLowerCase();
+                if (os.contains("win")) {
+                    String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
+                    Runtime.getRuntime().exec(cmd);
+                }
+                else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
+                    try {
+                        String[] cmd = {"xdg-open", "http://localhost:8080"};
+                        Runtime.getRuntime().exec(cmd);
+                    } catch (Exception e) {
+                        String [] cmd = new String[]{"open", "http://localhost:8080"};
+                        Runtime.getRuntime().exec(cmd);
+                    }
+                }
+            } catch (Exception e) {
+                DB.logError(e, "WARNING", "could not open port in browser");
+            }
+        }
     }
 
 }

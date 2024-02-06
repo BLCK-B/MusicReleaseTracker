@@ -28,6 +28,7 @@ export default {
     data: () => ({
         input: "",
         rules: [
+        //if isn't empty
         value => !!value.trim(),
         value => (value || '').length <= 25,
         ],

@@ -1,5 +1,9 @@
 package com.blck.MusicReleaseTracker;
 
+import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.Map;
+
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
         This program is free software: you can redistribute it and/or modify
@@ -13,10 +17,11 @@ package com.blck.MusicReleaseTracker;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-import java.util.ArrayList;
-import java.util.Map;
+@Component
+public class ValueStore {
 
-public class SettingsStore {
+    public ValueStore() {
+    }
 
     private String DBpath;
     private String DBtemplatePath;
@@ -31,9 +36,6 @@ public class SettingsStore {
     private boolean systemTheme = false;
     // array of all available sources, in order that fillCombviewTable uses
     final private String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
-
-    public SettingsStore() {
-    }
 
     public void setDBpath(String DBpath) {
         this.DBpath = DBpath;

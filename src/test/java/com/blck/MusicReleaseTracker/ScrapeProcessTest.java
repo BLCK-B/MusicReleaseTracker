@@ -1,13 +1,25 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MainBackendTest {
+@SpringBootTest
+public class ScrapeProcessTest {
+
+    private final ScrapeProcess scrapeProcess;
+
+    @Autowired
+    public ScrapeProcessTest(ScrapeProcess scrapeProcess) {
+        this.scrapeProcess = scrapeProcess;
+    }
 
     @Test
     void processInfo() {
@@ -15,7 +27,7 @@ public class MainBackendTest {
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
         songList.add(new SongClass("Son’g3", "artistName", "2023-03-01"));
         songList.add(new SongClass("Song2", "artistName", "2023-02-01"));
-        MainBackend.processInfo(songList, "test");
+        scrapeProcess.processInfo(songList, "test");
         // expected values: sort by date
         ArrayList<SongClass> expectedSongList = new ArrayList<>();
         expectedSongList.add(new SongClass("Son'g3", "artistName", "2023-03-01"));
@@ -29,7 +41,7 @@ public class MainBackendTest {
         songList.add(new SongClass("Song4", "artistName", "2023"));
         songList.add(new SongClass("Song5", "artistName", "-"));
         songList.add(new SongClass("Song6", "artistName", "08-05-2023"));
-        MainBackend.processInfo(songList, "test");
+        scrapeProcess.processInfo(songList, "test");
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
@@ -41,7 +53,7 @@ public class MainBackendTest {
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
         songList.add(new SongClass("Song1", "artistName", "2019-19-19"));
         songList.add(new SongClass("Song1", "artistName", "2005-05-05"));
-        MainBackend.processInfo(songList, "test");
+        scrapeProcess.processInfo(songList, "test");
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
@@ -62,7 +74,7 @@ public class MainBackendTest {
         else
             throw new UnsupportedOperationException("unsupported OS");
 
-        MainBackend.fillCombviewTable(DBpath);
+        scrapeProcess.fillCombviewTable(DBpath);
 
         ArrayList<SongClass> songList = new ArrayList<>();
         ArrayList<SongClass> expectedSongList = new ArrayList<>();
@@ -84,6 +96,7 @@ public class MainBackendTest {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
         for (int i = 0; i < expectedSongList.size(); i++) {
             SongClass obj1 = expectedSongList.get(i);
             SongClass obj2 = songList.get(i);
@@ -92,6 +105,50 @@ public class MainBackendTest {
                 () -> assertEquals(obj1.getArtist(), obj2.getArtist()),
                 () -> assertEquals(obj1.getDate(), obj2.getDate())
             );
+        }
+
+    }
+
+    @Test
+    void reduceToID() {
+        ArrayList<String> input = new ArrayList<String>();
+        // beatport
+        input.add("https://www.beatport.com/artist/artistname/1234/tracks");
+        input.add("https://www.beatport.com/artist/artistname/1234");
+        input.add("artistname/1234");
+        // musicbrainz
+        input.add("https://musicbrainz.org/artist/123-id-123/releases");
+        input.add("https://musicbrainz.org/artist/123-id-123");
+        input.add("123-id-123");
+        // junodownload
+        input.add("https://www.junodownload.com/artists/artistname/releases/");
+        input.add("https://www.junodownload.com/artists/artistname");
+        input.add("artistname");
+        // youtube
+        input.add("https://www.youtube.com/channel/123-id-123");
+        input.add("123-id-123");
+
+        for (int i = 0; i < input.size(); i++) {
+            // beatport
+            if (i < 3) {
+                String output = scrapeProcess.reduceToID(input.get(i), "beatport");
+                assertEquals("artistname/1234", output);
+            }
+            // musicbrainz
+            else if (i < 6) {
+                String output = scrapeProcess.reduceToID(input.get(i), "musicbrainz");
+                assertEquals("123-id-123", output);
+            }
+            // junodownload
+            else if (i < 9) {
+                String output = scrapeProcess.reduceToID(input.get(i), "junodownload");
+                assertEquals("artistname", output);
+            }
+            // youtube
+            else {
+                String output = scrapeProcess.reduceToID(input.get(i), "youtube");
+                assertEquals("123-id-123", output);
+            }
         }
 
     }

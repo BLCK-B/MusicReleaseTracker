@@ -2,8 +2,8 @@ package com.blck.MusicReleaseTracker.Simple;
 
 import com.blck.MusicReleaseTracker.DBtools;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /*      MusicReleaseTracker
@@ -19,21 +19,21 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-@Component
+@RestController
 public class SSEController {
 
     private final DBtools DB;
-    private static SseEmitter emitter;
+    private final SseEmitter emitter;
 
     @Autowired
-    public SSEController(DBtools DB) {
+    public SSEController(DBtools DB, SseEmitter emitter) {
         this.DB = DB;
+        this.emitter = emitter;
     }
 
     @GetMapping("/progress")
     public SseEmitter eventStream() {
-        // timeout 5 min
-        emitter = new SseEmitter(300000L);
+        emitter.onTimeout(emitter::complete);
         return emitter;
     }
 

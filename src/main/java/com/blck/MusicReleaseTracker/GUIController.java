@@ -2,7 +2,6 @@ package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;

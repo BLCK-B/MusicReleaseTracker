@@ -2,12 +2,15 @@ package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +29,7 @@ import java.util.logging.SimpleFormatter;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-// class for essential tasks (not only DB)
+// class for DB operations and error logs
 public class DBtools {
 
 private final ValueStore store;

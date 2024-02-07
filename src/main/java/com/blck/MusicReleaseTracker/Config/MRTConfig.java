@@ -4,6 +4,7 @@ import com.blck.MusicReleaseTracker.*;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 // config class for spring boot to manage lifecycle of the beans, this helps avoid static classes
 // each bean has a single instance, beans defined here can be used by other classes as dependencies
@@ -36,8 +37,9 @@ public class MRTConfig {
     }
 
     @Bean
-    public SSEController sseController(DBtools dBtools) {
-        return new SSEController(dBtools);
+    public SseEmitter sseEmitter() {
+        // timeout 5 min
+        return new SseEmitter(300000L);
     }
 
 }

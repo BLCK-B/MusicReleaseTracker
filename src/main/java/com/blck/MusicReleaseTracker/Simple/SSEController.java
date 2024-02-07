@@ -23,17 +23,16 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SSEController {
 
     private final DBtools DB;
-    private final SseEmitter emitter;
+    private SseEmitter emitter;
 
     @Autowired
-    public SSEController(DBtools DB, SseEmitter emitter) {
+    public SSEController(DBtools DB) {
         this.DB = DB;
-        this.emitter = emitter;
     }
 
     @GetMapping("/progress")
     public SseEmitter eventStream() {
-        emitter.onTimeout(emitter::complete);
+        emitter = new SseEmitter(300000L);
         return emitter;
     }
 

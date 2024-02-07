@@ -1,6 +1,6 @@
 ; UI settings
 !include "MUI2.nsh"
-!define VERSION "8"
+!define VERSION "8.1"
 !define MUI_ABORTWARNING
 !define MUI_ICON "MRTicon.ico"
 !insertmacro MUI_PAGE_LICENSE "license.txt"

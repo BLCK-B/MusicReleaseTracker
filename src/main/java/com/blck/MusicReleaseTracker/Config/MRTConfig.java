@@ -36,10 +36,4 @@ public class MRTConfig {
         return new DBtools(valueStore);
     }
 
-    @Bean
-    public SseEmitter sseEmitter() {
-        // timeout 5 min
-        return new SseEmitter(300000L);
-    }
-
 }

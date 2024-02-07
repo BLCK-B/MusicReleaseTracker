@@ -1,20 +1,20 @@
+// https://services.gradle.org/distributions - in gradle-wrapper.properties
+
 plugins {
     id 'java'
     id 'application'
     // https://plugins.gradle.org/plugin/org.beryx.jlink
     id("org.beryx.jlink") version "3.0.1"
-    // https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
-    id "com.github.johnrengelman.shadow" version "8.1.1"
     // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.2.1"
     // https://plugins.gradle.org/plugin/io.spring.dependency-management
     id("io.spring.dependency-management") version "1.1.4"
     // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#_adding_the_plugin
-    id 'org.graalvm.buildtools.native' version '0.9.28'
+    id 'org.graalvm.buildtools.native' version '0.10.0'
 }
 
 group 'com.blck'
-version '7.2'
+version '8.1'
 
 repositories {
     mavenCentral()
@@ -36,8 +36,10 @@ graalvmNative {
 }
 
 java {
+    // minimal supported
     sourceCompatibility = JavaVersion.VERSION_19
-    targetCompatibility = JavaVersion.VERSION_19
+    // target
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -67,18 +69,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-bootDistZip {
-    dependsOn shadowJar
-}
-bootDistTar {
-    dependsOn shadowJar
-}
-bootStartScripts {
-    dependsOn shadowJar
-}
-tasks.startShadowScripts.dependsOn(tasks.bootJar)
 bootJar {
     duplicatesStrategy = 'exclude'
+    archiveFileName = "MRT-${version}-linux-mac.jar"
 }
 
 jlink {
@@ -96,31 +89,15 @@ sourceSets {
     }
 }
 
-//This will create an executable JAR file with a manifest that specifies the main class
 tasks.jar {
     manifest {
         attributes 'Main-Class': 'com.blck.MusicReleaseTracker.Main'
     }
-    duplicatesStrategy = 'EXCLUDE'
+    duplicatesStrategy = 'exclude'
     from(sourceSets.main.output) {
         exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     }
-    archiveFileName = "MusicReleaseTracker.jar"
     dependsOn configurations.runtimeClasspath
-}
-
-shadowJar {
-    exclude 'org/sqlite/native/Linux-Musl/**'
-    exclude 'org/sqlite/native/Linux-Android/**'
-    exclude 'org/sqlite/native/Mac/**'
-    exclude 'org/sqlite/native/Windows/aarch64/**'
-    exclude 'org/sqlite/native/Windows/x86/**'
-    configurations = [project.configurations.runtimeClasspath, project.configurations.shadow]
-    archiveClassifier.set('')
-    manifest {
-        attributes 'Main-Class': 'com.blck.MusicReleaseTracker.Main'
-    }
-    mergeServiceFiles()
 }
 
 test {

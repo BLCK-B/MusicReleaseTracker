@@ -1,5 +1,7 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Simple;
 
+import com.blck.MusicReleaseTracker.DBtools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -19,20 +21,26 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 public class SSEController {
-    private static SseEmitter emitter;
+
+    private final DBtools DB;
+    private SseEmitter emitter;
+
+    @Autowired
+    public SSEController(DBtools DB) {
+        this.DB = DB;
+    }
 
     @GetMapping("/progress")
     public SseEmitter eventStream() {
-        // timeout 5min
         emitter = new SseEmitter(300000L);
         return emitter;
     }
 
-    public static void sendProgress(double state) {
+    public void sendProgress(double state) {
         try {
             emitter.send(String.valueOf(state));
         } catch (Exception e) {
-            DBtools.logError(e, "WARNING", "error in progress emitter");
+            DB.logError(e, "WARNING", "error in progress emitter");
         } finally {
             if (state == 1.0)
                 emitter.complete();

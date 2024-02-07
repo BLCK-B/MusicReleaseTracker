@@ -4,16 +4,25 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GUIControllerTest {
-    private static final GUIController GUIController = new GUIController();
+
+    private final GUIController GUI;
+
+    @Autowired
+    public GUIControllerTest(GUIController guiController) {
+        this.GUI = guiController;
+    }
+
     private static String DBpath;
 
     String getDBpath() {
@@ -36,10 +45,10 @@ public class GUIControllerTest {
     void AddLoadArtist() {
         String DBpath = getDBpath();
         // artistAddConfirm
-        GUIController.artistAddConfirm("Joe", DBpath);
+        GUI.artistAddConfirm("Joe", DBpath);
         // verify with loadList
         try {
-            String oneArtist = GUIController.loadList(DBpath).get(0);
+            String oneArtist = GUI.loadList(DBpath).get(0);
             assertEquals(oneArtist, "Joe");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -51,10 +60,10 @@ public class GUIControllerTest {
     void AddVerifyUrl() {
         String DBpath = getDBpath();
         // saveUrl
-        GUIController.saveUrl(DBpath);
+        GUI.saveUrl(DBpath);
         // verify with checkExistUrl
         try {
-            boolean exists = GUIController.checkExistURL(DBpath);
+            boolean exists = GUI.checkExistURL(DBpath);
             assertTrue(exists);
         }
         catch (Exception e) {
@@ -67,10 +76,10 @@ public class GUIControllerTest {
     void DeleteVerifyUrl() {
         String DBpath = getDBpath();
         // deleteUrl
-        GUIController.deleteUrl(DBpath);
+        GUI.deleteUrl(DBpath);
         // verify with checkExistUrl
         try {
-            boolean exists = GUIController.checkExistURL(DBpath);
+            boolean exists = GUI.checkExistURL(DBpath);
             assertFalse(exists);
         }
         catch (Exception e) {
@@ -83,10 +92,10 @@ public class GUIControllerTest {
     void DeleteArtist() {
         String DBpath = getDBpath();
         // artistClickDelete
-        GUIController.artistClickDelete(DBpath);
+        GUI.artistClickDelete(DBpath);
         // verify with loadList
         try {
-            assertTrue(GUIController.loadList(DBpath).isEmpty());
+            assertTrue(GUI.loadList(DBpath).isEmpty());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

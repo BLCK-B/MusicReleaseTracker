@@ -66,7 +66,7 @@ export default {
       this.scrapeLast = response.data;
     })
   },
-  // on any change of sourceTab trigger handleSourceClick
+  // trigger handleSourceClick if tab is not combview
   watch: {
     sourceTab(tabValue) {
       this.activeTab = tabValue;
@@ -81,7 +81,6 @@ export default {
     },
     // load respective table
     handleSourceClick(source) {
-      this.$store.commit('SET_ADD_VIS', false);
       axios.post('http://localhost:8080/api/listOrTabClick', { item: source, origin: "tab" })
         .then((response) => {
           this.$store.commit('SET_TABLE_CONTENT', response.data);
@@ -114,7 +113,6 @@ export default {
             this.scrapeColor = "var(--accent-color)";
             this.$store.commit('SET_ALLOW_BUTTONS', true);
             this.eventSource.close();
-            this.$store.commit('SET_PROGRESS', 0);
             let time = new Date().toLocaleString('en-GB', {
               day: '2-digit',
               month: '2-digit',

@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Simple;
 
 import java.util.logging.Logger;
 

@@ -1,9 +1,8 @@
 package com.blck.MusicReleaseTracker;
 
-import com.blck.MusicReleaseTracker.ModelsEnums.TableModel;
+import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -24,6 +23,7 @@ import java.util.Map;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+// API controller receives REST requests from frontend and passes the requests to GUIController
 @RestController
 @RequestMapping("/api")
 public class ApiController {
@@ -31,8 +31,8 @@ public class ApiController {
     private final GUIController sendRequest;
 
     @Autowired
-    public ApiController(GUIController sendRequest) {
-        this.sendRequest = sendRequest;
+    public ApiController(GUIController guiController) {
+        this.sendRequest = guiController;
     }
 
     @GetMapping("/loadList")

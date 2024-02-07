@@ -30,11 +30,11 @@ Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
 Setup
 -
 
-**dependencies:** A web browser: UI is rendered there. Works best with firefox. Linux: OpenJDK.
+**dependencies:** A web browser: UI is rendered there. Works best with firefox. Linux: OpenJDK or similar.
 
 **Windows:** Download and install. When launched, Spring terminal and browser window/tab will open.
 
-**Linux:** Unzip tar. Run jar by ```java -jar XXX.jar```
+**Linux:** Run jar by ```java -jar XXX.jar```
 
 **macOS:** *Should be same as Linux. Not tested. Could someone please confirm?
 

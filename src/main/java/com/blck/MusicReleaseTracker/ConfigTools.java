@@ -27,8 +27,7 @@ import java.util.Set;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-// class that manages config
-//@Component
+/** class that manages config */
 public class ConfigTools {
 
     private final ValueStore store;

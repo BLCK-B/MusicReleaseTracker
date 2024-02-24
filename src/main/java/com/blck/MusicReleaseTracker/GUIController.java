@@ -1,5 +1,9 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Scrapers.BeatportScraper;
+import com.blck.MusicReleaseTracker.Scrapers.JunodownloadScraper;
+import com.blck.MusicReleaseTracker.Scrapers.MusicbrainzScraper;
+import com.blck.MusicReleaseTracker.Scrapers.YoutubeScraper;
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
@@ -22,7 +26,7 @@ import java.util.Map;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-// class with methods called from ApiController
+/** class with methods called from ApiController */
 //@Service
 public class GUIController {
 
@@ -232,19 +236,31 @@ public class GUIController {
         if (lastClickedArtist == null || selectedSource == null || url.isBlank())
             return;
         tempID = null;
-
-        String id = scrapeProcess.reduceToID(url, selectedSource);
-        if (id == null)
-            return;
-
+        String id = null;
         try {
             switch(selectedSource) {
-                case "musicbrainz" -> scrapeProcess.scrapeBrainz(id, lastClickedArtist);
-                case "beatport" -> scrapeProcess.scrapeBeatport(id, lastClickedArtist);
-                case "junodownload" -> scrapeProcess.scrapeJunodownload(id, lastClickedArtist);
-                case "youtube" -> scrapeProcess.scrapeYoutube(id, lastClickedArtist);
+                case "musicbrainz" -> {
+                    MusicbrainzScraper MBscraper = new MusicbrainzScraper(store, DB, lastClickedArtist, url);
+                    id = MBscraper.reduceToID(url);
+                    MBscraper.scrape();
+                }
+                case "beatport" -> {
+                    BeatportScraper BPscraper = new BeatportScraper(store, DB, lastClickedArtist, url);
+                    id = BPscraper.reduceToID(url);
+                    BPscraper.scrape();
+                }
+                case "junodownload" -> {
+                    JunodownloadScraper JDscraper = new JunodownloadScraper(store, DB, lastClickedArtist, url);
+                    id = JDscraper.reduceToID(url);
+                    JDscraper.scrape();
+                }
+                case "youtube" -> {
+                    YoutubeScraper YTscraper = new YoutubeScraper(store, DB, lastClickedArtist, url);
+                    id = YTscraper.reduceToID(url);
+                    YTscraper.scrape();
+                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             DB.logError(e, "WARNING", "error scraping " + selectedSource + ", perhaps an incorrect link");
         }
 

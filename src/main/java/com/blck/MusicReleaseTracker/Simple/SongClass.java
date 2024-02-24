@@ -13,13 +13,12 @@ package com.blck.MusicReleaseTracker.Simple;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+/** an object representing a song */
 public class SongClass {
-    // an object representing a song with following parameters:
     private String songName;
     private String songArtist;
     private final String songDate;
     private String songType;
-
 
     public SongClass(String songName, String songArtist, String songDate, String songType) {
         this.songName = songName;
@@ -27,6 +26,7 @@ public class SongClass {
         this.songDate = songDate;
         this.songType = songType;
     }
+
     public SongClass(String songName, String songArtist, String songDate) {
         this.songName = songName;
         this.songArtist = songArtist;

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-// entry point class with startup logic
+/** entry point class with startup logic */
 @SpringBootApplication
 public class Main {
 

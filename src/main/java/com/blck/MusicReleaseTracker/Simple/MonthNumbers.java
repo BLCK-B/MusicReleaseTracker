@@ -13,6 +13,7 @@ package com.blck.MusicReleaseTracker.Simple;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+/** month-number codes for junodownload */
 public enum MonthNumbers {
     JAN("01"),
     FEB("02"),
@@ -26,7 +27,6 @@ public enum MonthNumbers {
     OCT("10"),
     NOV("11"),
     DEC("12");
-
 
     private final String numberCode;
 

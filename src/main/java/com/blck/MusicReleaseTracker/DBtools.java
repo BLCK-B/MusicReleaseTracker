@@ -29,7 +29,7 @@ import java.util.logging.SimpleFormatter;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-// class for DB operations and error logs
+/** class for DB operations and error logs */
 public class DBtools {
 
 private final ValueStore store;

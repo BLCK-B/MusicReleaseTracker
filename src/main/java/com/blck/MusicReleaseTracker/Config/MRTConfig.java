@@ -1,13 +1,13 @@
 package com.blck.MusicReleaseTracker.Config;
 
 import com.blck.MusicReleaseTracker.*;
+import com.blck.MusicReleaseTracker.Scrapers.ScraperParent;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-// config class for spring boot to manage lifecycle of the beans, this helps avoid static classes
-// each bean has a single instance, beans defined here can be used by other classes as dependencies
+/** config class for spring boot to manage lifecycle of the beans, this helps avoid static classes
+    each bean has a single instance, beans defined here can be used by other classes as dependencies */
 @Configuration
 public class MRTConfig {
 
@@ -19,6 +19,11 @@ public class MRTConfig {
     @Bean
     public ScrapeProcess scrapeProcess(ValueStore valueStore, ConfigTools configTools, DBtools dBtools, SSEController sseController) {
         return new ScrapeProcess(valueStore, configTools, dBtools, sseController);
+    }
+
+    @Bean
+    public ScraperParent scraperParent(ValueStore valueStore, DBtools DB) {
+        return new ScraperParent(valueStore, DB);
     }
 
     @Bean
@@ -35,5 +40,6 @@ public class MRTConfig {
     public DBtools dBtools(ValueStore valueStore) {
         return new DBtools(valueStore);
     }
+
 
 }

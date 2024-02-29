@@ -5,6 +5,8 @@ import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.net.SocketTimeoutException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -29,7 +31,7 @@ public class ScraperParent {
         this.DB = DB;
     }
 
-    public void scrape() {
+    public void scrape() throws ScraperTimeoutException {
         System.out.println("The method scrape() is to be overriden.");
     }
 

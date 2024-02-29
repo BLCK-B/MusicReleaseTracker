@@ -94,10 +94,7 @@ public class ValueStore {
        this.longTimeout = longTimeout;
     }
     public int getTimeout() {
-        if (!longTimeout)
-            return 25000;
-        else
-            return 80000;
+        return longTimeout ? 80000 : 25000;
     }
     public void setIsoDates(boolean isoDates) {
         this.isoDates = isoDates;

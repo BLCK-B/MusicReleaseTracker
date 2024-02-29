@@ -16,35 +16,43 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
 
     private final String songArtist;
     private String id;
+    private final boolean isIDnull;
     public BeatportScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
         super(valueStore, DB);
         this.songArtist = songArtist;
         this.id = id;
+
+        isIDnull = (id == null);
+        reduceToID();
     }
     @Override
-    public void scrape() {
-        if (id == null)
+    public void scrape() throws ScraperTimeoutException {
+        if (isIDnull)
             return;
-        // creating link
-        reduceToID();
+
         String url = "https://www.beatport.com/artist/" + id + "/tracks";
 
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
                     .timeout(store.getTimeout()).get();
-        } catch (SocketTimeoutException e) {
-            DB.logError(e, "INFO", "scrapeBeatport timed out " + url);
-        } catch (IOException e) {
+        }
+        catch (SocketTimeoutException e) {
+            throw new ScraperTimeoutException(url);
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         // pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
         String JSON = script.first().data();
+        //   "mix_name": "Song name",
+        //   "name": "Joe Smith",
+        //   "new_release_date": "2024-02-01"
         Pattern pattern = Pattern.compile(
-                "\"mix_name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
-                        "\"name\"\\s*:\\s*\"([^\"]+)\",\\s*" +
-                        "\"new_release_date\"\\s*:\\s*\"([^\"]+)\""
+        "\"mix_name\":\"([^\"]+)\"," +
+              "\"name\":\"([^\"]+)\"," +
+              "\"new_release_date\":\"([^\"]+)\""
         );
         Matcher matcher = pattern.matcher(JSON);
         ArrayList<String> typesArrayList = new ArrayList<>();
@@ -75,6 +83,8 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
     }
 
     private void reduceToID() {
+        if (isIDnull)
+            return;
         // reduce url to only the identifier
         // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
@@ -94,10 +104,8 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
         }
     }
 
-    public String reduceToID(String id) {
-        this.id = id;
-        reduceToID();
-        return this.id;
+    public String getID() {
+        return id;
     }
 
     @Override

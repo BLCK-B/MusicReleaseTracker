@@ -17,26 +17,31 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
 
     private final String songArtist;
     private String id;
+    private final boolean isIDnull;
     public JunodownloadScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
         super(valueStore, DB);
         this.songArtist = songArtist;
         this.id = id;
+
+        isIDnull = (id == null);
+        reduceToID();
     }
     @Override
-    public void scrape() {
-        if (id == null)
+    public void scrape() throws ScraperTimeoutException {
+        if (isIDnull)
             return;
-        //creating link
-        reduceToID();
+
         String url = "https://www.junodownload.com/artists/" + id + "/releases/?music_product_type=single&laorder=date_down";
 
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
                     .timeout(store.getTimeout()).get();
-        } catch (SocketTimeoutException e) {
-            DB.logError(e, "INFO", "scrapeJunodownload timed out " + url);
-        } catch (IOException e) {
+        }
+        catch (SocketTimeoutException e) {
+            throw new ScraperTimeoutException(url);
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         Elements songs = doc.select("a.juno-title");
@@ -97,6 +102,8 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
     }
 
     private void reduceToID() {
+        if (isIDnull)
+            return;
         // reduce url to only the identifier
         // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
@@ -115,10 +122,8 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
         }
     }
 
-    public String reduceToID(String id) {
-        this.id = id;
-        reduceToID();
-        return this.id;
+    public String getID() {
+        return id;
     }
 
     @Override

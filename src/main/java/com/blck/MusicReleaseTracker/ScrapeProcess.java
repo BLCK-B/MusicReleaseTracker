@@ -5,6 +5,8 @@ import com.blck.MusicReleaseTracker.Simple.SSEController;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,36 +47,20 @@ public class ScrapeProcess {
     public boolean scrapeCancel = false;
     public void scrapeData() throws SQLException, InterruptedException {
         config.readConfig("longTimeout");
-        // calling method for scrapers, based on artist URLs
         scrapeCancel = false;
-        // for each artistname: check all urls and load them into a list
+        // clear tables to prepare for new data
+        DB.clearDB();
+        // creating a list of scraper objects: one scraper holds one URL
         Connection conn = DriverManager.getConnection(store.getDBpath());
         String sql = "SELECT artistname FROM artists";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        ResultSet artistnameResults = pstmt.executeQuery();
-        ArrayList<String> artistNameList = new ArrayList<>();
-        while (artistnameResults.next()) {
-            artistNameList.add(artistnameResults.getString("artistname"));
-        }
-        // in case of no URLs
-        if (artistNameList.isEmpty())
-            return;
-        // clear tables to prepare for new data
-        for (String sourceTable : store.getSourceTables()) {
-            sql = "DELETE FROM " + sourceTable;
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
-        }
-        pstmt.close();
-        artistnameResults.close();
-        conn.close();
-        double progress = 0;
-        // creating a list of scraper objects artist by artist: one scraper holds one URL
-        conn = DriverManager.getConnection(store.getDBpath());
+        ResultSet artistResults = pstmt.executeQuery();
         ArrayList<ScraperParent> scrapers = new ArrayList<ScraperParent>();
-        for (String artist : artistNameList) {
+        // cycling artists
+        while (artistResults.next()) {
+            String artist = artistResults.getString("artistname");
+            // cycling sources
             for (String webSource : store.getSourceTables()) {
-                // selecting entire row
                 sql = "SELECT * FROM artists WHERE artistname = ?";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, artist);
@@ -88,9 +74,11 @@ public class ScrapeProcess {
                 }
             }
         }
+        pstmt.close();
+        artistResults.close();
         conn.close();
         // triggering scrapers
-        int counter = 0;
+        double progress = 0;
         for (ScraperParent scraper : scrapers) {
             double startTime = System.currentTimeMillis();
             // if clicked cancel
@@ -102,28 +90,25 @@ public class ScrapeProcess {
             for (int i = 0; i < 2; i++) {
                 try {
                     scraper.scrape();
-                } catch (Exception e) {
+                    break;
+                }
+                catch (ScraperTimeoutException e) {
                     if (i == 1)
-                        DB.logError(e, "INFO", "error scraping source " + scraper + ", trying again");
+                        DB.logError(e, "INFO", scraper + " timed out " + e);
                     else
-                        DB.logError(e, "WARNING", "error re-scraping source " + scraper + " moving on");
+                        DB.logError(e, "INFO", scraper + " second time out " + e + ", moving on");
                     Thread.sleep(2000);
                 }
             }
-            // calculated delay at the end of every source cycle
-            if (counter == 3) {
-                double endTime = System.currentTimeMillis();
-                double elapsedTime = endTime - startTime;
-                if (2800 - elapsedTime >= 0)
+            // calculated delay at the end of source cycle
+            if (scraper instanceof YoutubeScraper) {
+                double elapsedTime = System.currentTimeMillis() - startTime;
+                if (elapsedTime <= 2800)
                     Thread.sleep((long) (2800 - elapsedTime));
-                counter = 0;
             }
-            else
-                counter++;
-            // calculating progressbar value
             progress++;
-            // 40 cycles (10 artists * 4 sources) / 20 total artists / 4 sources = 50%
-            double state = progress / artistNameList.size() / 4;
+            // 40 cycles / 80 scrapers = 50%
+            double state = progress / scrapers.size();
             SSE.sendProgress(state);
         }
         System.gc();
@@ -168,40 +153,19 @@ public class ScrapeProcess {
                 sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
-
-                RScycle: while (rs.next()) {
+                while (rs.next()) {
                     String songName = rs.getString("song");
                     String songArtist = rs.getString("artist");
                     String songDate = rs.getString("date");
                     String songType = null;
-                    if (source.equals("beatport")) {
+                    if (source.equals("beatport"))
                         songType = rs.getString("type");
-                    }
 
-                    // filtering user-selected keywords
-                    if (testPath == null) {
-                        for (String checkword : store.getFilterWords()) {
-                            if (songType != null) {
-                                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
-                                    continue RScycle;
-                            }
-                            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                                continue RScycle;
+                    if (filterWords(songName, songType, testPath)) {
+                        switch (source) {
+                            case "beatport" -> songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
+                            case "musicbrainz", "junodownload", "youtube" -> songObjectList.add(new SongClass(songName, songArtist, songDate));
                         }
-                    }
-                    else {
-                        String checkword = "XXXXX";
-                        if (songType != null) {
-                            if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
-                                continue;
-                        }
-                        if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                            continue;
-                    }
-
-                    switch (source) {
-                        case "beatport" -> songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
-                        case "musicbrainz", "junodownload", "youtube" -> songObjectList.add(new SongClass(songName, songArtist, songDate));
                     }
                 }
             }
@@ -215,8 +179,7 @@ public class ScrapeProcess {
         Map<String, SongClass> nameArtistMap = songObjectList.stream()
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getArtist().replaceAll("\\s+", "").toLowerCase(),
-                        song -> song,
-                        (existingValue, newValue) -> {
+                        song -> song, (existingValue, newValue) -> {
                             try {
                                 Date existingDate = dateFormat.parse(existingValue.getDate());
                                 Date newDate = dateFormat.parse(newValue.getDate());
@@ -235,8 +198,7 @@ public class ScrapeProcess {
         Map<String, SongClass> nameDateMap = nameArtistMap.values().stream()
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
-                        song -> song,
-                        (existingValue, newValue) -> {
+                        song -> song, (existingValue, newValue) -> {
                             // append artist from duplicate song to the already existing object in map
                             String newArtist = newValue.getArtist();
                             if (!existingValue.getArtist().contains(newArtist))
@@ -254,13 +216,13 @@ public class ScrapeProcess {
 
         // insert data into table
         try {
-            // precomitting batch insert is way faster
             if (testPath == null)
                 conn = DriverManager.getConnection(store.getDBpath());
             else
                 conn = DriverManager.getConnection(testPath);
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
+            // precomitting batch insert is way faster
             int i = 0;
             for (SongClass item : finalSortedList) {
                 if (i == 115)
@@ -275,7 +237,6 @@ public class ScrapeProcess {
             pstmt.executeBatch();
             conn.commit();
             conn.setAutoCommit(true);
-            pstmt.clearBatch();
 
             songObjectList.clear();
             stmt.close();
@@ -285,6 +246,30 @@ public class ScrapeProcess {
             DB.logError(e, "SEVERE", "error inserting data to combview");
         }
         System.gc();
+    }
+
+    public boolean filterWords(String songName, String songType, String testPath) {
+        // filtering user-selected keywords
+        if (testPath == null) {
+            for (String checkword : store.getFilterWords()) {
+                if (songType != null) {
+                    if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                        return false;
+                }
+                if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
+                    return false;
+            }
+        }
+        else {
+            String checkword = "XXXXX";
+            if (songType != null) {
+                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                    return false;
+            }
+            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
+                return false;
+        }
+        return true;
     }
 
 }

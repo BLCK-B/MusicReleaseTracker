@@ -10,31 +10,37 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeoutException;
 
 public final class YoutubeScraper extends ScraperParent implements ScraperInterface {
 
     private final String songArtist;
     private String id;
+    private final boolean isIDnull;
     public YoutubeScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
         super(valueStore, DB);
         this.songArtist = songArtist;
         this.id = id;
+
+        isIDnull = (id == null);
+        reduceToID();
     }
     @Override
-    public void scrape() {
-        if (id == null)
+    public void scrape() throws ScraperTimeoutException {
+        if (isIDnull)
             return;
-        // creating link
-        reduceToID();
+
         String url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
 
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
                     .timeout(store.getTimeout()).get();
-        } catch (SocketTimeoutException e) {
-            DB.logError(e, "INFO", "scrapeYoutube timed out " + url);
-        } catch (IOException e) {
+        }
+        catch (SocketTimeoutException e) {
+            throw new ScraperTimeoutException(url);
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         Elements songs = doc.select("title");
@@ -56,11 +62,17 @@ public final class YoutubeScraper extends ScraperParent implements ScraperInterf
             if (songsArray[i] != null && datesArray[i] != null)
                 songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
         }
+        songs.clear();
+        dates.clear();
+        songsArray = null;
+        datesArray = null;
 
         super.processInfo(songList, "youtube");
     }
 
     private void reduceToID() {
+        if (isIDnull)
+            return;
         // reduce url to only the identifier
         // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
@@ -80,10 +92,8 @@ public final class YoutubeScraper extends ScraperParent implements ScraperInterf
         }
     }
 
-    public String reduceToID(String id) {
-        this.id = id;
-        reduceToID();
-        return this.id;
+    public String getID() {
+        return id;
     }
 
     @Override

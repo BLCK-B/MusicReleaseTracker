@@ -14,26 +14,32 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
 
     private final String songArtist;
     private String id;
+    private final boolean isIDnull;
+
     public MusicbrainzScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
         super(valueStore, DB);
         this.songArtist = songArtist;
         this.id = id;
+
+        isIDnull = (id == null);
+        reduceToID();
     }
     @Override
-    public void scrape() {
-        if (id == null)
+    public void scrape() throws ScraperTimeoutException {
+        if (isIDnull)
             return;
-        // creating link for API
-        reduceToID();
+
         String url = "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
 
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
                     .timeout(store.getTimeout()).get();
-        } catch (SocketTimeoutException e) {
-            DB.logError(e, "INFO", "scrapeBrainz timed out " + url);
-        } catch (IOException e) {
+        }
+        catch (SocketTimeoutException e) {
+            throw new ScraperTimeoutException(url);
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         Elements songs = doc.select("title");
@@ -57,6 +63,8 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
     }
 
     private void reduceToID() {
+        if (isIDnull)
+            return;
         // reduce url to only the identifier
         // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
@@ -75,10 +83,8 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
         }
     }
 
-    public String reduceToID(String id) {
-        this.id = id;
-        reduceToID();
-        return this.id;
+    public String getID() {
+        return id;
     }
 
     @Override

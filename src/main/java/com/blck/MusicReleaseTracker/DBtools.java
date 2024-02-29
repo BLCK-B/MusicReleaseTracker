@@ -160,7 +160,6 @@ public void createTables() {
             logError(e, "SEVERE", "error renaming/deleting DB files");
         }
     }
-
 }
 
 private void createDB(String path) {
@@ -234,6 +233,19 @@ private void createDB(String path) {
         conn.close();
     } catch (SQLException e) {
        logError(e, "SEVERE", "error creating DB file");
+    }
+}
+
+public void clearDB() {
+    try {
+        Connection conn = DriverManager.getConnection(store.getDBpath());
+        for (String sourceTable : store.getSourceTables()) {
+            String sql = "DELETE FROM " + sourceTable;
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
     }
 }
 

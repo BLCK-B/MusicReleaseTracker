@@ -1,12 +1,8 @@
 package com.blck.MusicReleaseTracker;
 
-import com.blck.MusicReleaseTracker.Scrapers.BeatportScraper;
-import com.blck.MusicReleaseTracker.Scrapers.JunodownloadScraper;
-import com.blck.MusicReleaseTracker.Scrapers.MusicbrainzScraper;
-import com.blck.MusicReleaseTracker.Scrapers.YoutubeScraper;
+import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,9 +40,13 @@ public class GUIController {
     }
 
     private String lastClickedArtist;
-    private String selectedSource;
     private final List<TableModel> tableContent = new ArrayList<>();
     private String tempID;
+
+    private enum sourceEnum {
+        combview, beatport, musicbrainz, junodownload, youtube
+    }
+    private sourceEnum selectedSource;
 
    public List<String> loadList(String testPath) throws SQLException {
         List<String> dataList = new ArrayList<>();
@@ -126,7 +126,7 @@ public class GUIController {
 
     public void deleteUrl(String testPath) {
         if (!testPath.isBlank()) {
-            selectedSource = "beatport";
+            selectedSource = sourceEnum.beatport;
             lastClickedArtist = "Joe";
         }
         // set null specific URL, delete related set
@@ -171,16 +171,16 @@ public class GUIController {
         if (origin.equals("list"))
             lastClickedArtist = item;
         else if (origin.equals("tab"))
-            selectedSource = item;
+            selectedSource = sourceEnum.valueOf(item);
 
-        if (selectedSource.equals("combview")) {
+        if (selectedSource == sourceEnum.combview) {
             try {
                 loadCombviewTable();
             } catch (SQLException e) {
                 DB.logError(e, "WARNING", "error loading combview");
             }
         }
-        else if (selectedSource != null &&lastClickedArtist != null) {
+        else if (selectedSource != null && lastClickedArtist != null) {
             try {
                 loadTable();
             } catch (SQLException e) {
@@ -228,6 +228,7 @@ public class GUIController {
         pstmt.close();
         rs.close();
     }
+
     public void fillCombview() {
         scrapeProcess.fillCombviewTable(null);
     }
@@ -239,24 +240,24 @@ public class GUIController {
         String id = null;
         try {
             switch(selectedSource) {
-                case "musicbrainz" -> {
-                    MusicbrainzScraper MBscraper = new MusicbrainzScraper(store, DB, lastClickedArtist, url);
-                    id = MBscraper.reduceToID(url);
+                case musicbrainz -> {
+                    MusicbrainzScraper MBscraper = new MusicbrainzScraper(null, null, null, url);
+                    id = MBscraper.getID();
                     MBscraper.scrape();
                 }
-                case "beatport" -> {
-                    BeatportScraper BPscraper = new BeatportScraper(store, DB, lastClickedArtist, url);
-                    id = BPscraper.reduceToID(url);
+                case beatport -> {
+                    BeatportScraper BPscraper = new BeatportScraper(null, null, null, url);
+                    id = BPscraper.getID();
                     BPscraper.scrape();
                 }
-                case "junodownload" -> {
-                    JunodownloadScraper JDscraper = new JunodownloadScraper(store, DB, lastClickedArtist, url);
-                    id = JDscraper.reduceToID(url);
+                case junodownload -> {
+                    JunodownloadScraper JDscraper = new JunodownloadScraper(null, null, null, url);
+                    id = JDscraper.getID();
                     JDscraper.scrape();
                 }
-                case "youtube" -> {
-                    YoutubeScraper YTscraper = new YoutubeScraper(store, DB, lastClickedArtist, url);
-                    id = YTscraper.reduceToID(url);
+                case youtube -> {
+                    YoutubeScraper YTscraper = new YoutubeScraper(null, null, null, url);
+                    id = YTscraper.getID();
                     YTscraper.scrape();
                 }
             }
@@ -270,7 +271,7 @@ public class GUIController {
     public void saveUrl(String testPath) {
         // save artist url to db
         if (!testPath.isBlank()) {
-            selectedSource = "beatport";
+            selectedSource = sourceEnum.beatport;
             lastClickedArtist = "Joe";
             tempID = "testingUrl";
         }
@@ -290,6 +291,7 @@ public class GUIController {
             DB.logError(e, "WARNING", "could not save URL");
         }
     }
+
     public boolean checkExistURL(String testPath) {
         // check for existence of url to determine showing url dialog
         boolean urlExists = false;
@@ -299,11 +301,11 @@ public class GUIController {
                 conn = DriverManager.getConnection(store.getDBpath());
             else {
                 conn = DriverManager.getConnection(testPath);
-                selectedSource = "beatport";
+                selectedSource = sourceEnum.beatport;
                 lastClickedArtist = "Joe";
             }
             String sql = null;
-            if (!selectedSource.equals("combview"))
+            if (selectedSource != sourceEnum.combview)
                 sql = "SELECT url" + selectedSource + " FROM artists WHERE artistname = ?";
             else
                 return urlExists;
@@ -335,9 +337,8 @@ public class GUIController {
         } catch (Exception e) {
             DB.logError(e, "WARNING", "fillCombviewTable error: clickScrape");
         }
-        Connection conn = null;
         try {
-            conn = DriverManager.getConnection(store.getDBpath());
+            Connection conn = DriverManager.getConnection(store.getDBpath());
             String sql = "VACUUM;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.execute();

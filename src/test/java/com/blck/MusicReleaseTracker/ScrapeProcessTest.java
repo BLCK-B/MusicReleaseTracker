@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,12 @@ public class ScrapeProcessTest {
 
     @Test
     void processInfo() {
+        ScraperParent scraperInstace = new ScraperParent(null, null);
         ArrayList<SongClass> songList = new ArrayList<>();
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
         songList.add(new SongClass("Son’g3", "artistName", "2023-03-01"));
         songList.add(new SongClass("Song2", "artistName", "2023-02-01"));
-        scrapeProcess.processInfo(songList, "test");
+        scraperInstace.processInfo(songList, "test");
         // expected values: sort by date
         ArrayList<SongClass> expectedSongList = new ArrayList<>();
         expectedSongList.add(new SongClass("Son'g3", "artistName", "2023-03-01"));
@@ -41,7 +43,7 @@ public class ScrapeProcessTest {
         songList.add(new SongClass("Song4", "artistName", "2023"));
         songList.add(new SongClass("Song5", "artistName", "-"));
         songList.add(new SongClass("Song6", "artistName", "08-05-2023"));
-        scrapeProcess.processInfo(songList, "test");
+        scraperInstace.processInfo(songList, "test");
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
@@ -53,7 +55,7 @@ public class ScrapeProcessTest {
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
         songList.add(new SongClass("Song1", "artistName", "2019-19-19"));
         songList.add(new SongClass("Song1", "artistName", "2005-05-05"));
-        scrapeProcess.processInfo(songList, "test");
+        scraperInstace.processInfo(songList, "test");
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
@@ -131,22 +133,26 @@ public class ScrapeProcessTest {
         for (int i = 0; i < input.size(); i++) {
             // beatport
             if (i < 3) {
-                String output = scrapeProcess.reduceToID(input.get(i), "beatport");
+                BeatportScraper scraper = new BeatportScraper(null, null, null, input.get(i));
+                String output = scraper.getID();
                 assertEquals("artistname/1234", output);
             }
             // musicbrainz
             else if (i < 6) {
-                String output = scrapeProcess.reduceToID(input.get(i), "musicbrainz");
+                MusicbrainzScraper scraper = new MusicbrainzScraper(null, null, null, input.get(i));
+                String output = scraper.getID();
                 assertEquals("123-id-123", output);
             }
             // junodownload
             else if (i < 9) {
-                String output = scrapeProcess.reduceToID(input.get(i), "junodownload");
+                JunodownloadScraper scraper = new JunodownloadScraper(null, null, null, input.get(i));
+                String output = scraper.getID();
                 assertEquals("artistname", output);
             }
             // youtube
             else {
-                String output = scrapeProcess.reduceToID(input.get(i), "youtube");
+                YoutubeScraper scraper = new YoutubeScraper(null, null, null, input.get(i));
+                String output = scraper.getID();
                 assertEquals("123-id-123", output);
             }
         }

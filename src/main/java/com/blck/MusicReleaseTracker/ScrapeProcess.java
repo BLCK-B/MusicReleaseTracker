@@ -5,8 +5,6 @@ import com.blck.MusicReleaseTracker.Simple.SSEController;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,7 +44,7 @@ public class ScrapeProcess {
 
     public boolean scrapeCancel = false;
     public void scrapeData() throws SQLException, InterruptedException {
-        config.readConfig("longTimeout");
+        config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
         // clear tables to prepare for new data
         DB.clearDB();
@@ -114,12 +112,12 @@ public class ScrapeProcess {
         System.gc();
     }
 
-    public void fillCombviewTable(String testPath) {
+    public void fillCombviewTable() {
         // assembles table for combined view: filters unwanted words, looks for duplicates
         // load filterwords and entrieslimit
-        if (testPath == null) {
+        if (!store.getDBpath().contains("testing")) {
             try {
-                config.readConfig("filters");
+                config.readConfig(ConfigTools.configOptions.filters);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -129,10 +127,7 @@ public class ScrapeProcess {
         String sql = null;
         Statement stmt = null;
         try {
-            if (testPath == null)
-                conn = DriverManager.getConnection(store.getDBpath());
-            else
-                conn = DriverManager.getConnection(testPath);
+            conn = DriverManager.getConnection(store.getDBpath());
             sql = "DELETE FROM combview";
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
@@ -145,10 +140,7 @@ public class ScrapeProcess {
         ArrayList<SongClass> songObjectList = new ArrayList<>();
 
         try {
-            if (testPath == null)
-                conn = DriverManager.getConnection(store.getDBpath());
-            else
-                conn = DriverManager.getConnection(testPath);
+            conn = DriverManager.getConnection(store.getDBpath());
             for (String source : store.getSourceTables()) {
                 sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
@@ -161,7 +153,7 @@ public class ScrapeProcess {
                     if (source.equals("beatport"))
                         songType = rs.getString("type");
 
-                    if (filterWords(songName, songType, testPath)) {
+                    if (filterWords(songName, songType)) {
                         switch (source) {
                             case "beatport" -> songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
                             case "musicbrainz", "junodownload", "youtube" -> songObjectList.add(new SongClass(songName, songArtist, songDate));
@@ -216,10 +208,7 @@ public class ScrapeProcess {
 
         // insert data into table
         try {
-            if (testPath == null)
-                conn = DriverManager.getConnection(store.getDBpath());
-            else
-                conn = DriverManager.getConnection(testPath);
+            conn = DriverManager.getConnection(store.getDBpath());
             sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             // precomitting batch insert is way faster
@@ -248,20 +237,9 @@ public class ScrapeProcess {
         System.gc();
     }
 
-    public boolean filterWords(String songName, String songType, String testPath) {
+    public boolean filterWords(String songName, String songType) {
         // filtering user-selected keywords
-        if (testPath == null) {
-            for (String checkword : store.getFilterWords()) {
-                if (songType != null) {
-                    if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
-                        return false;
-                }
-                if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                    return false;
-            }
-        }
-        else {
-            String checkword = "XXXXX";
+        for (String checkword : store.getFilterWords()) {
             if (songType != null) {
                 if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
                     return false;

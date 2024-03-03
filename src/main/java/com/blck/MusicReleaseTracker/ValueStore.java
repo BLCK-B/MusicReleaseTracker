@@ -24,10 +24,9 @@ public class ValueStore {
     public ValueStore() {
     }
 
+    private String appDataPath;
     private String DBpath;
-    private String DBtemplatePath;
     private String configPath;
-    private String configFolder;
     private String errorLogs;
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
@@ -38,31 +37,23 @@ public class ValueStore {
     // array of all available sources, in order that fillCombviewTable uses
     final private String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
 
+    public void setAppDataPath(String appDataPath) {
+        this.appDataPath = appDataPath;
+    }
+    public String getAppDataPath() {
+        return appDataPath;
+    }
     public void setDBpath(String DBpath) {
         this.DBpath = DBpath;
     }
     public String getDBpath() {
         return DBpath;
     }
-    public void setDBTemplatePath(String DBTemplatePath) {
-        this.DBtemplatePath = DBTemplatePath;
-    }
-    public String getDBTemplatePath() {
-        return DBtemplatePath;
-    }
-
     public void setConfigPath(String configPath) {
         this.configPath = configPath;
     }
     public String getConfigPath() {
         return configPath;
-    }
-
-    public void setConfigFolder(String configFolder) {
-        this.configFolder = configFolder;
-    }
-    public String getConfigFolder() {
-        return configFolder;
     }
     public void setErrorLogs(String errorLogs) {
         this.errorLogs = errorLogs;

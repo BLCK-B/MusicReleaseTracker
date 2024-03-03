@@ -2,7 +2,6 @@ package com.blck.MusicReleaseTracker;
 
 import com.typesafe.config.*;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,6 +32,10 @@ public class ConfigTools {
     private final ValueStore store;
     private final DBtools DB;
 
+    public enum configOptions {
+        filters, themes, lastScrape, longTimeout, isoDates, systemTheme
+    }
+
     @Autowired
     public ConfigTools(ValueStore valueStore, DBtools DB) {
         this.store = valueStore;
@@ -47,6 +50,7 @@ public class ConfigTools {
             configValue = ConfigValueFactory.fromAnyRef(Boolean.parseBoolean(value));
         else
             configValue = ConfigValueFactory.fromAnyRef(value);
+
         config = config.withValue(name, configValue);
         ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
         try (PrintWriter writer = new PrintWriter(new FileWriter(store.getConfigPath()))) {
@@ -56,23 +60,22 @@ public class ConfigTools {
         }
     }
 
-    public void readConfig(String option) {
+    public void readConfig(configOptions o) {
         // any reading from config file
         Config config = ConfigFactory.parseFile(new File(store.getConfigPath()));
 
-        switch (option) {
-            case ("filters") -> {
+        switch (o) {
+            case filters -> {
                 ArrayList<String> filterWords = new ArrayList<>();
                 Config filtersConfig = config.getConfig("filters");
                 for (Map.Entry<String, ConfigValue> entry : filtersConfig.entrySet()) {
                     String filter = entry.getKey();
-                    boolean enabled = entry.getValue().unwrapped().equals(true);
-                    if (enabled)
+                    if (entry.getValue().unwrapped().equals(true))
                         filterWords.add(filter);
                 }
                 store.setFilterWords(filterWords);
             }
-            case ("themes") -> {
+            case themes -> {
                 String theme = config.getString("theme");
                 String accent = config.getString("accent");
                 Map<String, String> themesMap = new HashMap<>();
@@ -80,10 +83,10 @@ public class ConfigTools {
                 themesMap.put("accent", accent);
                 store.setThemes(themesMap);
             }
-            case ("lastScrape") -> store.setScrapeDate(config.getString("lastScrape"));
-            case ("longTimeout") -> store.setLongTimeout(config.getBoolean("longTimeout"));
-            case ("isoDates") -> store.setIsoDates(config.getBoolean("isoDates"));
-            case ("systemTheme") -> store.setSystemTheme(config.getBoolean("systemTheme"));
+            case lastScrape -> store.setScrapeDate(config.getString("lastScrape"));
+            case longTimeout -> store.setLongTimeout(config.getBoolean("longTimeout"));
+            case isoDates -> store.setIsoDates(config.getBoolean("isoDates"));
+            case systemTheme -> store.setSystemTheme(config.getBoolean("systemTheme"));
         }
         config = null;
     }
@@ -92,11 +95,11 @@ public class ConfigTools {
         // create config if it does not exist, change to latest structure and transfer data if structure is different
 
         // appData/MusicReleaseTracker/MRTsettings.hocon
-        String configPath = store.getConfigPath();
+        final String configPath = store.getConfigPath();
         // appData/MusicReleaseTracker/
-        String configFolder = store.getConfigFolder();
+        final String configFolder = store.getAppDataPath();
         // a default settings structure for current version
-        String templateContent = """
+        final String templateContent = """
             filters {
                 Acoustic=false
                 Extended=false

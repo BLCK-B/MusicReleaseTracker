@@ -3,9 +3,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,13 +11,33 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class ScrapeProcessTest {
+public class ScrapingTest {
 
-    private final ScrapeProcess scrapeProcess;
+    private final ValueStore store = new ValueStore();
+    private final DBtools DB = new DBtools(store);
+    private final String testDBpath;
+    private final ScrapeProcess testedClass;
 
-    @Autowired
-    public ScrapeProcessTest(ScrapeProcess scrapeProcess) {
-        this.scrapeProcess = scrapeProcess;
+    public ScrapingTest() {
+        // data setup
+        String DBpath = null;
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) { // Windows
+            String appDataPath = System.getenv("APPDATA");
+            DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "testingdata.db";
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  // Linux
+            String userHome = System.getProperty("user.home");
+            DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "testingdata.db";
+        }
+        else
+            throw new UnsupportedOperationException("unsupported OS");
+        //DB.path();
+        testDBpath = DBpath; //store.getAppDataPath() + "testingdata.db";
+        store.setDBpath(testDBpath);
+        ArrayList<String> filterWords = new ArrayList<>();
+        filterWords.add("XXXXX");
+        store.setFilterWords(filterWords);
+        testedClass = new ScrapeProcess(store, null, DB, null);
     }
 
     @Test
@@ -63,20 +81,7 @@ public class ScrapeProcessTest {
 
     @Test
     void fillCombviewTable() {
-        String DBpath = null;
-        String os = System.getProperty("os.name").toLowerCase();
-
-        if (os.contains("win")) { // Windows
-            String appDataPath = System.getenv("APPDATA");
-            DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "testingdata.db";
-        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  // Linux
-            String userHome = System.getProperty("user.home");
-            DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "testingdata.db";
-        }
-        else
-            throw new UnsupportedOperationException("unsupported OS");
-
-        scrapeProcess.fillCombviewTable(DBpath);
+        testedClass.fillCombviewTable();
 
         ArrayList<SongClass> songList = new ArrayList<>();
         ArrayList<SongClass> expectedSongList = new ArrayList<>();
@@ -85,7 +90,7 @@ public class ScrapeProcessTest {
         expectedSongList.add(new SongClass("DiffDates", "B", "2000-30-30"));
 
         try {
-            Connection conn = DriverManager.getConnection(DBpath);
+            Connection conn = DriverManager.getConnection(testDBpath);
             String sql = "SELECT * FROM combview ORDER BY date DESC";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
@@ -113,7 +118,7 @@ public class ScrapeProcessTest {
 
     @Test
     void reduceToID() {
-        ArrayList<String> input = new ArrayList<String>();
+        ArrayList<String> input = new ArrayList<>();
         // beatport
         input.add("https://www.beatport.com/artist/artistname/1234/tracks");
         input.add("https://www.beatport.com/artist/artistname/1234");

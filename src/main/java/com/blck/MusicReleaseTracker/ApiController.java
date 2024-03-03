@@ -37,7 +37,7 @@ public class ApiController {
 
     @GetMapping("/loadList")
     public List<String> loadList() throws SQLException {
-        return sendRequest.loadList("");
+        return sendRequest.loadList();
     }
 
     @PostMapping ("/listOrTabClick")
@@ -50,16 +50,16 @@ public class ApiController {
     @PostMapping("/clickArtistAdd")
     public void clickArtistAdd(@RequestBody String artistname) {
         artistname = URLDecoder.decode(artistname, StandardCharsets.UTF_8).replace("=" , "").trim();
-        sendRequest.artistAddConfirm(artistname, "");
+        sendRequest.artistAddConfirm(artistname);
     }
 
     @RequestMapping ("/clickArtistDelete")
     public void clickArtistDelete() {
-        sendRequest.artistClickDelete("");
+        sendRequest.artistClickDelete();
     }
     @PostMapping("/deleteUrl")
     public void deleteUrl() {
-        sendRequest.deleteUrl("");
+        sendRequest.deleteUrl();
     }
 
     @RequestMapping ("/cleanArtistSource")
@@ -68,7 +68,7 @@ public class ApiController {
     }
     @RequestMapping ("/saveUrl")
     public void saveUrl() {
-        sendRequest.saveUrl("");
+        sendRequest.saveUrl();
     }
 
     @PostMapping ("/clickAddURL")
@@ -111,7 +111,7 @@ public class ApiController {
 
     @GetMapping("/checkExistURL")
     public boolean checkExistURL() {
-        return sendRequest.checkExistURL("");
+        return sendRequest.checkExistURL();
     }
 
     @GetMapping("/getScrapeDate")

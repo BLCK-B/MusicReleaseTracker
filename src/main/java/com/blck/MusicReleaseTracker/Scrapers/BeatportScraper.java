@@ -67,7 +67,7 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
         doc.empty();
 
         // create arraylist of song objects
-        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        ArrayList<SongClass> songList = new ArrayList<>();
         for (int i = 0; i < Math.min(songsArrayList.size(), datesArrayList.size()); i++) {
             if (songsArrayList.get(i) != null && datesArrayList.get(i) != null && typesArrayList.get(i) != null)
                 songList.add(new SongClass(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
@@ -104,6 +104,7 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
         }
     }
 
+    @Override
     public String getID() {
         return id;
     }

@@ -4,9 +4,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.io.File;
 import java.sql.SQLException;
 
@@ -16,39 +14,38 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GUIControllerTest {
 
-    private final GUIController GUI;
+    private final ValueStore store = new ValueStore();
+    private final DBtools DB = new DBtools(store);
+    private final String testDBpath;
+    private final GUIController testedClass;
 
-    @Autowired
-    public GUIControllerTest(GUIController guiController) {
-        this.GUI = guiController;
-    }
-
-    private static String DBpath;
-
-    String getDBpath() {
-        String os = System.getProperty("os.name").toLowerCase();
+    public GUIControllerTest() {
+        // data setup
         String DBpath = null;
-        String appDataPath = null;
-        if (os.contains("win")) // Windows
-            appDataPath = System.getenv("APPDATA");
-        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  // Linux
-            appDataPath = System.getProperty("user.home");
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win")) { // Windows
+            String appDataPath = System.getenv("APPDATA");
+            DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "testingdata.db";
+        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  // Linux
+            String userHome = System.getProperty("user.home");
+            DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "testingdata.db";
+        }
         else
             throw new UnsupportedOperationException("unsupported OS");
 
-        DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "testingdata.db";
-        return DBpath;
+        testDBpath = DBpath;
+        store.setDBpath(DBpath);
+        testedClass = new GUIController(store, null, null, DB);
     }
 
     @Test
     @Order(1)
     void AddLoadArtist() {
-        String DBpath = getDBpath();
         // artistAddConfirm
-        GUI.artistAddConfirm("Joe", DBpath);
+        testedClass.artistAddConfirm("Joe");
         // verify with loadList
         try {
-            String oneArtist = GUI.loadList(DBpath).get(0);
+            String oneArtist = testedClass.loadList().get(0);
             assertEquals(oneArtist, "Joe");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -58,12 +55,11 @@ public class GUIControllerTest {
     @Test
     @Order(2)
     void AddVerifyUrl() {
-        String DBpath = getDBpath();
         // saveUrl
-        GUI.saveUrl(DBpath);
+        testedClass.saveUrl();
         // verify with checkExistUrl
         try {
-            boolean exists = GUI.checkExistURL(DBpath);
+            boolean exists = testedClass.checkExistURL();
             assertTrue(exists);
         }
         catch (Exception e) {
@@ -74,12 +70,11 @@ public class GUIControllerTest {
     @Test
     @Order(3)
     void DeleteVerifyUrl() {
-        String DBpath = getDBpath();
         // deleteUrl
-        GUI.deleteUrl(DBpath);
+        testedClass.deleteUrl();
         // verify with checkExistUrl
         try {
-            boolean exists = GUI.checkExistURL(DBpath);
+            boolean exists = testedClass.checkExistURL();
             assertFalse(exists);
         }
         catch (Exception e) {
@@ -90,12 +85,11 @@ public class GUIControllerTest {
     @Test
     @Order(4)
     void DeleteArtist() {
-        String DBpath = getDBpath();
         // artistClickDelete
-        GUI.artistClickDelete(DBpath);
+        testedClass.artistClickDelete();
         // verify with loadList
         try {
-            assertTrue(GUI.loadList(DBpath).isEmpty());
+            assertTrue(testedClass.loadList().isEmpty());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

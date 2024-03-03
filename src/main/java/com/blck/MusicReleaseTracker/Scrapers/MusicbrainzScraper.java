@@ -83,6 +83,7 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
         }
     }
 
+    @Override
     public String getID() {
         return id;
     }

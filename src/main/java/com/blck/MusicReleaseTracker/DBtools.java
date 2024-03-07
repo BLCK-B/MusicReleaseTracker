@@ -77,29 +77,31 @@ public class DBtools {
             appData = System.getProperty("user.home");
         else
             throw new UnsupportedOperationException("unsupported OS");
-        // assemble paths for all appdata files
-        File folder = new File(appData + slash + "MusicReleaseTracker");
+
+        // paths
+        String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
+        String DBpath =             "jdbc:sqlite:" + appDataPath + "musicdata.db";
+        String configPath =         appDataPath + "MRTsettings.hocon";
+        String errorLogs =          appDataPath + "errorlogs.txt";
+        // save to settingsStore
+        store.setAppDataPath(appDataPath);
+        store.setConfigPath(configPath);
+        store.setDBpath(DBpath);
+        store.setErrorLogs(errorLogs);
+
+        // appdata folder
+        File folder = new File(appDataPath);
         if (!folder.exists())
             folder.mkdirs();
         // junk folder because sqlite did not delete temp files in "temp"
-        File tempfolder = new File(appData + slash + "MusicReleaseTracker" + slash + "temp");
+        File tempfolder = new File(appDataPath + "temp");
         if (!tempfolder.exists())
             tempfolder.mkdirs();
         File[] tempfiles = tempfolder.listFiles();
         for (File file : tempfiles) {
             file.delete();
         }
-        System.setProperty("org.sqlite.tmpdir", appData + slash + "MusicReleaseTracker" + slash + "temp");
-
-        String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
-        String DBpath =             "jdbc:sqlite:" + appDataPath + "musicdata.db";
-        String configPath =         appDataPath + "MRTsettings.hocon";
-        String errorLogs =          appDataPath + "errorlogs.txt";
-        // save paths to settingsStore
-        store.setAppDataPath(appDataPath);
-        store.setConfigPath(configPath);
-        store.setDBpath(DBpath);
-        store.setErrorLogs(errorLogs);
+        System.setProperty("org.sqlite.tmpdir", appDataPath + "temp");
     }
 
     public void createTables() {
@@ -123,7 +125,7 @@ public class DBtools {
                 Connection connDB = DriverManager.getConnection(store.getDBpath());
                 Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath);
 
-                // insert data from musicdata column to a template column
+                // insert data from musicdata's column to template's column
                 String sql = "SELECT * FROM artists";
                 Statement stmt = connDB.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
@@ -246,13 +248,14 @@ public class DBtools {
                 Statement stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
             }
+            conn.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public Map<String, ArrayList<String>> getDBStructure(String path) {
-        HashMap<String, ArrayList<String>> tableMap = new HashMap<String, ArrayList<String>>();
+        HashMap<String, ArrayList<String>> tableMap = new HashMap<>();
         try {
             Connection conn = DriverManager.getConnection(path);
             String sql = "SELECT name FROM sqlite_master WHERE type='table'";
@@ -263,7 +266,7 @@ public class DBtools {
                 tablesList.add(rsTables.getString(1));
 
             for (String tableName : tablesList) {
-                ArrayList<String> tableColumnsList = new ArrayList<String>();
+                ArrayList<String> tableColumnsList = new ArrayList<>();
                 ResultSet rsColumns = stmt.executeQuery("PRAGMA table_info(" + tableName + ")");
                 while (rsColumns.next())
                     tableColumnsList.add(rsColumns.getString("name"));

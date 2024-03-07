@@ -62,33 +62,35 @@ public class ConfigTools {
 
     public void readConfig(configOptions o) {
         // any reading from config file
-        Config config = ConfigFactory.parseFile(new File(store.getConfigPath()));
-
-        switch (o) {
-            case filters -> {
-                ArrayList<String> filterWords = new ArrayList<>();
-                Config filtersConfig = config.getConfig("filters");
-                for (Map.Entry<String, ConfigValue> entry : filtersConfig.entrySet()) {
-                    String filter = entry.getKey();
-                    if (entry.getValue().unwrapped().equals(true))
-                        filterWords.add(filter);
+        try {
+            Config config = ConfigFactory.parseFile(new File(store.getConfigPath()));
+            switch (o) {
+                case filters -> {
+                    ArrayList<String> filterWords = new ArrayList<>();
+                    Config filtersConfig = config.getConfig("filters");
+                    for (Map.Entry<String, ConfigValue> entry : filtersConfig.entrySet()) {
+                        String filter = entry.getKey();
+                        if (entry.getValue().unwrapped().equals(true))
+                            filterWords.add(filter);
+                    }
+                    store.setFilterWords(filterWords);
                 }
-                store.setFilterWords(filterWords);
+                case themes -> {
+                    Map<String, String> themesMap = new HashMap<>();
+                    themesMap.put("theme", config.getString("theme"));
+                    themesMap.put("accent", config.getString("accent"));
+                    store.setThemes(themesMap);
+                }
+                case lastScrape -> store.setScrapeDate(config.getString("lastScrape"));
+                case longTimeout -> store.setLongTimeout(config.getBoolean("longTimeout"));
+                case isoDates -> store.setIsoDates(config.getBoolean("isoDates"));
+                case systemTheme -> store.setSystemTheme(config.getBoolean("systemTheme"));
             }
-            case themes -> {
-                String theme = config.getString("theme");
-                String accent = config.getString("accent");
-                Map<String, String> themesMap = new HashMap<>();
-                themesMap.put("theme", theme);
-                themesMap.put("accent", accent);
-                store.setThemes(themesMap);
-            }
-            case lastScrape -> store.setScrapeDate(config.getString("lastScrape"));
-            case longTimeout -> store.setLongTimeout(config.getBoolean("longTimeout"));
-            case isoDates -> store.setIsoDates(config.getBoolean("isoDates"));
-            case systemTheme -> store.setSystemTheme(config.getBoolean("systemTheme"));
+            config = null;
         }
-        config = null;
+        catch (Exception e) {
+            DB.logError(e, "WARNING", "could not read config: " + o);
+        }
     }
 
     public void updateSettings() {

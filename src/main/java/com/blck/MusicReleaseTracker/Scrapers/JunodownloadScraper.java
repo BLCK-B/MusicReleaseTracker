@@ -1,7 +1,6 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.DBtools;
-import com.blck.MusicReleaseTracker.Simple.MonthNumbers;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.ValueStore;
 import org.jsoup.Jsoup;
@@ -13,8 +12,19 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.String.valueOf;
+
 public final class JunodownloadScraper extends ScraperParent implements ScraperInterface {
 
+    private enum MonthNumbers {
+        JAN("01"), FEB("02"), MAR("03"), APR("04"),
+        MAY("05"), JUN("06"), JUL("07"), AUG("08"),
+        SEP("09"), OCT("10"), NOV("11"), DEC("12");
+        public final String abbr;
+        MonthNumbers(String abbr) {
+            this.abbr = abbr;
+        }
+    }
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
@@ -62,7 +72,7 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
         */
         for (int i = 0; i < dates.size(); i++) {
             try {
-                String cleanWhitespace = String.valueOf(dates.get(i))
+                String cleanWhitespace = valueOf(dates.get(i))
                         .replaceAll("<br>", " ")
                         .replaceAll("\\s+", " ")
                         .trim();
@@ -74,10 +84,8 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
                 if (matcher.find())
                     extractedDate = matcher.group(1);
                 // extractedDate: 28 Jun 23
-
                 String[] parts = extractedDate.split(" ");
-                MonthNumbers monthEnum = MonthNumbers.valueOf(parts[1].toUpperCase());
-                String monthNumber = monthEnum.getCode();
+                String monthNumber = MonthNumbers.valueOf(parts[1].toUpperCase()).abbr;
                 // only assuming songs from 21st century
                 datesArray[i] = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
                 // datesArray[i]: 2023-06-28
@@ -87,7 +95,7 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
         }
 
         // create arraylist of song objects
-        ArrayList<SongClass> songList = new ArrayList<SongClass>();
+        ArrayList<SongClass> songList = new ArrayList<>();
         for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
             if (songsArray[i] != null && datesArray[i] != null)
                 songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));

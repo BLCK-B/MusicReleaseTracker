@@ -2,6 +2,7 @@ package com.blck.MusicReleaseTracker.Config;
 
 import com.blck.MusicReleaseTracker.*;
 import com.blck.MusicReleaseTracker.Scrapers.ScraperParent;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,28 +18,33 @@ public class MRTConfig {
     }
 
     @Bean
-    public ScrapeProcess scrapeProcess(ValueStore valueStore, ConfigTools configTools, DBtools dBtools, SSEController sseController) {
-        return new ScrapeProcess(valueStore, configTools, dBtools, sseController);
+    public ErrorLogging errorLogging(ValueStore store) {
+        return new ErrorLogging(store);
     }
 
     @Bean
-    public ScraperParent scraperParent(ValueStore valueStore, DBtools DB) {
-        return new ScraperParent(valueStore, DB);
+    public ScrapeProcess scrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBtools dBtools, SSEController sseController) {
+        return new ScrapeProcess(valueStore, errorLogging, configTools, dBtools, sseController);
     }
 
     @Bean
-    public GUIController guiController(ValueStore valueStore, ScrapeProcess scrapeProcess, ConfigTools config, DBtools dBtools) {
-        return new GUIController(valueStore, scrapeProcess, config, dBtools);
+    public ScraperParent scraperParent(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new ScraperParent(valueStore, errorLogging);
     }
 
     @Bean
-    public ConfigTools configTools(ValueStore valueStore, DBtools dBtools) {
-        return new ConfigTools(valueStore, dBtools);
+    public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess, ConfigTools config, DBtools dBtools) {
+        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBtools);
     }
 
     @Bean
-    public DBtools dBtools(ValueStore valueStore) {
-        return new DBtools(valueStore);
+    public ConfigTools configTools(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new ConfigTools(valueStore, errorLogging);
+    }
+
+    @Bean
+    public DBtools dBtools(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new DBtools(valueStore, errorLogging);
     }
 
 

@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
-import com.blck.MusicReleaseTracker.DBtools;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.ValueStore;
 import org.jsoup.Jsoup;
@@ -16,8 +16,8 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
     private String id;
     private final boolean isIDnull;
 
-    public MusicbrainzScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
-        super(valueStore, DB);
+    public MusicbrainzScraper(ValueStore valueStore, ErrorLogging errorLogging, String songArtist, String id) {
+        super(valueStore, errorLogging);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -53,9 +53,9 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
             if (songsArray[i] != null && datesArray[i] != null)
                 songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
         }
-        doc.empty();
-        songs.clear();
-        dates.clear();
+        doc = null;
+        songs = null;
+        dates = null;
         datesArray = null;
         songsArray = null;
 

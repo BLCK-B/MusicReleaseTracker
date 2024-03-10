@@ -1,6 +1,5 @@
 package com.blck.MusicReleaseTracker.Simple;
 
-import com.blck.MusicReleaseTracker.DBtools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,12 +22,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 public class SSEController {
 
-    private final DBtools DB;
+    private final ErrorLogging log;
     private SseEmitter emitter;
 
     @Autowired
-    public SSEController(DBtools DB) {
-        this.DB = DB;
+    public SSEController(ErrorLogging errorLogging) {
+        this.log = errorLogging;
     }
 
     @GetMapping("/progress")
@@ -41,7 +40,7 @@ public class SSEController {
         try {
             emitter.send(String.valueOf(state));
         } catch (Exception e) {
-            DB.logError(e, "WARNING", "error in progress emitter");
+            log.error(e, ErrorLogging.Severity.WARNING, "error in progress emitter");
         } finally {
             if (state == 1.0)
                 emitter.complete();

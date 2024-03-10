@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
-import com.blck.MusicReleaseTracker.DBtools;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +21,12 @@ import java.util.Set;
 public class ScraperParent {
 
     protected final ValueStore store;
-    protected final DBtools DB;
+    protected final ErrorLogging log;
 
     @Autowired
-    public ScraperParent(ValueStore valueStore, DBtools DB) {
+    public ScraperParent(ValueStore valueStore, ErrorLogging errorLogging) {
         this.store = valueStore;
-        this.DB = DB;
+        this.log = errorLogging;
     }
 
     public void scrape() throws ScraperTimeoutException {
@@ -109,7 +109,7 @@ public class ScraperParent {
             conn.setAutoCommit(true);
             conn.close();
         } catch (SQLException e) {
-            DB.logError(e, "SEVERE", "error inserting a set of songs");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting a set of songs");
         }
     }
 

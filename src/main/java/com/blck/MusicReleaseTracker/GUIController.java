@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Scrapers.*;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.*;
@@ -23,10 +24,10 @@ import java.util.Map;
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 /** class with methods called from ApiController */
-//@Service
 public class GUIController {
 
     private final ValueStore store;
+    private final ErrorLogging log;
     private final ScrapeProcess scrapeProcess;
     private final ConfigTools config;
     private final DBtools DB;
@@ -39,25 +40,30 @@ public class GUIController {
     private String tempID;
 
     @Autowired
-    public GUIController(ValueStore valueStore, ScrapeProcess scrapeProcess, ConfigTools config, DBtools DB) {
+    public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess, ConfigTools config, DBtools DB) {
         this.store = valueStore;
+        this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
         this.config = config;
         this.DB = DB;
     }
 
    public List<String> loadList() throws SQLException {
-        List<String> dataList = new ArrayList<>();
-        Connection conn = DriverManager.getConnection(store.getDBpath());
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname ASC");
-        while (rs.next()) {
-            dataList.add(rs.getString("artistname"));
-        }
-        conn.close();
-        stmt.close();
-        rs.close();
-        return dataList;
+       List<String> dataList = new ArrayList<>();
+       try {
+            Connection conn = DriverManager.getConnection(store.getDBpath());
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname ASC");
+            while (rs.next()) {
+                dataList.add(rs.getString("artistname"));
+            }
+            conn.close();
+            stmt.close();
+            rs.close();
+       } catch (SQLException e) {
+           log.error(e, ErrorLogging.Severity.SEVERE, "error loading list");
+       }
+       return dataList;
     }
 
     public void artistAddConfirm(String input) {
@@ -102,7 +108,7 @@ public class GUIController {
                 lastClickedArtist = null;
             }
             catch (SQLException e) {
-                DB.logError(e, "WARNING", "error deleting an artist");
+                log.error(e, ErrorLogging.Severity.WARNING, "error deleting an artist");
             }
         }
     }
@@ -126,7 +132,7 @@ public class GUIController {
                 pstmt.execute();
                 conn.close();
             } catch (SQLException e) {
-                DB.logError(e, "SEVERE", "error deleting an URL");
+                log.error(e, ErrorLogging.Severity.SEVERE, "error deleting an URL");
             }
         }
     }
@@ -141,7 +147,7 @@ public class GUIController {
             pstmt.executeUpdate();
             conn.close();
         } catch (SQLException e) {
-            DB.logError(e, "SEVERE", "error deleting a source URL");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error deleting a source URL");
         }
     }
 
@@ -159,7 +165,7 @@ public class GUIController {
                 loadTable();
         }
         catch (SQLException e) {
-            DB.logError(e, "WARNING", "error loading a table");
+            log.error(e, ErrorLogging.Severity.WARNING, "error loading a table");
         }
         return tableContent;
     }
@@ -224,7 +230,7 @@ public class GUIController {
             id = scraper.getID();
             scraper.scrape();
         } catch (Exception e) {
-            DB.logError(e, "WARNING", "error scraping " + selectedSource + ", perhaps an incorrect link");
+            log.error(e, ErrorLogging.Severity.WARNING, "error scraping " + selectedSource + ", perhaps an incorrect link");
         }
 
         tempID = id;
@@ -246,7 +252,7 @@ public class GUIController {
             pstmt.executeUpdate();
             conn.close();
         } catch (SQLException e) {
-            DB.logError(e, "WARNING", "could not save URL");
+            log.error(e, ErrorLogging.Severity.WARNING, "could not save URL");
         }
     }
 
@@ -274,7 +280,7 @@ public class GUIController {
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
-            DB.logError(e, "SEVERE", "error checking whether URL exists");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error checking whether URL exists");
         }
         return urlExists;
     }
@@ -285,7 +291,7 @@ public class GUIController {
             scrapeProcess.scrapeData();
             scrapeProcess.fillCombviewTable();
         } catch (Exception e) {
-            DB.logError(e, "WARNING", "scrapeProcess error");
+            log.error(e, ErrorLogging.Severity.WARNING, "scrapeProcess error");
         }
         try {
             Connection conn = DriverManager.getConnection(store.getDBpath());
@@ -295,7 +301,7 @@ public class GUIController {
             pstmt.close();
             conn.close();
         } catch (SQLException e) {
-            DB.logError(e, "WARNING", "vacuum error: clickScrape");
+            log.error(e, ErrorLogging.Severity.WARNING, "vacuum error: clickScrape");
         }
     }
 

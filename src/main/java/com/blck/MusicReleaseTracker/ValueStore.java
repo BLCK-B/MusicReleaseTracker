@@ -27,7 +27,7 @@ public class ValueStore {
     private String appDataPath;
     private String DBpath;
     private String configPath;
-    private String errorLogs;
+    private String errorLogsPath;
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
@@ -55,11 +55,11 @@ public class ValueStore {
     public String getConfigPath() {
         return configPath;
     }
-    public void setErrorLogs(String errorLogs) {
-        this.errorLogs = errorLogs;
+    public void setErrorLogsPath(String errorLogsPath) {
+        this.errorLogsPath = errorLogsPath;
     }
-    public String getErrorLogs() {
-        return errorLogs;
+    public String getErrorLogsPath() {
+        return errorLogsPath;
     }
 
     public void setFilterWords(ArrayList<String> filterWords) {

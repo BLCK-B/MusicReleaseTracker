@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Scrapers.*;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,15 @@ import java.util.stream.Collectors;
 public class ScrapeProcess {
 
     private final ValueStore store;
+    private final ErrorLogging log;
     private final ConfigTools config;
     private final DBtools DB;
     private final SSEController SSE;
 
     @Autowired
-    public ScrapeProcess(ValueStore valueStore, ConfigTools configTools, DBtools DB, SSEController sseController) {
+    public ScrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBtools DB, SSEController sseController) {
         this.store = valueStore;
+        this.log = errorLogging;
         this.config = configTools;
         this.DB = DB;
         this.SSE = sseController;
@@ -65,10 +68,10 @@ public class ScrapeProcess {
                 ResultSet rs = pstmt.executeQuery();
                 String url = rs.getString("url" + webSource);
                 switch (webSource) {
-                    case "musicbrainz"   -> scrapers.add(new MusicbrainzScraper(store, DB, artist, url));
-                    case "beatport"      -> scrapers.add(new BeatportScraper(store, DB, artist, url));
-                    case "junodownload"  -> scrapers.add(new JunodownloadScraper(store, DB, artist, url));
-                    case "youtube"       -> scrapers.add(new YoutubeScraper(store, DB, artist, url));
+                    case "musicbrainz"   -> scrapers.add(new MusicbrainzScraper(store, log, artist, url));
+                    case "beatport"      -> scrapers.add(new BeatportScraper(store, log, artist, url));
+                    case "junodownload"  -> scrapers.add(new JunodownloadScraper(store, log, artist, url));
+                    case "youtube"       -> scrapers.add(new YoutubeScraper(store, log, artist, url));
                 }
             }
         }
@@ -92,9 +95,9 @@ public class ScrapeProcess {
                 }
                 catch (ScraperTimeoutException e) {
                     if (i == 1)
-                        DB.logError(e, "INFO", scraper + " timed out " + e);
+                        log.error(e, ErrorLogging.Severity.INFO, scraper + " timed out " + e);
                     else
-                        DB.logError(e, "INFO", scraper + " second time out " + e + ", moving on");
+                        log.error(e, ErrorLogging.Severity.INFO, scraper + " second time out " + e + ", moving on");
                     Thread.sleep(2000);
                 }
             }
@@ -109,6 +112,7 @@ public class ScrapeProcess {
             double state = progress / scrapers.size();
             SSE.sendProgress(state);
         }
+        scrapers = null;
         System.gc();
     }
 
@@ -128,7 +132,7 @@ public class ScrapeProcess {
             stmt.executeUpdate(sql);
             conn.close();
         }  catch (Exception e) {
-            DB.logError(e, "SEVERE", "error cleaning combview table");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error cleaning combview table");
         }
 
         // song object list with data from all sources
@@ -158,7 +162,7 @@ public class ScrapeProcess {
             }
             conn.close();
         }  catch (Exception e) {
-            DB.logError(e, "WARNING", "error in filtering keywords");
+            log.error(e, ErrorLogging.Severity.WARNING, "error in filtering keywords");
         }
         // map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         // eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
@@ -175,7 +179,7 @@ public class ScrapeProcess {
                                 else
                                     return newValue;
                             } catch (ParseException e) {
-                                DB.logError(e, "WARNING", "error in parsing dates");
+                                log.error(e, ErrorLogging.Severity.WARNING, "error in parsing dates");
                                 return existingValue;
                             }
                         }
@@ -222,12 +226,12 @@ public class ScrapeProcess {
             conn.commit();
             conn.setAutoCommit(true);
 
-            songObjectList.clear();
+            songObjectList = null;
             stmt.close();
             pstmt.close();
             conn.close();
         } catch (Exception e) {
-            DB.logError(e, "SEVERE", "error inserting data to combview");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting data to combview");
         }
         System.gc();
     }

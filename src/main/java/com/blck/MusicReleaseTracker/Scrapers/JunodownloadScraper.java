@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
-import com.blck.MusicReleaseTracker.DBtools;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.ValueStore;
 import org.jsoup.Jsoup;
@@ -28,8 +28,8 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public JunodownloadScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
-        super(valueStore, DB);
+    public JunodownloadScraper(ValueStore valueStore, ErrorLogging errorLogging, String songArtist, String id) {
+        super(valueStore, errorLogging);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -59,7 +59,7 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
         String[] songsArray = songs.eachText().toArray(new String[0]);
 
         String[] datesArray = new String[dates.size()];
-        doc.empty();
+        doc = null;
         // processing dates into correct format
         /* example:
             <div class="text-sm mb-3 mb-lg-3">
@@ -90,7 +90,7 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
                 datesArray[i] = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
                 // datesArray[i]: 2023-06-28
             } catch (Exception e) {
-                DB.logError(e,"WARNING", "error processing junodownload date");
+                log.error(e, ErrorLogging.Severity.WARNING, "error processing junodownload date");
             }
         }
 
@@ -101,8 +101,8 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
                 songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
         }
 
-        songs.clear();
-        dates.clear();
+        songs = null;
+        dates = null;
         songsArray = null;
         datesArray = null;
 

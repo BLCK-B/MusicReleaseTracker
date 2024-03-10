@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GUIControllerTest {
 
     private final ValueStore store = new ValueStore();
-    private final DBtools DB = new DBtools(store);
+    private final DBtools DB = new DBtools(store, null);
     private final String testDBpath;
     private final GUIController testedClass;
 
@@ -35,7 +35,7 @@ public class GUIControllerTest {
 
         testDBpath = DBpath;
         store.setDBpath(DBpath);
-        testedClass = new GUIController(store, null, null, DB);
+        testedClass = new GUIController(store, null, null, null, DB);
     }
 
     @Test

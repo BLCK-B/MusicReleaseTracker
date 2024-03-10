@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ScrapingTest {
 
     private final ValueStore store = new ValueStore();
-    private final DBtools DB = new DBtools(store);
+    private final DBtools DB = new DBtools(store, null);
     private final String testDBpath;
     private final ScrapeProcess testedClass;
 
@@ -37,7 +37,7 @@ public class ScrapingTest {
         ArrayList<String> filterWords = new ArrayList<>();
         filterWords.add("XXXXX");
         store.setFilterWords(filterWords);
-        testedClass = new ScrapeProcess(store, null, DB, null);
+        testedClass = new ScrapeProcess(store, null, null, DB, null);
     }
 
     @Test

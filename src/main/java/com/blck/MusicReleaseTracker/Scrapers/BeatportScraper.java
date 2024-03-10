@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
-import com.blck.MusicReleaseTracker.DBtools;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.ValueStore;
 import org.jsoup.Jsoup;
@@ -17,8 +17,8 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public BeatportScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
-        super(valueStore, DB);
+    public BeatportScraper(ValueStore valueStore, ErrorLogging errorLogging, String songArtist, String id) {
+        super(valueStore, errorLogging);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -64,7 +64,6 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
             songsArrayList.add(matcher.group(2).replace("\\u0026", "&"));
             datesArrayList.add(matcher.group(3));
         }
-        doc.empty();
 
         // create arraylist of song objects
         ArrayList<SongClass> songList = new ArrayList<>();
@@ -73,11 +72,12 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
                 songList.add(new SongClass(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
         }
 
-        script.clear();
+        doc = null;
+        script = null;
         JSON = null;
-        songsArrayList.clear();
-        typesArrayList.clear();
-        datesArrayList.clear();
+        songsArrayList = null;
+        typesArrayList = null;
+        datesArrayList = null;
 
         super.processInfo(songList, "beatport");
     }

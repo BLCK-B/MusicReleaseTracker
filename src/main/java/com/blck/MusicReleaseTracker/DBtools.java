@@ -3,18 +3,10 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /*      MusicReleaseTracker
     Copyright (C) 2023 BLCK
@@ -29,43 +21,17 @@ import java.util.logging.SimpleFormatter;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-/** class for DB operations and error logs */
+/** class for DB operations */
 public class DBtools {
 
     private final ValueStore store;
+    private final ErrorLogging log;
     final String slash = File.separator;
 
     @Autowired
-    public DBtools(ValueStore valueStore) {
+    public DBtools(ValueStore valueStore, ErrorLogging errorLogging) {
         this.store = valueStore;
-    }
-
-    public void logError(Exception e, String level, String message) {
-        Logger logger = Logger.getLogger(ErrorLogging.class.getName());
-        String errorLogs = store.getErrorLogs();
-        try {
-            // filehandler logging the error
-            FileHandler fileHandler = new FileHandler(errorLogs, true);
-            fileHandler.setFormatter(new SimpleFormatter());
-            // clear log when it reaches approx 0.1 MB
-            final long logFileSize = Files.size(Paths.get(errorLogs));
-            if (logFileSize > 100000) {
-                Files.write(Paths.get(errorLogs), new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
-            }
-            // log the error
-            logger.addHandler(fileHandler);
-            switch (level) {
-                case ("SEVERE") -> logger.log(Level.SEVERE, message, e);
-                case ("WARNING") -> logger.log(Level.WARNING, message, e);
-                case ("INFO") -> logger.log(Level.INFO, message);
-            }
-            fileHandler.close();
-        } catch (IOException ioException) {
-            throw new RuntimeException(ioException);
-        }
-        if (level.equals("SEVERE")) {
-            throw new RuntimeException(e);
-        }
+        this.log = errorLogging;
     }
 
     public void path() {
@@ -82,12 +48,12 @@ public class DBtools {
         String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
         String DBpath =             "jdbc:sqlite:" + appDataPath + "musicdata.db";
         String configPath =         appDataPath + "MRTsettings.hocon";
-        String errorLogs =          appDataPath + "errorlogs.txt";
+        String errorLogsPath =          appDataPath + "errorlogs.txt";
         // save to settingsStore
         store.setAppDataPath(appDataPath);
         store.setConfigPath(configPath);
         store.setDBpath(DBpath);
-        store.setErrorLogs(errorLogs);
+        store.setErrorLogsPath(errorLogsPath);
 
         // appdata folder
         File folder = new File(appDataPath);
@@ -151,7 +117,7 @@ public class DBtools {
                 connDB.close();
                 connDBtemplate.close();
             } catch(Exception e) {
-                logError(e, "SEVERE", "error updating DB file");
+                log.error(e, ErrorLogging.Severity.SEVERE, "error updating DB file");
             }
             try {
                 File oldFile = new File(DBfilePath);
@@ -161,7 +127,7 @@ public class DBtools {
                 // rename template to musicdata
                 newFile.renameTo(oldFile);
             } catch(Exception e) {
-                logError(e, "SEVERE", "error renaming/deleting DB files");
+                log.error(e, ErrorLogging.Severity.SEVERE, "error renaming/deleting DB files");
             }
         }
     }
@@ -236,7 +202,7 @@ public class DBtools {
             stmt.close();
             conn.close();
         } catch (SQLException e) {
-           logError(e, "SEVERE", "error creating DB file");
+           log.error(e, ErrorLogging.Severity.SEVERE, "error creating DB file");
         }
     }
 
@@ -275,7 +241,7 @@ public class DBtools {
             stmt.close();
             conn.close();
         } catch (SQLException e) {
-            logError(e, "SEVERE", "error parsing DB structure");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error parsing DB structure");
         }
         return tableMap;
     }

@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.typesafe.config.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
@@ -30,16 +31,16 @@ import java.util.Set;
 public class ConfigTools {
 
     private final ValueStore store;
-    private final DBtools DB;
+    private final ErrorLogging log;
 
     public enum configOptions {
         filters, themes, lastScrape, longTimeout, isoDates, systemTheme
     }
 
     @Autowired
-    public ConfigTools(ValueStore valueStore, DBtools DB) {
+    public ConfigTools(ValueStore valueStore, ErrorLogging errorLogging) {
         this.store = valueStore;
-        this.DB = DB;
+        this.log = errorLogging;
     }
 
     public void writeSingleConfig(String name, String value) {
@@ -56,7 +57,7 @@ public class ConfigTools {
         try (PrintWriter writer = new PrintWriter(new FileWriter(store.getConfigPath()))) {
             writer.write(config.root().render(renderOptions));
         } catch (IOException e) {
-            DB.logError(e, "WARNING", "could not save " + name + " in config");
+            log.error(e, ErrorLogging.Severity.WARNING, "could not save " + name + " in config");
         }
     }
 
@@ -89,7 +90,7 @@ public class ConfigTools {
             config = null;
         }
         catch (Exception e) {
-            DB.logError(e, "WARNING", "could not read config: " + o);
+            log.error(e, ErrorLogging.Severity.WARNING, "could not read config: " + o);
         }
     }
 
@@ -122,7 +123,7 @@ public class ConfigTools {
         try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
             writer.write(templateContent);
         } catch (IOException e) {
-            DB.logError(e, "SEVERE", "could not overwrite templatecontent");
+            log.error(e, ErrorLogging.Severity.SEVERE, "could not overwrite templatecontent");
         }
         // create config file if not exist > write templateContent
         File configFile = new File(configPath);
@@ -130,7 +131,7 @@ public class ConfigTools {
             try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
                 writer.write(templateContent);
             } catch (IOException e) {
-                DB.logError(e, "SEVERE", "could not overwrite configfile");
+                log.error(e, ErrorLogging.Severity.SEVERE, "could not overwrite configfile");
             }
         }
         // comparing structure of existing config file and template
@@ -166,19 +167,19 @@ public class ConfigTools {
                 String renderedConfig = templateConfig.root().render(renderOptions);
                 writer.write(renderedConfig);
             } catch (IOException e) {
-                DB.logError(e, "SEVERE", "error while saving MRTsettingsTemplate.hocon");
+                log.error(e, ErrorLogging.Severity.SEVERE, "error while saving MRTsettingsTemplate.hocon");
             }
             // overwrite MRTsettings with MRTsettingsTemplate
             try {
                 Files.copy(templateFile.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                DB.logError(e, "SEVERE", "error while replacing MRTsettings with MRTsettingsTemplate");
+                log.error(e, ErrorLogging.Severity.SEVERE, "error while replacing MRTsettings with MRTsettingsTemplate");
             }
             // default templateContent again
             try (PrintWriter writer = new PrintWriter(new FileWriter(templateFile))) {
                 writer.write(templateContent);
             } catch (IOException e) {
-                DB.logError(e, "WARNING", "error defaulting MRTsettingsTemplate.hocon");
+                log.error(e, ErrorLogging.Severity.WARNING, "error defaulting MRTsettingsTemplate.hocon");
             }
         }
     }

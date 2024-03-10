@@ -1,24 +1,24 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
-import com.blck.MusicReleaseTracker.DBtools;
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.ValueStore;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.TimeoutException;
 
 public final class YoutubeScraper extends ScraperParent implements ScraperInterface {
 
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public YoutubeScraper(ValueStore valueStore, DBtools DB, String songArtist, String id) {
-        super(valueStore, DB);
+    public YoutubeScraper(ValueStore valueStore, ErrorLogging errorLogging, String songArtist, String id) {
+        super(valueStore, errorLogging);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -62,8 +62,9 @@ public final class YoutubeScraper extends ScraperParent implements ScraperInterf
             if (songsArray[i] != null && datesArray[i] != null)
                 songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
         }
-        songs.clear();
-        dates.clear();
+        doc = null;
+        songs = null;
+        dates = null;
         songsArray = null;
         datesArray = null;
 

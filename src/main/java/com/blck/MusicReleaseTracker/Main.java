@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -28,12 +29,14 @@ public class Main {
     }
 
     private final ConfigTools config;
+    private final ErrorLogging log;
     private final DBtools DB;
 
     @Autowired
-    public Main(ConfigTools configTools, DBtools DB) {
+    public Main(ConfigTools configTools, ErrorLogging errorLogging, DBtools dBtools) {
         this.config = configTools;
-        this.DB = DB;
+        this.log = errorLogging;
+        this.DB = dBtools;
     }
 
     @Component
@@ -58,12 +61,12 @@ public class Main {
             try {
                 DB.createTables();
             } catch (Exception e) {
-                DB.logError(e, "SEVERE", "error in DBtools createTables method");
+                log.error(e, ErrorLogging.Severity.SEVERE, "error in DBtools createTables method");
             }
             try {
                 config.updateSettings();
             } catch (Exception e) {
-                DB.logError(e, "WARNING", "error handling config file");
+                log.error(e, ErrorLogging.Severity.WARNING, "error handling config file");
             }
             // open port in web browser
             try {
@@ -82,7 +85,7 @@ public class Main {
                     }
                 }
             } catch (Exception e) {
-                DB.logError(e, "WARNING", "could not open port in browser");
+                log.error(e, ErrorLogging.Severity.WARNING, "could not open port in browser");
             }
         }
     }

@@ -1,17 +1,68 @@
 package com.blck.MusicReleaseTracker.Simple;
-
+import com.blck.MusicReleaseTracker.ValueStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
+/*      MusicReleaseTracker
+    Copyright (C) 2023 BLCK
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+
+@Component
 public class ErrorLogging {
-    private static final Logger logger = Logger.getLogger(ErrorLogging.class.getName());
 
-    public static void main(String[] args) {
-        logger.severe("This is a severe message.");
-        logger.warning("This is a warning message.");
-        logger.info("This is an informational message.");
-        logger.config("This is a configuration message.");
-        logger.fine("This is a fine message.");
-        logger.finer("This is a finer message.");
-        logger.finest("This is the finest message.");
+    public enum Severity {
+        SEVERE, WARNING, INFO
+    }
+    private final ValueStore store;
+    private final Logger logger = Logger.getLogger("errorLogger");
+    @Autowired
+    public ErrorLogging(ValueStore valueStore) {
+        this.store = valueStore;
+    }
+
+    public void error(Exception e, Severity level, String message) {
+        FileHandler fileHandler = null;
+        try {
+            final String errorLogs = store.getErrorLogsPath();
+            // filehandler logging the error
+            fileHandler = new FileHandler(errorLogs, true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            // clear log when it reaches approx 0.1 MB
+            final long logFileSize = Files.size(Paths.get(errorLogs));
+            if (logFileSize > 100000) {
+                Files.write(Paths.get(errorLogs), new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
+            }
+            // log the error
+            logger.addHandler(fileHandler);
+            switch (level) {
+                case SEVERE -> logger.log(Level.SEVERE, message, e);
+                case WARNING -> logger.log(Level.WARNING, message, e);
+                case INFO -> logger.log(Level.INFO, message);
+            }
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
+        } finally {
+            fileHandler.close();
+        }
+        if (level == Severity.SEVERE) {
+            throw new RuntimeException(e);
+        }
     }
 }

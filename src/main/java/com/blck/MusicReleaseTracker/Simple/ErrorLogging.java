@@ -1,9 +1,10 @@
 package com.blck.MusicReleaseTracker.Simple;
-import com.blck.MusicReleaseTracker.ValueStore;
+
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.logging.FileHandler;
@@ -45,9 +46,10 @@ public class ErrorLogging {
             fileHandler = new FileHandler(errorLogs, true);
             fileHandler.setFormatter(new SimpleFormatter());
             // clear log when it reaches approx 0.1 MB
-            final long logFileSize = Files.size(Paths.get(errorLogs));
+            Path path = Paths.get(errorLogs);
+            final long logFileSize = Files.size(path);
             if (logFileSize > 100000) {
-                Files.write(Paths.get(errorLogs), new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
+                Files.write(path, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
             }
             // log the error
             logger.addHandler(fileHandler);
@@ -56,8 +58,8 @@ public class ErrorLogging {
                 case WARNING -> logger.log(Level.WARNING, message, e);
                 case INFO -> logger.log(Level.INFO, message);
             }
-        } catch (IOException ioException) {
-            throw new RuntimeException(ioException);
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
         } finally {
             fileHandler.close();
         }

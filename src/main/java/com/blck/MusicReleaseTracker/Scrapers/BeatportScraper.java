@@ -2,7 +2,7 @@ package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
-import com.blck.MusicReleaseTracker.ValueStore;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;

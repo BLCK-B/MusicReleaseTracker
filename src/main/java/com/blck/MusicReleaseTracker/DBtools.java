@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
@@ -87,10 +88,11 @@ public class DBtools {
         Map<String, ArrayList<String>> DBMap = getDBStructure(store.getDBpath());
         Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(DBtemplatePath);
         if (!DBMap.equals(DBtemplateMap)) {
-            try {
-                Connection connDB = DriverManager.getConnection(store.getDBpath());
-                Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath);
-
+            try (
+                    Connection connDB = DriverManager.getConnection(store.getDBpath());
+                    Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath)
+                )
+            {
                 // insert data from musicdata's column to template's column
                 String sql = "SELECT * FROM artists";
                 Statement stmt = connDB.createStatement();
@@ -114,8 +116,6 @@ public class DBtools {
                 connDBtemplate.setAutoCommit(true);
                 pstmt.clearBatch();
                 pstmt.close();
-                connDB.close();
-                connDBtemplate.close();
             } catch(Exception e) {
                 log.error(e, ErrorLogging.Severity.SEVERE, "error updating DB file");
             }
@@ -133,8 +133,7 @@ public class DBtools {
     }
 
     private void createDB(String path) {
-        try {
-            Connection conn = DriverManager.getConnection(path);
+        try (Connection conn = DriverManager.getConnection(path)) {
 
             String sql = """
                 CREATE TABLE IF NOT EXISTS musicbrainz (
@@ -200,46 +199,46 @@ public class DBtools {
             stmt.execute(sql);
 
             stmt.close();
-            conn.close();
         } catch (SQLException e) {
            log.error(e, ErrorLogging.Severity.SEVERE, "error creating DB file");
         }
     }
 
     public void clearDB() {
-        try {
-            Connection conn = DriverManager.getConnection(store.getDBpath());
+        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             for (String sourceTable : store.getSourceTables()) {
                 String sql = "DELETE FROM " + sourceTable;
                 Statement stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
             }
-            conn.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            log.error(e, ErrorLogging.Severity.WARNING, "error clearing DB");
         }
     }
 
     public Map<String, ArrayList<String>> getDBStructure(String path) {
+
         HashMap<String, ArrayList<String>> tableMap = new HashMap<>();
-        try {
-            Connection conn = DriverManager.getConnection(path);
+
+        try (Connection conn = DriverManager.getConnection(path)) {
             String sql = "SELECT name FROM sqlite_master WHERE type='table'";
             Statement stmt = conn.createStatement();
             ResultSet rsTables = stmt.executeQuery(sql);
-            ArrayList<String> tablesList = new ArrayList<String>();
+            ArrayList<String> tablesList = new ArrayList<>();
+
             while(rsTables.next())
                 tablesList.add(rsTables.getString(1));
 
             for (String tableName : tablesList) {
                 ArrayList<String> tableColumnsList = new ArrayList<>();
                 ResultSet rsColumns = stmt.executeQuery("PRAGMA table_info(" + tableName + ")");
+
                 while (rsColumns.next())
                     tableColumnsList.add(rsColumns.getString("name"));
+
                 tableMap.put(tableName, tableColumnsList);
             }
             stmt.close();
-            conn.close();
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error parsing DB structure");
         }

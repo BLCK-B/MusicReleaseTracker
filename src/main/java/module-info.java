@@ -14,5 +14,7 @@ module com.blck.MusicReleaseTracker {
     exports com.blck.MusicReleaseTracker;
     exports com.blck.MusicReleaseTracker.Simple;
     opens com.blck.MusicReleaseTracker.Simple;
+    exports com.blck.MusicReleaseTracker.Core;
+    opens com.blck.MusicReleaseTracker.Core;
 }
 

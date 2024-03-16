@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "axios": "^1.6.7",
-    "vue": "^3.4.15"
+    "vue": "^3.4.15",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.3",

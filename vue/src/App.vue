@@ -32,11 +32,11 @@
       </div>
   
   </div>
-  
+
   <div class="app" v-if="settingsOpen">
     <SettingsWindow/>
   </div>
-
+  
 </template>
 
 <script>

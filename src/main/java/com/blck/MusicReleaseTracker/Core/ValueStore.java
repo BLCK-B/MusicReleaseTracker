@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Core;
 
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;

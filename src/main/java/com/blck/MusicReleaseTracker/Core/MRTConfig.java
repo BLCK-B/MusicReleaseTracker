@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker.Config;
+package com.blck.MusicReleaseTracker.Core;
 
 import com.blck.MusicReleaseTracker.*;
 import com.blck.MusicReleaseTracker.Scrapers.ScraperParent;

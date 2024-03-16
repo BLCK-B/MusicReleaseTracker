@@ -71,19 +71,16 @@ public class Main {
             // open port in web browser
             try {
                 String os = System.getProperty("os.name").toLowerCase();
-                if (os.contains("win")) {
-                    String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
-                    Runtime.getRuntime().exec(cmd);
-                }
-                else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-                    try {
-                        String[] cmd = {"xdg-open", "http://localhost:8080"};
-                        Runtime.getRuntime().exec(cmd);
-                    } catch (Exception e) {
-                        String [] cmd = new String[]{"open", "http://localhost:8080"};
-                        Runtime.getRuntime().exec(cmd);
-                    }
-                }
+
+                String[] cmd = null;
+                if (os.contains("win"))
+                    cmd = new String[]{"cmd.exe", "/c", "start", "http://localhost:8080"};
+                else if (os.contains("nix") || os.contains("nux"))
+                    cmd = new String[]{"xdg-open", "http://localhost:8080"};
+                else if (os.contains("mac"))
+                    cmd = new String[]{"open", "http://localhost:8080"};
+
+                Runtime.getRuntime().exec(cmd);
             } catch (Exception e) {
                 log.error(e, ErrorLogging.Severity.WARNING, "could not open port in browser");
             }

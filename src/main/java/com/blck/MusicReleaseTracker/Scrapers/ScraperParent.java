@@ -2,7 +2,7 @@ package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
-import com.blck.MusicReleaseTracker.ValueStore;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.sql.Connection;
@@ -80,8 +80,7 @@ public class ScraperParent {
     public void insertSet(ArrayList<SongClass> songList, String source) {
         PreparedStatement pstmt = null;
         // insert a set of songs to a source table
-        try {
-            Connection conn = DriverManager.getConnection(store.getDBpath());
+        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             int i = 0;
             for (SongClass songObject : songList) {
                 if (i == 15)
@@ -107,7 +106,6 @@ public class ScraperParent {
             conn.setAutoCommit(false);
             conn.commit();
             conn.setAutoCommit(true);
-            conn.close();
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error inserting a set of songs");
         }

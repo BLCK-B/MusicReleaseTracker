@@ -1,5 +1,6 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Core;
 
+import com.blck.MusicReleaseTracker.GUIController;
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class ApiController {
     }
 
     @GetMapping("/loadList")
-    public List<String> loadList() throws SQLException {
+    public List<String> loadList() {
         return sendRequest.loadList();
     }
 

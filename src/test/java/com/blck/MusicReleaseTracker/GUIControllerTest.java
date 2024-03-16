@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -44,12 +45,8 @@ public class GUIControllerTest {
         // artistAddConfirm
         testedClass.artistAddConfirm("Joe");
         // verify with loadList
-        try {
-            String oneArtist = testedClass.loadList().get(0);
-            assertEquals(oneArtist, "Joe");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        String oneArtist = testedClass.loadList().get(0);
+        assertEquals(oneArtist, "Joe");
     }
 
     @Test
@@ -88,10 +85,6 @@ public class GUIControllerTest {
         // artistClickDelete
         testedClass.artistClickDelete();
         // verify with loadList
-        try {
-            assertTrue(testedClass.loadList().isEmpty());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        assertTrue(testedClass.loadList().isEmpty());
     }
 }

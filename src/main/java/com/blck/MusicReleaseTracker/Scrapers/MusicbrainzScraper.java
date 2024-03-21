@@ -16,8 +16,8 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
     private String id;
     private final boolean isIDnull;
 
-    public MusicbrainzScraper(ValueStore valueStore, ErrorLogging errorLogging, String songArtist, String id) {
-        super(valueStore, errorLogging);
+    public MusicbrainzScraper(ValueStore store, ErrorLogging log, String songArtist, String id) {
+        super(store, log);
         this.songArtist = songArtist;
         this.id = id;
 

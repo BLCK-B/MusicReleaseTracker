@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +95,7 @@ public class DBtools {
                 )
             {
                 // insert data from musicdata's column to template's column
-                String sql = "SELECT * FROM artists";
+                String sql = "SELECT * FROM artists LIMIT 1000";
                 Statement stmt = connDB.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 
@@ -103,7 +104,7 @@ public class DBtools {
                 ArrayList<String> columnList = DBMap.get("artists");
                 // cycling table rows
                 while (rs.next()) {
-                    // fill sql query row data and add to batch
+                    // construct sql query for every column, add to batch
                     for (int i = 0; i < columnList.size(); i++) {
                         String column = columnList.get(i);
                         pstmt.setString(i + 1 , rs.getString(column));
@@ -205,19 +206,23 @@ public class DBtools {
     }
 
     public void clearDB() {
+        // clear source tables and combview
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            for (String sourceTable : store.getSourceTables()) {
+            for (SourcesEnum sourceTable : SourcesEnum.values()) {
                 String sql = "DELETE FROM " + sourceTable;
                 Statement stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
             }
+            String sql = "DELETE FROM combview";
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error clearing DB");
         }
     }
 
     public Map<String, ArrayList<String>> getDBStructure(String path) {
-
+        // assembles a structure of tables and their columns
         HashMap<String, ArrayList<String>> tableMap = new HashMap<>();
 
         try (Connection conn = DriverManager.getConnection(path)) {

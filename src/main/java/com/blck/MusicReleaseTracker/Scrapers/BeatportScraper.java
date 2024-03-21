@@ -17,8 +17,8 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public BeatportScraper(ValueStore valueStore, ErrorLogging errorLogging, String songArtist, String id) {
-        super(valueStore, errorLogging);
+    public BeatportScraper(ValueStore store, ErrorLogging log, String songArtist, String id) {
+        super(store, log);
         this.songArtist = songArtist;
         this.id = id;
 

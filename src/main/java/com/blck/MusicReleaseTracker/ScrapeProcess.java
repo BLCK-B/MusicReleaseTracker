@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
@@ -50,80 +50,23 @@ public class ScrapeProcess {
     public void scrapeData() {
         config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
-        // clear tables to prepare for new data
+        // clear tables - for new data
         DB.clearDB();
-        // creating a list of scraper objects: one scraper holds one URL
-        ArrayList<ScraperParent> scrapers = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT artistname FROM artists";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet artistResults = pstmt.executeQuery();
-            // cycling artists
-            while (artistResults.next()) {
-                String artist = artistResults.getString("artistname");
-                // cycling sources
-                for (String webSource : store.getSourceTables()) {
-                    sql = "SELECT * FROM artists WHERE artistname = ?";
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, artist);
-                    ResultSet rs = pstmt.executeQuery();
-                    String url = rs.getString("url" + webSource);
-                    switch (webSource) {
-                        case "musicbrainz" -> scrapers.add(new MusicbrainzScraper(store, log, artist, url));
-                        case "beatport" -> scrapers.add(new BeatportScraper(store, log, artist, url));
-                        case "junodownload" -> scrapers.add(new JunodownloadScraper(store, log, artist, url));
-                        case "youtube" -> scrapers.add(new YoutubeScraper(store, log, artist, url));
-                    }
-                }
-            }
-            pstmt.close();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error creating scrapers list");
-        }
+        ScraperBox box = new ScraperBox(store, log);
+        final int initSize = box.getInitSize();
         // triggering scrapers
-        double progress = 0;
-        for (ScraperParent scraper : scrapers) {
-            double startTime = System.currentTimeMillis();
-            // if clicked cancel
+        int remaining = 0;
+        double progress = 0.0;
+        while (remaining != -1) {
+            SSE.sendProgress(progress);
             if (scrapeCancel) {
-                SSE.sendProgress(1.0);
                 System.gc();
                 return;
             }
-            for (int i = 0; i < 2; i++) {
-                try {
-                    scraper.scrape();
-                    break;
-                }
-                catch (ScraperTimeoutException e) {
-                    if (i == 1)
-                        log.error(e, ErrorLogging.Severity.INFO, scraper + " timed out " + e);
-                    else
-                        log.error(e, ErrorLogging.Severity.INFO, scraper + " second time out " + e + ", moving on");
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-            // calculated delay at the end of source cycle
-            if (scraper instanceof YoutubeScraper) {
-                double elapsedTime = System.currentTimeMillis() - startTime;
-                if (elapsedTime <= 2800) {
-                    try {
-                        Thread.sleep((long) (2800 - elapsedTime));
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-            progress++;
-            // 40 cycles / 80 scrapers = 50%
-            double state = progress / scrapers.size();
-            SSE.sendProgress(state);
+            remaining = box.scrapeNext();
+            // 40 remaining / 80 total = 50%
+            progress = ((double)initSize - (double)remaining) / (double)initSize;
         }
-        scrapers = null;
         System.gc();
     }
 
@@ -147,7 +90,8 @@ public class ScrapeProcess {
         ArrayList<SongClass> songObjectList = new ArrayList<>();
 
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            for (String source : store.getSourceTables()) {
+            for (SourcesEnum source : SourcesEnum.values()) {
+                // limit defines max combview rows
                 sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
@@ -156,13 +100,13 @@ public class ScrapeProcess {
                     String songArtist = rs.getString("artist");
                     String songDate = rs.getString("date");
                     String songType = null;
-                    if (source.equals("beatport"))
+                    if (source == SourcesEnum.beatport)
                         songType = rs.getString("type");
 
                     if (filterWords(songName, songType)) {
                         switch (source) {
-                            case "beatport" -> songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
-                            case "musicbrainz", "junodownload", "youtube" -> songObjectList.add(new SongClass(songName, songArtist, songDate));
+                            case beatport -> songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
+                            case musicbrainz, junodownload, youtube -> songObjectList.add(new SongClass(songName, songArtist, songDate));
                         }
                     }
                 }
@@ -203,13 +147,13 @@ public class ScrapeProcess {
                             return existingValue;
                         }
                 ));
-        // create a list of SongClass objects sorted by date from map
+        // create a list of SongClass objects from map, sorted by date
         List<SongClass> finalSortedList = nameDateMap.values().stream()
                 .sorted(Comparator.comparing(SongClass::getDate, Comparator.reverseOrder()))
                 .toList();
 
-        nameDateMap.clear();
-        nameArtistMap.clear();
+        nameDateMap = null;
+        nameArtistMap = null;
 
         // insert data into table
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
@@ -218,6 +162,7 @@ public class ScrapeProcess {
             // precomitting batch insert is way faster
             int i = 0;
             for (SongClass item : finalSortedList) {
+                // table size limit
                 if (i == 115)
                     break;
                 pstmt.setString(1, item.getName());

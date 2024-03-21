@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
@@ -33,10 +34,7 @@ public class GUIController {
     private final ConfigTools config;
     private final DBtools DB;
     private final List<TableModel> tableContent = new ArrayList<>();
-    private enum sourceEnum {
-        combview, beatport, musicbrainz, junodownload, youtube
-    }
-    private sourceEnum selectedSource;
+    private SourcesEnum selectedSource;
     private String lastClickedArtist;
     private String tempID;
 
@@ -53,7 +51,7 @@ public class GUIController {
        List<String> dataList = new ArrayList<>();
        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname ASC");
+            ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname ASC LIMIT 500");
             while (rs.next()) {
                 dataList.add(rs.getString("artistname"));
             }
@@ -88,8 +86,7 @@ public class GUIController {
 
         if (lastClickedArtist != null) {
             try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-                Map<String, ArrayList<String>> tableMap = null;
-                tableMap = DB.getDBStructure(store.getDBpath());
+                Map<String, ArrayList<String>> tableMap = DB.getDBStructure(store.getDBpath());
                 String sql;
                 for (String tableName : tableMap.keySet()) {
                     if (tableName.equals("artists"))
@@ -110,7 +107,7 @@ public class GUIController {
 
     public void deleteUrl() {
         if (store.getDBpath().contains("testing")) {
-            selectedSource = sourceEnum.beatport;
+            selectedSource = SourcesEnum.beatport;
             lastClickedArtist = "Joe";
         }
         // set null specific URL, delete related set
@@ -147,11 +144,12 @@ public class GUIController {
         if (origin.equals("list"))
             lastClickedArtist = item;
         else if (origin.equals("tab"))
-            selectedSource = sourceEnum.valueOf(item);
+            // need to account for combview
+            selectedSource = item.equals("combview") ? null : SourcesEnum.valueOf(item);
 
-        if (selectedSource == sourceEnum.combview)
+        if (selectedSource == null)
             loadCombviewTable();
-        else if (selectedSource != null && lastClickedArtist != null)
+        else if (lastClickedArtist != null)
             loadTable();
 
         return tableContent;
@@ -161,16 +159,14 @@ public class GUIController {
         tableContent.clear();
         // adding data to tableContent
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT song, date FROM " + selectedSource + " WHERE artist = ? ORDER BY date DESC";
+            String sql = "SELECT song, date FROM " + selectedSource + " WHERE artist = ? ORDER BY date DESC LIMIT 100";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, lastClickedArtist);
             ResultSet rs = pstmt.executeQuery();
-            // loop through the result set and add each row to the data list
             while (rs.next()) {
-                String col1Value = rs.getString("song");
-                String col2Value = null;
-                String col3Value = rs.getString("date");
-                tableContent.add(new TableModel(col1Value, col2Value, col3Value));
+                String songsCol = rs.getString("song");
+                String datesCol = rs.getString("date");
+                tableContent.add(new TableModel(songsCol, null, datesCol));
             }
             pstmt.close();
             rs.close();
@@ -183,15 +179,14 @@ public class GUIController {
         tableContent.clear();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             // populating combview table
-            String sql = "SELECT * FROM combview ORDER BY date DESC";
+            String sql = "SELECT * FROM combview ORDER BY date DESC LIMIT 1000";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
-            // loop through the result set and add each row to the data list
             while (rs.next()) {
-                String col1Value = rs.getString("song");
-                String col2Value = rs.getString("artist");
-                String col3Value = rs.getString("date");
-                tableContent.add(new TableModel(col1Value, col2Value, col3Value));
+                String songsCol = rs.getString("song");
+                String artistsCol = rs.getString("artist");
+                String datesCol = rs.getString("date");
+                tableContent.add(new TableModel(songsCol, artistsCol, datesCol));
             }
             pstmt.close();
             rs.close();
@@ -205,6 +200,7 @@ public class GUIController {
     }
 
     public void clickAddURL(String url) {
+        // scrape preview functionality
         if (lastClickedArtist == null || selectedSource == null || url.isBlank())
             return;
 
@@ -213,10 +209,10 @@ public class GUIController {
         try {
             ScraperParent scraper = null;
             switch(selectedSource) {
-                case musicbrainz    -> scraper = new MusicbrainzScraper(null, null, null, url);
-                case beatport       -> scraper = new BeatportScraper(null, null, null, url);
-                case junodownload   -> scraper = new JunodownloadScraper(null, null, null, url);
-                case youtube        -> scraper = new YoutubeScraper(null, null, null, url);
+                case musicbrainz    -> scraper = new MusicbrainzScraper(store, log, lastClickedArtist, url);
+                case beatport       -> scraper = new BeatportScraper(store, log, lastClickedArtist, url);
+                case junodownload   -> scraper = new JunodownloadScraper(store, log, lastClickedArtist, url);
+                case youtube        -> scraper = new YoutubeScraper(store, log, lastClickedArtist, url);
             }
             id = scraper.getID();
             scraper.scrape();
@@ -230,7 +226,7 @@ public class GUIController {
     public void saveUrl() {
         // save artist url to db
         if (store.getDBpath().contains("testing")) {
-            selectedSource = sourceEnum.beatport;
+            selectedSource = SourcesEnum.beatport;
             lastClickedArtist = "Joe";
             tempID = "testingUrl";
         }
@@ -249,13 +245,16 @@ public class GUIController {
         // check for existence of url to determine visibility of url dialog
         boolean urlExists = false;
         if (store.getDBpath().contains("testing")) {
-            selectedSource = sourceEnum.beatport;
+            selectedSource = SourcesEnum.beatport;
             lastClickedArtist = "Joe";
         }
-        else if (selectedSource == sourceEnum.combview)
+        else try {
+            SourcesEnum.valueOf(String.valueOf(selectedSource));
+        } catch (IllegalArgumentException e) {
             return urlExists;
+        }
 
-        String sql = "SELECT url" + selectedSource + " FROM artists WHERE artistname = ?";
+        String sql = "SELECT url" + selectedSource + " FROM artists WHERE artistname = ? LIMIT 10";
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, lastClickedArtist);

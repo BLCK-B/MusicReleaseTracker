@@ -34,8 +34,6 @@ public class ValueStore {
     private boolean longTimeout = false;
     private boolean isoDates = false;
     private boolean systemTheme = false;
-    // array of all available sources, in order that fillCombviewTable uses
-    final private String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
 
     public void setAppDataPath(String appDataPath) {
         this.appDataPath = appDataPath;
@@ -98,10 +96,6 @@ public class ValueStore {
     }
     public boolean getSystemTheme() {
         return systemTheme;
-    }
-
-    public String[] getSourceTables() {
-        return this.sourceTables;
     }
 
     @Override

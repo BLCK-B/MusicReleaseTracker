@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.io.File;
-import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

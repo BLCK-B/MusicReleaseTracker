@@ -28,8 +28,8 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public JunodownloadScraper(ValueStore valueStore, ErrorLogging errorLogging, String songArtist, String id) {
-        super(valueStore, errorLogging);
+    public JunodownloadScraper(ValueStore store, ErrorLogging log, String songArtist, String id) {
+        super(store, log);
         this.songArtist = songArtist;
         this.id = id;
 

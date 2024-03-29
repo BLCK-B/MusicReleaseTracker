@@ -60,6 +60,7 @@ public class ScrapeProcess {
         while (remaining != -1) {
             SSE.sendProgress(progress);
             if (scrapeCancel) {
+                SSE.sendProgress(1.0);
                 System.gc();
                 return;
             }

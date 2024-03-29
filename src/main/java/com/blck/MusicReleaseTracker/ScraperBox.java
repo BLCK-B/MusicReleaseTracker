@@ -5,21 +5,20 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import java.sql.*;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 public class ScraperBox {
     private final ValueStore store;
     private final ErrorLogging log;
     private final int initSize;
     private final LinkedList<ScraperParent> scrapers = new LinkedList<>();
-    Iterator<ScraperParent> iter;
+    private final HashMap<String, Double> sourceTimes = new HashMap<>();
 
     // middleware abstraction for scraping with exception handling
     public ScraperBox(ValueStore store, ErrorLogging log) {
         this.store = store;
         this.log = log;
-        // creating a list of scraper objects: one scraper holds one URL or null
+        // creating a list of scraper objects: one scraper holds one URL
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "SELECT artistname FROM artists LIMIT 500";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -34,6 +33,8 @@ public class ScraperBox {
                     pstmt.setString(1, artist);
                     ResultSet rs = pstmt.executeQuery();
                     String url = rs.getString("url" + webSource);
+                    if (url == null)
+                        continue;
                     switch (webSource) {
                         case musicbrainz    -> scrapers.add(new MusicbrainzScraper(store, log, artist, url));
                         case beatport       -> scrapers.add(new BeatportScraper(store, log, artist, url));
@@ -47,7 +48,9 @@ public class ScraperBox {
             log.error(e, ErrorLogging.Severity.SEVERE, "error creating scrapers list");
         }
         initSize = scrapers.size();
-        iter = scrapers.iterator();
+        for (SourcesEnum source : SourcesEnum.values()) {
+            sourceTimes.put(source.toString(), 0.0);
+        }
     }
 
     public int getInitSize() {
@@ -55,18 +58,15 @@ public class ScraperBox {
     }
 
     public int scrapeNext() {
-        if (!iter.hasNext())
+        if (scrapers.isEmpty())
             return -1;
 
         double startTime = System.currentTimeMillis();
-        ScraperParent scraper = iter.next();
-        if (scraper == null)
-            return scrapers.size();
+        ScraperParent scraper = scrapers.get(0);
         for (int i = 0; i <= 2; i++) {
             try {
                 scraper.scrape();
-                // will not break if exception
-                break;
+                break; // exception = will not break
             }
             catch (ScraperTimeoutException e) {
                 switch (i) {
@@ -74,7 +74,7 @@ public class ScraperBox {
                     case 1 -> log.error(e, ErrorLogging.Severity.INFO, scraper + " second time out");
                     default -> {
                         log.error(e, ErrorLogging.Severity.INFO, "final time out, disabling source " + scraper);
-                        // remove all scrapers of faulty source
+                        // remove all scrapers of a faulty source
                         scrapers.removeIf(s -> s.getClass().equals(scraper.getClass()));
                     }
                 }
@@ -85,19 +85,28 @@ public class ScraperBox {
                 }
             }
         }
-        // calculated delay at the end of source cycle
-        if (scrapers.size() % SourcesEnum.values().length == 0) {
-            System.out.println(scraper.getClass());
-            double elapsedTime = System.currentTimeMillis() - startTime;
-            if (elapsedTime <= 2800) {
-                try {
-                    Thread.sleep((long) (2800 - elapsedTime));
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        double elapsedTime = System.currentTimeMillis() - startTime;
+        sourceTimes.replaceAll((key, value) -> value + elapsedTime);
+        delays(scraper.toString());
+
+        if (scraper.equals(scrapers.get(0)))
+            scrapers.remove(0);
+
+        return scrapers.size();
+    }
+
+    public void delays(String source) {
+        // every source has an enforced min delay
+        double timeLastScrape = sourceTimes.get(source);
+        if (timeLastScrape < 2800) {
+            long waitTime = (long) (2800 - timeLastScrape);
+            try {
+                Thread.sleep(waitTime);
+                sourceTimes.replaceAll((key, value) -> value + waitTime);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
-        iter.remove();
-        return scrapers.size();
+        sourceTimes.replace(source, 0.0);
     }
 }

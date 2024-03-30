@@ -42,12 +42,12 @@
       <div class="appearancecont">
 
         <div class="theme-buttons">
-          <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')" :disabled="systemTheme">
-          <label :class="{ 'disabled': systemTheme }">Black</label>
-          <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')" :disabled="systemTheme">
-          <label :class="{ 'disabled': systemTheme }">Dark</label>
-          <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')" :disabled="systemTheme">
-          <label :class="{ 'disabled': systemTheme }">Light</label>
+          <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')" :disabled="autoTheme">
+          <label :class="{ 'disabled': autoTheme }">Black</label>
+          <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')" :disabled="autoTheme">
+          <label :class="{ 'disabled': autoTheme }">Dark</label>
+          <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')" :disabled="autoTheme">
+          <label :class="{ 'disabled': autoTheme }">Light</label>
           
           <div class="colorindicator"></div>
         </div>
@@ -69,7 +69,7 @@
       </div>
 
       <div class="belowAppearance">
-        <input type="checkbox" v-model="systemTheme" @change="setSetting('systemTheme', $event.target.checked)">
+        <input type="checkbox" v-model="autoTheme" @change="setSetting('autoTheme', $event.target.checked)">
             <label>Match system theme</label>
       </div>
       
@@ -145,7 +145,7 @@ export default {
       },
       longTimeout: false,
       isoDates: false,
-      systemTheme: false,
+      autoTheme: false,
     }
   },
   computed: {
@@ -161,7 +161,7 @@ export default {
         this.filters = response.data;
         this.longTimeout = response.data.longTimeout;
         this.isoDates = response.data.isoDates;
-        this.systemTheme = response.data.systemTheme;
+        this.autoTheme = response.data.autoTheme;
       })
       .catch((error) => {
         console.error(error);
@@ -179,7 +179,6 @@ export default {
       switch(name) {
         case ("theme"): this.$store.commit('SET_PRIMARY_COLOR', this.theme);
         case ("accent"): this.$store.commit('SET_ACCENT_COLOR', this.accent);
-        case ("systemTheme"): this.$store.commit('SET_SYSTEM_THEME', this.systemTheme);
         case ("isoDates"): this.$store.commit("SET_ISODATES", this.isoDates);
       }
       axios.post(`http://localhost:8080/api/setSetting`, { name: name, value: value })

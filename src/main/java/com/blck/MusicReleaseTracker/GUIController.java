@@ -3,7 +3,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Scrapers.*;
-import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.*;
@@ -179,7 +179,7 @@ public class GUIController {
         tableContent.clear();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             // populating combview table
-            String sql = "SELECT * FROM combview ORDER BY date DESC LIMIT 1000";
+            String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist ASC, song ASC LIMIT 1000";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -312,8 +312,8 @@ public class GUIController {
 
         config.readConfig(ConfigTools.configOptions.isoDates);
         configData.put("isoDates", store.getIsoDates());
-        config.readConfig(ConfigTools.configOptions.systemTheme);
-        configData.put("systemTheme", store.getSystemTheme());
+        config.readConfig(ConfigTools.configOptions.autoTheme);
+        configData.put("autoTheme", store.getAutoTheme());
 
         return configData;
     }

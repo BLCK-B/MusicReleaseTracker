@@ -2,7 +2,6 @@ package com.blck.MusicReleaseTracker.Core;
 
 import com.blck.MusicReleaseTracker.*;
 import com.blck.MusicReleaseTracker.Scrapers.ScraperParent;
-import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

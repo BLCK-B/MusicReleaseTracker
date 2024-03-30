@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
-import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;

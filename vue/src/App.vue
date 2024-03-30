@@ -78,8 +78,7 @@ export default {
     "settingsOpen",
     "primaryColor",
     "accentColor",
-    "previewVis",
-    "systemTheme"
+    "previewVis"
     ])
   },
   watch: {
@@ -109,12 +108,13 @@ export default {
       // detecting system theme on load
       axios.get('http://localhost:8080/api/settingsOpened')
         .then(response => {
-          this.$store.commit('SET_SYSTEM_THEME', response.data.systemTheme);
           const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-          if (prefersDarkMode.matches && this.systemTheme)
-            this.$store.commit('SET_PRIMARY_COLOR', "Black");
-          else
-            this.$store.commit('SET_PRIMARY_COLOR', "Light");
+          if (response.data.autoTheme == true) {
+            if (prefersDarkMode.matches)
+              this.$store.commit('SET_PRIMARY_COLOR', "Black");
+            else
+              this.$store.commit('SET_PRIMARY_COLOR', "Light");
+          }
         })
         .catch((error) => {
           console.error(error);

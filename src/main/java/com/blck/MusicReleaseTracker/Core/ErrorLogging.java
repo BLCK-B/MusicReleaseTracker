@@ -1,6 +1,5 @@
-package com.blck.MusicReleaseTracker.Simple;
+package com.blck.MusicReleaseTracker.Core;
 
-import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.nio.file.Files;

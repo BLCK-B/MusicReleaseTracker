@@ -1,11 +1,12 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
-import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
-import com.blck.MusicReleaseTracker.Simple.SongClass;
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.typesafe.config.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
@@ -35,7 +35,7 @@ public class ConfigTools {
     private final ErrorLogging log;
 
     public enum configOptions {
-        filters, themes, lastScrape, longTimeout, isoDates, systemTheme
+        filters, themes, lastScrape, longTimeout, isoDates, autoTheme
     }
 
     @Autowired
@@ -86,7 +86,7 @@ public class ConfigTools {
                 case lastScrape -> store.setScrapeDate(config.getString("lastScrape"));
                 case longTimeout -> store.setLongTimeout(config.getBoolean("longTimeout"));
                 case isoDates -> store.setIsoDates(config.getBoolean("isoDates"));
-                case systemTheme -> store.setSystemTheme(config.getBoolean("systemTheme"));
+                case autoTheme -> store.setAutoTheme(config.getBoolean("autoTheme"));
             }
             config = null;
         }
@@ -117,7 +117,7 @@ public class ConfigTools {
             lastScrape=-
             longTimeout=false
             isoDates=false
-            systemTheme=true
+            autoTheme=true
             """;
         // create template file / overwrite templateContent
         File templateFile = new File(configFolder + "/MRTsettingsTemplate.hocon");

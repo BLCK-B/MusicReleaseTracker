@@ -5,8 +5,10 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.io.File;
+import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +35,10 @@ public class GUIControllerTest {
         else
             throw new UnsupportedOperationException("unsupported OS");
 
+
         testDBpath = DBpath;
+//        testDBpath = "jdbc:sqlite:" + System.getProperty("user.dir") + "/src/test/testresources/testdb.db";
+//        System.out.println(testDBpath);
         store.setDBpath(DBpath);
         testedClass = new GUIController(store, null, null, null, DB);
     }

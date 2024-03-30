@@ -3,7 +3,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Scrapers.*;
-import com.blck.MusicReleaseTracker.Simple.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import java.sql.*;
 import java.util.*;
 

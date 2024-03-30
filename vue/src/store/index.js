@@ -15,7 +15,6 @@ const state = {
   previewVis: false,
   isoDates: false,
   urlExists: false,
-  systemTheme: false,
 };
 
 const mutations = {
@@ -61,9 +60,6 @@ const mutations = {
   },
   SET_URL_EXISTS(state, urlExists) {
     state.urlExists = urlExists;
-  },
-  SET_SYSTEM_THEME(state, systemTheme) {
-    state.systemTheme = systemTheme;
   },
 };
 

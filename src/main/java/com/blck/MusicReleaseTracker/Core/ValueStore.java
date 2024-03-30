@@ -33,7 +33,7 @@ public class ValueStore {
     private String scrapeDate;
     private boolean longTimeout = false;
     private boolean isoDates = false;
-    private boolean systemTheme = false;
+    private boolean autoTheme = false;
 
     public void setAppDataPath(String appDataPath) {
         this.appDataPath = appDataPath;
@@ -91,11 +91,11 @@ public class ValueStore {
     public boolean getIsoDates() {
         return isoDates;
     }
-    public void setSystemTheme(boolean systemTheme) {
-        this.systemTheme = systemTheme;
+    public void setAutoTheme(boolean autoTheme) {
+        this.autoTheme = autoTheme;
     }
-    public boolean getSystemTheme() {
-        return systemTheme;
+    public boolean getAutoTheme() {
+        return autoTheme;
     }
 
     @Override

@@ -81,7 +81,7 @@ public class GUIController {
 
     public void artistClickDelete() {
         // delete last selected artist and all entries from artist
-        if (store.getDBpath().contains("testing"))
+        if (store.getDBpath().contains("testdb"))
             lastClickedArtist = "Joe";
 
         if (lastClickedArtist != null) {
@@ -106,7 +106,7 @@ public class GUIController {
     }
 
     public void deleteUrl() {
-        if (store.getDBpath().contains("testing")) {
+        if (store.getDBpath().contains("testdb")) {
             selectedSource = SourcesEnum.beatport;
             lastClickedArtist = "Joe";
         }
@@ -225,7 +225,7 @@ public class GUIController {
 
     public void saveUrl() {
         // save artist url to db
-        if (store.getDBpath().contains("testing")) {
+        if (store.getDBpath().contains("testdb")) {
             selectedSource = SourcesEnum.beatport;
             lastClickedArtist = "Joe";
             tempID = "testingUrl";
@@ -244,7 +244,7 @@ public class GUIController {
     public boolean checkExistURL() {
         // check for existence of url to determine visibility of url dialog
         boolean urlExists = false;
-        if (store.getDBpath().contains("testing")) {
+        if (store.getDBpath().contains("testdb")) {
             selectedSource = SourcesEnum.beatport;
             lastClickedArtist = "Joe";
         }
@@ -275,7 +275,10 @@ public class GUIController {
         // launch scraping in backend, then fill and load table
         scrapeProcess.scrapeData();
         scrapeProcess.fillCombviewTable();
+        vacuum();
+    }
 
+    public void vacuum() {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "VACUUM;";
             PreparedStatement pstmt = conn.prepareStatement(sql);

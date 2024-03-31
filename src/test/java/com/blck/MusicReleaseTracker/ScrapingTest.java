@@ -5,39 +5,42 @@ import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.io.File;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/*      MusicReleaseTracker
+        Copyright (C) 2023 BLCK
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @SpringBootTest
 public class ScrapingTest {
 
     private final ValueStore store = new ValueStore();
     private final DBtools DB = new DBtools(store, null);
-    private final String testDBpath;
     private final ScrapeProcess testedClass;
 
     public ScrapingTest() {
         // data setup
-        String DBpath = null;
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) { // Windows
-            String appDataPath = System.getenv("APPDATA");
-            DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "testingdata.db";
-        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  // Linux
-            String userHome = System.getProperty("user.home");
-            DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "testingdata.db";
-        }
-        else
-            throw new UnsupportedOperationException("unsupported OS");
-        //DB.path();
-        testDBpath = DBpath; //store.getAppDataPath() + "testingdata.db";
-        store.setDBpath(testDBpath);
+        String DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
+        store.setDBpath(DBpath);
+
         ArrayList<String> filterWords = new ArrayList<>();
         filterWords.add("XXXXX");
         store.setFilterWords(filterWords);
+
         testedClass = new ScrapeProcess(store, null, null, DB, null);
     }
 
@@ -91,7 +94,7 @@ public class ScrapingTest {
         expectedSongList.add(new SongClass("DiffDates", "B", "2000-30-30"));
 
         try {
-            Connection conn = DriverManager.getConnection(testDBpath);
+            Connection conn = DriverManager.getConnection(store.getDBpath());
             String sql = "SELECT * FROM combview ORDER BY date DESC";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);

@@ -5,12 +5,24 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.io.File;
-import java.sql.Connection;
+
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+/*      MusicReleaseTracker
+        Copyright (C) 2023 BLCK
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -18,28 +30,13 @@ public class GUIControllerTest {
 
     private final ValueStore store = new ValueStore();
     private final DBtools DB = new DBtools(store, null);
-    private final String testDBpath;
     private final GUIController testedClass;
 
     public GUIControllerTest() {
         // data setup
-        String DBpath = null;
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) { // Windows
-            String appDataPath = System.getenv("APPDATA");
-            DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "testingdata.db";
-        } else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {  // Linux
-            String userHome = System.getProperty("user.home");
-            DBpath = "jdbc:sqlite:" + userHome + File.separator + ".MusicReleaseTracker" + File.separator + "testingdata.db";
-        }
-        else
-            throw new UnsupportedOperationException("unsupported OS");
-
-
-        testDBpath = DBpath;
-//        testDBpath = "jdbc:sqlite:" + System.getProperty("user.dir") + "/src/test/testresources/testdb.db";
-//        System.out.println(testDBpath);
+        String DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store.setDBpath(DBpath);
+
         testedClass = new GUIController(store, null, null, null, DB);
     }
 
@@ -90,5 +87,7 @@ public class GUIControllerTest {
         testedClass.artistClickDelete();
         // verify with loadList
         assertTrue(testedClass.loadList().isEmpty());
+
+        testedClass.vacuum();
     }
 }

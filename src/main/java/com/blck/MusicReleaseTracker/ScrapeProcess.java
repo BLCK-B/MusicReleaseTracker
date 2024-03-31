@@ -74,7 +74,7 @@ public class ScrapeProcess {
     public void fillCombviewTable() {
         // assembles table for combined view: filters unwanted words, looks for duplicates
         // load filterwords and entrieslimit
-        if (!store.getDBpath().contains("testing"))
+        if (!store.getDBpath().contains("testdb"))
             config.readConfig(ConfigTools.configOptions.filters);
         // clear table
         String sql = null;

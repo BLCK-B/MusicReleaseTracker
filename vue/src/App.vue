@@ -50,6 +50,7 @@ import SettingsWindow from './components/SettingsWindow.vue';
 import PreviewDialog from './components/PreviewDialog.vue';
 import { mapState } from 'vuex';
 import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:57782';
 
 export default {
   data() {
@@ -95,7 +96,7 @@ export default {
   methods: {
     loadTheme() {
       // on start, load themes from config
-      axios.get("http://localhost:8080/api/getThemeConfig")
+      axios.get("/api/getThemeConfig")
         .then(response => {
           this.$store.commit('SET_PRIMARY_COLOR', response.data.theme);
           this.$store.commit('SET_ACCENT_COLOR', response.data.accent);
@@ -106,7 +107,7 @@ export default {
     },
     detectTheme() {
       // detecting system theme on load
-      axios.get('http://localhost:8080/api/settingsOpened')
+      axios.get('/api/settingsOpened')
         .then(response => {
           const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
           if (response.data.autoTheme == true) {

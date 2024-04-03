@@ -156,7 +156,7 @@ export default {
   },
   // on open, load setting states from HOCON
   created() {
-    axios.get('http://localhost:8080/api/settingsOpened')
+    axios.get('/api/settingsOpened')
       .then(response => {
         this.filters = response.data;
         this.longTimeout = response.data.longTimeout;
@@ -181,7 +181,7 @@ export default {
         case ("accent"): this.$store.commit('SET_ACCENT_COLOR', this.accent);
         case ("isoDates"): this.$store.commit("SET_ISODATES", this.isoDates);
       }
-      axios.post(`http://localhost:8080/api/setSetting`, { name: name, value: value })
+      axios.post(`/api/setSetting`, { name: name, value: value })
       .catch(error => {
         console.error(error);
       });
@@ -192,7 +192,7 @@ export default {
         this.settingsProtection = false;
       }
       else {
-        axios.post('http://localhost:8080/api/resetSettings')
+        axios.post('/api/resetSettings')
         .then(() => {
           this.clickClose();
         })
@@ -207,7 +207,7 @@ export default {
         this.dbProtection = false;
       }
       else {
-        axios.post('http://localhost:8080/api/resetDB')
+        axios.post('/api/resetDB')
         .then(() => {
           this.clickClose();
         })

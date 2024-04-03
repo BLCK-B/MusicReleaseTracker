@@ -51,7 +51,7 @@ export default {
   // load last clicked tab, otherwise combview as default, load scrapeLast time
   created() {
     this.activeTab = this.sourceTab;
-    axios.post('http://localhost:8080/api/fillCombview')
+    axios.post('/api/fillCombview')
         .catch((error) => {
           console.error(error);
         })
@@ -61,7 +61,7 @@ export default {
           else
             this.handleSourceClick(this.sourceTab);
         });
-    axios.get('http://localhost:8080/api/getScrapeDate')
+    axios.get('/api/getScrapeDate')
     .then(response => {
       this.scrapeLast = response.data;
     })
@@ -81,7 +81,7 @@ export default {
     },
     // load respective table
     handleSourceClick(source) {
-      axios.post('http://localhost:8080/api/listOrTabClick', { item: source, origin: "tab" })
+      axios.post('/api/listOrTabClick', { item: source, origin: "tab" })
         .then((response) => {
           this.$store.commit('SET_TABLE_CONTENT', response.data);
         })
@@ -93,7 +93,7 @@ export default {
     clickScrape() {
       const allowButtons = this.allowButtons;
       if (!allowButtons) {
-        axios.post('http://localhost:8080/api/cancelScrape')
+        axios.post('/api/cancelScrape')
           .then(() => {
             this.$store.commit('SET_ALLOW_BUTTONS', true);
             this.scrapeColor = "var(--accent-color)";
@@ -102,13 +102,13 @@ export default {
       else {
         this.$store.commit('SET_ALLOW_BUTTONS', false);
         this.scrapeColor = "var(--dull-color)";
-        this.eventSource = new EventSource('http://localhost:8080/progress');
+        this.eventSource = new EventSource('/progress');
         this.eventSource.onmessage = (event) => {
           const progress = parseFloat(event.data);
           this.$store.commit('SET_PROGRESS', progress);
         };
 
-        axios.post('http://localhost:8080/api/clickScrape')
+        axios.post('/api/clickScrape')
           .then(() => {
             this.scrapeColor = "var(--accent-color)";
             this.$store.commit('SET_ALLOW_BUTTONS', true);
@@ -123,7 +123,7 @@ export default {
             this.scrapeNotice = true;
             this.handleSourceClick("combview");
 
-            axios.post(`http://localhost:8080/api/setSetting`, { name: 'lastScrape', value: time })
+            axios.post(`/api/setSetting`, { name: 'lastScrape', value: time })
             .catch(error => {
               console.error(error);
             });

@@ -95,10 +95,10 @@ export default {
             const url = encodeURIComponent(this.input);
             this.input = "";
             if (url) {
-                axios.post('http://localhost:8080/api/clickAddURL', url)
+                axios.post('/api/clickAddURL', url)
                 .then(() => {
                     const artist = this.artist;
-                    axios.post('http://localhost:8080/api/listOrTabClick', { item: artist, origin: "list" })
+                    axios.post('/api/listOrTabClick', { item: artist, origin: "list" })
                         .then(response => {
                             this.$store.commit('SET_TABLE_CONTENT', response.data);
                             this.$store.commit('SET_PREVIEW_VIS', true);
@@ -112,7 +112,7 @@ export default {
         // only show dialog when table is null, and if URL does not exist
         determineDiagShow() {
             if (this.tableData.length === 0) {
-                axios.get("http://localhost:8080/api/checkExistURL")
+                axios.get("/api/checkExistURL")
                 .then(response => {
                     this.$store.commit('SET_URL_EXISTS', response.data);
                 })

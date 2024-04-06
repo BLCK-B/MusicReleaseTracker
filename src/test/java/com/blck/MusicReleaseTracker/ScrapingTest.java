@@ -1,10 +1,12 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
@@ -51,12 +53,13 @@ public class ScrapingTest {
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
         songList.add(new SongClass("Son’g3", "artistName", "2023-03-01"));
         songList.add(new SongClass("Song2", "artistName", "2023-02-01"));
-        scraperInstace.processInfo(songList, "test");
+        scraperInstace.setTestData(songList, SourcesEnum.beatport);
+        scraperInstace.processInfo();
         // expected values: sort by date
         ArrayList<SongClass> expectedSongList = new ArrayList<>();
         expectedSongList.add(new SongClass("Son'g3", "artistName", "2023-03-01"));
-        expectedSongList.add(new SongClass("Song2","artistName", "2023-02-01"));
-        expectedSongList.add(new SongClass("Song1","artistName", "2023-01-01"));
+        expectedSongList.add(new SongClass("Song2", "artistName", "2023-02-01"));
+        expectedSongList.add(new SongClass("Song1", "artistName", "2023-01-01"));
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
@@ -65,19 +68,21 @@ public class ScrapingTest {
         songList.add(new SongClass("Song4", "artistName", "2023"));
         songList.add(new SongClass("Song5", "artistName", "-"));
         songList.add(new SongClass("Song6", "artistName", "08-05-2023"));
-        scraperInstace.processInfo(songList, "test");
+        scraperInstace.setTestData(songList, SourcesEnum.beatport);
+        scraperInstace.processInfo();
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
 
         expectedSongList.remove(expectedSongList.size() - 1);
-        expectedSongList.add(new SongClass("Song1","artistName", "2005-05-05"));
+        expectedSongList.add(new SongClass("Song1", "artistName", "2005-05-05"));
 
         // duplicates: prefer older
         songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
         songList.add(new SongClass("Song1", "artistName", "2019-19-19"));
         songList.add(new SongClass("Song1", "artistName", "2005-05-05"));
-        scraperInstace.processInfo(songList, "test");
+        scraperInstace.setTestData(songList, SourcesEnum.beatport);
+        scraperInstace.processInfo();
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
@@ -93,8 +98,7 @@ public class ScrapingTest {
         expectedSongList.add(new SongClass("duplicates", "K", "2023-07-27"));
         expectedSongList.add(new SongClass("DiffDates", "B", "2000-30-30"));
 
-        try {
-            Connection conn = DriverManager.getConnection(store.getDBpath());
+        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "SELECT * FROM combview ORDER BY date DESC";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
@@ -112,9 +116,9 @@ public class ScrapingTest {
             SongClass obj1 = expectedSongList.get(i);
             SongClass obj2 = songList.get(i);
             assertAll("Combview table rows",
-                () -> assertEquals(obj1.getName(), obj2.getName()),
-                () -> assertEquals(obj1.getArtist(), obj2.getArtist()),
-                () -> assertEquals(obj1.getDate(), obj2.getDate())
+                    () -> assertEquals(obj1.getName(), obj2.getName()),
+                    () -> assertEquals(obj1.getArtist(), obj2.getArtist()),
+                    () -> assertEquals(obj1.getDate(), obj2.getDate())
             );
         }
 

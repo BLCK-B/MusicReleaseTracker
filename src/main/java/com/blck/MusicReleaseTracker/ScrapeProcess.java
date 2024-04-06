@@ -1,12 +1,13 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,7 +28,9 @@ import java.util.stream.Collectors;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-/** class with scraping and data processing logic */
+/**
+ * class with scraping and data processing logic
+ */
 @Component
 public class ScrapeProcess {
 
@@ -47,6 +50,7 @@ public class ScrapeProcess {
     }
 
     public boolean scrapeCancel = false;
+
     public void scrapeData() {
         config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
@@ -66,7 +70,7 @@ public class ScrapeProcess {
             }
             remaining = box.scrapeNext();
             // 40 remaining / 80 total = 50%
-            progress = ((double)initSize - (double)remaining) / (double)initSize;
+            progress = ((double) initSize - (double) remaining) / (double) initSize;
         }
         System.gc();
     }
@@ -83,7 +87,7 @@ public class ScrapeProcess {
             sql = "DELETE FROM combview";
             stmt = conn.createStatement();
             stmt.executeUpdate(sql);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error cleaning combview table");
         }
 
@@ -106,13 +110,15 @@ public class ScrapeProcess {
 
                     if (filterWords(songName, songType)) {
                         switch (source) {
-                            case beatport -> songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
-                            case musicbrainz, junodownload, youtube -> songObjectList.add(new SongClass(songName, songArtist, songDate));
+                            case beatport ->
+                                    songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
+                            case musicbrainz, junodownload, youtube ->
+                                    songObjectList.add(new SongClass(songName, songArtist, songDate));
                         }
                     }
                 }
             }
-        }  catch (Exception e) {
+        } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error filtering keywords");
         }
         // map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley

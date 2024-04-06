@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.jsoup.Jsoup;
@@ -68,7 +69,10 @@ public final class YoutubeScraper extends ScraperParent implements ScraperInterf
         songsArray = null;
         datesArray = null;
 
-        super.processInfo(songList, "youtube");
+        super.songList = songList;
+        super.source = SourcesEnum.youtube;
+        super.processInfo();
+        super.insertSet();
     }
 
     private void reduceToID() {

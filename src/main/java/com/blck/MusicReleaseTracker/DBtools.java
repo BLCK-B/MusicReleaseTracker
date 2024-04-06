@@ -1,9 +1,10 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,7 +24,9 @@ import java.util.Map;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-/** class for DB operations */
+/**
+ * class for DB operations
+ */
 public class DBtools {
 
     private final ValueStore store;
@@ -48,9 +51,9 @@ public class DBtools {
 
         // paths
         String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
-        String DBpath =             "jdbc:sqlite:" + appDataPath + "musicdata.db";
-        String configPath =         appDataPath + "MRTsettings.hocon";
-        String errorLogsPath =          appDataPath + "errorlogs.txt";
+        String DBpath = "jdbc:sqlite:" + appDataPath + "musicdata.db";
+        String configPath = appDataPath + "MRTsettings.hocon";
+        String errorLogsPath = appDataPath + "errorlogs.txt";
         // save to settingsStore
         store.setAppDataPath(appDataPath);
         store.setConfigPath(configPath);
@@ -92,8 +95,7 @@ public class DBtools {
             try (
                     Connection connDB = DriverManager.getConnection(store.getDBpath());
                     Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath)
-                )
-            {
+            ) {
                 // insert data from musicdata's column to template's column
                 String sql = "SELECT * FROM artists LIMIT 1000";
                 Statement stmt = connDB.createStatement();
@@ -107,7 +109,7 @@ public class DBtools {
                     // construct sql query for every column, add to batch
                     for (int i = 0; i < columnList.size(); i++) {
                         String column = columnList.get(i);
-                        pstmt.setString(i + 1 , rs.getString(column));
+                        pstmt.setString(i + 1, rs.getString(column));
                     }
                     pstmt.addBatch();
                 }
@@ -117,7 +119,7 @@ public class DBtools {
                 connDBtemplate.setAutoCommit(true);
                 pstmt.clearBatch();
                 pstmt.close();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 log.error(e, ErrorLogging.Severity.SEVERE, "error updating DB file");
             }
             try {
@@ -127,7 +129,7 @@ public class DBtools {
                 oldFile.delete();
                 // rename template to musicdata
                 newFile.renameTo(oldFile);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 log.error(e, ErrorLogging.Severity.SEVERE, "error renaming/deleting DB files");
             }
         }
@@ -137,71 +139,71 @@ public class DBtools {
         try (Connection conn = DriverManager.getConnection(path)) {
 
             String sql = """
-                CREATE TABLE IF NOT EXISTS musicbrainz (
-                song text NOT NULL,
-                artist text NOT NULL,
-                date text NOT NULL
-                );
-                """;
+                    CREATE TABLE IF NOT EXISTS musicbrainz (
+                    song text NOT NULL,
+                    artist text NOT NULL,
+                    date text NOT NULL
+                    );
+                    """;
             Statement stmt = conn.createStatement();
             stmt.execute(sql);
 
             sql = """
-                CREATE TABLE IF NOT EXISTS beatport (
-                song text NOT NULL,
-                artist text NOT NULL,
-                date text NOT NULL,
-                type text NOT NULL
-                );
-                """;
+                    CREATE TABLE IF NOT EXISTS beatport (
+                    song text NOT NULL,
+                    artist text NOT NULL,
+                    date text NOT NULL,
+                    type text NOT NULL
+                    );
+                    """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
             sql = """
-                CREATE TABLE IF NOT EXISTS junodownload (
-                song text NOT NULL,
-                artist text NOT NULL,
-                date text NOT NULL
-                );
-                """;
+                    CREATE TABLE IF NOT EXISTS junodownload (
+                    song text NOT NULL,
+                    artist text NOT NULL,
+                    date text NOT NULL
+                    );
+                    """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
             sql = """
-                CREATE TABLE IF NOT EXISTS youtube (
-                song text NOT NULL,
-                artist text NOT NULL,
-                date text NOT NULL
-                );
-                """;
+                    CREATE TABLE IF NOT EXISTS youtube (
+                    song text NOT NULL,
+                    artist text NOT NULL,
+                    date text NOT NULL
+                    );
+                    """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
             sql = """
-                CREATE TABLE IF NOT EXISTS artists (
-                artistname text PRIMARY KEY,
-                urlmusicbrainz text,
-                urlbeatport text,
-                urljunodownload text,
-                urlyoutube text
-                );
-                """;
+                    CREATE TABLE IF NOT EXISTS artists (
+                    artistname text PRIMARY KEY,
+                    urlmusicbrainz text,
+                    urlbeatport text,
+                    urljunodownload text,
+                    urlyoutube text
+                    );
+                    """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
             sql = """
-                CREATE TABLE IF NOT EXISTS combview (
-                song text NOT NULL,
-                artist text NOT NULL,
-                date text NOT NULL
-                );
-                """;
+                    CREATE TABLE IF NOT EXISTS combview (
+                    song text NOT NULL,
+                    artist text NOT NULL,
+                    date text NOT NULL
+                    );
+                    """;
             stmt = conn.createStatement();
             stmt.execute(sql);
 
             stmt.close();
         } catch (SQLException e) {
-           log.error(e, ErrorLogging.Severity.SEVERE, "error creating DB file");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error creating DB file");
         }
     }
 
@@ -231,7 +233,7 @@ public class DBtools {
             ResultSet rsTables = stmt.executeQuery(sql);
             ArrayList<String> tablesList = new ArrayList<>();
 
-            while(rsTables.next())
+            while (rsTables.next())
                 tablesList.add(rsTables.getString(1));
 
             for (String tableName : tablesList) {
@@ -251,10 +253,10 @@ public class DBtools {
     }
 
     public void resetDB() {
-       // default the musicdata
-       File musicdata = new File(store.getAppDataPath() + "musicdata.db");
-       musicdata.delete();
-       createDB(store.getDBpath());
+        // default the musicdata
+        File musicdata = new File(store.getAppDataPath() + "musicdata.db");
+        musicdata.delete();
+        createDB(store.getDBpath());
     }
 }
 

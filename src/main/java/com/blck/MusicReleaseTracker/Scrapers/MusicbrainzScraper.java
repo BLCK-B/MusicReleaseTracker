@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.jsoup.Jsoup;
@@ -59,7 +60,10 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
         datesArray = null;
         songsArray = null;
 
-        super.processInfo(songList, "musicbrainz");
+        super.songList = songList;
+        super.source = SourcesEnum.musicbrainz;
+        super.processInfo();
+        super.insertSet();
     }
 
     private void reduceToID() {

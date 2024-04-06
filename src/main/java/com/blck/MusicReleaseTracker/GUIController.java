@@ -1,11 +1,12 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Scrapers.*;
-import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +26,9 @@ import java.util.Map;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-/** class with methods called from ApiController */
+/**
+ * class with methods called from ApiController
+ */
 public class GUIController {
 
     private final ValueStore store;
@@ -47,9 +50,15 @@ public class GUIController {
         this.DB = DB;
     }
 
-   public List<String> loadList() {
-       List<String> dataList = new ArrayList<>();
-       try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+    public void setTestDaata(String lastClickedArtist, SourcesEnum selectedSource) {
+        this.lastClickedArtist = lastClickedArtist;
+        this.selectedSource = selectedSource;
+        tempID = "testingUrl";
+    }
+
+    public List<String> loadList() {
+        List<String> dataList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname ASC LIMIT 500");
             while (rs.next()) {
@@ -57,10 +66,10 @@ public class GUIController {
             }
             stmt.close();
             rs.close();
-       } catch (SQLException e) {
-           log.error(e, ErrorLogging.Severity.SEVERE, "error loading list");
-       }
-       return dataList;
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error loading list");
+        }
+        return dataList;
     }
 
     public void artistAddConfirm(String input) {
@@ -81,9 +90,6 @@ public class GUIController {
 
     public void artistClickDelete() {
         // delete last selected artist and all entries from artist
-        if (store.getDBpath().contains("testdb"))
-            lastClickedArtist = "Joe";
-
         if (lastClickedArtist != null) {
             try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
                 Map<String, ArrayList<String>> tableMap = DB.getDBStructure(store.getDBpath());
@@ -98,22 +104,17 @@ public class GUIController {
                     pstmt.executeUpdate();
                 }
                 lastClickedArtist = null;
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 log.error(e, ErrorLogging.Severity.WARNING, "error deleting an artist");
             }
         }
     }
 
     public void deleteUrl() {
-        if (store.getDBpath().contains("testdb")) {
-            selectedSource = SourcesEnum.beatport;
-            lastClickedArtist = "Joe";
-        }
         // set null specific URL, delete related set
         if (lastClickedArtist != null && selectedSource != null) {
             try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-                String sql = "UPDATE artists SET url" + selectedSource +  " = NULL WHERE artistname = ?";
+                String sql = "UPDATE artists SET url" + selectedSource + " = NULL WHERE artistname = ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, lastClickedArtist);
                 pstmt.executeUpdate();
@@ -208,11 +209,11 @@ public class GUIController {
         String id = null;
         try {
             ScraperParent scraper = null;
-            switch(selectedSource) {
-                case musicbrainz    -> scraper = new MusicbrainzScraper(store, log, lastClickedArtist, url);
-                case beatport       -> scraper = new BeatportScraper(store, log, lastClickedArtist, url);
-                case junodownload   -> scraper = new JunodownloadScraper(store, log, lastClickedArtist, url);
-                case youtube        -> scraper = new YoutubeScraper(store, log, lastClickedArtist, url);
+            switch (selectedSource) {
+                case musicbrainz -> scraper = new MusicbrainzScraper(store, log, lastClickedArtist, url);
+                case beatport -> scraper = new BeatportScraper(store, log, lastClickedArtist, url);
+                case junodownload -> scraper = new JunodownloadScraper(store, log, lastClickedArtist, url);
+                case youtube -> scraper = new YoutubeScraper(store, log, lastClickedArtist, url);
             }
             id = scraper.getID();
             scraper.scrape();
@@ -225,11 +226,6 @@ public class GUIController {
 
     public void saveUrl() {
         // save artist url to db
-        if (store.getDBpath().contains("testdb")) {
-            selectedSource = SourcesEnum.beatport;
-            lastClickedArtist = "Joe";
-            tempID = "testingUrl";
-        }
         String sql = "UPDATE artists SET url" + selectedSource + " = ? WHERE artistname = ?";
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -244,11 +240,7 @@ public class GUIController {
     public boolean checkExistURL() {
         // check for existence of url to determine visibility of url dialog
         boolean urlExists = false;
-        if (store.getDBpath().contains("testdb")) {
-            selectedSource = SourcesEnum.beatport;
-            lastClickedArtist = "Joe";
-        }
-        else try {
+        try {
             SourcesEnum.valueOf(String.valueOf(selectedSource));
         } catch (IllegalArgumentException e) {
             return urlExists;
@@ -325,20 +317,25 @@ public class GUIController {
         // write any setting in config, note: "name" = config name
         config.writeSingleConfig(name, value);
     }
-    public Map<String,String> getThemeConfig() {
+
+    public Map<String, String> getThemeConfig() {
         config.readConfig(ConfigTools.configOptions.themes);
         return store.getThemes();
     }
+
     public String getScrapeDate() {
         config.readConfig(ConfigTools.configOptions.lastScrape);
         return store.getScrapeDate();
     }
+
     public String getLastArtist() {
         return lastClickedArtist;
     }
+
     public void resetSettings() {
         config.resetSettings();
     }
+
     public void resetDB() {
         DB.resetDB();
     }

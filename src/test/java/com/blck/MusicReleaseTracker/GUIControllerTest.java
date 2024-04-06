@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -38,6 +39,7 @@ public class GUIControllerTest {
         store.setDBpath(DBpath);
 
         testedClass = new GUIController(store, null, null, null, DB);
+        testedClass.setTestDaata("Joe", SourcesEnum.beatport);
     }
 
     @Test
@@ -59,8 +61,7 @@ public class GUIControllerTest {
         try {
             boolean exists = testedClass.checkExistURL();
             assertTrue(exists);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -74,8 +75,7 @@ public class GUIControllerTest {
         try {
             boolean exists = testedClass.checkExistURL();
             assertFalse(exists);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

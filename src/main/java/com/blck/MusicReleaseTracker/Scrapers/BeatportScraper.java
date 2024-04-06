@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.jsoup.Jsoup;
@@ -80,7 +81,10 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
         typesArrayList = null;
         datesArrayList = null;
 
-        super.processInfo(songList, "beatport");
+        super.songList = songList;
+        super.source = SourcesEnum.beatport;
+        super.processInfo();
+        super.insertSet();
     }
 
     private void reduceToID() {

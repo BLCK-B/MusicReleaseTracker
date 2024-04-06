@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Simple.SongClass;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.jsoup.Jsoup;
@@ -106,7 +107,10 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
         songsArray = null;
         datesArray = null;
 
-        super.processInfo(songList, "junodownload");
+        super.songList = songList;
+        super.source = SourcesEnum.junodownload;
+        super.processInfo();
+        super.insertSet();
     }
 
     private void reduceToID() {

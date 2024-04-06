@@ -1,10 +1,12 @@
 package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Simple.SongClass;
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.Simple.SongClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -22,6 +24,8 @@ public class ScraperParent {
 
     protected final ValueStore store;
     protected final ErrorLogging log;
+    protected ArrayList<SongClass> songList;
+    SourcesEnum source;
 
     @Autowired
     public ScraperParent(ValueStore valueStore, ErrorLogging errorLogging) {
@@ -29,14 +33,20 @@ public class ScraperParent {
         this.log = errorLogging;
     }
 
+    public void setTestData(ArrayList<SongClass> songList, SourcesEnum source) {
+        this.songList = songList;
+        this.source = source;
+    }
+
     public void scrape() throws ScraperTimeoutException {
         System.out.println("The method scrape() is to be overriden.");
     }
+
     public String getID() {
         return "The method getID() is to be overriden.";
     }
 
-    public void processInfo(ArrayList<SongClass> songList, String source) {
+    public void processInfo() {
         // unify apostrophes/grave accents/backticks/quotes...
         for (SongClass object : songList) {
             String songName = object.getName().replace("’", "'").replace("`", "'").replace("´", "'");
@@ -72,12 +82,9 @@ public class ScraperParent {
         });
         // reverse to newest-oldest
         Collections.reverse(songList);
-
-        if (!source.equals("test"))
-            insertSet(songList, source);
     }
 
-    public void insertSet(ArrayList<SongClass> songList, String source) {
+    public void insertSet() {
         PreparedStatement pstmt = null;
         // insert a set of songs to a source table
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
@@ -92,8 +99,7 @@ public class ScraperParent {
                     pstmt.setString(2, songObject.getArtist());
                     pstmt.setString(3, songObject.getDate());
                     pstmt.setString(4, songObject.getType());
-                }
-                else {
+                } else {
                     String sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, songObject.getName());

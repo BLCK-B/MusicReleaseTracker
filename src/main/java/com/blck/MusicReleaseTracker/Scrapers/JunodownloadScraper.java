@@ -2,7 +2,7 @@ package com.blck.MusicReleaseTracker.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
-import com.blck.MusicReleaseTracker.Simple.SongClass;
+import com.blck.MusicReleaseTracker.Simple.Song;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -96,10 +96,10 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
         }
 
         // create arraylist of song objects
-        ArrayList<SongClass> songList = new ArrayList<>();
+        ArrayList<Song> songList = new ArrayList<>();
         for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
             if (songsArray[i] != null && datesArray[i] != null)
-                songList.add(new SongClass(songsArray[i], songArtist, datesArray[i]));
+                songList.add(new Song(songsArray[i], songArtist, datesArray[i]));
         }
 
         songs = null;

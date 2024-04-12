@@ -4,7 +4,7 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
-import com.blck.MusicReleaseTracker.Simple.SongClass;
+import com.blck.MusicReleaseTracker.Simple.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -75,7 +75,14 @@ public class ScrapeProcess {
         System.gc();
     }
 
+
     public void fillCombviewTable() {
+        ArrayList<Song> songObjectList = prepareSongs();
+        List<Song> finalSortedList = processSongs(songObjectList);
+        insertIntoCombview(finalSortedList);
+    }
+
+    public ArrayList<Song> prepareSongs() {
         // assembles table for combined view: filters unwanted words, looks for duplicates
         // load filterwords and entrieslimit
         if (!store.getDBpath().contains("testdb"))
@@ -92,7 +99,7 @@ public class ScrapeProcess {
         }
 
         // song object list with data from all sources
-        ArrayList<SongClass> songObjectList = new ArrayList<>();
+        ArrayList<Song> songObjectList = new ArrayList<>();
 
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             for (SourcesEnum source : SourcesEnum.values()) {
@@ -111,20 +118,25 @@ public class ScrapeProcess {
                     if (filterWords(songName, songType)) {
                         switch (source) {
                             case beatport ->
-                                    songObjectList.add(new SongClass(songName, songArtist, songDate, songType));
+                                    songObjectList.add(new Song(songName, songArtist, songDate, songType));
                             case musicbrainz, junodownload, youtube ->
-                                    songObjectList.add(new SongClass(songName, songArtist, songDate));
+                                    songObjectList.add(new Song(songName, songArtist, songDate));
                         }
                     }
                 }
             }
+            stmt.close();
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error filtering keywords");
         }
+        return songObjectList;
+    }
+
+    public List<Song> processSongs(List<Song> songObjectList) {
         // map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         // eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Map<String, SongClass> nameArtistMap = songObjectList.stream()
+        Map<String, Song> nameArtistMap = songObjectList.stream()
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getArtist().replaceAll("\\s+", "").toLowerCase(),
                         song -> song, (existingValue, newValue) -> {
@@ -143,7 +155,7 @@ public class ScrapeProcess {
                 ));
         // map nameArtistMap.values to merge name-date duplicates, example key: theoutlines2023-06-23
         // eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
-        Map<String, SongClass> nameDateMap = nameArtistMap.values().stream()
+        Map<String, Song> nameDateMap = nameArtistMap.values().stream()
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
                         song -> song, (existingValue, newValue) -> {
@@ -155,20 +167,25 @@ public class ScrapeProcess {
                         }
                 ));
         // create a list of SongClass objects from map, sorted by date
-        List<SongClass> finalSortedList = nameDateMap.values().stream()
-                .sorted(Comparator.comparing(SongClass::getDate, Comparator.reverseOrder()))
+        List<Song> finalSortedList = nameDateMap.values().stream()
+                .sorted(Comparator.comparing(Song::getDate, Comparator.reverseOrder()))
                 .toList();
 
+        songObjectList = null;
         nameDateMap = null;
         nameArtistMap = null;
 
+        return finalSortedList;
+    }
+
+    private void insertIntoCombview(List<Song> finalSortedList) {
         // insert data into table
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            sql = "insert into combview(song, artist, date) values(?, ?, ?)";
+            String sql = "insert into combview(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             // precomitting batch insert is way faster
             int i = 0;
-            for (SongClass item : finalSortedList) {
+            for (Song item : finalSortedList) {
                 // table size limit
                 if (i == 115)
                     break;
@@ -182,9 +199,6 @@ public class ScrapeProcess {
             pstmt.executeBatch();
             conn.commit();
             conn.setAutoCommit(true);
-
-            songObjectList = null;
-            stmt.close();
             pstmt.close();
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error inserting data to combview");

@@ -34,6 +34,7 @@ public class ValueStore {
     private boolean longTimeout = false;
     private boolean isoDates = false;
     private boolean autoTheme = false;
+    private int timeout = 25000;
 
     public void setAppDataPath(String appDataPath) {
         this.appDataPath = appDataPath;
@@ -59,14 +60,12 @@ public class ValueStore {
     public String getErrorLogsPath() {
         return errorLogsPath;
     }
-
     public void setFilterWords(ArrayList<String> filterWords) {
         this.filterWords = filterWords;
     }
     public ArrayList<String> getFilterWords() {
         return filterWords;
     }
-
     public void setThemes(Map<String,String> themesMap) {
         this.themesMap = themesMap;
     }
@@ -83,7 +82,7 @@ public class ValueStore {
        this.longTimeout = longTimeout;
     }
     public int getTimeout() {
-        return longTimeout ? 80000 : 25000;
+        return longTimeout ? timeout + 55000 : timeout;
     }
     public void setIsoDates(boolean isoDates) {
         this.isoDates = isoDates;
@@ -97,10 +96,14 @@ public class ValueStore {
     public boolean getAutoTheme() {
         return autoTheme;
     }
+    // for testing
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 
     @Override
     public String toString() {
-        return null;
+        return "value store";
     }
 
 }

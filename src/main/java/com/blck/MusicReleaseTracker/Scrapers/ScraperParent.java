@@ -3,7 +3,7 @@ package com.blck.MusicReleaseTracker.Scrapers;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Simple.SongClass;
+import com.blck.MusicReleaseTracker.Simple.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ public class ScraperParent {
 
     protected final ValueStore store;
     protected final ErrorLogging log;
-    protected ArrayList<SongClass> songList;
+    protected ArrayList<Song> songList;
     SourcesEnum source;
 
     @Autowired
@@ -33,7 +33,7 @@ public class ScraperParent {
         this.log = errorLogging;
     }
 
-    public void setTestData(ArrayList<SongClass> songList, SourcesEnum source) {
+    public void setTestData(ArrayList<Song> songList, SourcesEnum source) {
         this.songList = songList;
         this.source = source;
     }
@@ -48,7 +48,7 @@ public class ScraperParent {
 
     public void processInfo() {
         // unify apostrophes/grave accents/backticks/quotes...
-        for (SongClass object : songList) {
+        for (Song object : songList) {
             String songName = object.getName().replace("’", "'").replace("`", "'").replace("´", "'");
             object.setName(songName);
         }
@@ -89,7 +89,7 @@ public class ScraperParent {
         // insert a set of songs to a source table
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             int i = 0;
-            for (SongClass songObject : songList) {
+            for (Song songObject : songList) {
                 if (i == 15)
                     break;
                 if (songObject.getType() != null) {

@@ -2,10 +2,7 @@ package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.file.Paths;
@@ -39,7 +36,7 @@ public class GUIControllerTest {
         store.setDBpath(DBpath);
 
         testedClass = new GUIController(store, null, null, null, DB);
-        testedClass.setTestDaata("Joe", SourcesEnum.beatport);
+        testedClass.setTestData("Joe", SourcesEnum.beatport);
     }
 
     @Test
@@ -90,4 +87,5 @@ public class GUIControllerTest {
 
         testedClass.vacuum();
     }
+
 }

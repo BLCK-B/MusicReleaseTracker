@@ -3,7 +3,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Scrapers.*;
-import com.blck.MusicReleaseTracker.Simple.SongClass;
+import com.blck.MusicReleaseTracker.Simple.Song;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,13 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @SpringBootTest
-public class ScrapingTest {
+public class ScrapeProcessingTest {
 
     private final ValueStore store = new ValueStore();
     private final DBtools DB = new DBtools(store, null);
-    private final ScrapeProcess testedClass;
+    private final ScrapeProcess testedSP;
 
-    public ScrapingTest() {
+    public ScrapeProcessingTest() {
         // data setup
         String DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store.setDBpath(DBpath);
@@ -43,31 +43,31 @@ public class ScrapingTest {
         filterWords.add("XXXXX");
         store.setFilterWords(filterWords);
 
-        testedClass = new ScrapeProcess(store, null, null, DB, null);
+        testedSP = new ScrapeProcess(store, null, null, DB, null);
     }
 
     @Test
     void processInfo() {
         ScraperParent scraperInstace = new ScraperParent(null, null);
-        ArrayList<SongClass> songList = new ArrayList<>();
-        songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
-        songList.add(new SongClass("Son’g3", "artistName", "2023-03-01"));
-        songList.add(new SongClass("Song2", "artistName", "2023-02-01"));
+        ArrayList<Song> songList = new ArrayList<>();
+        songList.add(new Song("Song1", "artistName", "2023-01-01"));
+        songList.add(new Song("Son’g3", "artistName", "2023-03-01"));
+        songList.add(new Song("Song2", "artistName", "2023-02-01"));
         scraperInstace.setTestData(songList, SourcesEnum.beatport);
         scraperInstace.processInfo();
         // expected values: sort by date
-        ArrayList<SongClass> expectedSongList = new ArrayList<>();
-        expectedSongList.add(new SongClass("Son'g3", "artistName", "2023-03-01"));
-        expectedSongList.add(new SongClass("Song2", "artistName", "2023-02-01"));
-        expectedSongList.add(new SongClass("Song1", "artistName", "2023-01-01"));
+        ArrayList<Song> expectedSongList = new ArrayList<>();
+        expectedSongList.add(new Song("Son'g3", "artistName", "2023-03-01"));
+        expectedSongList.add(new Song("Song2", "artistName", "2023-02-01"));
+        expectedSongList.add(new Song("Song1", "artistName", "2023-01-01"));
 
         for (int i = 0; i < songList.size(); i++)
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
 
         // incorrect dates: discard
-        songList.add(new SongClass("Song4", "artistName", "2023"));
-        songList.add(new SongClass("Song5", "artistName", "-"));
-        songList.add(new SongClass("Song6", "artistName", "08-05-2023"));
+        songList.add(new Song("Song4", "artistName", "2023"));
+        songList.add(new Song("Song5", "artistName", "-"));
+        songList.add(new Song("Song6", "artistName", "08-05-2023"));
         scraperInstace.setTestData(songList, SourcesEnum.beatport);
         scraperInstace.processInfo();
 
@@ -75,12 +75,12 @@ public class ScrapingTest {
             assertEquals(songList.get(i).toString(), expectedSongList.get(i).toString());
 
         expectedSongList.remove(expectedSongList.size() - 1);
-        expectedSongList.add(new SongClass("Song1", "artistName", "2005-05-05"));
+        expectedSongList.add(new Song("Song1", "artistName", "2005-05-05"));
 
         // duplicates: prefer older
-        songList.add(new SongClass("Song1", "artistName", "2023-01-01"));
-        songList.add(new SongClass("Song1", "artistName", "2019-19-19"));
-        songList.add(new SongClass("Song1", "artistName", "2005-05-05"));
+        songList.add(new Song("Song1", "artistName", "2023-01-01"));
+        songList.add(new Song("Song1", "artistName", "2019-19-19"));
+        songList.add(new Song("Song1", "artistName", "2005-05-05"));
         scraperInstace.setTestData(songList, SourcesEnum.beatport);
         scraperInstace.processInfo();
 
@@ -90,13 +90,13 @@ public class ScrapingTest {
 
     @Test
     void fillCombviewTable() {
-        testedClass.fillCombviewTable();
+        testedSP.fillCombviewTable();
 
-        ArrayList<SongClass> songList = new ArrayList<>();
-        ArrayList<SongClass> expectedSongList = new ArrayList<>();
-        expectedSongList.add(new SongClass("Collab", "B, L, K", "2023-11-10"));
-        expectedSongList.add(new SongClass("duplicates", "K", "2023-07-27"));
-        expectedSongList.add(new SongClass("DiffDates", "B", "2000-30-30"));
+        ArrayList<Song> songList = new ArrayList<>();
+        ArrayList<Song> expectedSongList = new ArrayList<>();
+        expectedSongList.add(new Song("Collab", "B, L, K", "2023-11-10"));
+        expectedSongList.add(new Song("duplicates", "K", "2023-07-27"));
+        expectedSongList.add(new Song("DiffDates", "B", "2000-30-30"));
 
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "SELECT * FROM combview ORDER BY date DESC";
@@ -106,15 +106,15 @@ public class ScrapingTest {
                 String song = rs.getString("song");
                 String artist = rs.getString("artist");
                 String date = rs.getString("date");
-                songList.add(new SongClass(song, artist, date));
+                songList.add(new Song(song, artist, date));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         for (int i = 0; i < expectedSongList.size(); i++) {
-            SongClass obj1 = expectedSongList.get(i);
-            SongClass obj2 = songList.get(i);
+            Song obj1 = expectedSongList.get(i);
+            Song obj2 = songList.get(i);
             assertAll("Combview table rows",
                     () -> assertEquals(obj1.getName(), obj2.getName()),
                     () -> assertEquals(obj1.getArtist(), obj2.getArtist()),

@@ -3,7 +3,7 @@ package com.blck.MusicReleaseTracker.Scrapers;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Simple.SongClass;
+import com.blck.MusicReleaseTracker.Simple.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -68,10 +68,10 @@ public final class BeatportScraper extends ScraperParent implements ScraperInter
         }
 
         // create arraylist of song objects
-        ArrayList<SongClass> songList = new ArrayList<>();
+        ArrayList<Song> songList = new ArrayList<>();
         for (int i = 0; i < Math.min(songsArrayList.size(), datesArrayList.size()); i++) {
             if (songsArrayList.get(i) != null && datesArrayList.get(i) != null && typesArrayList.get(i) != null)
-                songList.add(new SongClass(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
+                songList.add(new Song(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
         }
 
         doc = null;

@@ -50,7 +50,7 @@ public class GUIController {
         this.DB = DB;
     }
 
-    public void setTestDaata(String lastClickedArtist, SourcesEnum selectedSource) {
+    public void setTestData(String lastClickedArtist, SourcesEnum selectedSource) {
         this.lastClickedArtist = lastClickedArtist;
         this.selectedSource = selectedSource;
         tempID = "testingUrl";

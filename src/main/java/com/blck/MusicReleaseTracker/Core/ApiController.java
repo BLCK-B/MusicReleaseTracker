@@ -23,7 +23,7 @@ import java.util.Map;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-/** API controller receives REST requests from frontend and passes the requests to GUIController */
+/** API controller receives REST requests from vue and passes them to GUIController */
 @RestController
 @RequestMapping("/api")
 public class ApiController {

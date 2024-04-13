@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 /**
- * class with scraping and data processing logic
+ * class handling scraping and data processing logic
  */
 @Component
 public class ScrapeProcess {

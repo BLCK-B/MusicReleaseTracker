@@ -52,21 +52,17 @@ application {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-    implementation 'org.xerial:sqlite-jdbc:3.44.1.0'
-    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+
+    implementation 'org.xerial:sqlite-jdbc:3.45.2.0'
     implementation 'org.jsoup:jsoup:1.17.2'
-    // https://mvnrepository.com/artifact/com.typesafe/config
     implementation 'com.typesafe:config:1.4.3'
 
-    // https://mvnrepository.com/artifact/org.junit/junit-bom
-    testImplementation(platform("org.junit:junit-bom:5.10.1"))
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
-    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation(platform('org.junit:junit-bom:5.10.2'))
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.4'
 }
 
 bootJar {

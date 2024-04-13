@@ -32,11 +32,11 @@
       </div>
   
   </div>
-  
+
   <div class="app" v-if="settingsOpen">
     <SettingsWindow/>
   </div>
-
+  
 </template>
 
 <script>
@@ -50,6 +50,7 @@ import SettingsWindow from './components/SettingsWindow.vue';
 import PreviewDialog from './components/PreviewDialog.vue';
 import { mapState } from 'vuex';
 import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:57782';
 
 export default {
   data() {
@@ -78,8 +79,7 @@ export default {
     "settingsOpen",
     "primaryColor",
     "accentColor",
-    "previewVis",
-    "systemTheme"
+    "previewVis"
     ])
   },
   watch: {
@@ -96,7 +96,7 @@ export default {
   methods: {
     loadTheme() {
       // on start, load themes from config
-      axios.get("http://localhost:8080/api/getThemeConfig")
+      axios.get("/api/getThemeConfig")
         .then(response => {
           this.$store.commit('SET_PRIMARY_COLOR', response.data.theme);
           this.$store.commit('SET_ACCENT_COLOR', response.data.accent);
@@ -107,14 +107,15 @@ export default {
     },
     detectTheme() {
       // detecting system theme on load
-      axios.get('http://localhost:8080/api/settingsOpened')
+      axios.get('/api/settingsOpened')
         .then(response => {
-          this.$store.commit('SET_SYSTEM_THEME', response.data.systemTheme);
           const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-          if (prefersDarkMode.matches && this.systemTheme)
-            this.$store.commit('SET_PRIMARY_COLOR', "Black");
-          else
-            this.$store.commit('SET_PRIMARY_COLOR', "Light");
+          if (response.data.autoTheme == true) {
+            if (prefersDarkMode.matches)
+              this.$store.commit('SET_PRIMARY_COLOR', "Black");
+            else
+              this.$store.commit('SET_PRIMARY_COLOR', "Light");
+          }
         })
         .catch((error) => {
           console.error(error);

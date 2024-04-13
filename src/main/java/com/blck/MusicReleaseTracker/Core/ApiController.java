@@ -1,11 +1,11 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Core;
 
+import com.blck.MusicReleaseTracker.GUIController;
 import com.blck.MusicReleaseTracker.Simple.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.Map;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-// API controller receives REST requests from frontend and passes the requests to GUIController
+/** API controller receives REST requests from vue and passes them to GUIController */
 @RestController
 @RequestMapping("/api")
 public class ApiController {
@@ -36,8 +36,8 @@ public class ApiController {
     }
 
     @GetMapping("/loadList")
-    public List<String> loadList() throws SQLException {
-        return sendRequest.loadList("");
+    public List<String> loadList() {
+        return sendRequest.loadList();
     }
 
     @PostMapping ("/listOrTabClick")
@@ -50,16 +50,16 @@ public class ApiController {
     @PostMapping("/clickArtistAdd")
     public void clickArtistAdd(@RequestBody String artistname) {
         artistname = URLDecoder.decode(artistname, StandardCharsets.UTF_8).replace("=" , "").trim();
-        sendRequest.artistAddConfirm(artistname, "");
+        sendRequest.artistAddConfirm(artistname);
     }
 
     @RequestMapping ("/clickArtistDelete")
     public void clickArtistDelete() {
-        sendRequest.artistClickDelete("");
+        sendRequest.artistClickDelete();
     }
     @PostMapping("/deleteUrl")
     public void deleteUrl() {
-        sendRequest.deleteUrl("");
+        sendRequest.deleteUrl();
     }
 
     @RequestMapping ("/cleanArtistSource")
@@ -68,7 +68,7 @@ public class ApiController {
     }
     @RequestMapping ("/saveUrl")
     public void saveUrl() {
-        sendRequest.saveUrl("");
+        sendRequest.saveUrl();
     }
 
     @PostMapping ("/clickAddURL")
@@ -111,7 +111,7 @@ public class ApiController {
 
     @GetMapping("/checkExistURL")
     public boolean checkExistURL() {
-        return sendRequest.checkExistURL("");
+        return sendRequest.checkExistURL();
     }
 
     @GetMapping("/getScrapeDate")

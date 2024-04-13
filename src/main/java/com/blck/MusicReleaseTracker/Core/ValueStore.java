@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Core;
 
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
@@ -17,66 +17,55 @@ import java.util.Map;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+/** a central value store of variables shared among classes */
 @Component
 public class ValueStore {
 
     public ValueStore() {
     }
 
+    private String appDataPath;
     private String DBpath;
-    private String DBtemplatePath;
     private String configPath;
-    private String configFolder;
-    private String errorLogs;
+    private String errorLogsPath;
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
     private boolean longTimeout = false;
     private boolean isoDates = false;
-    private boolean systemTheme = false;
-    // array of all available sources, in order that fillCombviewTable uses
-    final private String[] sourceTables = {"beatport", "musicbrainz", "junodownload", "youtube"};
+    private boolean autoTheme = false;
+    private int timeout = 25000;
 
+    public void setAppDataPath(String appDataPath) {
+        this.appDataPath = appDataPath;
+    }
+    public String getAppDataPath() {
+        return appDataPath;
+    }
     public void setDBpath(String DBpath) {
         this.DBpath = DBpath;
     }
     public String getDBpath() {
         return DBpath;
     }
-    public void setDBTemplatePath(String DBTemplatePath) {
-        this.DBtemplatePath = DBTemplatePath;
-    }
-    public String getDBTemplatePath() {
-        return DBtemplatePath;
-    }
-
     public void setConfigPath(String configPath) {
         this.configPath = configPath;
     }
     public String getConfigPath() {
         return configPath;
     }
-
-    public void setConfigFolder(String configFolder) {
-        this.configFolder = configFolder;
+    public void setErrorLogsPath(String errorLogsPath) {
+        this.errorLogsPath = errorLogsPath;
     }
-    public String getConfigFolder() {
-        return configFolder;
+    public String getErrorLogsPath() {
+        return errorLogsPath;
     }
-    public void setErrorLogs(String errorLogs) {
-        this.errorLogs = errorLogs;
-    }
-    public String getErrorLogs() {
-        return errorLogs;
-    }
-
     public void setFilterWords(ArrayList<String> filterWords) {
         this.filterWords = filterWords;
     }
     public ArrayList<String> getFilterWords() {
         return filterWords;
     }
-
     public void setThemes(Map<String,String> themesMap) {
         this.themesMap = themesMap;
     }
@@ -93,10 +82,7 @@ public class ValueStore {
        this.longTimeout = longTimeout;
     }
     public int getTimeout() {
-        if (!longTimeout)
-            return 25000;
-        else
-            return 80000;
+        return longTimeout ? timeout + 55000 : timeout;
     }
     public void setIsoDates(boolean isoDates) {
         this.isoDates = isoDates;
@@ -104,20 +90,20 @@ public class ValueStore {
     public boolean getIsoDates() {
         return isoDates;
     }
-    public void setSystemTheme(boolean systemTheme) {
-        this.systemTheme = systemTheme;
+    public void setAutoTheme(boolean autoTheme) {
+        this.autoTheme = autoTheme;
     }
-    public boolean getSystemTheme() {
-        return systemTheme;
+    public boolean getAutoTheme() {
+        return autoTheme;
     }
-
-    public String[] getSourceTables() {
-        return this.sourceTables;
+    // for testing
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     @Override
     public String toString() {
-        return null;
+        return "value store";
     }
 
 }

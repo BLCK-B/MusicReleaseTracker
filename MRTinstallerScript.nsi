@@ -1,6 +1,6 @@
-; UI settings
 !include "MUI2.nsh"
-!define VERSION "8.1"
+!include x64.nsh ; Include x64.nsh for 64-bit support
+!define VERSION "8.2"
 !define MUI_ABORTWARNING
 !define MUI_ICON "MRTicon.ico"
 !insertmacro MUI_PAGE_LICENSE "license.txt"
@@ -32,16 +32,21 @@ SectionEnd
 ; Installer section
 Section
     ; Uninstall previous version
-	Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
-	Delete "$INSTDIR\MusicReleaseTracker.exe"
+    Delete "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk"
+    Delete "$INSTDIR\MusicReleaseTracker.exe"
 
     ; Create the installation directory and appdata folder (if not exist)
     SetOutPath "$INSTDIR"
-	CreateDirectory "$APPDATA\MusicReleaseTracker"
+    CreateDirectory "$APPDATA\MusicReleaseTracker"
     ; Install the new version and create Start Menu shortcut
     File "MusicReleaseTracker.exe"
     CreateDirectory "$SMPrograms\MusicReleaseTracker"
     CreateShortCut "$SMPrograms\MusicReleaseTracker\MusicReleaseTracker.lnk" "$INSTDIR\MusicReleaseTracker.exe"
+
+    ; Remove folder from x86
+    IfFileExists "$PROGRAMFILES\MusicReleaseTracker\*.*" 0 NoOldFolder
+        RMDir /r /REBOOTOK "$PROGRAMFILES\MusicReleaseTracker"
+    NoOldFolder:
 
     ; Create uninstaller
     WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -59,7 +64,7 @@ Name "MusicReleaseTracker installer"
 Outfile "MRT-${VERSION}-win.exe"
 Icon "MRTicon.ico"
 ; Default installation directory
-InstallDir $PROGRAMFILES\MusicReleaseTracker
+InstallDir $PROGRAMFILES64\MusicReleaseTracker ; Use $PROGRAMFILES64 for 64-bit installation
 ShowInstDetails hide
 
 ; Uninstaller details

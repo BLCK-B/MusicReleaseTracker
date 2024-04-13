@@ -48,7 +48,7 @@ export default {
         clickAdd() {
             // it needs be encoded decoded trimmed ... because axios is changing symbols
             const artistname = encodeURIComponent(this.input);
-            axios.post('http://localhost:8080/api/clickArtistAdd', artistname)
+            axios.post('/api/clickArtistAdd', artistname)
                 .then(() => {
                     this.input = "";
                     this.$store.commit('SET_SELECTED_ARTIST', "");

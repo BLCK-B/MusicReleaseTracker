@@ -21,7 +21,7 @@ export default {
 
 <style scoped>
 * {
-  transition: 0.25s;
+  transition: 0.2s;
 }
 .progress-container {
   background-color: transparent;

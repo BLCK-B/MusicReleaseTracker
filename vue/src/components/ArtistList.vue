@@ -37,7 +37,7 @@ export default {
   created() {
     // load artist list, last clicked artist if not null
     this.loadList();
-    axios.get('http://localhost:8080/api/getLastArtist')
+    axios.get('/api/getLastArtist')
     .then(response => {
       if (response.data !== "")
         this.lastClickedItem = response.data;
@@ -61,7 +61,7 @@ export default {
   methods: {
     // populate list from backend
     loadList() {
-      axios.get('http://localhost:8080/api/loadList')
+      axios.get('/api/loadList')
         .then(response => {
           this.artistsArrayList = response.data;
         })
@@ -72,7 +72,7 @@ export default {
     // load respective table when artist selected
     handleItemClick(artist) {
       this.lastClickedItem = artist;
-      axios.post('http://localhost:8080/api/listOrTabClick', { item: artist, origin: "list" })
+      axios.post('/api/listOrTabClick', { item: artist, origin: "list" })
         .then(response => {
           this.$store.commit('SET_SELECTED_ARTIST', artist);
           this.$store.commit('SET_TABLE_CONTENT', response.data);
@@ -88,7 +88,7 @@ export default {
     // delete all (last selected) artist entries from db, rebuild combview
     clickDeleteArtist() {
       if (this.lastClickedItem !== "") {
-        axios.get('http://localhost:8080/api/clickArtistDelete')
+        axios.get('/api/clickArtistDelete')
         .then(() => {
           this.$store.commit('SET_SELECTED_ARTIST', "");
           this.$store.commit('SET_SOURCE_TAB', "combview");
@@ -104,7 +104,7 @@ export default {
     },
     deleteUrl() {
       // set null specific URL, trigger table reload
-      axios.post('http://localhost:8080/api/deleteUrl')
+      axios.post('/api/deleteUrl')
       .then(() => {
         this.handleItemClick(this.lastClickedItem);
         })

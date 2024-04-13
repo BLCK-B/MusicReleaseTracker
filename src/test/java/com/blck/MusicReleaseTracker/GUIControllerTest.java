@@ -1,72 +1,64 @@
 package com.blck.MusicReleaseTracker;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.File;
-import java.sql.SQLException;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+/*      MusicReleaseTracker
+        Copyright (C) 2023 BLCK
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GUIControllerTest {
 
-    private final GUIController GUI;
+    private final ValueStore store = new ValueStore();
+    private final DBtools DB = new DBtools(store, null);
+    private final GUIController testedClass;
 
-    @Autowired
-    public GUIControllerTest(GUIController guiController) {
-        this.GUI = guiController;
-    }
+    public GUIControllerTest() {
+        // data setup
+        String DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
+        store.setDBpath(DBpath);
 
-    private static String DBpath;
-
-    String getDBpath() {
-        String os = System.getProperty("os.name").toLowerCase();
-        String DBpath = null;
-        String appDataPath = null;
-        if (os.contains("win")) // Windows
-            appDataPath = System.getenv("APPDATA");
-        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  // Linux
-            appDataPath = System.getProperty("user.home");
-        else
-            throw new UnsupportedOperationException("unsupported OS");
-
-        DBpath = "jdbc:sqlite:" + appDataPath + File.separator + "MusicReleaseTracker" + File.separator + "testingdata.db";
-        return DBpath;
+        testedClass = new GUIController(store, null, null, null, DB);
+        testedClass.setTestData("Joe", SourcesEnum.beatport);
     }
 
     @Test
     @Order(1)
     void AddLoadArtist() {
-        String DBpath = getDBpath();
         // artistAddConfirm
-        GUI.artistAddConfirm("Joe", DBpath);
+        testedClass.artistAddConfirm("Joe");
         // verify with loadList
-        try {
-            String oneArtist = GUI.loadList(DBpath).get(0);
-            assertEquals(oneArtist, "Joe");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        String oneArtist = testedClass.loadList().get(0);
+        assertEquals(oneArtist, "Joe");
     }
 
     @Test
     @Order(2)
     void AddVerifyUrl() {
-        String DBpath = getDBpath();
         // saveUrl
-        GUI.saveUrl(DBpath);
+        testedClass.saveUrl();
         // verify with checkExistUrl
         try {
-            boolean exists = GUI.checkExistURL(DBpath);
+            boolean exists = testedClass.checkExistURL();
             assertTrue(exists);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -74,15 +66,13 @@ public class GUIControllerTest {
     @Test
     @Order(3)
     void DeleteVerifyUrl() {
-        String DBpath = getDBpath();
         // deleteUrl
-        GUI.deleteUrl(DBpath);
+        testedClass.deleteUrl();
         // verify with checkExistUrl
         try {
-            boolean exists = GUI.checkExistURL(DBpath);
+            boolean exists = testedClass.checkExistURL();
             assertFalse(exists);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -90,14 +80,12 @@ public class GUIControllerTest {
     @Test
     @Order(4)
     void DeleteArtist() {
-        String DBpath = getDBpath();
         // artistClickDelete
-        GUI.artistClickDelete(DBpath);
+        testedClass.artistClickDelete();
         // verify with loadList
-        try {
-            assertTrue(GUI.loadList(DBpath).isEmpty());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        assertTrue(testedClass.loadList().isEmpty());
+
+        testedClass.vacuum();
     }
+
 }

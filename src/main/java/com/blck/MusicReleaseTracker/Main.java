@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-// entry point class with startup logic
+/** entry point class with startup logic */
 @SpringBootApplication
 public class Main {
 
@@ -28,12 +29,14 @@ public class Main {
     }
 
     private final ConfigTools config;
+    private final ErrorLogging log;
     private final DBtools DB;
 
     @Autowired
-    public Main(ConfigTools configTools, DBtools DB) {
+    public Main(ConfigTools configTools, ErrorLogging errorLogging, DBtools dBtools) {
         this.config = configTools;
-        this.DB = DB;
+        this.log = errorLogging;
+        this.DB = dBtools;
     }
 
     @Component
@@ -58,31 +61,28 @@ public class Main {
             try {
                 DB.createTables();
             } catch (Exception e) {
-                DB.logError(e, "SEVERE", "error in DBtools createTables method");
+                log.error(e, ErrorLogging.Severity.SEVERE, "error in DBtools createTables method");
             }
             try {
                 config.updateSettings();
             } catch (Exception e) {
-                DB.logError(e, "WARNING", "error handling config file");
+                log.error(e, ErrorLogging.Severity.WARNING, "error handling config file");
             }
             // open port in web browser
             try {
                 String os = System.getProperty("os.name").toLowerCase();
-                if (os.contains("win")) {
-                    String[] cmd = {"cmd.exe", "/c", "start", "http://localhost:8080"};
-                    Runtime.getRuntime().exec(cmd);
-                }
-                else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-                    try {
-                        String[] cmd = {"xdg-open", "http://localhost:8080"};
-                        Runtime.getRuntime().exec(cmd);
-                    } catch (Exception e) {
-                        String [] cmd = new String[]{"open", "http://localhost:8080"};
-                        Runtime.getRuntime().exec(cmd);
-                    }
-                }
+
+                String[] cmd = null;
+                if (os.contains("win"))
+                    cmd = new String[]{"cmd.exe", "/c", "start", "http://localhost:57782"};
+                else if (os.contains("nix") || os.contains("nux"))
+                    cmd = new String[]{"xdg-open", "http://localhost:57782"};
+                else if (os.contains("mac"))
+                    cmd = new String[]{"open", "http://localhost:57782"};
+
+                Runtime.getRuntime().exec(cmd);
             } catch (Exception e) {
-                DB.logError(e, "WARNING", "could not open port in browser");
+                log.error(e, ErrorLogging.Severity.WARNING, "could not open port in browser");
             }
         }
     }

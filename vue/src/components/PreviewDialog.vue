@@ -31,7 +31,7 @@ export default {
     methods: {
         // close dialog, delete scraped preview from db
         clickCancel() {
-            axios.request('http://localhost:8080/api/cleanArtistSource')
+            axios.request('/api/cleanArtistSource')
             .catch(error => {
                 console.error(error);
             });
@@ -39,7 +39,7 @@ export default {
         },
         // close dialog, save url used for preview
         clickConfirm() {
-            axios.request('http://localhost:8080/api/saveUrl')
+            axios.request('/api/saveUrl')
             .catch(error => {
                 console.error(error);
             });

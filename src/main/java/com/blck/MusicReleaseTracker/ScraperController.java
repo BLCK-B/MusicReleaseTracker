@@ -7,15 +7,15 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import java.sql.*;
 import java.util.*;
 
-public class ScraperBox {
+public class ScraperController {
     private final ValueStore store;
     private final ErrorLogging log;
     private final int initSize;
-    private final LinkedList<ScraperParent> scrapers = new LinkedList<>();
+    private final LinkedList<Scraper> scrapers = new LinkedList<>();
     private final HashMap<String, Double> sourceTimes = new HashMap<>();
 
     // middleware abstraction for scraping with exception handling
-    public ScraperBox(ValueStore store, ErrorLogging log) {
+    public ScraperController(ValueStore store, ErrorLogging log) {
         this.store = store;
         this.log = log;
         // creating a list of scraper objects: one scraper holds one URL
@@ -36,10 +36,10 @@ public class ScraperBox {
                     if (url == null)
                         continue;
                     switch (webSource) {
-                        case musicbrainz    -> scrapers.add(new MusicbrainzScraper(store, log, artist, url));
-                        case beatport       -> scrapers.add(new BeatportScraper(store, log, artist, url));
-                        case junodownload   -> scrapers.add(new JunodownloadScraper(store, log, artist, url));
-                        case youtube        -> scrapers.add(new YoutubeScraper(store, log, artist, url));
+                        case musicbrainz    -> scrapers.add(new ScraperMusicbrainz(store, log, artist, url));
+                        case beatport       -> scrapers.add(new ScraperBeatport(store, log, artist, url));
+                        case junodownload   -> scrapers.add(new ScraperJunodownload(store, log, artist, url));
+                        case youtube        -> scrapers.add(new ScraperYoutube(store, log, artist, url));
                     }
                 }
             }
@@ -62,7 +62,7 @@ public class ScraperBox {
             return -1;
 
         double startTime = System.currentTimeMillis();
-        ScraperParent scraper = scrapers.get(0);
+        Scraper scraper = scrapers.get(0);
         for (int i = 0; i <= 2; i++) {
             try {
                 scraper.scrape();

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.String.valueOf;
 
-public final class JunodownloadScraper extends ScraperParent implements ScraperInterface {
+public final class ScraperJunodownload extends Scraper implements ScraperInterface {
 
     private enum MonthNumbers {
         JAN("01"), FEB("02"), MAR("03"), APR("04"),
@@ -29,7 +29,7 @@ public final class JunodownloadScraper extends ScraperParent implements ScraperI
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public JunodownloadScraper(ValueStore store, ErrorLogging log, String songArtist, String id) {
+    public ScraperJunodownload(ValueStore store, ErrorLogging log, String songArtist, String id) {
         super(store, log);
         this.songArtist = songArtist;
         this.id = id;

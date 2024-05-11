@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 /**
- * class handling scraping and data processing logic
+ * class handling scraping and processing logic
  */
 @Component
 public class ScrapeProcess {
@@ -54,10 +54,9 @@ public class ScrapeProcess {
     public void scrapeData() {
         config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
-        // clear tables - for new data
         DB.clearDB();
-        ScraperBox box = new ScraperBox(store, log);
-        final int initSize = box.getInitSize();
+        ScraperController scrapers = new ScraperController(store, log);
+        final int initSize = scrapers.getInitSize();
         // triggering scrapers
         int remaining = 0;
         double progress = 0.0;
@@ -68,13 +67,11 @@ public class ScrapeProcess {
                 System.gc();
                 return;
             }
-            remaining = box.scrapeNext();
-            // 40 remaining / 80 total = 50%
+            remaining = scrapers.scrapeNext();
             progress = ((double) initSize - (double) remaining) / (double) initSize;
         }
         System.gc();
     }
-
 
     public void fillCombviewTable() {
         ArrayList<Song> songObjectList = prepareSongs();

@@ -7,17 +7,18 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public final class MusicbrainzScraper extends ScraperParent implements ScraperInterface {
+public final class ScraperYoutube extends Scraper implements ScraperInterface {
 
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-
-    public MusicbrainzScraper(ValueStore store, ErrorLogging log, String songArtist, String id) {
+    public ScraperYoutube(ValueStore store, ErrorLogging log, String songArtist, String id) {
         super(store, log);
         this.songArtist = songArtist;
         this.id = id;
@@ -30,11 +31,11 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
         if (isIDnull)
             return;
 
-        String url = "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
+        String url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(url).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
+            doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
                     .timeout(store.getTimeout()).get();
         }
         catch (SocketTimeoutException e) {
@@ -44,9 +45,17 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
             throw new RuntimeException(e);
         }
         Elements songs = doc.select("title");
-        Elements dates = doc.select("first-release-date");
+        Elements dates = doc.select("published");
         String[] songsArray = songs.eachText().toArray(new String[0]);
-        String[] datesArray = dates.eachText().toArray(new String[0]);
+        String[] datesDirtyArray = dates.eachText().toArray(new String[0]);
+
+        // cut date to yyyy-MM-dd
+        String[] datesArray = Arrays.stream(datesDirtyArray)
+                .map(date -> date.substring(0, 10))
+                .toArray(String[]::new);
+        // first index is channel name
+        songsArray = Arrays.copyOfRange(songsArray, 1, songsArray.length);
+        datesArray = Arrays.copyOfRange(datesArray, 1, datesArray.length);
 
         // create arraylist of song objects
         ArrayList<Song> songList = new ArrayList<Song>();
@@ -57,11 +66,11 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
         doc = null;
         songs = null;
         dates = null;
-        datesArray = null;
         songsArray = null;
+        datesArray = null;
 
         super.songList = songList;
-        super.source = SourcesEnum.musicbrainz;
+        super.source = SourcesEnum.youtube;
         super.processInfo();
         super.insertSet();
     }
@@ -73,17 +82,18 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
         // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
-        // https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
-        int artistIndex = id.indexOf("/artist/");
-        if (artistIndex != -1 && id.contains("musicbrainz.org")) {
-            idStartIndex = artistIndex + "/artist/".length();
-            // the next '/' after /artist/
+        // https://www.youtube.com/channel/UCWaKvFOf-a7vENyuEsZkNqg
+        int channelIndex = id.indexOf("/channel/");
+        // url
+        if (channelIndex != -1) {
+            idStartIndex = channelIndex + "/channel/".length();
+            // the next '/' after /artists/
             idEndIndex = id.indexOf('/', idStartIndex);
             if (idEndIndex != -1)
                 id = id.substring(idStartIndex, idEndIndex);
             else // if no other '/'
                 id = id.substring(idStartIndex);
-        // ad110705-cbe6-4c47-9b99-8526e6db0f41
+        // UCWaKvFOf-a7vENyuEsZkNqg
         }
     }
 
@@ -94,7 +104,7 @@ public final class MusicbrainzScraper extends ScraperParent implements ScraperIn
 
     @Override
     public String toString() {
-        return "musicbrainz";
+        return "youtube";
     }
 
 }

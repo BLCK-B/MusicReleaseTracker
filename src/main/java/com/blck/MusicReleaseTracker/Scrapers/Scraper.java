@@ -20,22 +20,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class ScraperParent {
+public class Scraper {
 
     protected final ValueStore store;
     protected final ErrorLogging log;
-    protected ArrayList<Song> songList;
-    SourcesEnum source;
+    public ArrayList<Song> songList = new ArrayList<>();
+    public SourcesEnum source;
 
     @Autowired
-    public ScraperParent(ValueStore valueStore, ErrorLogging errorLogging) {
+    public Scraper(ValueStore valueStore, ErrorLogging errorLogging) {
         this.store = valueStore;
         this.log = errorLogging;
-    }
-
-    public void setTestData(ArrayList<Song> songList, SourcesEnum source) {
-        this.songList = songList;
-        this.source = source;
     }
 
     public void scrape() throws ScraperTimeoutException {
@@ -47,12 +42,23 @@ public class ScraperParent {
     }
 
     public void processInfo() {
-        // unify apostrophes/grave accents/backticks/quotes...
-        for (Song object : songList) {
-            String songName = object.getName().replace("’", "'").replace("`", "'").replace("´", "'");
-            object.setName(songName);
+        unifyApostrophes();
+        enforceDateFormat();
+        sortByDateDescending();
+        removeNameDuplicates();
+
+        // reverse to newest-oldest
+        Collections.reverse(songList);
+    }
+
+    public void unifyApostrophes() {
+        for (Song song : songList) {
+            String songName = song.getName().replace("’", "'").replace("`", "'").replace("´", "'");
+            song.setName(songName);
         }
-        // discard objects with an incorrect date format
+    }
+
+    public void enforceDateFormat() {
         songList.removeIf(obj -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             try {
@@ -62,14 +68,10 @@ public class ScraperParent {
                 return true;
             }
         });
-        // sort by date from oldest
-        songList.sort((obj1, obj2) -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
-            LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
-            return date1.compareTo(date2);
-        });
-        // remove name duplicates
+    }
+
+    // TODO: discard duplicates from oldest, in any way
+    public void removeNameDuplicates() {
         Set<String> recordedNames = new HashSet<>();
         songList.removeIf(obj -> {
             String name = obj.getName().toLowerCase();
@@ -80,8 +82,15 @@ public class ScraperParent {
                 return false;
             }
         });
-        // reverse to newest-oldest
-        Collections.reverse(songList);
+    }
+
+    public void sortByDateDescending() {
+        songList.sort((obj1, obj2) -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
+            LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
+            return date2.compareTo(date1);
+        });
     }
 
     public void insertSet() {

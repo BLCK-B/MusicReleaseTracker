@@ -208,12 +208,12 @@ public class GUIController {
         tempID = null;
         String id = null;
         try {
-            ScraperParent scraper = null;
+            Scraper scraper = null;
             switch (selectedSource) {
-                case musicbrainz -> scraper = new MusicbrainzScraper(store, log, lastClickedArtist, url);
-                case beatport -> scraper = new BeatportScraper(store, log, lastClickedArtist, url);
-                case junodownload -> scraper = new JunodownloadScraper(store, log, lastClickedArtist, url);
-                case youtube -> scraper = new YoutubeScraper(store, log, lastClickedArtist, url);
+                case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, lastClickedArtist, url);
+                case beatport -> scraper = new ScraperBeatport(store, log, lastClickedArtist, url);
+                case junodownload -> scraper = new ScraperJunodownload(store, log, lastClickedArtist, url);
+                case youtube -> scraper = new ScraperYoutube(store, log, lastClickedArtist, url);
             }
             id = scraper.getID();
             scraper.scrape();

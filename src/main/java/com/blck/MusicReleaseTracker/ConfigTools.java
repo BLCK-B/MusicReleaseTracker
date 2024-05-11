@@ -113,7 +113,7 @@ public class ConfigTools {
                 VIP=false
             }
             theme=Black
-            accent=Classic
+            accent=Lavender
             lastScrape=-
             longTimeout=false
             isoDates=false

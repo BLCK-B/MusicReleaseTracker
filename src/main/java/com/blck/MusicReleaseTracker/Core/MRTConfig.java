@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker.Core;
 
 import com.blck.MusicReleaseTracker.*;
-import com.blck.MusicReleaseTracker.Scrapers.ScraperParent;
+import com.blck.MusicReleaseTracker.Scrapers.Scraper;
 import com.blck.MusicReleaseTracker.Simple.SSEController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +27,8 @@ public class MRTConfig {
     }
 
     @Bean
-    public ScraperParent scraperParent(ValueStore valueStore, ErrorLogging errorLogging) {
-        return new ScraperParent(valueStore, errorLogging);
+    public Scraper scraperParent(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new Scraper(valueStore, errorLogging);
     }
 
     @Bean

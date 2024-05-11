@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class BeatportScraper extends ScraperParent implements ScraperInterface {
+public final class ScraperBeatport extends Scraper implements ScraperInterface {
 
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public BeatportScraper(ValueStore store, ErrorLogging log, String songArtist, String id) {
+    public ScraperBeatport(ValueStore store, ErrorLogging log, String songArtist, String id) {
         super(store, log);
         this.songArtist = songArtist;
         this.id = id;

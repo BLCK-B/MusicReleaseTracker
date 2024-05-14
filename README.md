@@ -34,7 +34,7 @@ Setup
 
 **Windows:** Download and install. When launched, Spring terminal and browser window/tab will open.
 
-**Linux:** Unzip tar. Run jar by ```java -jar XXX.jar```
+**Linux:** Run jar by ```java -jar XXX.jar```
 
 **macOS:** *Should be same as Linux. Not tested. Could someone please confirm?
 
@@ -43,23 +43,11 @@ Setup
 **Responsibility**:
 
 Delays during scraping prevent excessive traffic.
-To avoid granting admin permission, can run the exe from unzipped installer.
+To avoid granting admin permission, one can run the exe from unzipped installer.
 
 I have no affiliation with Musicbrainz, Beatport, Junodownload, Youtube. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
 
 ---
-
-**v5.1 and older**
-
-**JDK not found [#5](https://github.com/BLCK-B/MusicReleaseTracker/issues/5)**: you can resolve this by [downloading JDK](https://www.oracle.com/java/technologies/downloads/). Tested with JDK20. Location must be `C:\Program Files\Java\jdk-20` ***exactly***.
-
-**Windows:** Download and install. Won´t function without JDK.
-
-**Linux**: Unzip tar. OpenJDK or alternative and OpenJFX are required. Direct way to launch the jar (XXX name of the jar):
-```
-java --module-path "/usr/lib/jvm/openjfx" --add-modules=javafx.controls,javafx.fxml -jar XXX.jar
-```
-
 
 License
 -

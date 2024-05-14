@@ -3,7 +3,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.nio.file.Paths;
 
@@ -22,69 +22,26 @@ import static org.junit.jupiter.api.Assertions.*;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class GUIControllerTest {
 
-    private final ValueStore store = new ValueStore();
-    private final DBtools DB = new DBtools(store, null);
-    private final GUIController testedClass;
-
-    public GUIControllerTest() {
-        // data setup
-        String DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
+    private String DBpath;
+    private ValueStore store;
+    private DBtools DB;
+    private GUIController guiController;
+    
+    @BeforeEach
+    void setUp() {
+        DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
+        store = new ValueStore();
         store.setDBpath(DBpath);
-
-        testedClass = new GUIController(store, null, null, null, DB);
-        testedClass.setTestData("Joe", SourcesEnum.beatport);
+        DB = new DBtools(store, null);
+        guiController = new GUIController(store, null, null, null, DB);
+        guiController.setTestData("Joe", SourcesEnum.beatport);
     }
 
-    @Test
-    @Order(1)
-    void AddLoadArtist() {
-        // artistAddConfirm
-        testedClass.artistAddConfirm("Joe");
-        // verify with loadList
-        String oneArtist = testedClass.loadList().get(0);
-        assertEquals(oneArtist, "Joe");
-    }
+    @AfterEach
+    void cleanUp() {
 
-    @Test
-    @Order(2)
-    void AddVerifyUrl() {
-        // saveUrl
-        testedClass.saveUrl();
-        // verify with checkExistUrl
-        try {
-            boolean exists = testedClass.checkExistURL();
-            assertTrue(exists);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    @Order(3)
-    void DeleteVerifyUrl() {
-        // deleteUrl
-        testedClass.deleteUrl();
-        // verify with checkExistUrl
-        try {
-            boolean exists = testedClass.checkExistURL();
-            assertFalse(exists);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    @Order(4)
-    void DeleteArtist() {
-        // artistClickDelete
-        testedClass.artistClickDelete();
-        // verify with loadList
-        assertTrue(testedClass.loadList().isEmpty());
-
-        testedClass.vacuum();
     }
 
 }

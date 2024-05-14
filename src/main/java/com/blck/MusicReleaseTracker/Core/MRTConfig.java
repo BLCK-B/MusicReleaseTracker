@@ -46,5 +46,10 @@ public class MRTConfig {
         return new DBtools(valueStore, errorLogging);
     }
 
+    @Bean
+    public StartSetup startSetup(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new StartSetup(valueStore, errorLogging);
+    }
+
 
 }

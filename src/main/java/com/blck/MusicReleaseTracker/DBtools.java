@@ -31,48 +31,11 @@ public class DBtools {
 
     private final ValueStore store;
     private final ErrorLogging log;
-    final String slash = File.separator;
 
     @Autowired
     public DBtools(ValueStore valueStore, ErrorLogging errorLogging) {
         this.store = valueStore;
         this.log = errorLogging;
-    }
-
-    public void path() {
-        String appData = null;
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win")) // Windows
-            appData = System.getenv("APPDATA");
-        else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))  // Linux
-            appData = System.getProperty("user.home");
-        else
-            throw new UnsupportedOperationException("unsupported OS");
-
-        // paths
-        String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
-        String DBpath = "jdbc:sqlite:" + appDataPath + "musicdata.db";
-        String configPath = appDataPath + "MRTsettings.hocon";
-        String errorLogsPath = appDataPath + "errorlogs.txt";
-        // save to settingsStore
-        store.setAppDataPath(appDataPath);
-        store.setConfigPath(configPath);
-        store.setDBpath(DBpath);
-        store.setErrorLogsPath(errorLogsPath);
-
-        // appdata folder
-        File folder = new File(appDataPath);
-        if (!folder.exists())
-            folder.mkdirs();
-        // junk folder because sqlite did not delete temp files in "temp"
-        File tempfolder = new File(appDataPath + "temp");
-        if (!tempfolder.exists())
-            tempfolder.mkdirs();
-        File[] tempfiles = tempfolder.listFiles();
-        for (File file : tempfiles) {
-            file.delete();
-        }
-        System.setProperty("org.sqlite.tmpdir", appDataPath + "temp");
     }
 
     public void createTables() {

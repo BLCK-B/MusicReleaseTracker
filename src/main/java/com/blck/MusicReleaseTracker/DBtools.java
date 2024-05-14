@@ -4,7 +4,6 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -46,8 +45,8 @@ public class DBtools {
 
         File templateFile = new File(templateFilePath);
         templateFile.delete();
-        createDB(store.getDBpath());
-        createDB(DBtemplatePath);
+        createDBandSourceTables(store.getDBpath());
+        createDBandSourceTables(DBtemplatePath);
 
         // if different structure, fill template artist table data from musicdata and then rename/delete, make new template
         // this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes
@@ -98,9 +97,9 @@ public class DBtools {
         }
     }
 
-    private void createDB(String path) {
+    public void createDBandSourceTables(String path) {
+    // note: generate by string templates after preview
         try (Connection conn = DriverManager.getConnection(path)) {
-
             String sql = """
                     CREATE TABLE IF NOT EXISTS musicbrainz (
                     song text NOT NULL,
@@ -170,8 +169,6 @@ public class DBtools {
         }
     }
 
-
-
     public void clearDB() {
         // clear source tables and combview
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
@@ -221,7 +218,7 @@ public class DBtools {
         // default the musicdata
         File musicdata = new File(store.getAppDataPath() + "musicdata.db");
         musicdata.delete();
-        createDB(store.getDBpath());
+        createDBandSourceTables(store.getDBpath());
     }
 }
 

@@ -61,7 +61,7 @@ public class GUIController {
         List<String> dataList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname ASC LIMIT 500");
+            ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname LIMIT 500");
             while (rs.next()) {
                 dataList.add(rs.getString("artistname"));
             }
@@ -181,7 +181,7 @@ public class GUIController {
         tableContent.clear();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             // populating combview table
-            String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist ASC, song ASC LIMIT 1000";
+            String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist, song LIMIT 1000";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {

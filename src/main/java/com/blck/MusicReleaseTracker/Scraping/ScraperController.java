@@ -1,9 +1,10 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Scraping;
 
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Scrapers.*;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
+
 import java.sql.*;
 import java.util.*;
 

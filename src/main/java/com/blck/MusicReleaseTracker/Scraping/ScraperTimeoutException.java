@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker.Scrapers;
+package com.blck.MusicReleaseTracker.Scraping;
 
 public class ScraperTimeoutException extends Exception {
 

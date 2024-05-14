@@ -1,6 +1,8 @@
-package com.blck.MusicReleaseTracker.Core;
+package com.blck.MusicReleaseTracker;
 
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;

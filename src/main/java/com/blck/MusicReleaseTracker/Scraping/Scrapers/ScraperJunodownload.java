@@ -1,8 +1,9 @@
-package com.blck.MusicReleaseTracker.Scrapers;
+package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
-import com.blck.MusicReleaseTracker.Simple.Song;
+import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
+import com.blck.MusicReleaseTracker.DataModels.Song;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

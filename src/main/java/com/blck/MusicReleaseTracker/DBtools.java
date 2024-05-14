@@ -38,7 +38,7 @@ public class DBtools {
         this.log = errorLogging;
     }
 
-    public void createTables() {
+    public void migrateDB() {
         // on start: create DB if not exist, check DB structure, if different -> create new from template and refill with all data possible
         final String templateFilePath = store.getAppDataPath() + "DBTemplate.db";
         final String DBtemplatePath = "jdbc:sqlite:" + templateFilePath;
@@ -169,6 +169,8 @@ public class DBtools {
             log.error(e, ErrorLogging.Severity.SEVERE, "error creating DB file");
         }
     }
+
+
 
     public void clearDB() {
         // clear source tables and combview

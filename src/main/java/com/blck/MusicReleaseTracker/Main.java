@@ -1,7 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.StartSetup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -57,7 +56,7 @@ public class Main {
                 |_|  |_|_| \\_\\|_|
             """);
             startSetup.initializeSystem();
-            DB.createTables();
+            DB.migrateDB();
             config.updateSettings();
             // open port in web browser
             try {

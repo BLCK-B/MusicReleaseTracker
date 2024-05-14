@@ -1,10 +1,12 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Scraping;
 
+import com.blck.MusicReleaseTracker.ConfigTools;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Simple.SSEController;
-import com.blck.MusicReleaseTracker.Simple.Song;
+import com.blck.MusicReleaseTracker.DBtools;
+import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
+import com.blck.MusicReleaseTracker.DataModels.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

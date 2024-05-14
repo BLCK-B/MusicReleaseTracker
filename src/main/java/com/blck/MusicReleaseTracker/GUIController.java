@@ -3,8 +3,9 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.Scrapers.*;
-import com.blck.MusicReleaseTracker.Simple.TableModel;
+import com.blck.MusicReleaseTracker.DataModels.TableModel;
+import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.*;

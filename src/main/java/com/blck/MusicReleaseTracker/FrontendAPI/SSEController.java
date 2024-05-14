@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker.Simple;
+package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
-package com.blck.MusicReleaseTracker.Core;
+package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.GUIController;
-import com.blck.MusicReleaseTracker.Simple.TableModel;
+import com.blck.MusicReleaseTracker.DataModels.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.net.URLDecoder;

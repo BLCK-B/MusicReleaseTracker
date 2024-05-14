@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker.Simple;
+package com.blck.MusicReleaseTracker.DataModels;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK

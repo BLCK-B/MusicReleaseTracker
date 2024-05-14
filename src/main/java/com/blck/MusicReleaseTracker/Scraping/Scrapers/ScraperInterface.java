@@ -1,4 +1,6 @@
-package com.blck.MusicReleaseTracker.Scrapers;
+package com.blck.MusicReleaseTracker.Scraping.Scrapers;
+
+import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 
 public interface ScraperInterface {
 

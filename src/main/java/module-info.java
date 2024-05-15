@@ -8,6 +8,7 @@ module com.blck.MusicReleaseTracker {
     requires spring.boot.autoconfigure;
     requires spring.boot;
     requires spring.webmvc;
+    requires org.xerial.sqlitejdbc;
 
     opens com.blck.MusicReleaseTracker;
 

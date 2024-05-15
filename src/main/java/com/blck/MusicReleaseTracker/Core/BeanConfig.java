@@ -23,20 +23,15 @@ public class BeanConfig {
     }
 
     @Bean
-    public ScrapeProcess scrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBtools dBtools, SSEController sseController) {
-        return new ScrapeProcess(valueStore, errorLogging, configTools, dBtools, sseController);
-    }
-
-    @Bean
-    public Scraper scraperParent(ValueStore valueStore, ErrorLogging errorLogging) {
-        return new Scraper(valueStore, errorLogging);
+    public ScrapeProcess scrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBqueries dBqueries, SSEController sseController) {
+        return new ScrapeProcess(valueStore, errorLogging, configTools, dBqueries, sseController);
     }
 
     @Bean
     public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging,
                                        ScrapeProcess scrapeProcess, ConfigTools config,
-                                       ManageMigrateDB manageMigrateDB, DBtools dBtools) {
-        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBtools, manageMigrateDB);
+                                       ManageMigrateDB manageMigrateDB, DBqueries dBqueries) {
+        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBqueries, manageMigrateDB);
     }
 
     @Bean
@@ -50,8 +45,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public DBtools dBtools(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageMigrateDB) {
-        return new DBtools(valueStore, errorLogging, manageMigrateDB);
+    public DBqueries dBqueries(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageMigrateDB) {
+        return new DBqueries(valueStore, errorLogging, manageMigrateDB);
     }
 
     @Bean

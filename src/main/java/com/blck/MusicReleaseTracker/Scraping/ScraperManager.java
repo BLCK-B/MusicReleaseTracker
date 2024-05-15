@@ -3,22 +3,26 @@ package com.blck.MusicReleaseTracker.Scraping;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
+import org.sqlite.core.DB;
 
 import java.sql.*;
 import java.util.*;
 
-public class ScraperController {
+public class ScraperManager {
     private final ValueStore store;
     private final ErrorLogging log;
+    private final DBqueries DB;
     private final int initSize;
     private final LinkedList<Scraper> scrapers = new LinkedList<>();
     private final HashMap<String, Double> sourceTimes = new HashMap<>();
 
     // middleware abstraction for scraping with exception handling
-    public ScraperController(ValueStore store, ErrorLogging log) {
+    public ScraperManager(ValueStore store, ErrorLogging log, DBqueries DB) {
         this.store = store;
         this.log = log;
+        this.DB = DB;
         // creating a list of scraper objects: one scraper holds one URL
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "SELECT artist FROM artists LIMIT 500";
@@ -37,10 +41,10 @@ public class ScraperController {
                     if (url == null)
                         continue;
                     switch (webSource) {
-                        case musicbrainz    -> scrapers.add(new ScraperMusicbrainz(store, log, artist, url));
-                        case beatport       -> scrapers.add(new ScraperBeatport(store, log, artist, url));
-                        case junodownload   -> scrapers.add(new ScraperJunodownload(store, log, artist, url));
-                        case youtube        -> scrapers.add(new ScraperYoutube(store, log, artist, url));
+                        case musicbrainz    -> scrapers.add(new ScraperMusicbrainz(log, DB, artist, url));
+                        case beatport       -> scrapers.add(new ScraperBeatport(log, DB, artist, url));
+                        case junodownload   -> scrapers.add(new ScraperJunodownload(log, DB, artist, url));
+                        case youtube        -> scrapers.add(new ScraperYoutube(log, DB, artist, url));
                     }
                 }
             }
@@ -66,7 +70,7 @@ public class ScraperController {
         Scraper scraper = scrapers.get(0);
         for (int i = 0; i <= 2; i++) {
             try {
-                scraper.scrape();
+                scraper.scrape(store.getTimeout());
                 break; // exception = will not break
             }
             catch (ScraperTimeoutException e) {

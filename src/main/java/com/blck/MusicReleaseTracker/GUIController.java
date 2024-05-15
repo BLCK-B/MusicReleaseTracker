@@ -35,15 +35,16 @@ public class GUIController {
     private final ErrorLogging log;
     private final ScrapeProcess scrapeProcess;
     private final ConfigTools config;
-    private final DBtools DB;
+    private final DBqueries DB;
     private final ManageMigrateDB manageDB;
+
     private SourcesEnum selectedSource;
-    private String lastClickedArtist;
+    private String selectedArtist;
     private String tempID;
 
     @Autowired
     public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                         ConfigTools config, DBtools DB, ManageMigrateDB manageDB) {
+                         ConfigTools config, DBqueries DB, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
@@ -53,7 +54,7 @@ public class GUIController {
     }
 
     public void setTestData(String lastClickedArtist, SourcesEnum selectedSource) {
-        this.lastClickedArtist = lastClickedArtist;
+        this.selectedArtist = lastClickedArtist;
         this.selectedSource = selectedSource;
         tempID = "testingUrl";
     }
@@ -66,37 +67,37 @@ public class GUIController {
         if (name.isEmpty() || name.isBlank())
             return;
         DB.insertIntoArtistList(name);
-        lastClickedArtist = null;
+        selectedArtist = null;
     }
 
     public void deleteArtist() {
-        if (lastClickedArtist == null)
+        if (selectedArtist == null)
             return;
-        DB.removeArtist(lastClickedArtist);
-        lastClickedArtist = null;
+        DB.removeArtist(selectedArtist);
+        selectedArtist = null;
     }
 
     public void deleteSourceID() {
-        if (lastClickedArtist != null && selectedSource != null) {
-            DB.updateArtistSourceID(lastClickedArtist, selectedSource, null);
-            DB.clearArtistDataFrom(lastClickedArtist, selectedSource.toString());
+        if (selectedArtist != null && selectedSource != null) {
+            DB.updateArtistSourceID(selectedArtist, selectedSource, null);
+            DB.clearArtistDataFrom(selectedArtist, selectedSource.toString());
         }
     }
 
     public void cleanArtistSource() {
-        DB.clearArtistDataFrom(selectedSource.toString(), lastClickedArtist);
+        DB.clearArtistDataFrom(selectedSource.toString(), selectedArtist);
     }
 
     public List<TableModel> getTableData(String item, String origin) {
         if (origin.equals("list"))
-            lastClickedArtist = item;
+            selectedArtist = item;
         else if (origin.equals("tab"))
             selectedSource = item.equals("combview") ? null : SourcesEnum.valueOf(item);
 
         if (selectedSource == null)
             return DB.loadCombviewTable();
-        else if (lastClickedArtist != null)
-            return DB.loadTable(selectedSource, lastClickedArtist);
+        else if (selectedArtist != null)
+            return DB.loadTable(selectedSource, selectedArtist);
 
         return null;
     }
@@ -106,7 +107,7 @@ public class GUIController {
     }
 
     public void scrapePreview(String url) {
-        if (lastClickedArtist == null || selectedSource == null || url.isBlank())
+        if (selectedArtist == null || selectedSource == null || url.isBlank())
             return;
 
         tempID = null;
@@ -114,13 +115,13 @@ public class GUIController {
         try {
             Scraper scraper = null;
             switch (selectedSource) {
-                case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, lastClickedArtist, url);
-                case beatport -> scraper = new ScraperBeatport(store, log, lastClickedArtist, url);
-                case junodownload -> scraper = new ScraperJunodownload(store, log, lastClickedArtist, url);
-                case youtube -> scraper = new ScraperYoutube(store, log, lastClickedArtist, url);
+                case musicbrainz -> scraper = new ScraperMusicbrainz(log, DB, selectedArtist, url);
+                case beatport -> scraper = new ScraperBeatport(log, DB, selectedArtist, url);
+                case junodownload -> scraper = new ScraperJunodownload(log, DB, selectedArtist, url);
+                case youtube -> scraper = new ScraperYoutube(log, DB, selectedArtist, url);
             }
             id = scraper.getID();
-            scraper.scrape();
+            scraper.scrape(store.getTimeout());
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error scraping " + selectedSource + ", perhaps an incorrect link");
         }
@@ -129,7 +130,7 @@ public class GUIController {
     }
 
     public void saveUrl() {
-       DB.updateArtistSourceID(lastClickedArtist, selectedSource, tempID);
+       DB.updateArtistSourceID(selectedArtist, selectedSource, tempID);
     }
 
     public boolean checkExistURL() {
@@ -138,7 +139,7 @@ public class GUIController {
         } catch (IllegalArgumentException e) {
             return false;
         }
-        return DB.getArtistSourceID(lastClickedArtist, selectedSource) != null;
+        return DB.getArtistSourceID(selectedArtist, selectedSource) != null;
     }
 
     public void clickScrape() {
@@ -195,7 +196,7 @@ public class GUIController {
     }
 
     public String getLastArtist() {
-        return lastClickedArtist;
+        return selectedArtist;
     }
 
     public void resetSettings() {

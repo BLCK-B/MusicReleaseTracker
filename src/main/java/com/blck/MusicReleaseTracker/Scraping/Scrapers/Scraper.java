@@ -2,16 +2,10 @@ package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
-import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -20,21 +14,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
 public class Scraper {
 
-    protected final ValueStore store;
     protected final ErrorLogging log;
+    private final DBqueries DB;
     public ArrayList<Song> songList = new ArrayList<>();
     public SourcesEnum source;
 
-    @Autowired
-    public Scraper(ValueStore valueStore, ErrorLogging errorLogging) {
-        this.store = valueStore;
+    public Scraper(ErrorLogging errorLogging, DBqueries DB) {
         this.log = errorLogging;
+        this.DB = DB;
     }
 
-    public void scrape() throws ScraperTimeoutException {
+    public void scrape(int timeout) throws ScraperTimeoutException {
         System.out.println("The method scrape() is to be overriden.");
     }
 
@@ -95,36 +87,6 @@ public class Scraper {
     }
 
     public void insertSet() {
-        PreparedStatement pstmt = null;
-        // insert a set of songs to a source table
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            int i = 0;
-            for (Song songObject : songList) {
-                if (i == 15)
-                    break;
-                if (songObject.getType() != null) {
-                    String sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, songObject.getName());
-                    pstmt.setString(2, songObject.getArtist());
-                    pstmt.setString(3, songObject.getDate());
-                    pstmt.setString(4, songObject.getType());
-                } else {
-                    String sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, songObject.getName());
-                    pstmt.setString(2, songObject.getArtist());
-                    pstmt.setString(3, songObject.getDate());
-                }
-                pstmt.executeUpdate();
-                i++;
-            }
-            conn.setAutoCommit(false);
-            conn.commit();
-            conn.setAutoCommit(true);
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting a set of songs");
-        }
+        DB.batchInsertSongs(songList, source, 15);
     }
-
 }

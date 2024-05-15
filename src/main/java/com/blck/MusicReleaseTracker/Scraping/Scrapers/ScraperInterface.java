@@ -4,7 +4,7 @@ import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 
 public interface ScraperInterface {
 
-    void scrape() throws ScraperTimeoutException;
+    void scrape(int timeout) throws ScraperTimeoutException;
 
     private void reduceToID() {}
 

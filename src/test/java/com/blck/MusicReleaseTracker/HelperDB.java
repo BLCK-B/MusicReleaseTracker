@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 public class HelperDB {
 
-    private static DBtools dBtools;
+    private static DBqueries dBqueries;
     private static ManageMigrateDB manageDB;
 
     public static void redoTestDB() {

@@ -8,7 +8,7 @@ public class DBToolsTest {
 
     private String testDBpath;
     private ValueStore store;
-    private DBtools dBtools;
+    private DBqueries dBqueries;
 
     @BeforeTestClass
     public void setUp() {
@@ -16,7 +16,7 @@ public class DBToolsTest {
         testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store = new ValueStore();
         store.setDBpath(testDBpath);
-        dBtools = new DBtools(store, null, null);
+        dBqueries = new DBqueries(store, null, null);
     }
 
 

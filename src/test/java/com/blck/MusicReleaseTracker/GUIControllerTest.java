@@ -3,11 +3,8 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.junit.jupiter.api.*;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -26,7 +23,7 @@ public class GUIControllerTest {
 
     private String DBpath;
     private ValueStore store;
-    private DBtools DB;
+    private DBqueries DB;
     private GUIController guiController;
     
     @BeforeEach
@@ -34,7 +31,7 @@ public class GUIControllerTest {
         DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store = new ValueStore();
         store.setDBpath(DBpath);
-        DB = new DBtools(store, null, null);
+        DB = new DBqueries(store, null, null);
         guiController = new GUIController(store, null, null, null, DB, null);
         guiController.setTestData("Joe", SourcesEnum.beatport);
     }

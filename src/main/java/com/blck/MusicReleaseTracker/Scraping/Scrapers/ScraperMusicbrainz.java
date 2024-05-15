@@ -2,6 +2,7 @@ package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
@@ -18,8 +19,8 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
     private String id;
     private final boolean isIDnull;
 
-    public ScraperMusicbrainz(ValueStore store, ErrorLogging log, String songArtist, String id) {
-        super(store, log);
+    public ScraperMusicbrainz(ErrorLogging log, DBqueries DB, String songArtist, String id) {
+        super(log, DB);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -27,7 +28,7 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         reduceToID();
     }
     @Override
-    public void scrape() throws ScraperTimeoutException {
+    public void scrape(int timeout) throws ScraperTimeoutException {
         if (isIDnull)
             return;
 
@@ -36,7 +37,7 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
-                    .timeout(store.getTimeout()).get();
+                    .timeout(timeout).get();
         }
         catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);

@@ -2,15 +2,13 @@ package com.blck.MusicReleaseTracker.Scraping;
 
 import com.blck.MusicReleaseTracker.ConfigTools;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DBtools;
+import com.blck.MusicReleaseTracker.DBqueries;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,11 +37,11 @@ public class ScrapeProcess {
     private final ValueStore store;
     private final ErrorLogging log;
     private final ConfigTools config;
-    private final DBtools DB;
+    private final DBqueries DB;
     private final SSEController SSE;
 
     @Autowired
-    public ScrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBtools DB, SSEController sseController) {
+    public ScrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBqueries DB, SSEController sseController) {
         this.store = valueStore;
         this.log = errorLogging;
         this.config = configTools;
@@ -56,82 +54,38 @@ public class ScrapeProcess {
     public void scrapeData() {
         config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
-        DB.truncateAllScrapeData();
-        ScraperController scrapers = new ScraperController(store, log);
+        DB.truncateScrapeData(true);
+        ScraperManager scrapers = new ScraperManager(store, log, DB);
         final int initSize = scrapers.getInitSize();
-        // triggering scrapers
         int remaining = 0;
         double progress = 0.0;
         while (remaining != -1) {
             SSE.sendProgress(progress);
-            if (scrapeCancel) {
-                SSE.sendProgress(1.0);
-                System.gc();
-                return;
-            }
+            if (scrapeCancel)
+                break;
             remaining = scrapers.scrapeNext();
             progress = ((double) initSize - (double) remaining) / (double) initSize;
         }
+        SSE.sendProgress(1.0);
         System.gc();
     }
 
     public void fillCombviewTable() {
         ArrayList<Song> songObjectList = prepareSongs();
-        List<Song> finalSortedList = processSongs(songObjectList);
-        insertIntoCombview(finalSortedList);
+        ArrayList<Song> finalSortedList = processSongs(songObjectList);
+        DB.batchInsertSongs(finalSortedList, null, 115);
+        System.gc();
     }
 
     public ArrayList<Song> prepareSongs() {
-        // assembles table for combined view: filters unwanted words, looks for duplicates
-        // load filterwords and entrieslimit
         if (!store.getDBpath().contains("testdb"))
             config.readConfig(ConfigTools.configOptions.filters);
-        // clear table
-        String sql = null;
-        Statement stmt = null;
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            sql = "DELETE FROM combview";
-            stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
-        } catch (Exception e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error cleaning combview table");
-        }
 
-        // song object list with data from all sources
-        ArrayList<Song> songObjectList = new ArrayList<>();
-
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            for (SourcesEnum source : SourcesEnum.values()) {
-                // limit defines max combview rows
-                sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
-                stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);
-                while (rs.next()) {
-                    String songName = rs.getString("song");
-                    String songArtist = rs.getString("artist");
-                    String songDate = rs.getString("date");
-                    String songType = null;
-                    if (source == SourcesEnum.beatport)
-                        songType = rs.getString("type");
-
-                    if (filterWords(songName, songType)) {
-                        switch (source) {
-                            case beatport ->
-                                    songObjectList.add(new Song(songName, songArtist, songDate, songType));
-                            case musicbrainz, junodownload, youtube ->
-                                    songObjectList.add(new Song(songName, songArtist, songDate));
-                        }
-                    }
-                }
-            }
-            stmt.close();
-        } catch (Exception e) {
-            log.error(e, ErrorLogging.Severity.WARNING, "error filtering keywords");
-        }
-        return songObjectList;
+        DB.truncateScrapeData(false);
+        return DB.getAllSourceTableData();
     }
 
-    public List<Song> processSongs(List<Song> songObjectList) {
+    public ArrayList<Song> processSongs(List<Song> songObjectList) {
         // map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
         // eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -166,56 +120,15 @@ public class ScrapeProcess {
                         }
                 ));
         // create a list of SongClass objects from map, sorted by date
-        List<Song> finalSortedList = nameDateMap.values().stream()
+        ArrayList<Song> finalSortedList = nameDateMap.values().stream()
                 .sorted(Comparator.comparing(Song::getDate, Comparator.reverseOrder()))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
         songObjectList = null;
         nameDateMap = null;
         nameArtistMap = null;
 
         return finalSortedList;
-    }
-
-    private void insertIntoCombview(List<Song> finalSortedList) {
-        // insert data into table
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "insert into combview(song, artist, date) values(?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            // precomitting batch insert is way faster
-            int i = 0;
-            for (Song item : finalSortedList) {
-                // table size limit
-                if (i == 115)
-                    break;
-                pstmt.setString(1, item.getName());
-                pstmt.setString(2, item.getArtist());
-                pstmt.setString(3, item.getDate());
-                pstmt.addBatch();
-                i++;
-            }
-            conn.setAutoCommit(false);
-            pstmt.executeBatch();
-            conn.commit();
-            conn.setAutoCommit(true);
-            pstmt.close();
-        } catch (Exception e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting data to combview");
-        }
-        System.gc();
-    }
-
-    public boolean filterWords(String songName, String songType) {
-        // filtering user-selected keywords
-        for (String checkword : store.getFilterWords()) {
-            if (songType != null) {
-                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
-                    return false;
-            }
-            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                return false;
-        }
-        return true;
     }
 
 }

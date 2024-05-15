@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ScrapeProcessTest {
 
     private ValueStore store = new ValueStore();
-    private DBtools DB = new DBtools(store, null, null);
+    private DBqueries DB = new DBqueries(store, null, null);
     private ScrapeProcess scrapeProcess;
     private ArrayList<Song> expectedList;
 

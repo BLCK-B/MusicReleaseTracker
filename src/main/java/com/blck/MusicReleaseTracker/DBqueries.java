@@ -3,6 +3,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,14 +24,14 @@ import java.util.List;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class DBtools {
+public class DBqueries {
 
     private final ValueStore store;
     private final ErrorLogging log;
     private final ManageMigrateDB manageDB;
 
     @Autowired
-    public DBtools(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageDB) {
+    public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.manageDB = manageDB;
@@ -156,18 +157,101 @@ public class DBtools {
             clearArtistDataFrom(name, tableName);
     }
 
-    public void truncateAllScrapeData() {
+    public void truncateScrapeData(boolean all) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            for (SourcesEnum sourceTable : SourcesEnum.values()) {
-                String sql = "DELETE FROM " + sourceTable;
-                Statement stmt = conn.createStatement();
-                stmt.executeUpdate(sql);
+            if (all) {
+                for (SourcesEnum sourceTable : SourcesEnum.values()) {
+                    String sql = "DELETE FROM " + sourceTable;
+                    Statement stmt = conn.createStatement();
+                    stmt.executeUpdate(sql);
+                }
             }
             String sql = "DELETE FROM combview";
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error clearing DB");
+        }
+    }
+
+    public ArrayList<Song> getAllSourceTableData() {
+        // song object list with data from all sources
+        ArrayList<Song> songObjectList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+            for (SourcesEnum source : SourcesEnum.values()) {
+                String sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql);
+                while (rs.next()) {
+                    String songName = rs.getString("song");
+                    String songArtist = rs.getString("artist");
+                    String songDate = rs.getString("date");
+                    String songType = null;
+                    if (source == SourcesEnum.beatport)
+                        songType = rs.getString("type");
+
+                    if (filterWords(songName, songType)) {
+                        switch (source) {
+                            case beatport ->
+                                    songObjectList.add(new Song(songName, songArtist, songDate, songType));
+                            case musicbrainz, junodownload, youtube ->
+                                    songObjectList.add(new Song(songName, songArtist, songDate));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e, ErrorLogging.Severity.WARNING, "error filtering keywords");
+        }
+        return songObjectList;
+    }
+
+    private boolean filterWords(String songName, String songType) {
+        // filtering user-selected keywords
+        for (String checkword : store.getFilterWords()) {
+            if (songType != null) {
+                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                    return false;
+            }
+            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
+                return false;
+        }
+        return true;
+    }
+
+    public void batchInsertSongs(ArrayList<Song> songList, SourcesEnum source, int limit) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+            int i = 0;
+            String sql;
+            PreparedStatement pstmt = null;
+            for (Song songObject : songList) {
+                if (i == limit)
+                    break;
+                if (songObject.getType() != null && source != null) {
+                    sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, songObject.getName());
+                    pstmt.setString(2, songObject.getArtist());
+                    pstmt.setString(3, songObject.getDate());
+                    pstmt.setString(4, songObject.getType());
+                } else {
+                    if (source != null)
+                        sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
+                    else
+                        sql = "insert into combview(song, artist, date) values(?, ?, ?)";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, songObject.getName());
+                    pstmt.setString(2, songObject.getArtist());
+                    pstmt.setString(3, songObject.getDate());
+                }
+                pstmt.executeUpdate();
+                i++;
+            }
+            conn.setAutoCommit(false);
+            conn.commit();
+            conn.setAutoCommit(true);
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting a set of songs");
         }
     }
 

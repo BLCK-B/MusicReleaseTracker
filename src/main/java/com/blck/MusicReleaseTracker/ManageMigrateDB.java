@@ -80,7 +80,7 @@ public class ManageMigrateDB {
 
             sql = """
                     CREATE TABLE IF NOT EXISTS artists (
-                    artistname text PRIMARY KEY,
+                    artist text PRIMARY KEY,
                     urlmusicbrainz text,
                     urlbeatport text,
                     urljunodownload text,
@@ -134,12 +134,12 @@ public class ManageMigrateDB {
                     Connection connDB = DriverManager.getConnection(store.getDBpath());
                     Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath)
             ) {
-                // insert data from musicdata's column to template's column
+                // insert data from musicdata column to template column
                 String sql = "SELECT * FROM artists LIMIT 1000";
                 Statement stmt = connDB.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 
-                sql = "insert into artists(artistname, urlmusicbrainz, urlbeatport, urljunodownload, urlyoutube) values(?, ?, ?, ?, ?)";
+                sql = "insert into artists(artist, urlmusicbrainz, urlbeatport, urljunodownload, urlyoutube) values(?, ?, ?, ?, ?)";
                 PreparedStatement pstmt = connDBtemplate.prepareStatement(sql);
                 ArrayList<String> columnList = DBMap.get("artists");
                 // cycling table rows
@@ -174,7 +174,7 @@ public class ManageMigrateDB {
     }
 
     public Map<String, ArrayList<String>> getDBStructure(String path) {
-        // assembles a structure of tables and their columns
+        // returns a structure of tables and their columns
         HashMap<String, ArrayList<String>> tableMap = new HashMap<>();
 
         try (Connection conn = DriverManager.getConnection(path)) {

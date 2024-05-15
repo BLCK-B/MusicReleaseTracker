@@ -34,7 +34,7 @@ public class GUIControllerTest {
         DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store = new ValueStore();
         store.setDBpath(DBpath);
-        DB = new DBtools(store, null);
+        DB = new DBtools(store, null, null);
         guiController = new GUIController(store, null, null, null, DB, null);
         guiController.setTestData("Joe", SourcesEnum.beatport);
     }

@@ -3,12 +3,11 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DataModels.TableModel;
+import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,6 @@ public class GUIController {
     private final ConfigTools config;
     private final DBtools DB;
     private final ManageMigrateDB manageDB;
-    private final List<TableModel> tableContent = new ArrayList<>();
     private SourcesEnum selectedSource;
     private String lastClickedArtist;
     private String tempID;
@@ -61,151 +59,53 @@ public class GUIController {
     }
 
     public List<String> loadList() {
-        List<String> dataList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT artistname FROM artists ORDER BY artistname LIMIT 500");
-            while (rs.next()) {
-                dataList.add(rs.getString("artistname"));
-            }
-            stmt.close();
-            rs.close();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error loading list");
-        }
-        return dataList;
+        return DB.getArtistList();
     }
 
-    public void artistAddConfirm(String input) {
-        // add new artist typed by user
-        if (input.isEmpty() || input.isBlank())
+    public void addNewArtist(String name) {
+        if (name.isEmpty() || name.isBlank())
             return;
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "INSERT INTO artists (artistname) values(?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, input);
-            pstmt.executeUpdate();
-            pstmt.close();
-            lastClickedArtist = null;
-        } catch (SQLException e) {
-            System.out.println("artist already exists");
-        }
+        DB.insertIntoArtistList(name);
+        lastClickedArtist = null;
     }
 
-    public void artistClickDelete() {
-        // delete last selected artist and all entries from artist
-        if (lastClickedArtist != null) {
-            try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-                Map<String, ArrayList<String>> tableMap = manageDB.getDBStructure(store.getDBpath());
-                String sql;
-                for (String tableName : tableMap.keySet()) {
-                    if (tableName.equals("artists"))
-                        sql = "DELETE FROM artists WHERE artistname = ?";
-                    else
-                        sql = "DELETE FROM " + tableName + " WHERE artist = ?";
-                    PreparedStatement pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, lastClickedArtist);
-                    pstmt.executeUpdate();
-                }
-                lastClickedArtist = null;
-            } catch (SQLException e) {
-                log.error(e, ErrorLogging.Severity.WARNING, "error deleting an artist");
-            }
-        }
+    public void deleteArtist() {
+        if (lastClickedArtist == null)
+            return;
+        DB.removeArtist(lastClickedArtist);
+        lastClickedArtist = null;
     }
 
-    public void deleteUrl() {
-        // set null specific URL, delete related set
+    public void deleteSourceID() {
         if (lastClickedArtist != null && selectedSource != null) {
-            try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-                String sql = "UPDATE artists SET url" + selectedSource + " = NULL WHERE artistname = ?";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.executeUpdate();
-                sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, lastClickedArtist);
-                pstmt.execute();
-            } catch (SQLException e) {
-                log.error(e, ErrorLogging.Severity.SEVERE, "error deleting an URL");
-            }
+            DB.updateArtistSourceID(lastClickedArtist, selectedSource, null);
+            DB.clearArtistDataFrom(lastClickedArtist, selectedSource.toString());
         }
     }
 
     public void cleanArtistSource() {
-        // clear artist entries from a source table, used by scrape preview
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "DELETE FROM " + selectedSource + " WHERE artist = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, lastClickedArtist);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error deleting a source URL");
-        }
+        DB.clearArtistDataFrom(selectedSource.toString(), lastClickedArtist);
     }
 
-    public List<TableModel> listOrTabClick(String item, String origin) {
-        // when source or artist selected, load respective table
+    public List<TableModel> getTableData(String item, String origin) {
         if (origin.equals("list"))
             lastClickedArtist = item;
         else if (origin.equals("tab"))
-            // need to account for combview
             selectedSource = item.equals("combview") ? null : SourcesEnum.valueOf(item);
 
         if (selectedSource == null)
-            loadCombviewTable();
+            return DB.loadCombviewTable();
         else if (lastClickedArtist != null)
-            loadTable();
+            return DB.loadTable(selectedSource, lastClickedArtist);
 
-        return tableContent;
-    }
-
-    public void loadTable() {
-        tableContent.clear();
-        // adding data to tableContent
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT song, date FROM " + selectedSource + " WHERE artist = ? ORDER BY date DESC LIMIT 100";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, lastClickedArtist);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                String songsCol = rs.getString("song");
-                String datesCol = rs.getString("date");
-                tableContent.add(new TableModel(songsCol, null, datesCol));
-            }
-            pstmt.close();
-            rs.close();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error loading table");
-        }
-    }
-
-    public void loadCombviewTable() {
-        tableContent.clear();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            // populating combview table
-            String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist, song LIMIT 1000";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                String songsCol = rs.getString("song");
-                String artistsCol = rs.getString("artist");
-                String datesCol = rs.getString("date");
-                tableContent.add(new TableModel(songsCol, artistsCol, datesCol));
-            }
-            pstmt.close();
-            rs.close();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview table");
-        }
+        return null;
     }
 
     public void fillCombview() {
         scrapeProcess.fillCombviewTable();
     }
 
-    public void clickAddURL(String url) {
-        // scrape preview functionality
+    public void scrapePreview(String url) {
         if (lastClickedArtist == null || selectedSource == null || url.isBlank())
             return;
 
@@ -229,60 +129,22 @@ public class GUIController {
     }
 
     public void saveUrl() {
-        // save artist url to db
-        String sql = "UPDATE artists SET url" + selectedSource + " = ? WHERE artistname = ?";
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, tempID);
-            pstmt.setString(2, lastClickedArtist);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.WARNING, "could not save URL");
-        }
+       DB.updateArtistSourceID(lastClickedArtist, selectedSource, tempID);
     }
 
     public boolean checkExistURL() {
-        // check for existence of url to determine visibility of url dialog
-        boolean urlExists = false;
         try {
             SourcesEnum.valueOf(String.valueOf(selectedSource));
         } catch (IllegalArgumentException e) {
-            return urlExists;
+            return false;
         }
-
-        String sql = "SELECT url" + selectedSource + " FROM artists WHERE artistname = ? LIMIT 10";
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, lastClickedArtist);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.getString(1) != null)
-                urlExists = true;
-
-            rs.close();
-            pstmt.close();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.WARNING, "error checking url existence");
-        }
-        return urlExists;
+        return DB.getArtistSourceID(lastClickedArtist, selectedSource) != null;
     }
 
     public void clickScrape() {
-        // launch scraping in backend, then fill and load table
         scrapeProcess.scrapeData();
         scrapeProcess.fillCombviewTable();
-        vacuum();
-    }
-
-    public void vacuum() {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "VACUUM;";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.execute();
-            pstmt.close();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.WARNING, "vacuum error: clickScrape");
-        }
+        DB.vacuum();
     }
 
     public void cancelScrape() {

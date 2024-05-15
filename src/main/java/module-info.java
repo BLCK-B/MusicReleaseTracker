@@ -18,7 +18,7 @@ module com.blck.MusicReleaseTracker {
     exports com.blck.MusicReleaseTracker.Scraping;
     exports com.blck.MusicReleaseTracker.FrontendAPI;
     opens com.blck.MusicReleaseTracker.FrontendAPI;
-    exports com.blck.MusicReleaseTracker.DataModels;
-    opens com.blck.MusicReleaseTracker.DataModels;
+    exports com.blck.MusicReleaseTracker.DataObjects;
+    opens com.blck.MusicReleaseTracker.DataObjects;
 }
 

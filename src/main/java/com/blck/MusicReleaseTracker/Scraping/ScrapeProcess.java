@@ -6,7 +6,7 @@ import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DBtools;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
-import com.blck.MusicReleaseTracker.DataModels.Song;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,7 +56,7 @@ public class ScrapeProcess {
     public void scrapeData() {
         config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
-        DB.truncateDB();
+        DB.truncateAllScrapeData();
         ScraperController scrapers = new ScraperController(store, log);
         final int initSize = scrapers.getInitSize();
         // triggering scrapers

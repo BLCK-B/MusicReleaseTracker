@@ -50,8 +50,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public DBtools dBtools(ValueStore valueStore, ErrorLogging errorLogging) {
-        return new DBtools(valueStore, errorLogging);
+    public DBtools dBtools(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageMigrateDB) {
+        return new DBtools(valueStore, errorLogging, manageMigrateDB);
     }
 
     @Bean

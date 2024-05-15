@@ -21,15 +21,15 @@ public class ScraperController {
         this.log = log;
         // creating a list of scraper objects: one scraper holds one URL
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT artistname FROM artists LIMIT 500";
+            String sql = "SELECT artist FROM artists LIMIT 500";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet artistResults = pstmt.executeQuery();
             // cycling artists
             while (artistResults.next()) {
-                String artist = artistResults.getString("artistname");
+                String artist = artistResults.getString("artist");
                 // cycling sources
                 for (SourcesEnum webSource : SourcesEnum.values()) {
-                    sql = "SELECT * FROM artists WHERE artistname = ? LIMIT 100";
+                    sql = "SELECT * FROM artists WHERE artist = ? LIMIT 100";
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, artist);
                     ResultSet rs = pstmt.executeQuery();

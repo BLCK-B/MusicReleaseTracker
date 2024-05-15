@@ -46,16 +46,20 @@ public class StartSetup {
 
     private void createDirs() {
         String appDataPath = store.getAppDataPath();
-        File folder = new File(appDataPath);
-        if (!folder.exists())
-            folder.mkdirs();
-        // junk folder because sqlite did not delete temp files in "temp"
-        File tempfolder = new File(appDataPath + "temp");
-        if (!tempfolder.exists())
-            tempfolder.mkdirs();
-        for (File file : tempfolder.listFiles())
-            file.delete();
-        System.setProperty("org.sqlite.tmpdir", appDataPath + "temp");
+        try {
+            File folder = new File(appDataPath);
+            if (!folder.exists())
+                folder.mkdirs();
+            // junk folder because sqlite did not delete temp files in "temp"
+            File tempfolder = new File(appDataPath + "temp");
+            if (!tempfolder.exists())
+                tempfolder.mkdirs();
+            for (File file : tempfolder.listFiles())
+                file.delete();
+            System.setProperty("org.sqlite.tmpdir", appDataPath + "temp");
+        } catch (Exception e) {
+            log.error(e, ErrorLogging.Severity.WARNING, "something went wrong in directory setup");
+        }
     }
 
 }

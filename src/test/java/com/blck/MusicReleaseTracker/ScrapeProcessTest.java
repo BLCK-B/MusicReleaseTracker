@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DataModels.Song;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ScrapeProcessTest {
 
     private ValueStore store = new ValueStore();
-    private DBtools DB = new DBtools(store, null);
+    private DBtools DB = new DBtools(store, null, null);
     private ScrapeProcess scrapeProcess;
     private ArrayList<Song> expectedList;
 

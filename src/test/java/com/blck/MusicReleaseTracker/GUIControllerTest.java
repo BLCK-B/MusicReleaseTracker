@@ -35,7 +35,7 @@ public class GUIControllerTest {
         store = new ValueStore();
         store.setDBpath(DBpath);
         DB = new DBtools(store, null);
-        guiController = new GUIController(store, null, null, null, DB);
+        guiController = new GUIController(store, null, null, null, DB, null);
         guiController.setTestData("Joe", SourcesEnum.beatport);
     }
 

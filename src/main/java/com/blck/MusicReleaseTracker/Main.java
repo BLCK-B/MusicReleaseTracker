@@ -30,15 +30,15 @@ public class Main {
 
     private final ConfigTools config;
     private final ErrorLogging log;
-    private final DBtools DB;
+    private final ManageMigrateDB manageDB;
     private final StartSetup startSetup;
 
     @Autowired
-    public Main(ConfigTools configTools, ErrorLogging errorLogging, DBtools dBtools, StartSetup startSetup) {
+    public Main(ConfigTools configTools, ErrorLogging errorLogging, StartSetup startSetup, ManageMigrateDB manageDB) {
         this.config = configTools;
         this.log = errorLogging;
-        this.DB = dBtools;
         this.startSetup = startSetup;
+        this.manageDB = manageDB;
     }
 
     @Component
@@ -56,7 +56,7 @@ public class Main {
                 |_|  |_|_| \\_\\|_|
             """);
             startSetup.initializeSystem();
-            DB.migrateDB();
+            manageDB.migrateDB();
             config.updateSettings();
             // open port in web browser
             try {

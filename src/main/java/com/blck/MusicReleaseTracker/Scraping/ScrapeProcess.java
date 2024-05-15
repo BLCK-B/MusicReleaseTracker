@@ -56,7 +56,7 @@ public class ScrapeProcess {
     public void scrapeData() {
         config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
-        DB.clearDB();
+        DB.truncateDB();
         ScraperController scrapers = new ScraperController(store, log);
         final int initSize = scrapers.getInitSize();
         // triggering scrapers

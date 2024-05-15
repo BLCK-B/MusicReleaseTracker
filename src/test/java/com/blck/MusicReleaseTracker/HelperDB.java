@@ -6,12 +6,13 @@ import java.nio.file.Paths;
 public class HelperDB {
 
     private static DBtools dBtools;
+    private static ManageMigrateDB manageDB;
 
     public static void redoTestDB() {
         File testDB = new File(DBpath());
         if (testDB.exists())
             testDB.delete();
-        dBtools.createDBandSourceTables(DBpath());
+        manageDB.createDBandSourceTables(DBpath());
     }
 
     public static void redoTestData() {

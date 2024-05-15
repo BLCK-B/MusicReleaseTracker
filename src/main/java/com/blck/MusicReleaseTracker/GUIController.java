@@ -37,18 +37,21 @@ public class GUIController {
     private final ScrapeProcess scrapeProcess;
     private final ConfigTools config;
     private final DBtools DB;
+    private final ManageMigrateDB manageDB;
     private final List<TableModel> tableContent = new ArrayList<>();
     private SourcesEnum selectedSource;
     private String lastClickedArtist;
     private String tempID;
 
     @Autowired
-    public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess, ConfigTools config, DBtools DB) {
+    public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
+                         ConfigTools config, DBtools DB, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
         this.config = config;
         this.DB = DB;
+        this.manageDB = manageDB;
     }
 
     public void setTestData(String lastClickedArtist, SourcesEnum selectedSource) {
@@ -93,7 +96,7 @@ public class GUIController {
         // delete last selected artist and all entries from artist
         if (lastClickedArtist != null) {
             try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-                Map<String, ArrayList<String>> tableMap = DB.getDBStructure(store.getDBpath());
+                Map<String, ArrayList<String>> tableMap = manageDB.getDBStructure(store.getDBpath());
                 String sql;
                 for (String tableName : tableMap.keySet()) {
                     if (tableName.equals("artists"))
@@ -338,6 +341,6 @@ public class GUIController {
     }
 
     public void resetDB() {
-        DB.resetDB();
+        manageDB.resetDB();
     }
 }

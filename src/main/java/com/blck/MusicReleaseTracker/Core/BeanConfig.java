@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 /** config class for spring boot to manage lifecycle of the beans, this helps avoid static classes
     each bean has a single instance, beans defined here can be used by other classes as dependencies */
 @Configuration
-public class MRTConfig {
+public class BeanConfig {
 
     @Bean
     public ValueStore valueStore() {
@@ -33,13 +33,20 @@ public class MRTConfig {
     }
 
     @Bean
-    public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess, ConfigTools config, DBtools dBtools) {
-        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBtools);
+    public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging,
+                                       ScrapeProcess scrapeProcess, ConfigTools config,
+                                       ManageMigrateDB manageMigrateDB, DBtools dBtools) {
+        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBtools, manageMigrateDB);
     }
 
     @Bean
     public ConfigTools configTools(ValueStore valueStore, ErrorLogging errorLogging) {
         return new ConfigTools(valueStore, errorLogging);
+    }
+
+    @Bean
+    public ManageMigrateDB manageMigrateDB(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new ManageMigrateDB(valueStore, errorLogging);
     }
 
     @Bean

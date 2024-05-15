@@ -5,10 +5,12 @@ import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /*      MusicReleaseTracker
@@ -204,6 +206,40 @@ public class DBqueries {
             log.error(e, ErrorLogging.Severity.WARNING, "error filtering keywords");
         }
         return songObjectList;
+    }
+
+    public LinkedList<Scraper> getAllScrapers() {
+        // creating a list of scraper objects: one scraper holds one URL
+        LinkedList<Scraper> scrapers = new LinkedList<>();
+        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+            String sql = "SELECT artist FROM artists LIMIT 500";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet artistResults = pstmt.executeQuery();
+            // cycling artists
+            while (artistResults.next()) {
+                String artist = artistResults.getString("artist");
+                // cycling sources
+                for (SourcesEnum webSource : SourcesEnum.values()) {
+                    sql = "SELECT * FROM artists WHERE artist = ? LIMIT 100";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, artist);
+                    ResultSet rs = pstmt.executeQuery();
+                    String url = rs.getString("url" + webSource);
+                    if (url == null)
+                        continue;
+                    switch (webSource) {
+                        case musicbrainz    -> scrapers.add(new ScraperMusicbrainz(log, this, artist, url));
+                        case beatport       -> scrapers.add(new ScraperBeatport(log, this, artist, url));
+                        case junodownload   -> scrapers.add(new ScraperJunodownload(log, this, artist, url));
+                        case youtube        -> scrapers.add(new ScraperYoutube(log, this, artist, url));
+                    }
+                }
+            }
+            pstmt.close();
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error creating scrapers list");
+        }
+        return scrapers;
     }
 
     private boolean filterWords(String songName, String songType) {

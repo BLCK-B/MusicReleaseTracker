@@ -37,11 +37,7 @@ public class Scraper {
     public void processInfo() {
         unifyApostrophes();
         enforceDateFormat();
-        sortByDateDescending();
-        removeNameDuplicates();
-
-        // reverse to newest-oldest
-        Collections.reverse(songList);
+        sortAndRemoveNameDuplicates();
     }
 
     public void unifyApostrophes() {
@@ -63,8 +59,14 @@ public class Scraper {
         });
     }
 
-    // TODO: discard duplicates from oldest, in any way
-    public void removeNameDuplicates() {
+    public void sortAndRemoveNameDuplicates() {
+        // oldest to newest
+        songList.sort((obj1, obj2) -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
+            LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
+            return date1.compareTo(date2);
+        });
         Set<String> recordedNames = new HashSet<>();
         songList.removeIf(obj -> {
             String name = obj.getName().toLowerCase();
@@ -75,15 +77,8 @@ public class Scraper {
                 return false;
             }
         });
-    }
-
-    public void sortByDateDescending() {
-        songList.sort((obj1, obj2) -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
-            LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
-            return date2.compareTo(date1);
-        });
+        // newest to oldest
+        Collections.reverse(songList);
     }
 
     public void insertSet() {

@@ -56,7 +56,7 @@ public class ScrapeProcess {
         scrapeCancel = false;
         DB.truncateScrapeData(true);
         ScraperManager scrapers = new ScraperManager(store, log, DB);
-        final int initSize = scrapers.getInitSize();
+        final int initSize = scrapers.loadWithScrapers();
         int remaining = 0;
         double progress = 0.0;
         while (remaining != -1) {

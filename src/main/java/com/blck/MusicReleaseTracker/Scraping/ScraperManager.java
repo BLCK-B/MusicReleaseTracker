@@ -5,17 +5,14 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
-import org.sqlite.core.DB;
 
-import java.sql.*;
 import java.util.*;
 
 public class ScraperManager {
     private final ValueStore store;
     private final ErrorLogging log;
     private final DBqueries DB;
-    private final int initSize;
-    private final LinkedList<Scraper> scrapers = new LinkedList<>();
+    private LinkedList<Scraper> scrapers;
     private final HashMap<String, Double> sourceTimes = new HashMap<>();
 
     // middleware abstraction for scraping with exception handling
@@ -23,43 +20,14 @@ public class ScraperManager {
         this.store = store;
         this.log = log;
         this.DB = DB;
-        // creating a list of scraper objects: one scraper holds one URL
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT artist FROM artists LIMIT 500";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet artistResults = pstmt.executeQuery();
-            // cycling artists
-            while (artistResults.next()) {
-                String artist = artistResults.getString("artist");
-                // cycling sources
-                for (SourcesEnum webSource : SourcesEnum.values()) {
-                    sql = "SELECT * FROM artists WHERE artist = ? LIMIT 100";
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, artist);
-                    ResultSet rs = pstmt.executeQuery();
-                    String url = rs.getString("url" + webSource);
-                    if (url == null)
-                        continue;
-                    switch (webSource) {
-                        case musicbrainz    -> scrapers.add(new ScraperMusicbrainz(log, DB, artist, url));
-                        case beatport       -> scrapers.add(new ScraperBeatport(log, DB, artist, url));
-                        case junodownload   -> scrapers.add(new ScraperJunodownload(log, DB, artist, url));
-                        case youtube        -> scrapers.add(new ScraperYoutube(log, DB, artist, url));
-                    }
-                }
-            }
-            pstmt.close();
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error creating scrapers list");
-        }
-        initSize = scrapers.size();
         for (SourcesEnum source : SourcesEnum.values()) {
             sourceTimes.put(source.toString(), 0.0);
         }
     }
 
-    public int getInitSize() {
-        return initSize;
+    public int loadWithScrapers() {
+        scrapers = DB.getAllScrapers();
+        return scrapers.size();
     }
 
     public int scrapeNext() {
@@ -67,7 +35,7 @@ public class ScraperManager {
             return -1;
 
         double startTime = System.currentTimeMillis();
-        Scraper scraper = scrapers.get(0);
+        Scraper scraper = scrapers.getFirst();
         for (int i = 0; i <= 2; i++) {
             try {
                 scraper.scrape(store.getTimeout());
@@ -94,8 +62,8 @@ public class ScraperManager {
         sourceTimes.replaceAll((key, value) -> value + elapsedTime);
         delays(scraper.toString());
 
-        if (scraper.equals(scrapers.get(0)))
-            scrapers.remove(0);
+        if (scraper.equals(scrapers.getFirst()))
+            scrapers.removeFirst();
 
         return scrapers.size();
     }

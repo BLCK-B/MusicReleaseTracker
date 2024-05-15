@@ -1,8 +1,8 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.Scraping;
 
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DBqueries;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
-import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

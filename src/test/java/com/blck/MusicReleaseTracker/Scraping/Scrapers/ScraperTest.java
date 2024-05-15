@@ -1,9 +1,7 @@
-package com.blck.MusicReleaseTracker.Scrapers;
+package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -39,7 +37,8 @@ public class ScraperTest {
 
         scraper.unifyApostrophes();
 
-        assertEquals(scraper.songList.get(0).toString(), new Song("S'o'n'g", "artistName", "2023-01-01").toString());
+        assertEquals(scraper.songList.getFirst().toString(),
+                new Song("S'o'n'g", "artistName", "2023-01-01").toString());
     }
 
     @Test
@@ -55,33 +54,22 @@ public class ScraperTest {
     }
 
     @Test
-    void songListSortedByDateDescending() {
+    void leaveOldestDuplicatesOnlyAndSortByNewest() {
+        scraper.songList.add(new Song("Song1", "", "2023-01-01"));
+        scraper.songList.add(new Song("SONG1", "", "2005-05-05"));
+        scraper.songList.add(new Song("song1", "", "2005-05-06"));
+        scraper.songList.add(new Song("Song3", "", "2021-01-01"));
+        scraper.songList.add(new Song("Song3", "", "2019-01-01"));
+        scraper.songList.add(new Song("song2", "", "2017-01-01"));
         ArrayList<Song> expectedList = new ArrayList<>();
-        scraper.songList.add(new Song("Song3", "artistName", "2015-01-07"));
-        scraper.songList.add(new Song("Song2", "artistName", "2021-06-08"));
-        scraper.songList.add(new Song("Song4", "artistName", "2000-03-01"));
-        scraper.songList.add(new Song("Song1", "artistName", "2024-12-05"));
-        expectedList.add(new Song("Song1", "artistName", "2024-12-05"));
-        expectedList.add(new Song("Song2", "artistName", "2021-06-08"));
-        expectedList.add(new Song("Song3", "artistName", "2015-01-07"));
-        expectedList.add(new Song("Song4", "artistName", "2000-03-01"));
+        expectedList.add(new Song("Song3", "", "2019-01-01"));
+        expectedList.add(new Song("song2", "", "2017-01-01"));
+        expectedList.add(new Song("SONG1", "", "2005-05-05"));
 
-        scraper.sortByDateDescending();
+        scraper.sortAndRemoveNameDuplicates();
 
         for (int i = 0; i < scraper.songList.size(); i++)
-            assertEquals(scraper.songList.get(i).toString(), expectedList.get(i).toString());
-    }
-
-    @Disabled("do not forget")
-    @Test
-    void removeNameDuplicatesLeaveOldest() {
-        scraper.songList.add(new Song("Song1", "artistName", "2023-01-01"));
-        scraper.songList.add(new Song("SONG1", "artistName", "2005-05-05"));
-        scraper.songList.add(new Song("song1", "artistName", "2019-19-19"));
-
-        scraper.removeNameDuplicates();
-        // TODO: mind hash
-        assertEquals(scraper.songList.get(0), new Song("SONG1", "artistName", "2005-05-05"));
+            assertEquals(expectedList.get(i).toString(), scraper.songList.get(i).toString());
     }
 
     @Test

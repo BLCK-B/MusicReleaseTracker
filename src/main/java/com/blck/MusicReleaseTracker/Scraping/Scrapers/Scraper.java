@@ -2,7 +2,8 @@ package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
-import com.blck.MusicReleaseTracker.DBqueries;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
+import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 
@@ -26,7 +27,7 @@ public class Scraper {
         this.DB = DB;
     }
 
-    public void scrape(int timeout) throws ScraperTimeoutException {
+    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         System.out.println("The method scrape() is to be overriden.");
     }
 
@@ -35,6 +36,10 @@ public class Scraper {
     }
 
     public void processInfo() {
+        if (songList.isEmpty()) {
+            log.error(new Exception(), ErrorLogging.Severity.WARNING, "song list produced by scraper is empty");
+            return;
+        }
         unifyApostrophes();
         enforceDateFormat();
         sortAndRemoveNameDuplicates();

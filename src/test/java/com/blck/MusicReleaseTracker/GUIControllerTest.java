@@ -2,6 +2,8 @@ package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
+import com.blck.MusicReleaseTracker.DB.DBqueriesClass;
 import org.junit.jupiter.api.*;
 
 import java.nio.file.Paths;
@@ -31,7 +33,7 @@ public class GUIControllerTest {
         DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store = new ValueStore();
         store.setDBpath(DBpath);
-        DB = new DBqueries(store, null, null);
+        DB = new DBqueriesClass(store, null, null);
         guiController = new GUIController(store, null, null, null, DB, null);
         guiController.setTestData("Joe", SourcesEnum.beatport);
     }

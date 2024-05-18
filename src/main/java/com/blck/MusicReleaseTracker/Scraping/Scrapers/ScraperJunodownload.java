@@ -2,13 +2,14 @@ package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
-import com.blck.MusicReleaseTracker.DBqueries;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
+import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import java.io.IOException;
+
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -39,7 +40,7 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
         reduceToID();
     }
     @Override
-    public void scrape(int timeout) throws ScraperTimeoutException {
+    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
             return;
 
@@ -53,8 +54,8 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
         catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        catch (Exception e) {
+            throw new ScraperGenericException(url);
         }
         Elements songs = doc.select("a.juno-title");
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");

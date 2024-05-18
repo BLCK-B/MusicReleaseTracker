@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
@@ -26,19 +26,20 @@ import java.util.List;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class DBqueries {
+public class DBqueriesClass implements DBqueries {
 
     private final ValueStore store;
     private final ErrorLogging log;
     private final ManageMigrateDB manageDB;
 
     @Autowired
-    public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageDB) {
+    public DBqueriesClass(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.manageDB = manageDB;
     }
 
+    @Override
     public List<String> getArtistList() {
         List<String> dataList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
@@ -55,6 +56,7 @@ public class DBqueries {
         return dataList;
     }
 
+    @Override
     public List<TableModel> loadTable(SourcesEnum source, String name) {
         // adding data to tableContent
         List<TableModel> tableContent = new ArrayList<>();
@@ -76,6 +78,7 @@ public class DBqueries {
         return tableContent;
     }
 
+    @Override
     public List<TableModel> loadCombviewTable() {
         List<TableModel> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
@@ -96,6 +99,7 @@ public class DBqueries {
         return tableContent;
     }
 
+    @Override
     public void insertIntoArtistList(String name) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "INSERT INTO artists (artist) values(?)";
@@ -108,6 +112,7 @@ public class DBqueries {
         }
     }
 
+    @Override
     public void updateArtistSourceID(String name, SourcesEnum source, String ID) {
         String sql;
         if (ID == null)
@@ -129,6 +134,7 @@ public class DBqueries {
         }
     }
 
+    @Override
     public String getArtistSourceID(String name, SourcesEnum source) {
         String ID = null;
         String sql = "SELECT url" + source + " FROM artists WHERE artist = ?";
@@ -143,6 +149,7 @@ public class DBqueries {
         return ID;
     }
 
+    @Override
     public void clearArtistDataFrom(String name, String table) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "DELETE FROM " + table + " WHERE artist = ?";
@@ -154,11 +161,13 @@ public class DBqueries {
         }
     }
 
+    @Override
     public void removeArtist(String name) {
         for (String tableName : manageDB.getDBStructure(store.getDBpath()).keySet())
             clearArtistDataFrom(name, tableName);
     }
 
+    @Override
     public void truncateScrapeData(boolean all) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             if (all) {
@@ -176,6 +185,7 @@ public class DBqueries {
         }
     }
 
+    @Override
     public ArrayList<Song> getAllSourceTableData() {
         // song object list with data from all sources
         ArrayList<Song> songObjectList = new ArrayList<>();
@@ -208,6 +218,7 @@ public class DBqueries {
         return songObjectList;
     }
 
+    @Override
     public LinkedList<Scraper> getAllScrapers() {
         // creating a list of scraper objects: one scraper holds one URL
         LinkedList<Scraper> scrapers = new LinkedList<>();
@@ -255,6 +266,7 @@ public class DBqueries {
         return true;
     }
 
+    @Override
     public void batchInsertSongs(ArrayList<Song> songList, SourcesEnum source, int limit) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             int i = 0;
@@ -291,6 +303,7 @@ public class DBqueries {
         }
     }
 
+    @Override
     public void vacuum() {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "VACUUM;";

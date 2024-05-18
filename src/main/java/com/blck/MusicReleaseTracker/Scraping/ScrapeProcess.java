@@ -3,7 +3,7 @@ package com.blck.MusicReleaseTracker.Scraping;
 import com.blck.MusicReleaseTracker.ConfigTools;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DBqueries;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class ScrapeProcess {
         config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
         DB.truncateScrapeData(true);
-        ScraperManager scrapers = new ScraperManager(store, log, DB);
+        ScraperManager scrapers = new ScraperManager(log, DB);
         final int initSize = scrapers.loadWithScrapers();
         int remaining = 0;
         double progress = 0.0;

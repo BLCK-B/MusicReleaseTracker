@@ -1,5 +1,8 @@
 package com.blck.MusicReleaseTracker;
 
+import com.blck.MusicReleaseTracker.DB.DBqueries;
+import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+
 import java.io.File;
 import java.nio.file.Paths;
 

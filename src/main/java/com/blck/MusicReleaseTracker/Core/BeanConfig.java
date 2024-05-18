@@ -1,7 +1,8 @@
 package com.blck.MusicReleaseTracker.Core;
 
 import com.blck.MusicReleaseTracker.*;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
+import com.blck.MusicReleaseTracker.DB.DBqueriesClass;
+import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import org.springframework.context.annotation.Bean;
@@ -23,15 +24,15 @@ public class BeanConfig {
     }
 
     @Bean
-    public ScrapeProcess scrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBqueries dBqueries, SSEController sseController) {
-        return new ScrapeProcess(valueStore, errorLogging, configTools, dBqueries, sseController);
+    public ScrapeProcess scrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBqueriesClass dBqueriesClass, SSEController sseController) {
+        return new ScrapeProcess(valueStore, errorLogging, configTools, dBqueriesClass, sseController);
     }
 
     @Bean
     public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging,
                                        ScrapeProcess scrapeProcess, ConfigTools config,
-                                       ManageMigrateDB manageMigrateDB, DBqueries dBqueries) {
-        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBqueries, manageMigrateDB);
+                                       ManageMigrateDB manageMigrateDB, DBqueriesClass dBqueriesClass) {
+        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBqueriesClass, manageMigrateDB);
     }
 
     @Bean
@@ -45,8 +46,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public DBqueries dBqueries(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageMigrateDB) {
-        return new DBqueries(valueStore, errorLogging, manageMigrateDB);
+    public DBqueriesClass dBqueriesClass(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageMigrateDB) {
+        return new DBqueriesClass(valueStore, errorLogging, manageMigrateDB);
     }
 
     @Bean

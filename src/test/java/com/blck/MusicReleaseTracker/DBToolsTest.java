@@ -1,5 +1,7 @@
 package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
+import com.blck.MusicReleaseTracker.DB.DBqueriesClass;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.nio.file.Paths;
@@ -16,7 +18,7 @@ public class DBToolsTest {
         testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store = new ValueStore();
         store.setDBpath(testDBpath);
-        dBqueries = new DBqueries(store, null, null);
+        dBqueries = new DBqueriesClass(store, null, null);
     }
 
 

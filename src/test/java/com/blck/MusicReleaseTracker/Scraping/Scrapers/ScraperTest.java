@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -32,12 +31,17 @@ public class ScraperTest {
     }
 
     @Test
+    void emptySongListFromScraper() {
+        assertThrows(Exception.class, () -> scraper.processInfo());
+    }
+
+    @Test
     void unifyApostrophesBackticksAndAccents() {
         scraper.songList.add(new Song("S’o´n'g", "artistName", "2023-01-01"));
 
         scraper.unifyApostrophes();
 
-        assertEquals(scraper.songList.getFirst().toString(),
+        assertEquals(scraper.songList.get(0).toString(),
                 new Song("S'o'n'g", "artistName", "2023-01-01").toString());
     }
 

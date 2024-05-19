@@ -12,7 +12,8 @@ public class ScraperManager {
     private final ErrorLogging log;
     private final DBqueries DB;
     private LinkedList<Scraper> scrapers;
-    private int sleepTime = 2800;
+    private int minDelay = 2800; // ms
+    private final int jsoupTimeout = 25000; // ms
     private final HashMap<String, Double> sourceTimes = new HashMap<>();
 
     public ScraperManager(ErrorLogging log, DBqueries DB) {
@@ -25,7 +26,7 @@ public class ScraperManager {
     public ScraperManager(ErrorLogging log, DBqueries DB, int customSleepTime) {
         this.log = log;
         this.DB = DB;
-        sleepTime = customSleepTime;
+        minDelay = customSleepTime;
         for (SourcesEnum source : SourcesEnum.values()) {
             sourceTimes.put(source.toString(), 0.0);
         }
@@ -41,7 +42,7 @@ public class ScraperManager {
         Scraper scraper = scrapers.getFirst();
         for (int i = 0; i <= 2; i++) {
             try {
-                scraper.scrape(sleepTime);
+                scraper.scrape(jsoupTimeout);
                 break; // exception = will not break
             }
             catch (ScraperTimeoutException e) {
@@ -55,7 +56,7 @@ public class ScraperManager {
                     }
                 }
                 try {
-                    Thread.sleep(sleepTime);
+                    Thread.sleep(minDelay);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -71,7 +72,7 @@ public class ScraperManager {
                     }
                 }
                 try {
-                    Thread.sleep(sleepTime);
+                    Thread.sleep(minDelay);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -81,8 +82,11 @@ public class ScraperManager {
         }
         double elapsedTime = System.currentTimeMillis() - startTime;
         sourceTimes.replaceAll((key, value) -> value + elapsedTime);
-        if (sleepTime != 0)
-            delays(scraper.toString());
+        try {
+            Thread.sleep(delays(scraper.toString()));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         if (scraper.equals(scrapers.getFirst()))
             scrapers.removeFirst();
@@ -90,18 +94,13 @@ public class ScraperManager {
         return scrapers.isEmpty() ? -1 : scrapers.size();
     }
 
-    public void delays(String source) {
-        // every source has an enforced min delay
-        double timeLastScrape = sourceTimes.get(source);
-        if (timeLastScrape < sleepTime) {
-            long waitTime = (long) (sleepTime - timeLastScrape);
-            try {
-                Thread.sleep(waitTime);
-                sourceTimes.replaceAll((key, value) -> value + waitTime);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+    public long delays(String source) {
+        long waitTime = (long) (minDelay - sourceTimes.get(source));
+        if (waitTime > 0) {
+            sourceTimes.replaceAll((key, value) -> value + waitTime);
+            return waitTime;
         }
         sourceTimes.replace(source, 0.0);
+        return 0;
     }
 }

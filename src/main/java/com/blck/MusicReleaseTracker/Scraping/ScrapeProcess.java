@@ -34,15 +34,13 @@ import java.util.stream.Collectors;
 @Component
 public class ScrapeProcess {
 
-    private final ValueStore store;
     private final ErrorLogging log;
     private final ConfigTools config;
     private final DBqueries DB;
     private final SSEController SSE;
 
     @Autowired
-    public ScrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBqueries DB, SSEController sseController) {
-        this.store = valueStore;
+    public ScrapeProcess(ErrorLogging errorLogging, ConfigTools configTools, DBqueries DB, SSEController sseController) {
         this.log = errorLogging;
         this.config = configTools;
         this.DB = DB;
@@ -52,11 +50,12 @@ public class ScrapeProcess {
     public boolean scrapeCancel = false;
 
     public void scrapeData() {
-        config.readConfig(ConfigTools.configOptions.longTimeout);
         scrapeCancel = false;
         DB.truncateScrapeData(true);
         ScraperManager scrapers = new ScraperManager(log, DB);
         final int initSize = scrapers.loadWithScrapers();
+        if (initSize == 0)
+            return;
         int remaining = 0;
         double progress = 0.0;
         while (remaining != -1) {
@@ -78,9 +77,7 @@ public class ScrapeProcess {
     }
 
     public ArrayList<Song> prepareSongs() {
-        if (!store.getDBpath().contains("testdb"))
-            config.readConfig(ConfigTools.configOptions.filters);
-
+        config.readConfig(ConfigTools.configOptions.filters);
         DB.truncateScrapeData(false);
         return DB.getAllSourceTableData();
     }

@@ -24,8 +24,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public ScrapeProcess scrapeProcess(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, DBqueriesClass dBqueriesClass, SSEController sseController) {
-        return new ScrapeProcess(valueStore, errorLogging, configTools, dBqueriesClass, sseController);
+    public ScrapeProcess scrapeProcess(ErrorLogging errorLogging, ConfigTools configTools, DBqueriesClass dBqueriesClass, SSEController sseController) {
+        return new ScrapeProcess(errorLogging, configTools, dBqueriesClass, sseController);
     }
 
     @Bean

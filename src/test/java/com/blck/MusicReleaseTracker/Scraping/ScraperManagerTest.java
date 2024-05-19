@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker.Scraping;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,8 @@ class ScraperManagerTest {
         scrapers = new LinkedList<Scraper>();
         scraperManager = new ScraperManager(log, DB, 0);
         lenient().when(DB.getAllScrapers()).thenReturn(scrapers);
+        lenient().when(scraperMB.toString()).thenReturn("musicbrainz");
+        lenient().when(scraperBP.toString()).thenReturn("beatport");
     }
 
     void insertScrapers() {
@@ -92,7 +95,13 @@ class ScraperManagerTest {
     }
 
     @Test
-    void delays() {
-        assertTrue(true);
+    void delaysReturnsZeroWhenWaitedLongerThatMinDelay() {
+        assertEquals(scraperManager.delays("musicbrainz"), 0);
+    }
+
+    @Test
+    void delaysReturnsDifferenceWhenWaitedLessThanMinDelay() {
+        scraperManager = new ScraperManager(log, DB, 500);
+        assertEquals(500, scraperManager.delays("musicbrainz"));
     }
 }

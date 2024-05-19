@@ -7,6 +7,13 @@ import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.webservices.server.AutoConfigureMockWebServiceClient;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.nio.file.Paths;
@@ -14,6 +21,8 @@ import java.sql.*;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.*;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -27,66 +36,35 @@ import static org.junit.jupiter.api.Assertions.*;
         GNU General Public License for more details.
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-
+@ExtendWith(MockitoExtension.class)
 public class ScrapeProcessTest {
 
     private ValueStore store = new ValueStore();
-    private DBqueries DB = new DBqueriesClass(store, null, null);
-    private ScrapeProcess scrapeProcess;
     private ArrayList<Song> expectedList;
+//    private final String DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
 
-    @BeforeTestClass
-    void beforeClass() {
-        // data setup
-        String DBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
-        store.setDBpath(DBpath);
+    @Mock
+    DBqueries DB;
 
-        ArrayList<String> filterWords = new ArrayList<>();
-        filterWords.add("XXXXX");
-        store.setFilterWords(filterWords);
-        scrapeProcess = new ScrapeProcess(store, null, null, DB, null);
-    }
+    @Mock
+    ScraperManager scraperManager;
+
+    @InjectMocks
+    ScrapeProcess scrapeProcess;
 
     @BeforeEach
-    void setUp() {
-        // TODO: granular setup of instance store
-//        scrapeProcess = new ScrapeProcess(store, null, null, DB, null);
+    public void setUp() {
+
     }
 
-    @Disabled("do not forget")
     @Test
-    void fillCombviewTable() {
-        scrapeProcess.fillCombviewTable();
-
-        ArrayList<Song> songList = new ArrayList<>();
-        ArrayList<Song> expectedSongList = new ArrayList<>();
-        expectedSongList.add(new Song("Collab", "B, L, K", "2023-11-10"));
-        expectedSongList.add(new Song("duplicates", "K", "2023-07-27"));
-        expectedSongList.add(new Song("DiffDates", "B", "2000-30-30"));
-
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT * FROM combview ORDER BY date DESC";
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                String song = rs.getString("song");
-                String artist = rs.getString("artist");
-                String date = rs.getString("date");
-                songList.add(new Song(song, artist, date));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        for (int i = 0; i < expectedSongList.size(); i++) {
-            Song obj1 = expectedSongList.get(i);
-            Song obj2 = songList.get(i);
-            assertAll("Combview table rows",
-                    () -> assertEquals(obj1.getName(), obj2.getName()),
-                    () -> assertEquals(obj1.getArtist(), obj2.getArtist()),
-                    () -> assertEquals(obj1.getDate(), obj2.getDate())
-            );
-        }
+    @Disabled
+    public void testScrapeData() {
+//        doNothing().when(DB).truncateScrapeData(anyBoolean());
+        when(scraperManager.loadWithScrapers()).thenReturn(0);
+        scrapeProcess.scrapeData();
     }
+
+
 
 }

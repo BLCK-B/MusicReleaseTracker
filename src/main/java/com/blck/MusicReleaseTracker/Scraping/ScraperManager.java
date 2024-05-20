@@ -78,7 +78,7 @@ public class ScraperManager {
                 }
             }
             if (scrapers.isEmpty())
-                return -1;
+                return 0;
         }
         double elapsedTime = System.currentTimeMillis() - startTime;
         sourceTimes.replaceAll((key, value) -> value + elapsedTime);
@@ -91,7 +91,7 @@ public class ScraperManager {
         if (scraper.equals(scrapers.getFirst()))
             scrapers.removeFirst();
 
-        return scrapers.isEmpty() ? -1 : scrapers.size();
+        return scrapers.size();
     }
 
     public long delays(String source) {

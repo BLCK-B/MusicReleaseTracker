@@ -24,8 +24,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public ScrapeProcess scrapeProcess(ErrorLogging errorLogging, ConfigTools configTools, DBqueriesClass dBqueriesClass, SSEController sseController) {
-        return new ScrapeProcess(errorLogging, configTools, dBqueriesClass, sseController);
+    public ScrapeProcess scrapeProcess(ErrorLogging errorLogging, DBqueriesClass dBqueriesClass, SSEController sseController) {
+        return new ScrapeProcess(errorLogging, dBqueriesClass, sseController);
     }
 
     @Bean
@@ -46,8 +46,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public DBqueriesClass dBqueriesClass(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageMigrateDB) {
-        return new DBqueriesClass(valueStore, errorLogging, manageMigrateDB);
+    public DBqueriesClass dBqueriesClass(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, ManageMigrateDB manageMigrateDB) {
+        return new DBqueriesClass(valueStore, errorLogging, configTools, manageMigrateDB);
     }
 
     @Bean

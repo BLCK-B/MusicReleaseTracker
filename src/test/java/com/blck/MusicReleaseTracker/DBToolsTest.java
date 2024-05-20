@@ -18,7 +18,7 @@ public class DBToolsTest {
         testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
         store = new ValueStore();
         store.setDBpath(testDBpath);
-        dBqueries = new DBqueriesClass(store, null, null);
+        dBqueries = new DBqueriesClass(store, null, null, null);
     }
 
 

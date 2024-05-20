@@ -7,6 +7,7 @@ import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
+import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -145,7 +146,7 @@ public class GUIController {
     }
 
     public void clickScrape() {
-        scrapeProcess.scrapeData();
+        scrapeProcess.scrapeData(new ScraperManager(log, DB));
         scrapeProcess.fillCombviewTable();
         DB.vacuum();
     }

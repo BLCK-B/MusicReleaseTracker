@@ -59,7 +59,7 @@ class ScraperManagerTest {
         assertEquals(3, scraperManager.scrapeNext());
         assertEquals(2, scraperManager.scrapeNext());
         assertEquals(1, scraperManager.scrapeNext());
-        assertEquals(-1, scraperManager.scrapeNext());
+        assertEquals(0, scraperManager.scrapeNext());
     }
 
     @Test
@@ -78,7 +78,7 @@ class ScraperManagerTest {
         scrapers.add(scraperMB);
 
         assertEquals(1, scraperManager.loadWithScrapers());
-        assertEquals(-1, scraperManager.scrapeNext());
+        assertEquals(0, scraperManager.scrapeNext());
         verify(log, times(3)).error(any(), eq(ErrorLogging.Severity.INFO), contains("time out"));
     }
 
@@ -90,7 +90,7 @@ class ScraperManagerTest {
 
         assertEquals(4, scraperManager.loadWithScrapers());
         assertEquals(1, scraperManager.scrapeNext());
-        assertEquals(-1, scraperManager.scrapeNext());
+        assertEquals(0, scraperManager.scrapeNext());
         verify(log, times(6)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("error"));
     }
 

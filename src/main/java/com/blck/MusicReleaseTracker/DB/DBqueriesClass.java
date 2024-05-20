@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker.DB;
 
+import com.blck.MusicReleaseTracker.ConfigTools;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
@@ -31,12 +32,14 @@ public class DBqueriesClass implements DBqueries {
     private final ValueStore store;
     private final ErrorLogging log;
     private final ManageMigrateDB manageDB;
+    private final ConfigTools config;
 
     @Autowired
-    public DBqueriesClass(ValueStore valueStore, ErrorLogging errorLogging, ManageMigrateDB manageDB) {
+    public DBqueriesClass(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.manageDB = manageDB;
+        this.config = configTools;
     }
 
     @Override
@@ -187,7 +190,7 @@ public class DBqueriesClass implements DBqueries {
 
     @Override
     public ArrayList<Song> getAllSourceTableData() {
-        // song object list with data from all sources
+        config.readConfig(ConfigTools.configOptions.filters);
         ArrayList<Song> songObjectList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             for (SourcesEnum source : SourcesEnum.values()) {

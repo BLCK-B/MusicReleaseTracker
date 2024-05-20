@@ -1,8 +1,6 @@
 package com.blck.MusicReleaseTracker.Scraping;
 
-import com.blck.MusicReleaseTracker.ConfigTools;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
@@ -35,34 +33,31 @@ import java.util.stream.Collectors;
 public class ScrapeProcess {
 
     private final ErrorLogging log;
-    private final ConfigTools config;
     private final DBqueries DB;
     private final SSEController SSE;
 
     @Autowired
-    public ScrapeProcess(ErrorLogging errorLogging, ConfigTools configTools, DBqueries DB, SSEController sseController) {
+    public ScrapeProcess(ErrorLogging errorLogging, DBqueries DB, SSEController sseController) {
         this.log = errorLogging;
-        this.config = configTools;
         this.DB = DB;
         this.SSE = sseController;
     }
 
     public boolean scrapeCancel = false;
 
-    public void scrapeData() {
+    public void scrapeData(ScraperManager scraperManager) {
         scrapeCancel = false;
         DB.truncateScrapeData(true);
-        ScraperManager scrapers = new ScraperManager(log, DB);
-        final int initSize = scrapers.loadWithScrapers();
+        final int initSize = scraperManager.loadWithScrapers();
         if (initSize == 0)
             return;
-        int remaining = 0;
+        int remaining = 1;
         double progress = 0.0;
-        while (remaining != -1) {
+        while (remaining != 0) {
             SSE.sendProgress(progress);
             if (scrapeCancel)
                 break;
-            remaining = scrapers.scrapeNext();
+            remaining = scraperManager.scrapeNext();
             progress = ((double) initSize - (double) remaining) / (double) initSize;
         }
         SSE.sendProgress(1.0);
@@ -77,7 +72,6 @@ public class ScrapeProcess {
     }
 
     public ArrayList<Song> prepareSongs() {
-        config.readConfig(ConfigTools.configOptions.filters);
         DB.truncateScrapeData(false);
         return DB.getAllSourceTableData();
     }

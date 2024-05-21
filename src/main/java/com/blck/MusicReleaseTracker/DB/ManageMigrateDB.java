@@ -35,6 +35,7 @@ public class ManageMigrateDB {
     }
 
     public void createDBandSourceTables(String path) {
+        System.out.println(path);
         // note: generate by string templates after preview
         try (Connection conn = DriverManager.getConnection(path)) {
             String sql = """

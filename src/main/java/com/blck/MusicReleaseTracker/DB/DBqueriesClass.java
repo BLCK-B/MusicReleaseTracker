@@ -8,6 +8,7 @@ import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.sqlite.core.DB;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ import java.util.List;
 
 public class DBqueriesClass implements DBqueries {
 
+    private final String DBpath;
+
     private final ValueStore store;
     private final ErrorLogging log;
     private final ManageMigrateDB manageDB;
@@ -40,12 +43,13 @@ public class DBqueriesClass implements DBqueries {
         this.log = errorLogging;
         this.manageDB = manageDB;
         this.config = configTools;
+        DBpath = store.getDBpath();
     }
 
     @Override
     public List<String> getArtistList() {
         List<String> dataList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT artist FROM artists ORDER BY artist LIMIT 500");
             while (rs.next()) {
@@ -63,7 +67,7 @@ public class DBqueriesClass implements DBqueries {
     public List<TableModel> loadTable(SourcesEnum source, String name) {
         // adding data to tableContent
         List<TableModel> tableContent = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             String sql = "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC LIMIT 100";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
@@ -84,7 +88,7 @@ public class DBqueriesClass implements DBqueries {
     @Override
     public List<TableModel> loadCombviewTable() {
         List<TableModel> tableContent = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist, song LIMIT 1000";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
@@ -104,7 +108,7 @@ public class DBqueriesClass implements DBqueries {
 
     @Override
     public void insertIntoArtistList(String name) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             String sql = "INSERT INTO artists (artist) values(?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
@@ -116,19 +120,19 @@ public class DBqueriesClass implements DBqueries {
     }
 
     @Override
-    public void updateArtistSourceID(String name, SourcesEnum source, String ID) {
+    public void updateArtistSourceID(String name, SourcesEnum source, String newID) {
         String sql;
-        if (ID == null)
+        if (newID == null)
             sql = "UPDATE artists SET url" + source + " = NULL WHERE artist = ?";
         else
             sql = "UPDATE artists SET url" + source + " = ? WHERE artist = ?";
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            if (ID == null) {
+            if (newID == null) {
                 pstmt.setString(1, name);
             }
             else {
-                pstmt.setString(1, ID);
+                pstmt.setString(1, newID);
                 pstmt.setString(2, name);
             }
             pstmt.executeUpdate();
@@ -141,7 +145,7 @@ public class DBqueriesClass implements DBqueries {
     public String getArtistSourceID(String name, SourcesEnum source) {
         String ID = null;
         String sql = "SELECT url" + source + " FROM artists WHERE artist = ?";
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
             ID = pstmt.executeQuery().getString(1);
@@ -154,7 +158,7 @@ public class DBqueriesClass implements DBqueries {
 
     @Override
     public void clearArtistDataFrom(String name, String table) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             String sql = "DELETE FROM " + table + " WHERE artist = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
@@ -166,13 +170,13 @@ public class DBqueriesClass implements DBqueries {
 
     @Override
     public void removeArtist(String name) {
-        for (String tableName : manageDB.getDBStructure(store.getDBpath()).keySet())
+        for (String tableName : manageDB.getDBStructure(DBpath).keySet())
             clearArtistDataFrom(name, tableName);
     }
 
     @Override
     public void truncateScrapeData(boolean all) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             if (all) {
                 for (SourcesEnum sourceTable : SourcesEnum.values()) {
                     String sql = "DELETE FROM " + sourceTable;
@@ -192,7 +196,7 @@ public class DBqueriesClass implements DBqueries {
     public ArrayList<Song> getAllSourceTableData() {
         config.readConfig(ConfigTools.configOptions.filters);
         ArrayList<Song> songObjectList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             for (SourcesEnum source : SourcesEnum.values()) {
                 String sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 Statement stmt = conn.createStatement();
@@ -225,7 +229,7 @@ public class DBqueriesClass implements DBqueries {
     public LinkedList<Scraper> getAllScrapers() {
         // creating a list of scraper objects: one scraper holds one URL
         LinkedList<Scraper> scrapers = new LinkedList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             String sql = "SELECT artist FROM artists LIMIT 500";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet artistResults = pstmt.executeQuery();
@@ -271,7 +275,7 @@ public class DBqueriesClass implements DBqueries {
 
     @Override
     public void batchInsertSongs(ArrayList<Song> songList, SourcesEnum source, int limit) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             int i = 0;
             String sql;
             PreparedStatement pstmt = null;
@@ -308,7 +312,7 @@ public class DBqueriesClass implements DBqueries {
 
     @Override
     public void vacuum() {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(DBpath)) {
             String sql = "VACUUM;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.execute();

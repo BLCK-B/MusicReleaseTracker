@@ -65,20 +65,15 @@ public class ScrapeProcess {
     }
 
     public void fillCombviewTable() {
-        ArrayList<Song> songObjectList = prepareSongs();
+        DB.truncateScrapeData(false);
+        ArrayList<Song> songObjectList = DB.getAllSourceTableData();
         ArrayList<Song> finalSortedList = processSongs(songObjectList);
         DB.batchInsertSongs(finalSortedList, null, 115);
         System.gc();
     }
 
-    public ArrayList<Song> prepareSongs() {
-        DB.truncateScrapeData(false);
-        return DB.getAllSourceTableData();
-    }
-
     public ArrayList<Song> processSongs(List<Song> songObjectList) {
-        // map songObjectList to get rid of name-artist duplicates, prefer older, example key: neverenoughbensley
-        // eg: Never Enough - Bensley - 2023-05-12 : Never Enough - Bensley - 2022-12-16 = Never Enough - Bensley - 2022-12-16
+        // name-artist duplicates
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Map<String, Song> nameArtistMap = songObjectList.stream()
                 .collect(Collectors.toMap(
@@ -92,25 +87,26 @@ public class ScrapeProcess {
                                 else
                                     return newValue;
                             } catch (ParseException e) {
-                                log.error(e, ErrorLogging.Severity.WARNING, "error in parsing dates");
+                                log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
                                 return existingValue;
                             }
                         }
                 ));
-        // map nameArtistMap.values to merge name-date duplicates, example key: theoutlines2023-06-23
-        // eg: The Outlines - Koven - 2023-06-23 : The Outlines - Circadian - 2023-06-23 = The Outlines - Circadian, Koven - 2023-06-23
+        // name-date duplicates
         Map<String, Song> nameDateMap = nameArtistMap.values().stream()
+                .sorted(Comparator.comparing(Song::getArtist).thenComparing(song -> song.getName()
+                        .replaceAll("\\s+", "").toLowerCase() + song.getDate()))
                 .collect(Collectors.toMap(
                         song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
-                        song -> song, (existingValue, newValue) -> {
-                            // append artist from duplicate song to the already existing object in map
+                        song -> song,
+                        (existingValue, newValue) -> {
                             String newArtist = newValue.getArtist();
                             if (!existingValue.getArtist().contains(newArtist))
                                 existingValue.appendArtist(newArtist);
                             return existingValue;
                         }
                 ));
-        // create a list of SongClass objects from map, sorted by date
+        // sort by newest
         ArrayList<Song> finalSortedList = nameDateMap.values().stream()
                 .sorted(Comparator.comparing(Song::getDate, Comparator.reverseOrder()))
                 .collect(Collectors.toCollection(ArrayList::new));

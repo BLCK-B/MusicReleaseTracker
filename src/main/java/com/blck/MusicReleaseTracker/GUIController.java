@@ -73,7 +73,7 @@ public class GUIController {
         selectedArtist = null;
     }
 
-    public void deleteArtist() {
+    public void removeArtist() {
         if (selectedArtist == null)
             return;
         DB.removeArtist(selectedArtist);

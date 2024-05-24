@@ -35,7 +35,6 @@ public class ManageMigrateDB {
     }
 
     public void createDBandSourceTables(String path) {
-        System.out.println(path);
         // note: generate by string templates after preview
         try (Connection conn = DriverManager.getConnection(path)) {
             String sql = """
@@ -105,13 +104,6 @@ public class ManageMigrateDB {
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error creating DB file");
         }
-    }
-
-    public void resetDB() {
-        // default the musicdata
-        File musicdata = new File(store.getAppDataPath() + "musicdata.db");
-        musicdata.delete();
-        createDBandSourceTables(store.getDBpath());
     }
 
     public void migrateDB() {
@@ -201,6 +193,12 @@ public class ManageMigrateDB {
             log.error(e, ErrorLogging.Severity.SEVERE, "error parsing DB structure");
         }
         return tableMap;
+    }
+
+    public void resetDB() {
+        File musicdata = new File(store.getAppDataPath() + "musicdata.db");
+        musicdata.delete();
+        createDBandSourceTables(store.getDBpath());
     }
 
 }

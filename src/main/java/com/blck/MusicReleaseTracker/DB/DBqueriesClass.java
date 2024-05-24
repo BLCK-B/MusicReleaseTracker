@@ -8,7 +8,6 @@ import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.sqlite.core.DB;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -193,7 +192,7 @@ public class DBqueriesClass implements DBqueries {
     }
 
     @Override
-    public ArrayList<Song> getAllSourceTableData() {
+    public ArrayList<Song> getSourceTablesDataForCombview() {
         config.readConfig(ConfigTools.configOptions.filters);
         ArrayList<Song> songObjectList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DBpath)) {
@@ -223,6 +222,19 @@ public class DBqueriesClass implements DBqueries {
             log.error(e, ErrorLogging.Severity.WARNING, "error filtering keywords");
         }
         return songObjectList;
+    }
+
+    private boolean filterWords(String songName, String songType) {
+        // filtering user-selected keywords
+        for (String checkword : store.getFilterWords()) {
+            if (songType != null) {
+                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
+                    return false;
+            }
+            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
+                return false;
+        }
+        return true;
     }
 
     @Override
@@ -258,19 +270,6 @@ public class DBqueriesClass implements DBqueries {
             log.error(e, ErrorLogging.Severity.SEVERE, "error creating scrapers list");
         }
         return scrapers;
-    }
-
-    private boolean filterWords(String songName, String songType) {
-        // filtering user-selected keywords
-        for (String checkword : store.getFilterWords()) {
-            if (songType != null) {
-                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
-                    return false;
-            }
-            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                return false;
-        }
-        return true;
     }
 
     @Override

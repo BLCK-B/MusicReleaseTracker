@@ -66,7 +66,7 @@ public class ScrapeProcess {
 
     public void fillCombviewTable() {
         DB.truncateScrapeData(false);
-        ArrayList<Song> songObjectList = DB.getAllSourceTableData();
+        ArrayList<Song> songObjectList = DB.getSourceTablesDataForCombview();
         ArrayList<Song> finalSortedList = processSongs(songObjectList);
         DB.batchInsertSongs(finalSortedList, null, 115);
         System.gc();

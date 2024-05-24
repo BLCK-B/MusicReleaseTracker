@@ -4,24 +4,35 @@ import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueriesClass;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.ArrayList;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+
+/*      MusicReleaseTracker
+    Copyright (C) 2023 BLCK
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @ExtendWith(MockitoExtension.class)
 public class DBqueriesTest {
 
-    final String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
+    final static String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
 
     @Mock
     ValueStore store;
@@ -34,29 +45,152 @@ public class DBqueriesTest {
     @InjectMocks
     DBqueriesClass dBqueriesClass;
 
-    @BeforeTestClass
-    void setUpDB() {
-        HelperDB.DBpath = testDBpath;
-        HelperDB.redoTestDB();
+    ArrayList<Song> songList;
+
+    @BeforeAll
+    static void setUpDB() {
+        helperDB.redoTestDB();
     }
 
     @BeforeEach
     void setUp() {
-        HelperDB.DBpath = testDBpath;
-        HelperDB.redoTestData();
+        helperDB.redoTestData();
         when(store.getDBpath()).thenReturn(testDBpath);
         dBqueriesClass = new DBqueriesClass(store, log, config, manageMigrateDB);
+        songList = new ArrayList<>();
+        songList.add(new Song("song1", "artist1", "2022-01-01", "remix"));
+        songList.add(new Song("song2", "artist1", "2022-01-01", "type"));
+        songList.add(new Song("song3", "artist2", "2022-01-01", "Remixed"));
     }
 
     @Test
-    @Disabled
-    void getNewArtistSourceID() {
+    void batchInsertIntoSource() {
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+
+        assertEquals(3, helperDB.getNumEntries("beatport"));
+    }
+
+    @Test
+    void batchInsertIntoCombview() {
+        dBqueriesClass.batchInsertSongs(songList, null, 10);
+
+        assertEquals(3, helperDB.getNumEntries("combview"));
+    }
+
+    @Test
+    void batchInsertOverLimit() {
+        dBqueriesClass.batchInsertSongs(songList, null, 1);
+
+        assertEquals(1, helperDB.getNumEntries("combview"));
+    }
+
+    @Test
+    void getArtistEntriesInSourceTable() {
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+
+        assertEquals(2, dBqueriesClass.loadTable(SourcesEnum.beatport, "artist1").size());
+    }
+
+    @Test
+    void getEntriesInCombviewTable() {
+        dBqueriesClass.batchInsertSongs(songList, null, 10);
+
+        assertEquals(3, dBqueriesClass.loadCombviewTable().size());
+    }
+
+    @Test
+    void newArtistSourceID() {
         assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
 
         dBqueriesClass.updateArtistSourceID("artist1", SourcesEnum.beatport, "newID");
 
         assertEquals("newID", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
     }
+
+    @Test
+    void nullArtistSourceID() {
+        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
+
+        dBqueriesClass.updateArtistSourceID("artist1", SourcesEnum.beatport, null);
+
+        assertNull(dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
+    }
+
+    @Test
+    void insertNewArtist() {
+        assertFalse(dBqueriesClass.getArtistList().contains("joe"));
+
+        dBqueriesClass.insertIntoArtistList("joe");
+
+        assertTrue(dBqueriesClass.getArtistList().contains("joe"));
+    }
+
+    @Test
+    void getDataFromSourceTablesForCombviewWithFiltering() {
+        ArrayList<String> filters = new ArrayList<>();
+        filters.add("remix");
+        filters.add("filterme");
+        when(store.getFilterWords()).thenReturn(filters);
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        songList.clear();
+        songList.add(new Song("song1filterme", "artist1", "2022-01-01"));
+        songList.add(new Song("FILTERMEsong2", "artist2", "2022-01-01"));
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.youtube, 10);
+
+        assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
+    }
+
+    @Test
+    void truncateOnlyCombviewTable() {
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        dBqueriesClass.batchInsertSongs(songList, null, 10);
+        int entries = helperDB.getNumEntries("combview", "beatport");
+        assertEquals(6, entries);
+
+        dBqueriesClass.truncateScrapeData(false);
+
+        entries = helperDB.getNumEntries("combview", "beatport");
+        assertEquals(3, entries);
+    }
+
+    @Test
+    void truncateAllTables() {
+        songList = new ArrayList<>();
+        songList.add(new Song("song1", "artist1", "2022-01-01"));
+        songList.add(new Song("song2", "artist1", "2022-01-01"));
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.musicbrainz, 10);
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.junodownload, 10);
+        dBqueriesClass.batchInsertSongs(songList, null, 10);
+        int entries = helperDB.getNumEntries("combview", "musicbrainz", "junodownload");
+        assertEquals(6, entries);
+
+        dBqueriesClass.truncateScrapeData(true);
+
+        entries = helperDB.getNumEntries("combview", "musicbrainz", "junodownload");
+        assertEquals(0, entries);
+    }
+
+    @Test
+    void getScrapersFromIDs() {
+        assertEquals(6, dBqueriesClass.getAllScrapers().size());
+    }
+
+    @Test
+    void clearArtistDataFrom() {;
+        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        assertEquals(2, helperDB.getCountOf("beatport", "artist", "artist1"));
+
+        dBqueriesClass.clearArtistDataFrom("artist1", "beatport");
+
+        assertEquals(0, helperDB.getCountOf("beatport", "artist", "artist1"));
+        assertEquals(1, helperDB.getCountOf("beatport", "artist", "artist2"));
+    }
+
+    @AfterAll
+    static void cleanUp() {
+        helperDB.redoTestData();
+    }
+
 
 
 }

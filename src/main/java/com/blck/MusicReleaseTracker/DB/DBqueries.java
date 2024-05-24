@@ -28,7 +28,7 @@ public interface DBqueries {
 
     void truncateScrapeData(boolean all);
 
-    ArrayList<Song> getAllSourceTableData();
+    ArrayList<Song> getSourceTablesDataForCombview();
 
     LinkedList<Scraper> getAllScrapers();
 

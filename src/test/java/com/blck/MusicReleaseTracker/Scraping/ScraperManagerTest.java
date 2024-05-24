@@ -95,7 +95,7 @@ class ScraperManagerTest {
     }
 
     @Test
-    void errorSourceCausesWarningLogAndIsRemoved() throws ScraperTimeoutException, ScraperGenericException {
+    void erroringSourceCausesWarningLogAndIsRemoved() throws ScraperTimeoutException, ScraperGenericException {
         doThrow(ScraperGenericException.class).when(scraperMB).scrape(anyInt());
         doThrow(ScraperGenericException.class).when(scraperBP).scrape(anyInt());
         insertScrapers();

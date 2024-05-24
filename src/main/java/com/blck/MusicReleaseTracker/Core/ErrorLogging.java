@@ -63,7 +63,7 @@ public class ErrorLogging {
             fileHandler.close();
         }
         if (level == Severity.SEVERE) {
-            throw new RuntimeException(e);
+            System.exit(1);
         }
     }
 }

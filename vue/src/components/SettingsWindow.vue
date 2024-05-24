@@ -79,10 +79,6 @@
        <p class="title">Other</p>
        <div class="flex-items">
          <div class="flex-padding">
-           <input type="checkbox" v-model="longTimeout" @change="setSetting('longTimeout', $event.target.checked)">
-               <label>Longer timeout for unreliable internet</label>
-         </div>
-         <div class="flex-padding">
            <input type="checkbox" v-model="isoDates" @change="setSetting('isoDates', $event.target.checked)">
                <label>Dates in yyyy-MM-dd (ISO 8601)</label>
          </div>
@@ -138,7 +134,6 @@
          Dark: false,
          Light: false,
        },
-       longTimeout: false,
        isoDates: false,
        autoTheme: false,
      }
@@ -154,7 +149,6 @@
      axios.get('/api/settingsOpened')
        .then(response => {
          this.filters = response.data;
-         this.longTimeout = response.data.longTimeout;
          this.isoDates = response.data.isoDates;
          this.autoTheme = response.data.autoTheme;
        })

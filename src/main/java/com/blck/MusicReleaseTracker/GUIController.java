@@ -47,12 +47,12 @@ public class GUIController {
 
     @Autowired
     public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                         ConfigTools config, DBqueries DB, ManageMigrateDB manageDB) {
+                         ConfigTools config, DBqueries dBqueries, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
         this.config = config;
-        this.DB = DB;
+        this.DB = dBqueries;
         this.manageDB = manageDB;
     }
 
@@ -124,7 +124,7 @@ public class GUIController {
                 case youtube -> scraper = new ScraperYoutube(log, DB, selectedArtist, url);
             }
             id = scraper.getID();
-            scraper.scrape(store.getTimeout());
+            scraper.scrape(25000);
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error scraping " + selectedSource + ", perhaps an incorrect link");
         }
@@ -168,12 +168,6 @@ public class GUIController {
             else
                 configData.put(filter, false);
         }
-
-        config.readConfig(ConfigTools.configOptions.longTimeout);
-        if (store.getTimeout() > 25000)
-            configData.put("longTimeout", true);
-        else
-            configData.put("longTimeout", false);
 
         config.readConfig(ConfigTools.configOptions.isoDates);
         configData.put("isoDates", store.getIsoDates());

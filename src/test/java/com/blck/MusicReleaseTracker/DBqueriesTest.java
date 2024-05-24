@@ -2,7 +2,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DB.DBqueriesClass;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.junit.jupiter.api.*;
@@ -43,7 +43,7 @@ public class DBqueriesTest {
     @Mock
     ConfigTools config;
     @InjectMocks
-    DBqueriesClass dBqueriesClass;
+    DBqueries dBqueriesClass;
 
     ArrayList<Song> songList;
 
@@ -56,7 +56,7 @@ public class DBqueriesTest {
     void setUp() {
         helperDB.redoTestData();
         when(store.getDBpath()).thenReturn(testDBpath);
-        dBqueriesClass = new DBqueriesClass(store, log, config, manageMigrateDB);
+        dBqueriesClass = new DBqueries(store, log, config, manageMigrateDB);
         songList = new ArrayList<>();
         songList.add(new Song("song1", "artist1", "2022-01-01", "remix"));
         songList.add(new Song("song2", "artist1", "2022-01-01", "type"));

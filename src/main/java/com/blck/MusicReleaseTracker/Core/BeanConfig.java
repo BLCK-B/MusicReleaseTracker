@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker.Core;
 
 import com.blck.MusicReleaseTracker.*;
-import com.blck.MusicReleaseTracker.DB.DBqueriesClass;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
@@ -24,15 +24,15 @@ public class BeanConfig {
     }
 
     @Bean
-    public ScrapeProcess scrapeProcess(ErrorLogging errorLogging, DBqueriesClass dBqueriesClass, SSEController sseController) {
-        return new ScrapeProcess(errorLogging, dBqueriesClass, sseController);
+    public ScrapeProcess scrapeProcess(ErrorLogging errorLogging, DBqueries dBqueries, SSEController sseController) {
+        return new ScrapeProcess(errorLogging, dBqueries, sseController);
     }
 
     @Bean
     public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging,
                                        ScrapeProcess scrapeProcess, ConfigTools config,
-                                       ManageMigrateDB manageMigrateDB, DBqueriesClass dBqueriesClass) {
-        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBqueriesClass, manageMigrateDB);
+                                       ManageMigrateDB manageMigrateDB, DBqueries dBqueries) {
+        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBqueries, manageMigrateDB);
     }
 
     @Bean
@@ -46,8 +46,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public DBqueriesClass dBqueriesClass(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, ManageMigrateDB manageMigrateDB) {
-        return new DBqueriesClass(valueStore, errorLogging, configTools, manageMigrateDB);
+    public DBqueries dBqueries(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, ManageMigrateDB manageMigrateDB) {
+        return new DBqueries(valueStore, errorLogging, configTools, manageMigrateDB);
     }
 
     @Bean

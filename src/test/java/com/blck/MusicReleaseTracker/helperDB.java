@@ -72,13 +72,14 @@ public class helperDB {
         try (Connection conn = DriverManager.getConnection(testDBpath)) {
             Statement stmt = conn.createStatement();
             for (SourcesEnum sourceTable : SourcesEnum.values()) {
-                String sql = "DELETE FROM " + sourceTable;
-                stmt.executeUpdate(sql);
+                stmt.addBatch("DELETE FROM " + sourceTable);
             }
-            String sql = "DELETE FROM combview";
-            stmt.executeUpdate(sql);
-            sql = "DELETE FROM artists";
-            stmt.executeUpdate(sql);
+            stmt.addBatch("DELETE FROM combview");
+            stmt.addBatch("DELETE FROM artists");
+            conn.setAutoCommit(false);
+            stmt.executeBatch();
+            conn.setAutoCommit(true);
+            stmt.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -86,14 +87,18 @@ public class helperDB {
 
     private static void insertIntoArtists(String... artists) {
         try (Connection conn = DriverManager.getConnection(testDBpath)) {
+            String sql = "INSERT INTO artists (artist, urlmusicbrainz, urlbeatport) values(?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
             for (String artist : artists) {
-                String sql = "INSERT INTO artists (artist, urlmusicbrainz, urlbeatport) values(?, ?, ?)";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, artist);
                 pstmt.setString(2, "IDMB");
                 pstmt.setString(3, "IDBP");
-                pstmt.executeUpdate();
+                pstmt.addBatch();
             }
+            conn.setAutoCommit(false);
+            pstmt.executeBatch();
+            conn.setAutoCommit(true);
+            pstmt.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

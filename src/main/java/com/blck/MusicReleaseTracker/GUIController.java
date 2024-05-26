@@ -162,12 +162,8 @@ public class GUIController {
         config.readConfig(ConfigTools.configOptions.filters);
         ArrayList<String> filterWords = store.getFilterWords();
         String[] allFilters = new String[]{"Acoustic", "Extended", "Instrumental", "Remaster", "Remix", "VIP"};
-        for (String filter : allFilters) {
-            if (filterWords.contains(filter))
-                configData.put(filter, true);
-            else
-                configData.put(filter, false);
-        }
+        for (String filter : allFilters)
+            configData.put(filter, filterWords.contains(filter));
 
         config.readConfig(ConfigTools.configOptions.isoDates);
         configData.put("isoDates", store.getIsoDates());

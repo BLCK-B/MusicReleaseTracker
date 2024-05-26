@@ -7,6 +7,9 @@ import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,9 +40,9 @@ public class ScrapeProcess {
     private final SSEController SSE;
 
     @Autowired
-    public ScrapeProcess(ErrorLogging errorLogging, DBqueries DB, SSEController sseController) {
+    public ScrapeProcess(ErrorLogging errorLogging, DBqueries dBqueries, SSEController sseController) {
         this.log = errorLogging;
-        this.DB = DB;
+        this.DB = dBqueries;
         this.SSE = sseController;
     }
 
@@ -53,12 +56,10 @@ public class ScrapeProcess {
             return;
         int remaining = 1;
         double progress = 0.0;
-        while (remaining != 0) {
-            SSE.sendProgress(progress);
-            if (scrapeCancel)
-                break;
+        while (remaining != 0 && !scrapeCancel) {
             remaining = scraperManager.scrapeNext();
             progress = ((double) initSize - (double) remaining) / (double) initSize;
+            SSE.sendProgress(progress);
         }
         SSE.sendProgress(1.0);
         System.gc();
@@ -67,6 +68,8 @@ public class ScrapeProcess {
     public void fillCombviewTable() {
         DB.truncateScrapeData(false);
         ArrayList<Song> songObjectList = DB.getSourceTablesDataForCombview();
+        if (songObjectList.isEmpty())
+            return;
         ArrayList<Song> finalSortedList = processSongs(songObjectList);
         DB.batchInsertSongs(finalSortedList, null, 115);
         System.gc();

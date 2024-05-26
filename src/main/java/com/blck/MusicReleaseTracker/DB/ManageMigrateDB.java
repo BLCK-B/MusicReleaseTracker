@@ -37,6 +37,7 @@ public class ManageMigrateDB {
     public void createDBandSourceTables(String path) {
         // note: generate by string templates after preview
         try (Connection conn = DriverManager.getConnection(path)) {
+            Statement stmt = conn.createStatement();
             String sql = """
                     CREATE TABLE IF NOT EXISTS musicbrainz (
                     song text NOT NULL,
@@ -44,8 +45,7 @@ public class ManageMigrateDB {
                     date text NOT NULL
                     );
                     """;
-            Statement stmt = conn.createStatement();
-            stmt.execute(sql);
+            stmt.addBatch(sql);
 
             sql = """
                     CREATE TABLE IF NOT EXISTS beatport (
@@ -55,8 +55,7 @@ public class ManageMigrateDB {
                     type text NOT NULL
                     );
                     """;
-            stmt = conn.createStatement();
-            stmt.execute(sql);
+            stmt.addBatch(sql);
 
             sql = """
                     CREATE TABLE IF NOT EXISTS junodownload (
@@ -65,8 +64,7 @@ public class ManageMigrateDB {
                     date text NOT NULL
                     );
                     """;
-            stmt = conn.createStatement();
-            stmt.execute(sql);
+            stmt.addBatch(sql);
 
             sql = """
                     CREATE TABLE IF NOT EXISTS youtube (
@@ -75,8 +73,7 @@ public class ManageMigrateDB {
                     date text NOT NULL
                     );
                     """;
-            stmt = conn.createStatement();
-            stmt.execute(sql);
+            stmt.addBatch(sql);
 
             sql = """
                     CREATE TABLE IF NOT EXISTS artists (
@@ -87,8 +84,7 @@ public class ManageMigrateDB {
                     urlyoutube text
                     );
                     """;
-            stmt = conn.createStatement();
-            stmt.execute(sql);
+            stmt.addBatch(sql);
 
             sql = """
                     CREATE TABLE IF NOT EXISTS combview (
@@ -97,9 +93,11 @@ public class ManageMigrateDB {
                     date text NOT NULL
                     );
                     """;
-            stmt = conn.createStatement();
-            stmt.execute(sql);
+            stmt.addBatch(sql);
 
+            conn.setAutoCommit(false);
+            stmt.executeBatch();
+            conn.setAutoCommit(true);
             stmt.close();
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error creating DB file");
@@ -148,7 +146,6 @@ public class ManageMigrateDB {
                 pstmt.executeBatch();
                 connDBtemplate.commit();
                 connDBtemplate.setAutoCommit(true);
-                pstmt.clearBatch();
                 pstmt.close();
             } catch (Exception e) {
                 log.error(e, ErrorLogging.Severity.SEVERE, "error updating DB file");

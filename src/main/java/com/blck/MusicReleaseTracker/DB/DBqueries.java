@@ -49,9 +49,8 @@ public class DBqueries {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT artist FROM artists ORDER BY artist LIMIT 500");
-            while (rs.next()) {
+            while (rs.next())
                 dataList.add(rs.getString("artist"));
-            }
             stmt.close();
             rs.close();
         } catch (SQLException e) {
@@ -61,17 +60,15 @@ public class DBqueries {
     }
 
     public List<TableModel> loadTable(SourcesEnum source, String name) {
-        // adding data to tableContent
         List<TableModel> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC LIMIT 100";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC LIMIT 100");
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                String songsCol = rs.getString("song");
-                String datesCol = rs.getString("date");
-                tableContent.add(new TableModel(songsCol, null, datesCol));
+                tableContent.add(new TableModel(
+                        rs.getString("song"), null, rs.getString("date")));
             }
             pstmt.close();
             rs.close();
@@ -88,10 +85,8 @@ public class DBqueries {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                String songsCol = rs.getString("song");
-                String artistsCol = rs.getString("artist");
-                String datesCol = rs.getString("date");
-                tableContent.add(new TableModel(songsCol, artistsCol, datesCol));
+                tableContent.add(new TableModel(
+                        rs.getString("song"), rs.getString("artist"), rs.getString("date")));
             }
             pstmt.close();
             rs.close();
@@ -103,8 +98,8 @@ public class DBqueries {
 
     public void insertIntoArtistList(String name) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "INSERT INTO artists (artist) values(?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "INSERT INTO artists (artist) values(?)");
             pstmt.setString(1, name);
             pstmt.executeUpdate();
             pstmt.close();
@@ -136,9 +131,9 @@ public class DBqueries {
 
     public String getArtistSourceID(String name, SourcesEnum source) {
         String ID = null;
-        String sql = "SELECT url" + source + " FROM artists WHERE artist = ?";
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT url" + source + " FROM artists WHERE artist = ?");
             pstmt.setString(1, name);
             ID = pstmt.executeQuery().getString(1);
             pstmt.close();
@@ -150,8 +145,8 @@ public class DBqueries {
 
     public void clearArtistDataFrom(String name, String table) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "DELETE FROM " + table + " WHERE artist = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "DELETE FROM " + table + " WHERE artist = ?");
             pstmt.setString(1, name);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -166,16 +161,16 @@ public class DBqueries {
 
     public void truncateScrapeData(boolean all) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            if (all) {
-                for (SourcesEnum sourceTable : SourcesEnum.values()) {
-                    String sql = "DELETE FROM " + sourceTable;
-                    Statement stmt = conn.createStatement();
-                    stmt.executeUpdate(sql);
-                }
-            }
-            String sql = "DELETE FROM combview";
             Statement stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
+            if (all) {
+                for (SourcesEnum sourceTable : SourcesEnum.values())
+                    stmt.addBatch("DELETE FROM " + sourceTable);
+            }
+            stmt.addBatch("DELETE FROM combview");
+            conn.setAutoCommit(false);
+            stmt.executeBatch();
+            conn.setAutoCommit(true);
+            stmt.close();
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error clearing DB");
         }
@@ -186,9 +181,8 @@ public class DBqueries {
         ArrayList<Song> songObjectList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             for (SourcesEnum source : SourcesEnum.values()) {
-                String sql = "SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200";
                 Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);
+                ResultSet rs = stmt.executeQuery("SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200");
                 while (rs.next()) {
                     String songName = rs.getString("song");
                     String songArtist = rs.getString("artist");
@@ -214,7 +208,6 @@ public class DBqueries {
     }
 
     private boolean filterWords(String songName, String songType) {
-        // filtering user-selected keywords
         for (String checkword : store.getFilterWords()) {
             if (songType != null) {
                 if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
@@ -230,26 +223,26 @@ public class DBqueries {
         // creating a list of scraper objects: one scraper holds one URL
         LinkedList<Scraper> scrapers = new LinkedList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "SELECT artist FROM artists LIMIT 500";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT artist FROM artists LIMIT 500");
             ResultSet artistResults = pstmt.executeQuery();
             // cycling artists
             while (artistResults.next()) {
                 String artist = artistResults.getString("artist");
                 // cycling sources
                 for (SourcesEnum webSource : SourcesEnum.values()) {
-                    sql = "SELECT * FROM artists WHERE artist = ? LIMIT 100";
-                    pstmt = conn.prepareStatement(sql);
+                    pstmt = conn.prepareStatement(
+                            "SELECT * FROM artists WHERE artist = ? LIMIT 100");
                     pstmt.setString(1, artist);
                     ResultSet rs = pstmt.executeQuery();
                     String url = rs.getString("url" + webSource);
                     if (url == null)
                         continue;
                     switch (webSource) {
-                        case musicbrainz    -> scrapers.add(new ScraperMusicbrainz(log, this, artist, url));
-                        case beatport       -> scrapers.add(new ScraperBeatport(log, this, artist, url));
-                        case junodownload   -> scrapers.add(new ScraperJunodownload(log, this, artist, url));
-                        case youtube        -> scrapers.add(new ScraperYoutube(log, this, artist, url));
+                        case musicbrainz -> scrapers.add(new ScraperMusicbrainz(log, this, artist, url));
+                        case beatport -> scrapers.add(new ScraperBeatport(log, this, artist, url));
+                        case junodownload -> scrapers.add(new ScraperJunodownload(log, this, artist, url));
+                        case youtube -> scrapers.add(new ScraperYoutube(log, this, artist, url));
                     }
                 }
             }
@@ -262,44 +255,42 @@ public class DBqueries {
 
     public void batchInsertSongs(ArrayList<Song> songList, SourcesEnum source, int limit) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            int i = 0;
             String sql;
-            PreparedStatement pstmt = null;
+            boolean types = false;
+            if (songList.get(0).getType() != null && source != null) {
+                sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
+                types = true;
+            } else {
+                if (source != null)
+                    sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
+                else
+                    sql = "insert into combview(song, artist, date) values(?, ?, ?)";
+            }
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            int i = 0;
             for (Song songObject : songList) {
                 if (i == limit)
                     break;
-                if (songObject.getType() != null && source != null) {
-                    sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, songObject.getName());
-                    pstmt.setString(2, songObject.getArtist());
-                    pstmt.setString(3, songObject.getDate());
+                pstmt.setString(1, songObject.getName());
+                pstmt.setString(2, songObject.getArtist());
+                pstmt.setString(3, songObject.getDate());
+                if (types)
                     pstmt.setString(4, songObject.getType());
-                } else {
-                    if (source != null)
-                        sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
-                    else
-                        sql = "insert into combview(song, artist, date) values(?, ?, ?)";
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, songObject.getName());
-                    pstmt.setString(2, songObject.getArtist());
-                    pstmt.setString(3, songObject.getDate());
-                }
-                pstmt.executeUpdate();
-                i++;
+                ++i;
+                pstmt.addBatch();
             }
             conn.setAutoCommit(false);
-            conn.commit();
+            pstmt.executeBatch();
             conn.setAutoCommit(true);
+            pstmt.close();
         } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting a set of songs");
+            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting a batch of songs");
         }
     }
 
     public void vacuum() {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
-            String sql = "VACUUM;";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement("VACUUM;");
             pstmt.execute();
             pstmt.close();
         } catch (SQLException e) {

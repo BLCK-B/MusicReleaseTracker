@@ -9,12 +9,12 @@
       <div @mousedown="setStoreTab('youtube')" :class="{ 'active': activeTab === 'youtube' }" class="stab">YT</div>
     </div>
     
-    <button @click="openSettings()" class="imgbutton1" :disabled="!allowButtons">
+    <button @click="openSettings()" class="settingsButton" :disabled="!allowButtons">
       <img v-if="primaryColor === 'Black'" class="image" src="./icons/optionsblack.png" alt="Settings"/>
       <img v-else-if="primaryColor === 'Dark'" class="image" src="./icons/optionsdark.png" alt="Settings"/>
       <img v-else-if="primaryColor === 'Light'" class="image" src="./icons/optionslight.png" alt="Settings"/>
     </button>
-    <button @click="clickScrape()" @mouseover="scrapeHover()" @mouseleave="scrapeMouseOff()" v-bind:style="{ 'background-color': scrapeColor }" class="imgbutton2">
+    <button @click="clickScrape()" @mouseover="scrapeHover()" @mouseleave="scrapeMouseOff()" class="scrapeButton" :class="{ 'scrapeActive': isActive }">
       <img class="image" src="./icons/refreshuniversal.png" alt="Refresh"/>
     </button>
 
@@ -36,9 +36,9 @@ export default {
      return {
        activeTab: "",
        eventSource: null,
-       scrapeColor: "var(--accent-color)",
        scrapeNotice: false,
        scrapeLast: "-",
+       isActive: false,
      }
   },
   computed: {
@@ -91,17 +91,18 @@ export default {
     },
     // trigger scraping or cancel it, SSE listener for progressbar
     clickScrape() {
+      this.scrapeNotice = false;
       const allowButtons = this.allowButtons;
       if (!allowButtons) {
         axios.post('/api/cancelScrape')
           .then(() => {
             this.$store.commit('SET_ALLOW_BUTTONS', true);
-            this.scrapeColor = "var(--accent-color)";
+            this.isActive = false;
           })
       }
       else {
         this.$store.commit('SET_ALLOW_BUTTONS', false);
-        this.scrapeColor = "var(--dull-color)";
+        this.isActive = true;
         this.eventSource = new EventSource('/progress');
         this.eventSource.onmessage = (event) => {
           const progress = parseFloat(event.data);
@@ -110,7 +111,7 @@ export default {
 
         axios.post('/api/clickScrape')
           .then(() => {
-            this.scrapeColor = "var(--accent-color)";
+            this.isActive = false;
             this.$store.commit('SET_ALLOW_BUTTONS', true);
             this.eventSource.close();
             let time = new Date().toLocaleString('en-GB', {
@@ -163,29 +164,34 @@ export default {
     height: 32px;
     width: 32px;
   }
-  .imgbutton1:hover, .imgbutton2:hover {
+  .settingsButton, .scrapeButton {
+    padding: 0;
+    margin-left: 8px;
+    margin-top: 2px;
+    height: 32px;
+    width: 32px;
+    border: none;
+  }
+  .settingsButton:hover, .scrapeButton:hover {
     opacity: 70%;
   }
-  .imgbutton1 {
-    padding: 0;
+  .settingsButton {
     height: 32px;
     width: 32px;
-    margin-left: 8px;
     background-color: var(--accent-color);
-    border: none;
-    margin-top: 2px;
-    height: 32px;
-    width: 32px;
   }
-  .imgbutton2 {
-    padding: 0;
-    margin-left: 8px;
+  .scrapeButton {
+    background-color: var(--accent-color);
     margin-right: 20px;
-    border: none;
-    margin-top: 2px;
     border-radius: 50px;
-    height: 32px;
-    width: 32px;
+  }
+  .scrapeActive {
+    transition: 0.75s;
+    rotate: 180deg;
+    filter:hue-rotate(120deg);
+  }
+  .scrapeActive:hover {
+    opacity: 1;
   }
   .cvtab {
     width: 80%;

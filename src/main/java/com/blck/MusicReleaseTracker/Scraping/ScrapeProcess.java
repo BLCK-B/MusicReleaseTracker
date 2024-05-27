@@ -58,8 +58,11 @@ public class ScrapeProcess {
         double progress = 0.0;
         while (remaining != 0 && !scrapeCancel) {
             remaining = scraperManager.scrapeNext();
+            if (scrapeCancel)
+                break;
             progress = ((double) initSize - (double) remaining) / (double) initSize;
-            SSE.sendProgress(progress);
+            if (progress != 1.0)
+                SSE.sendProgress(progress);
         }
         SSE.sendProgress(1.0);
         System.gc();

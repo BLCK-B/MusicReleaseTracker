@@ -6,4 +6,9 @@ public class ScraperTimeoutException extends Exception {
         super(url);
     }
 
+    @Override
+    public String toString() {
+        return "time out exception";
+    }
+
 }

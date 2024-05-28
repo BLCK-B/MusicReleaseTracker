@@ -40,42 +40,12 @@ public class ScraperManager {
     public int scrapeNext() {
         double startTime = System.currentTimeMillis();
         Scraper scraper = scrapers.getFirst();
-        for (int i = 0; i <= 2; i++) {
+        for (int i = 0; i <= 2; ++i) {
             try {
                 scraper.scrape(jsoupTimeout);
-                break; // exception = will not break
-            }
-            catch (ScraperTimeoutException e) {
-                switch (i) {
-                    case 0 -> log.error(e, ErrorLogging.Severity.INFO, scraper + " time out");
-                    case 1 -> log.error(e, ErrorLogging.Severity.INFO, scraper + " second time out");
-                    default -> {
-                        log.error(e, ErrorLogging.Severity.INFO, "final time out, disabling source " + scraper);
-                        // remove all scrapers of a faulty source
-                        scrapers.removeIf(s -> s.getClass().equals(scraper.getClass()));
-                    }
-                }
-                try {
-                    Thread.sleep(minDelay);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-            catch (Exception e) {
-                switch (i) {
-                    case 0 -> log.error(e, ErrorLogging.Severity.WARNING, scraper + " error of scraper");
-                    case 1 -> log.error(e, ErrorLogging.Severity.WARNING, scraper + " second error of scraper");
-                    default -> {
-                        log.error(e, ErrorLogging.Severity.WARNING, "final error of scraper, disabling source " + scraper);
-                        // remove all scrapers of a faulty source
-                        scrapers.removeIf(s -> s.getClass().equals(scraper.getClass()));
-                    }
-                }
-                try {
-                    Thread.sleep(minDelay);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
+                break;
+            } catch (Exception e) {
+                scrapeErrorLaunder(i, scraper, e);
             }
             if (scrapers.isEmpty())
                 return 0;
@@ -92,6 +62,21 @@ public class ScraperManager {
             scrapers.removeFirst();
 
         return scrapers.size();
+    }
+
+    private void scrapeErrorLaunder(int i, Scraper scraper, Exception e) {
+        if (e instanceof ScraperTimeoutException)
+            log.error(e, ErrorLogging.Severity.INFO, scraper + " scraper threw " + e + " " + i + " times");
+        else
+            log.error(e, ErrorLogging.Severity.WARNING, scraper + " scraper threw " + e + " " + i + " times");
+        // remove scrapers of a faulty source
+        if (i == 2)
+            scrapers.removeIf(s -> s.getClass().equals(scraper.getClass()));
+        try {
+            Thread.sleep(minDelay);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public long delays(String source) {

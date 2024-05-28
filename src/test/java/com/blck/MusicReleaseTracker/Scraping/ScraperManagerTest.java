@@ -103,7 +103,7 @@ class ScraperManagerTest {
         assertEquals(4, scraperManager.loadWithScrapers());
         assertEquals(1, scraperManager.scrapeNext());
         assertEquals(0, scraperManager.scrapeNext());
-        verify(log, times(6)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("error"));
+        verify(log, times(6)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("generic"));
     }
 
     @Test

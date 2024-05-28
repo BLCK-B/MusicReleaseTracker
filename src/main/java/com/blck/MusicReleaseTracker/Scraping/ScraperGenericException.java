@@ -6,4 +6,9 @@ public class ScraperGenericException extends Exception {
         super(url);
     }
 
+    @Override
+    public String toString() {
+        return "generic exception";
+    }
+
 }

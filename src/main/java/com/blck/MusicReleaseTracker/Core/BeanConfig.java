@@ -55,5 +55,4 @@ public class BeanConfig {
         return new StartSetup(valueStore, errorLogging);
     }
 
-
 }

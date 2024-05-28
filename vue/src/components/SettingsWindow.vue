@@ -1,7 +1,7 @@
 <template>
   <div class="settings">
  
-     <button @click="clickClose()" class="imgbutton">
+     <button @click="clickClose()" class="crossImgButton">
        <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="X"/>
        <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
      </button>
@@ -234,7 +234,7 @@
    justify-content: center;
    accent-color: var(--contrast-color);
  }
- @media screen and (min-width: 950px) {
+ @media screen and (min-width: 1050px) {
    .settings {
      display: grid;
      grid-template-columns: repeat(2, 0fr);
@@ -279,17 +279,16 @@
    margin-top: 6px;
  }
  
- .imgbutton {
+ .crossImgButton {
    position: absolute;
-   right: 0;
-   top: 0;
+   right: 55px;
+   top: 6px;
    padding: 0;
-   margin: 10px;
    background-color: transparent;
    border: none;
    transition: 0s;
  }
- .imgbutton:hover {
+ .crossImgButton:hover {
    opacity: 60%;
  }
  .image {

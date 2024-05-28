@@ -19,7 +19,7 @@
     </button>
 
     <transition name="fade">
-      <div class="scrapenotice" @mouseover="scrapeMouseOff()" v-if="scrapeNotice">
+      <div class="scrapenotice" @mouseover="scrapeMouseOff()" v-if="scrapeDateInfo">
         <p>Last scrape: {{ scrapeLast }}</p>
       </div>
     </transition>
@@ -36,7 +36,7 @@ export default {
      return {
        activeTab: "",
        eventSource: null,
-       scrapeNotice: false,
+       scrapeDateInfo: false,
        scrapeLast: "-",
        isActive: false,
      }
@@ -91,9 +91,10 @@ export default {
     },
     // trigger scraping or cancel it, SSE listener for progressbar
     clickScrape() {
-      this.scrapeNotice = false;
+      this.scrapeDateInfo = false;
       const allowButtons = this.allowButtons;
       if (!allowButtons) {
+        this.eventSource.close;
         axios.post('/api/cancelScrape')
           .then(() => {
             this.$store.commit('SET_ALLOW_BUTTONS', true);
@@ -103,7 +104,7 @@ export default {
       else {
         this.$store.commit('SET_ALLOW_BUTTONS', false);
         this.isActive = true;
-        this.eventSource = new EventSource('/progress');
+        this.eventSource = new EventSource('http://localhost:57782/progress');
         this.eventSource.onmessage = (event) => {
           const progress = parseFloat(event.data);
           this.$store.commit('SET_PROGRESS', progress);
@@ -121,7 +122,7 @@ export default {
               minute: '2-digit'
             }).replace(/\//g, '.').replace(',', '').replace(/(\d{2})\.(\d{2})/, '\$1.\$2.');
             this.scrapeLast = time;
-            this.scrapeNotice = true;
+            this.scrapeDateInfo = true;
             this.handleSourceClick("combview");
 
             axios.post(`/api/setSetting`, { name: 'lastScrape', value: time })
@@ -132,10 +133,10 @@ export default {
       }
     },
     scrapeHover() {
-      this.scrapeNotice = true;
+      this.scrapeDateInfo = true;
     },
     scrapeMouseOff() {
-      this.scrapeNotice = false;
+      this.scrapeDateInfo = false;
     },
     // open settings
     openSettings() {

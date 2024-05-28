@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,19 +34,23 @@ public class SSEController {
 
     @GetMapping("/progress")
     public SseEmitter eventStream() {
-        emitter = new SseEmitter(300000L);
+        emitter = new SseEmitter(3000000L); // timeout 10 min
         return emitter;
     }
 
-    public void sendProgress(double state) {
+    public boolean sendProgress(double state) {
         try {
             emitter.send(String.valueOf(state));
-        } catch (Exception e) {
-            log.error(e, ErrorLogging.Severity.WARNING, "error in progress emitter");
-        } finally {
             if (state == 1.0)
                 emitter.complete();
         }
+        catch (IllegalStateException e) {
+            return true;
+        }
+        catch (Exception e) {
+            log.error(e, ErrorLogging.Severity.INFO, "error in progress emitter");
+        }
+        return false;
     }
 
 }

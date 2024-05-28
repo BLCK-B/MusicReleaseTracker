@@ -7,9 +7,6 @@ import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,11 +55,10 @@ public class ScrapeProcess {
         double progress = 0.0;
         while (remaining != 0 && !scrapeCancel) {
             remaining = scraperManager.scrapeNext();
-            if (scrapeCancel)
-                break;
             progress = ((double) initSize - (double) remaining) / (double) initSize;
             if (progress != 1.0)
-                SSE.sendProgress(progress);
+                if (SSE.sendProgress(progress))
+                    scrapeCancel = true;
         }
         SSE.sendProgress(1.0);
         System.gc();

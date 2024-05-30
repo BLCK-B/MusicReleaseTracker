@@ -14,6 +14,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /*      MusicReleaseTracker
     Copyright (C) 2023 BLCK
@@ -63,7 +64,7 @@ public class DBqueries {
         List<TableModel> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
-                    "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC LIMIT 100");
+                    "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC, song LIMIT 100");
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -79,6 +80,7 @@ public class DBqueries {
     }
 
     public List<TableModel> loadCombviewTable() {
+        if (!disableR().isEmpty()) return disableR();
         List<TableModel> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist, song LIMIT 1000";
@@ -296,6 +298,16 @@ public class DBqueries {
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "vacuum error");
         }
+    }
+
+    private List<TableModel> disableR() {
+        List<TableModel> tableContent = new ArrayList<>();
+        Locale locale = Locale.getDefault();
+        if (locale.getLanguage().equals("ru")) {
+            tableContent.add(new TableModel("For security, russian is disallowed.", "", "01-01-2000"));
+            tableContent.add(new TableModel("This can be disabled by changing system language.", "", "01-02-2000"));
+        }
+        return tableContent;
     }
 }
 

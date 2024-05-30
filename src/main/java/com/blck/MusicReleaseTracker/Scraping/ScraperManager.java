@@ -7,6 +7,19 @@ import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 
 import java.util.*;
 
+/*      MusicReleaseTracker
+    Copyright (C) 2023 BLCK
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+
 public class ScraperManager {
 
     private final ErrorLogging log;
@@ -19,17 +32,15 @@ public class ScraperManager {
     public ScraperManager(ErrorLogging log, DBqueries DB) {
         this.log = log;
         this.DB = DB;
-        for (SourcesEnum source : SourcesEnum.values()) {
+        for (SourcesEnum source : SourcesEnum.values())
             sourceTimes.put(source.toString(), 0.0);
-        }
     }
     public ScraperManager(ErrorLogging log, DBqueries DB, int customSleepTime) {
         this.log = log;
         this.DB = DB;
         minDelay = customSleepTime;
-        for (SourcesEnum source : SourcesEnum.values()) {
+        for (SourcesEnum source : SourcesEnum.values())
             sourceTimes.put(source.toString(), 0.0);
-        }
     }
 
     public int loadWithScrapers() {

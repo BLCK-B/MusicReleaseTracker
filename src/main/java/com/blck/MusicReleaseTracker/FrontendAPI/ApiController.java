@@ -1,7 +1,7 @@
-package com.blck.MusicReleaseTracker.Core;
+package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.GUIController;
-import com.blck.MusicReleaseTracker.Simple.TableModel;
+import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.net.URLDecoder;
@@ -44,22 +44,22 @@ public class ApiController {
     public List<TableModel> listOrTabClick(@RequestBody Map<String, String> requestData) {
         String item = requestData.get("item");
         String origin = requestData.get("origin");
-        return sendRequest.listOrTabClick(item, origin);
+        return sendRequest.getTableData(item, origin);
     }
 
     @PostMapping("/clickArtistAdd")
     public void clickArtistAdd(@RequestBody String artistname) {
         artistname = URLDecoder.decode(artistname, StandardCharsets.UTF_8).replace("=" , "").trim();
-        sendRequest.artistAddConfirm(artistname);
+        sendRequest.addNewArtist(artistname);
     }
 
     @RequestMapping ("/clickArtistDelete")
     public void clickArtistDelete() {
-        sendRequest.artistClickDelete();
+        sendRequest.removeArtist();
     }
     @PostMapping("/deleteUrl")
     public void deleteUrl() {
-        sendRequest.deleteUrl();
+        sendRequest.deleteSourceID();
     }
 
     @RequestMapping ("/cleanArtistSource")
@@ -74,7 +74,7 @@ public class ApiController {
     @PostMapping ("/clickAddURL")
     public void clickAddURL(@RequestBody String url) {
         url = URLDecoder.decode(url, StandardCharsets.UTF_8).replace("=" , "").trim();
-        sendRequest.clickAddURL(url);
+        sendRequest.scrapePreview(url);
     }
 
     @RequestMapping ("/clickScrape")

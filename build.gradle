@@ -14,7 +14,7 @@ plugins {
 }
 
 group 'com.blck'
-version '8.1'
+version '8.3'
 
 repositories {
     mavenCentral()
@@ -53,16 +53,18 @@ application {
 
 dependencies {
 
-    implementation 'org.xerial:sqlite-jdbc:3.45.2.0'
+    implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
     implementation 'org.jsoup:jsoup:1.17.2'
     implementation 'com.typesafe:config:1.4.3'
 
     testImplementation(platform('org.junit:junit-bom:5.10.2'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.4'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.4'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.6'
 }
 
 bootJar {
@@ -98,5 +100,6 @@ tasks.jar {
 
 test {
     useJUnitPlatform()
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
 

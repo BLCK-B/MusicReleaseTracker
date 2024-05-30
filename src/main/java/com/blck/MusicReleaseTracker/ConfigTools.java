@@ -84,7 +84,6 @@ public class ConfigTools {
                     store.setThemes(themesMap);
                 }
                 case lastScrape -> store.setScrapeDate(config.getString("lastScrape"));
-                case longTimeout -> store.setLongTimeout(config.getBoolean("longTimeout"));
                 case isoDates -> store.setIsoDates(config.getBoolean("isoDates"));
                 case autoTheme -> store.setAutoTheme(config.getBoolean("autoTheme"));
             }
@@ -113,9 +112,8 @@ public class ConfigTools {
                 VIP=false
             }
             theme=Black
-            accent=Classic
+            accent=Lavender
             lastScrape=-
-            longTimeout=false
             isoDates=false
             autoTheme=true
             """;

@@ -8,13 +8,20 @@ module com.blck.MusicReleaseTracker {
     requires spring.boot.autoconfigure;
     requires spring.boot;
     requires spring.webmvc;
+    requires org.xerial.sqlitejdbc;
 
     opens com.blck.MusicReleaseTracker;
 
     exports com.blck.MusicReleaseTracker;
-    exports com.blck.MusicReleaseTracker.Simple;
-    opens com.blck.MusicReleaseTracker.Simple;
     exports com.blck.MusicReleaseTracker.Core;
     opens com.blck.MusicReleaseTracker.Core;
+    opens com.blck.MusicReleaseTracker.Scraping;
+    exports com.blck.MusicReleaseTracker.Scraping;
+    exports com.blck.MusicReleaseTracker.FrontendAPI;
+    opens com.blck.MusicReleaseTracker.FrontendAPI;
+    exports com.blck.MusicReleaseTracker.DataObjects;
+    opens com.blck.MusicReleaseTracker.DataObjects;
+    exports com.blck.MusicReleaseTracker.DB;
+    opens com.blck.MusicReleaseTracker.DB;
 }
 

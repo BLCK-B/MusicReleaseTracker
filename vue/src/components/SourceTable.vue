@@ -64,12 +64,10 @@ export default {
     },
   },
   methods: {
-    // get current date
     isDateInFuture(dateString) {
       const date = new Date(dateString);
       return date > new Date();
     },
-    // formatting an ISO date
     formatDate(dateString) {
       if (!this.isoDates) {
         const date = new Date(dateString);

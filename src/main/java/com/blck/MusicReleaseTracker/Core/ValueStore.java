@@ -31,10 +31,8 @@ public class ValueStore {
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
-    private boolean longTimeout = false;
     private boolean isoDates = false;
     private boolean autoTheme = false;
-    private int timeout = 25000;
 
     public void setAppDataPath(String appDataPath) {
         this.appDataPath = appDataPath;
@@ -78,12 +76,6 @@ public class ValueStore {
     public String getScrapeDate() {
         return scrapeDate;
     }
-    public void setLongTimeout(boolean longTimeout) {
-       this.longTimeout = longTimeout;
-    }
-    public int getTimeout() {
-        return longTimeout ? timeout + 55000 : timeout;
-    }
     public void setIsoDates(boolean isoDates) {
         this.isoDates = isoDates;
     }
@@ -95,10 +87,6 @@ public class ValueStore {
     }
     public boolean getAutoTheme() {
         return autoTheme;
-    }
-    // for testing
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
     }
 
     @Override

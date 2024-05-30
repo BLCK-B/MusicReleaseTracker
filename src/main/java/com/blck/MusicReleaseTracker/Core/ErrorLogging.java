@@ -41,7 +41,6 @@ public class ErrorLogging {
         FileHandler fileHandler = null;
         try {
             final String errorLogs = store.getErrorLogsPath();
-            // filehandler logging the error
             fileHandler = new FileHandler(errorLogs, true);
             fileHandler.setFormatter(new SimpleFormatter());
             // clear log when it reaches approx 0.1 MB
@@ -50,7 +49,6 @@ public class ErrorLogging {
             if (logFileSize > 100000) {
                 Files.write(path, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
             }
-            // log the error
             logger.addHandler(fileHandler);
             switch (level) {
                 case SEVERE -> logger.log(Level.SEVERE, message, e);
@@ -63,7 +61,7 @@ public class ErrorLogging {
             fileHandler.close();
         }
         if (level == Severity.SEVERE) {
-            throw new RuntimeException(e);
+            System.exit(1);
         }
     }
 }

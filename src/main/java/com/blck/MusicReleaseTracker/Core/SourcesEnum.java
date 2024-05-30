@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker.Core;
 
-/** an important enum used throughout the backend */
+/** a central enum declaring web sources */
 public enum SourcesEnum {
     beatport,
     musicbrainz,

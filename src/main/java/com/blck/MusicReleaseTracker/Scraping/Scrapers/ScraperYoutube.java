@@ -1,25 +1,39 @@
-package com.blck.MusicReleaseTracker.Scrapers;
+package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.SourcesEnum;
-import com.blck.MusicReleaseTracker.Simple.Song;
-import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DB.DBqueries;
+import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
+import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public final class YoutubeScraper extends ScraperParent implements ScraperInterface {
+/*      MusicReleaseTracker
+    Copyright (C) 2023 BLCK
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+
+public final class ScraperYoutube extends Scraper implements ScraperInterface {
 
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
-    public YoutubeScraper(ValueStore store, ErrorLogging log, String songArtist, String id) {
-        super(store, log);
+    public ScraperYoutube(ErrorLogging log, DBqueries DB, String songArtist, String id) {
+        super(log, DB);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -27,7 +41,7 @@ public final class YoutubeScraper extends ScraperParent implements ScraperInterf
         reduceToID();
     }
     @Override
-    public void scrape() throws ScraperTimeoutException {
+    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
             return;
 
@@ -36,13 +50,13 @@ public final class YoutubeScraper extends ScraperParent implements ScraperInterf
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
-                    .timeout(store.getTimeout()).get();
+                    .timeout(timeout).get();
         }
         catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        catch (Exception e) {
+            throw new ScraperGenericException(url);
         }
         Elements songs = doc.select("title");
         Elements dates = doc.select("published");

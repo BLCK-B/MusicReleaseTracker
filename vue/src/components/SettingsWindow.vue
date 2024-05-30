@@ -1,7 +1,7 @@
 <template>
   <div class="settings">
  
-     <button @click="clickClose()" class="imgbutton">
+     <button @click="clickClose()" class="crossImgButton">
        <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="X"/>
        <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
      </button>
@@ -79,10 +79,6 @@
        <p class="title">Other</p>
        <div class="flex-items">
          <div class="flex-padding">
-           <input type="checkbox" v-model="longTimeout" @change="setSetting('longTimeout', $event.target.checked)">
-               <label>Longer timeout for unreliable internet</label>
-         </div>
-         <div class="flex-padding">
            <input type="checkbox" v-model="isoDates" @change="setSetting('isoDates', $event.target.checked)">
                <label>Dates in yyyy-MM-dd (ISO 8601)</label>
          </div>
@@ -138,7 +134,6 @@
          Dark: false,
          Light: false,
        },
-       longTimeout: false,
        isoDates: false,
        autoTheme: false,
      }
@@ -154,7 +149,6 @@
      axios.get('/api/settingsOpened')
        .then(response => {
          this.filters = response.data;
-         this.longTimeout = response.data.longTimeout;
          this.isoDates = response.data.isoDates;
          this.autoTheme = response.data.autoTheme;
        })
@@ -240,7 +234,7 @@
    justify-content: center;
    accent-color: var(--contrast-color);
  }
- @media screen and (min-width: 950px) {
+ @media screen and (min-width: 1050px) {
    .settings {
      display: grid;
      grid-template-columns: repeat(2, 0fr);
@@ -285,17 +279,16 @@
    margin-top: 6px;
  }
  
- .imgbutton {
+ .crossImgButton {
    position: absolute;
-   right: 0;
-   top: 0;
+   right: 55px;
+   top: 6px;
    padding: 0;
-   margin: 10px;
    background-color: transparent;
    border: none;
    transition: 0s;
  }
- .imgbutton:hover {
+ .crossImgButton:hover {
    opacity: 60%;
  }
  .image {

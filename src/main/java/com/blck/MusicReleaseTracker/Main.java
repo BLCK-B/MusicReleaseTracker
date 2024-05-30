@@ -1,6 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -30,13 +31,15 @@ public class Main {
 
     private final ConfigTools config;
     private final ErrorLogging log;
-    private final DBtools DB;
+    private final ManageMigrateDB manageDB;
+    private final StartSetup startSetup;
 
     @Autowired
-    public Main(ConfigTools configTools, ErrorLogging errorLogging, DBtools dBtools) {
+    public Main(ConfigTools configTools, ErrorLogging errorLogging, StartSetup startSetup, ManageMigrateDB manageDB) {
         this.config = configTools;
         this.log = errorLogging;
-        this.DB = dBtools;
+        this.startSetup = startSetup;
+        this.manageDB = manageDB;
     }
 
     @Component
@@ -53,21 +56,9 @@ public class Main {
                 | |  | |  _ < | |
                 |_|  |_|_| \\_\\|_|
             """);
-            try {
-                DB.path();
-            } catch (Exception e) {
-                throw new RuntimeException("error in DB path method", e);
-            }
-            try {
-                DB.createTables();
-            } catch (Exception e) {
-                log.error(e, ErrorLogging.Severity.SEVERE, "error in DBtools createTables method");
-            }
-            try {
-                config.updateSettings();
-            } catch (Exception e) {
-                log.error(e, ErrorLogging.Severity.WARNING, "error handling config file");
-            }
+            startSetup.initializeSystem();
+            manageDB.migrateDB();
+            config.updateSettings();
             // open port in web browser
             try {
                 String os = System.getProperty("os.name").toLowerCase();

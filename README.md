@@ -5,7 +5,7 @@
 <h2 align="center">MusicReleaseTracker</h2>
 
 <p align="center">
-No-nonsense multi-source scraper that helps you find new music and follow latest songs. Available for Windows, Linux, macOS*.
+Multi-source music scraper that helps you follow latest songs. <br> Available for Windows, Linux, macOS*.
 </p>
 
 <p align="center">
@@ -16,14 +16,14 @@ No-nonsense multi-source scraper that helps you find new music and follow latest
 
 ##
 
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/82621c39-73fb-43c0-b5b9-eab7313eb417" width="480px"/>
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/3de8e98a-eee8-4eca-baf3-06fa56a9543e" width="480px"/>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/82621c39-73fb-43c0-b5b9-eab7313eb417" width="480px"/> <br>
+<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/3de8e98a-eee8-4eca-baf3-06fa56a9543e" width="480px"/> <br>
 <img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/b9120ff1-e74a-4eae-b702-699fcf2b769d" width="480px"/>
 
 ##
 
-Look at music releases from individual artists and see all songs ordered by date in "Combined view".
-You will no longer have to search social media or streaming services in fear of missing a new song. MusicReleaseTracker is a free open-source tool for music discovery.
+Latest info about your defined artists is gathered and combined into a simple overview.
+You will no longer have to search social media or streaming services. Never miss a new song again.
 
 Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
 
@@ -54,4 +54,4 @@ License
 
 MusicReleaseTracker is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-key words: JDBC spring vue.js REST java jsoup graalvm gradle
+key words: java sqlite jsoup spring vue.js graalvm

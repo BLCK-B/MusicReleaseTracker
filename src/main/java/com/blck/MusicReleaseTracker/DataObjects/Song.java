@@ -13,31 +13,36 @@ package com.blck.MusicReleaseTracker.DataObjects;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 /** an object representing a song */
 public class Song {
     private String songName;
-    private String songArtist;
+    private final SortedSet<String> songArtists;
     private final String songDate;
     private String songType;
 
-    public Song(String songName, String songArtist, String songDate, String songType) {
+    public Song(String songName, String songArtists, String songDate, String songType) {
         this.songName = songName;
-        this.songArtist = songArtist;
+        this.songArtists = new TreeSet<>();
+        this.songArtists.add(songArtists);
         this.songDate = songDate;
         this.songType = songType;
     }
 
-    public Song(String songName, String songArtist, String songDate) {
+    public Song(String songName, String songArtists, String songDate) {
         this.songName = songName;
-        this.songArtist = songArtist;
+        this.songArtists = new TreeSet<>();
+        this.songArtists.add(songArtists);
         this.songDate = songDate;
     }
 
     public String getName() {
         return songName;
     }
-    public String getArtist() {
-        return songArtist;
+    public String getArtists() {
+        return String.join(", ", songArtists);
     }
     public String getDate() {
         return songDate;
@@ -51,16 +56,15 @@ public class Song {
     }
 
     public void appendArtist(String artist) {
-        if (!this.songArtist.contains(artist))
-            this.songArtist = this.songArtist + ", " + artist;
+        this.songArtists.add(artist);
     }
 
     @Override
     public String toString() {
         if (this.songType != null)
-            return songName + " " + songArtist + " " + songDate + " " + songType;
+            return songName + " " + getArtists() + " " + songDate + " " + songType;
         if (this.songType == null)
-            return songName + " " + songArtist + " " + songDate;
+            return songName + " " + getArtists() + " " + songDate;
 
         return null;
     }

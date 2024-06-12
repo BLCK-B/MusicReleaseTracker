@@ -8,8 +8,6 @@ import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** config class for spring boot to manage lifecycle of the beans, this helps avoid static classes
-    each bean has a single instance, beans defined here can be used by other classes as dependencies */
 @Configuration
 public class BeanConfig {
 

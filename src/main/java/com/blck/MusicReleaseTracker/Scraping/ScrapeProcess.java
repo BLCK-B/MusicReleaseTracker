@@ -6,12 +6,11 @@ import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import java.util.stream.Collectors;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -76,48 +75,42 @@ public class ScrapeProcess {
 
     public ArrayList<Song> processSongs(List<Song> songObjectList) {
         // name-artist duplicates
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Map<String, Song> nameArtistMap = songObjectList.stream()
-                .collect(Collectors.toMap(
-                        song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getArtist().replaceAll("\\s+", "").toLowerCase(),
-                        song -> song, (existingValue, newValue) -> {
-                            try {
-                                Date existingDate = dateFormat.parse(existingValue.getDate());
-                                Date newDate = dateFormat.parse(newValue.getDate());
-                                if (existingDate.compareTo(newDate) < 0)
-                                    return existingValue;
-                                else
-                                    return newValue;
-                            } catch (ParseException e) {
-                                log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
-                                return existingValue;
-                            }
-                        }
+        Map<String, Song> nameArtistMap =
+                songObjectList.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        song -> noSpacesLowerCase(song.getName() + song.getArtists()),
+                        song -> song, this::getOlderDate
                 ));
         // name-date duplicates
-        Map<String, Song> nameDateMap = nameArtistMap.values().stream()
-                .sorted(Comparator.comparing(Song::getArtist).thenComparing(song -> song.getName()
-                        .replaceAll("\\s+", "").toLowerCase() + song.getDate()))
-                .collect(Collectors.toMap(
-                        song -> song.getName().replaceAll("\\s+", "").toLowerCase() + song.getDate(),
-                        song -> song,
-                        (existingValue, newValue) -> {
-                            String newArtist = newValue.getArtist();
-                            if (!existingValue.getArtist().contains(newArtist))
-                                existingValue.appendArtist(newArtist);
+        Map<String, Song> nameDateMap =
+                nameArtistMap.values().stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        song -> noSpacesLowerCase(noSpacesLowerCase(song.getName() + song.getDate())),
+                        song -> song, (existingValue, newValue) -> {
+                            existingValue.appendArtist(newValue.getArtists());
                             return existingValue;
                         }
                 ));
         // sort by newest
-        ArrayList<Song> finalSortedList = nameDateMap.values().stream()
-                .sorted(Comparator.comparing(Song::getDate, Comparator.reverseOrder()))
+        return nameDateMap.values().stream()
+                .sorted(Comparator.comparing(Song::getDate).reversed())
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
 
-        songObjectList = null;
-        nameDateMap = null;
-        nameArtistMap = null;
+    private String noSpacesLowerCase(String s) {
+        return s.replaceAll("\\s+", "").toLowerCase();
+    }
 
-        return finalSortedList;
+    private Song getOlderDate(Song song1, Song song2) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date existingDate = dateFormat.parse(song1.getDate());
+            Date newDate = dateFormat.parse(song2.getDate());
+            return existingDate.before(newDate) ? song1 : song2;
+        } catch (ParseException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
+        }
+        return song1;
     }
 
 }

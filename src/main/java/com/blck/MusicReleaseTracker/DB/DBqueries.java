@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /*      MusicReleaseTracker
     Copyright (C) 2023 BLCK
@@ -274,7 +271,7 @@ public class DBqueries {
                 if (i == limit)
                     break;
                 pstmt.setString(1, songObject.getName());
-                pstmt.setString(2, songObject.getArtist());
+                pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
                 if (types)
                     pstmt.setString(4, songObject.getType());

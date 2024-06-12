@@ -205,9 +205,13 @@ public class DBqueries {
     }
 
     public boolean doesNotContainDisabledWords(String songName, String songType) {
-        return store.getFilterWords().stream()
-                .noneMatch(word -> songType.toLowerCase().contains(word.toLowerCase()) ||
-                        songName.toLowerCase().contains(word.toLowerCase()));
+        if (songType == null)
+            return store.getFilterWords().stream()
+                    .noneMatch(disabledWord -> songName.toLowerCase().contains(disabledWord.toLowerCase()));
+        else
+            return store.getFilterWords().stream()
+                    .noneMatch(disabledWord -> songType.toLowerCase().contains(disabledWord.toLowerCase()) ||
+                            songName.toLowerCase().contains(disabledWord.toLowerCase()));
     }
 
     public LinkedList<Scraper> getAllScrapers() {

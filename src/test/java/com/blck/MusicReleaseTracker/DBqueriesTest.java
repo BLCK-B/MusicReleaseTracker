@@ -13,7 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 /*      MusicReleaseTracker
@@ -55,7 +59,7 @@ public class DBqueriesTest {
     @BeforeEach
     void setUp() {
         helperDB.redoTestData();
-        when(store.getDBpath()).thenReturn(testDBpath);
+        lenient().when(store.getDBpath()).thenReturn(testDBpath);
         dBqueriesClass = new DBqueries(store, log, config, manageMigrateDB);
         songList = new ArrayList<>();
         songList.add(new Song("song1", "artist1", "2022-01-01", "remix"));
@@ -100,20 +104,20 @@ public class DBqueriesTest {
 
     @Test
     void newArtistSourceID() {
-        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
+        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).get());
 
         dBqueriesClass.updateArtistSourceID("artist1", SourcesEnum.beatport, "newID");
 
-        assertEquals("newID", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
+        assertEquals("newID", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).get());
     }
 
     @Test
     void nullArtistSourceID() {
-        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
+        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).get());
 
         dBqueriesClass.updateArtistSourceID("artist1", SourcesEnum.beatport, null);
 
-        assertNull(dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport));
+        assertTrue(dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).isEmpty());
     }
 
     @Test
@@ -126,10 +130,19 @@ public class DBqueriesTest {
     }
 
     @Test
+    void filtersUnwantedNameAndTypeWords() {
+        when(store.getFilterWords()).thenReturn(new ArrayList<String>(Collections.singletonList("remix")));
+
+        assertTrue(dBqueriesClass.doesNotContainDisabledWords("song", "type"));
+        assertFalse(dBqueriesClass.doesNotContainDisabledWords("REMIX", "REMIXED"));
+        assertFalse(dBqueriesClass.doesNotContainDisabledWords("soRemix", "type"));
+        assertFalse(dBqueriesClass.doesNotContainDisabledWords("song", "tyRemiXpe"));
+    }
+
+    @Test
     void getDataFromSourceTablesForCombviewWithFiltering() {
         ArrayList<String> filters = new ArrayList<>();
-        filters.add("remix");
-        filters.add("filterme");
+        Collections.addAll(filters,"remix","filterme");
         when(store.getFilterWords()).thenReturn(filters);
         dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
         songList.clear();

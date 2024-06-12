@@ -128,18 +128,16 @@ public class DBqueries {
         }
     }
 
-    public String getArtistSourceID(String name, SourcesEnum source) {
-        String ID = null;
+    public Optional<String> getArtistSourceID(String name, SourcesEnum source) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT url" + source + " FROM artists WHERE artist = ?");
             pstmt.setString(1, name);
-            ID = pstmt.executeQuery().getString(1);
-            pstmt.close();
+            return Optional.ofNullable(pstmt.executeQuery().getString(1));
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error checking url existence");
         }
-        return ID;
+        return Optional.empty();
     }
 
     public void clearArtistDataFrom(String name, String table) {
@@ -190,7 +188,7 @@ public class DBqueries {
                     if (source == SourcesEnum.beatport)
                         songType = rs.getString("type");
 
-                    if (filterWords(songName, songType)) {
+                    if (doesNotContainDisabledWords(songName, songType)) {
                         switch (source) {
                             case beatport ->
                                     songObjectList.add(new Song(songName, songArtist, songDate, songType));
@@ -206,16 +204,10 @@ public class DBqueries {
         return songObjectList;
     }
 
-    private boolean filterWords(String songName, String songType) {
-        for (String checkword : store.getFilterWords()) {
-            if (songType != null) {
-                if ((songType.toLowerCase()).contains(checkword.toLowerCase()))
-                    return false;
-            }
-            if ((songName.toLowerCase()).contains(checkword.toLowerCase()))
-                return false;
-        }
-        return true;
+    public boolean doesNotContainDisabledWords(String songName, String songType) {
+        return store.getFilterWords().stream()
+                .noneMatch(word -> songType.toLowerCase().contains(word.toLowerCase()) ||
+                        songName.toLowerCase().contains(word.toLowerCase()));
     }
 
     public LinkedList<Scraper> getAllScrapers() {

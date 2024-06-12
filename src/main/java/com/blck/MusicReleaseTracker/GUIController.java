@@ -139,7 +139,7 @@ public class GUIController {
         } catch (IllegalArgumentException e) {
             return false;
         }
-        return DB.getArtistSourceID(selectedArtist, selectedSource) != null;
+        return DB.getArtistSourceID(selectedArtist, selectedSource).isPresent();
     }
 
     public void clickScrape() {

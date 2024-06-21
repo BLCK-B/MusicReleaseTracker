@@ -69,20 +69,15 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
         songsArray = Arrays.copyOfRange(songsArray, 1, songsArray.length);
         datesArray = Arrays.copyOfRange(datesArray, 1, datesArray.length);
 
-        ArrayList<String> songsArrayList = new ArrayList<>(List.of(songsArray));
-        ArrayList<String> datesArrayList = new ArrayList<>(List.of(datesArray));
-
         super.source = SourcesEnum.youtube;
         super.insertSet(
                 processInfo(
-                        artistToSongList(songsArrayList, songArtist, datesArrayList, null)));
+                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://www.youtube.com/channel/UCWaKvFOf-a7vENyuEsZkNqg

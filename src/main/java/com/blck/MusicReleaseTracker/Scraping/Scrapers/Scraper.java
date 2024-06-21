@@ -46,7 +46,7 @@ public class Scraper {
         return "The method getID() is to be overriden.";
     }
 
-    public List<Song> artistToSongList(ArrayList<String> names, String artist, ArrayList<String> dates, ArrayList<String> types) {
+    public List<Song> artistToSongList(List<String> names, String artist, List<String> dates, List<String> types) {
         return IntStream.range(0, Math.min(names.size(), dates.size()))
                 .filter(i -> names.get(i) != null && artist != null && dates.get(i) != null)
                 .mapToObj(i -> new Song(

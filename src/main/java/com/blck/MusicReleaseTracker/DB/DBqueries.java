@@ -186,7 +186,7 @@ public class DBqueries {
                     String songDate = rs.getString("date");
                     String songType = null;
                     try {
-                        rs.getString("type");
+                        songType = rs.getString("type");
                     } catch (Exception ignored){} // check column count?
                     if (doesNotContainDisabledWords(songName, songType))
                         songObjectList.add(new Song(songName, songArtist, songDate, songType));

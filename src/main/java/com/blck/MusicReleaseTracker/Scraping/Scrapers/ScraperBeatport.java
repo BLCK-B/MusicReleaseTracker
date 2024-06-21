@@ -90,8 +90,6 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://beatport.com/artist/koven/245904/charts

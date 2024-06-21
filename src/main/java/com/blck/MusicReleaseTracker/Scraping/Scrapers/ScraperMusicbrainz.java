@@ -62,20 +62,15 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
         String[] datesArray = doc.select("first-release-date").eachText().toArray(new String[0]);
 
-        ArrayList<String> songsArrayList = new ArrayList<>(List.of(songsArray));
-        ArrayList<String> datesArrayList = new ArrayList<>(List.of(datesArray));
-
         super.source = SourcesEnum.musicbrainz;
         super.insertSet(
                 processInfo(
-                        artistToSongList(songsArrayList, songArtist, datesArrayList, null)));
+                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings

@@ -43,9 +43,11 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
             this.abbr = abbr;
         }
     }
+
     private final String songArtist;
     private String id;
     private final boolean isIDnull;
+
     public ScraperJunodownload(ErrorLogging log, DBqueries DB, String songArtist, String id) {
         super(log, DB);
         this.songArtist = songArtist;
@@ -54,6 +56,7 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
         isIDnull = (id == null);
         reduceToID();
     }
+
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
@@ -77,7 +80,7 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
 
         String[] datesArray = new String[dates.size()];
         // processing dates into correct format
-        /* example:
+        /*
             <div class="text-sm mb-3 mb-lg-3">
              LIQ 202
              <br>
@@ -86,44 +89,34 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
              Drum &amp; Bass / Jungle
             </div>
         */
+        Pattern pattern = Pattern.compile("\\b (\\d{1,2} [A-Za-z]{3} \\d{2}) \\b");
         for (int i = 0; i < dates.size(); i++) {
             try {
+                // <div class="text-sm mb-3 mb-lg-3"> LIQ 202 28 Jun 23 Drum &amp; Bass / Jungle </div>
                 String cleanWhitespace = valueOf(dates.get(i))
                         .replaceAll("<br>", " ")
                         .replaceAll("\\s+", " ")
                         .trim();
-                // cleanWhitespace: <div class="text-sm mb-3 mb-lg-3"> LIQ 202 28 Jun 23 Drum &amp; Bass / Jungle </div>
-
-                Pattern pattern = Pattern.compile("\\b (\\d{1,2} [A-Za-z]{3} \\d{2}) \\b");
                 Matcher matcher = pattern.matcher(cleanWhitespace);
-                String extractedDate = null;
-                if (matcher.find())
-                    extractedDate = matcher.group(1);
-                // extractedDate: 28 Jun 23
-                String[] parts = extractedDate.split(" ");
-                String monthNumber = MonthNumbers.valueOf(parts[1].toUpperCase()).abbr;
-                // only assuming songs from 21st century
-                datesArray[i] = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
-                // datesArray[i]: 2023-06-28
+                String[] extractedParts = matcher.find() ? matcher.group(1).split(" ") : null;
+                // 28 Jun 23
+                String monthNumber = MonthNumbers.valueOf(extractedParts[1].toUpperCase()).abbr;
+                datesArray[i] = "20" + extractedParts[2] + "-" + monthNumber + "-" + extractedParts[0];
+                // 2023-06-28
             } catch (Exception e) {
                 log.error(e, ErrorLogging.Severity.WARNING, "error processing junodownload date");
             }
         }
 
-        ArrayList<String> songsArrayList = new ArrayList<>(List.of(songsArray));
-        ArrayList<String> datesArrayList = new ArrayList<>(List.of(datesArray));
-
         super.source = SourcesEnum.junodownload;
         super.insertSet(
                 processInfo(
-                        artistToSongList(songsArrayList, songArtist, datesArrayList, null)));
+                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://www.junodownload.com/artists/Koven/releases/

@@ -5,13 +5,15 @@ import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,12 +72,10 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
         catch (Exception e) {
             throw new ScraperGenericException(url);
         }
-        Elements songs = doc.select("a.juno-title");
+        String[] songsArray = doc.select("a.juno-title").eachText().toArray(new String[0]);
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
-        String[] songsArray = songs.eachText().toArray(new String[0]);
 
         String[] datesArray = new String[dates.size()];
-        doc = null;
         // processing dates into correct format
         /* example:
             <div class="text-sm mb-3 mb-lg-3">
@@ -110,22 +110,13 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
             }
         }
 
-        // create arraylist of song objects
-        ArrayList<Song> songList = new ArrayList<>();
-        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
-            if (songsArray[i] != null && datesArray[i] != null)
-                songList.add(new Song(songsArray[i], songArtist, datesArray[i]));
-        }
+        ArrayList<String> songsArrayList = new ArrayList<>(List.of(songsArray));
+        ArrayList<String> datesArrayList = new ArrayList<>(List.of(datesArray));
 
-        songs = null;
-        dates = null;
-        songsArray = null;
-        datesArray = null;
-
-        super.songList = songList;
         super.source = SourcesEnum.junodownload;
-        super.processInfo();
-        super.insertSet();
+        super.insertSet(
+                processInfo(
+                        artistToSongList(songsArrayList, songArtist, datesArrayList, null)));
     }
 
     private void reduceToID() {

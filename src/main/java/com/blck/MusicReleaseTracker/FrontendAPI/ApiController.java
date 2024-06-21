@@ -42,9 +42,7 @@ public class ApiController {
 
     @PostMapping ("/listOrTabClick")
     public List<TableModel> listOrTabClick(@RequestBody Map<String, String> requestData) {
-        String item = requestData.get("item");
-        String origin = requestData.get("origin");
-        return sendRequest.getTableData(item, origin);
+        return sendRequest.getTableData(requestData.get("item"), requestData.get("origin"));
     }
 
     @PostMapping("/clickArtistAdd")
@@ -84,9 +82,7 @@ public class ApiController {
 
     @PostMapping("/setSetting")
     public void setSetting(@RequestBody Map<String, String> params) {
-        String name = params.get("name");
-        String value = params.get("value");
-        sendRequest.setSetting(name, value);
+        sendRequest.setSetting(params.get("name"), params.get("value"));
     }
 
     @GetMapping("/getThemeConfig")

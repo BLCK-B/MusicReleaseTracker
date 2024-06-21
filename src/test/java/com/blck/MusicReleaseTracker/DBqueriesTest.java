@@ -141,13 +141,12 @@ public class DBqueriesTest {
 
     @Test
     void getDataFromSourceTablesForCombviewWithFiltering() {
-        ArrayList<String> filters = new ArrayList<>();
-        Collections.addAll(filters,"remix","filterme");
+        ArrayList<String> filters = new ArrayList<>(Arrays.asList("remix", "filterme"));
         when(store.getFilterWords()).thenReturn(filters);
         dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
         songList.clear();
-        songList.add(new Song("song1filterme", "artist1", "2022-01-01"));
-        songList.add(new Song("FILTERMEsong2", "artist2", "2022-01-01"));
+        songList.add(new Song("song1filterme", "artist1", "2022-01-01", null));
+        songList.add(new Song("FILTERMEsong2", "artist2", "2022-01-01", null));
         dBqueriesClass.batchInsertSongs(songList, SourcesEnum.youtube, 10);
 
         assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
@@ -169,8 +168,8 @@ public class DBqueriesTest {
     @Test
     void truncateAllTables() {
         songList = new ArrayList<>();
-        songList.add(new Song("song1", "artist1", "2022-01-01"));
-        songList.add(new Song("song2", "artist1", "2022-01-01"));
+        songList.add(new Song("song1", "artist1", "2022-01-01", null));
+        songList.add(new Song("song2", "artist1", "2022-01-01", null));
         dBqueriesClass.batchInsertSongs(songList, SourcesEnum.musicbrainz, 10);
         dBqueriesClass.batchInsertSongs(songList, SourcesEnum.junodownload, 10);
         dBqueriesClass.batchInsertSongs(songList, null, 10);

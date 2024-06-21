@@ -185,17 +185,11 @@ public class DBqueries {
                     String songArtist = rs.getString("artist");
                     String songDate = rs.getString("date");
                     String songType = null;
-                    if (source == SourcesEnum.beatport)
-                        songType = rs.getString("type");
-
-                    if (doesNotContainDisabledWords(songName, songType)) {
-                        switch (source) {
-                            case beatport ->
-                                    songObjectList.add(new Song(songName, songArtist, songDate, songType));
-                            case musicbrainz, junodownload, youtube ->
-                                    songObjectList.add(new Song(songName, songArtist, songDate));
-                        }
-                    }
+                    try {
+                        rs.getString("type");
+                    } catch (Exception ignored){} // check column count?
+                    if (doesNotContainDisabledWords(songName, songType))
+                        songObjectList.add(new Song(songName, songArtist, songDate, songType));
                 }
             }
         } catch (Exception e) {
@@ -248,7 +242,7 @@ public class DBqueries {
         return scrapers;
     }
 
-    public void batchInsertSongs(ArrayList<Song> songList, SourcesEnum source, int limit) {
+    public void batchInsertSongs(List<Song> songList, SourcesEnum source, int limit) {
         try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
             String sql;
             boolean types = false;

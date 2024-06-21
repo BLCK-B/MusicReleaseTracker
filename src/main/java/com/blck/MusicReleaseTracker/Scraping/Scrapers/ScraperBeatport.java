@@ -81,24 +81,10 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
             datesArrayList.add(matcher.group(3));
         }
 
-        // create arraylist of song objects
-        ArrayList<Song> songList = new ArrayList<>();
-        for (int i = 0; i < Math.min(songsArrayList.size(), datesArrayList.size()); i++) {
-            if (songsArrayList.get(i) != null && datesArrayList.get(i) != null && typesArrayList.get(i) != null)
-                songList.add(new Song(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
-        }
-
-        doc = null;
-        script = null;
-        JSON = null;
-        songsArrayList = null;
-        typesArrayList = null;
-        datesArrayList = null;
-
-        super.songList = songList;
         super.source = SourcesEnum.beatport;
-        super.processInfo();
-        super.insertSet();
+        super.insertSet(
+                processInfo(
+                        artistToSongList(songsArrayList, songArtist, datesArrayList, typesArrayList)));
     }
 
     private void reduceToID() {

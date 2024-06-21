@@ -10,10 +10,9 @@ import com.blck.MusicReleaseTracker.DataObjects.Song;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /*      MusicReleaseTracker
     Copyright (C) 2023 BLCK
@@ -32,7 +31,6 @@ public class Scraper {
 
     protected final ErrorLogging log;
     private final DBqueries DB;
-    public ArrayList<Song> songList = new ArrayList<>();
     public SourcesEnum source;
 
     public Scraper(ErrorLogging errorLogging, DBqueries DB) {
@@ -48,58 +46,48 @@ public class Scraper {
         return "The method getID() is to be overriden.";
     }
 
-    public void processInfo() {
+    public List<Song> artistToSongList(ArrayList<String> names, String artist, ArrayList<String> dates, ArrayList<String> types) {
+        return IntStream.range(0, Math.min(names.size(), dates.size()))
+                .filter(i -> names.get(i) != null && artist != null && dates.get(i) != null)
+                .mapToObj(i -> new Song(
+                        names.get(i),
+                        artist,
+                        dates.get(i),
+                        types == null ? null : types.get(i)))
+                .collect(Collectors.toList());
+    }
+
+    public List<Song> processInfo(List<Song> songList) {
         if (songList.isEmpty()) {
             log.error(new Exception(), ErrorLogging.Severity.WARNING, "song list produced by scraper is empty");
-            return;
+            return null;
         }
-        unifyApostrophes();
-        enforceDateFormat();
-        sortAndRemoveNameDuplicates();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return songList.stream()
+                .filter(song -> isValidDate(song.getDate(), formatter))
+                .map(song -> new Song(unifyAphostrophes(song.getName()), song.getArtists(), song.getDate(), song.getType()))
+                .sorted((song1, song2) -> song1.compareDates(song2, formatter))
+                .distinct() // remove all name duplicates but the oldest by date
+                .toList().reversed(); // newest by date
     }
 
-    public void unifyApostrophes() {
-        for (Song song : songList) {
-            String songName = song.getName().replace("’", "'").replace("`", "'").replace("´", "'");
-            song.setName(songName);
+    public String unifyAphostrophes(String input) {
+        return input.replace("’", "'")
+                .replace("`", "'")
+                .replace("´", "'");
+    }
+
+    public boolean isValidDate(String date, DateTimeFormatter formatter) {
+        try {
+            LocalDate.parse(date, formatter);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
         }
     }
 
-    public void enforceDateFormat() {
-        songList.removeIf(obj -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            try {
-                LocalDate.parse(obj.getDate(), formatter);
-                return false;
-            } catch (DateTimeParseException e) {
-                return true;
-            }
-        });
-    }
-
-    public void sortAndRemoveNameDuplicates() {
-        // oldest to newest
-        songList.sort((obj1, obj2) -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
-            LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
-            return date1.compareTo(date2);
-        });
-        Set<String> recordedNames = new HashSet<>();
-        songList.removeIf(obj -> {
-            String name = obj.getName().toLowerCase();
-            if (recordedNames.contains(name))
-                return true;
-            else {
-                recordedNames.add(name);
-                return false;
-            }
-        });
-        // newest to oldest
-        Collections.reverse(songList);
-    }
-
-    public void insertSet() {
+    public void insertSet(List<Song> songList) {
         DB.batchInsertSongs(songList, source, 15);
     }
 }

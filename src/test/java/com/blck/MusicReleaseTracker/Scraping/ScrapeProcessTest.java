@@ -91,21 +91,21 @@ public class ScrapeProcessTest {
     @Test
     void takeOlderSongArtistDuplicate() {
         ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song", "artist", "2022-02-02"));
-        songList.add(new Song("song", "artist", "2023-01-01"));
-        songList.add(new Song("song", "artist", "2022-01-01"));
+        songList.add(new Song("song", "artist", "2022-02-02", null));
+        songList.add(new Song("song", "artist", "2023-01-01", null));
+        songList.add(new Song("song", "artist", "2022-01-01", null));
 
         List<Song> output = scrapeProcess.processSongs(songList);
 
-        Song expected = new Song("song", "artist", "2022-01-01");
+        Song expected = new Song("song", "artist", "2022-01-01", null);
         assertEquals(expected.toString(), output.getFirst().toString());
     }
 
     @Test
     void wrongDateFormatException() {
         ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song", "artist", "2022"));
-        songList.add(new Song("song", "artist", "2022-01-01"));
+        songList.add(new Song("song", "artist", "2022", null));
+        songList.add(new Song("song", "artist", "2022-01-01", null));
 
         List<Song> output = scrapeProcess.processSongs(songList);
 
@@ -115,27 +115,27 @@ public class ScrapeProcessTest {
     @Test
     void appendArtistsSortedAlphabeticallyWhenSameSongAndDate() {
         ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song", "zilch", "2022-01-01"));
-        songList.add(new Song("song", "bob", "2022-01-01"));
-        songList.add(new Song("song", "joe", "2022-01-01"));
-        songList.add(new Song("song", "joe", "2022-01-01"));
+        songList.add(new Song("song", "zilch", "2022-01-01", null));
+        songList.add(new Song("song", "bob", "2022-01-01", null));
+        songList.add(new Song("song", "joe", "2022-01-01", null));
+        songList.add(new Song("song", "joe", "2022-01-01", null));
 
         List<Song> output = scrapeProcess.processSongs(songList);
 
-        Song expected = new Song("song", "bob, joe, zilch", "2022-01-01");
+        Song expected = new Song("song", "bob, joe, zilch", "2022-01-01", null);
         assertEquals(expected.toString(), output.getFirst().toString());
     }
 
     @Test
     void sortByNewest() {
         ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song3", "artist", "2020-01-01"));
-        songList.add(new Song("song1", "artist", "2023-01-05"));
-        songList.add(new Song("song2", "artist", "2023-01-01"));
+        songList.add(new Song("song3", "artist", "2020-01-01", null));
+        songList.add(new Song("song1", "artist", "2023-01-05", null));
+        songList.add(new Song("song2", "artist", "2023-01-01", null));
         ArrayList<Song> expected = new ArrayList<>();
-        expected.add(new Song("song1", "artist", "2023-01-05"));
-        expected.add(new Song("song2", "artist", "2023-01-01"));
-        expected.add(new Song("song3", "artist", "2020-01-01"));
+        expected.add(new Song("song1", "artist", "2023-01-05", null));
+        expected.add(new Song("song2", "artist", "2023-01-01", null));
+        expected.add(new Song("song3", "artist", "2020-01-01", null));
 
         List<Song> output = scrapeProcess.processSongs(songList);
 

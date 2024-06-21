@@ -5,13 +5,14 @@ import com.blck.MusicReleaseTracker.Core.SourcesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.List;
 
 /*      MusicReleaseTracker
     Copyright (C) 2023 BLCK
@@ -58,27 +59,16 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         catch (Exception e) {
             throw new ScraperGenericException(url);
         }
-        Elements songs = doc.select("title");
-        Elements dates = doc.select("first-release-date");
-        String[] songsArray = songs.eachText().toArray(new String[0]);
-        String[] datesArray = dates.eachText().toArray(new String[0]);
+        String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
+        String[] datesArray = doc.select("first-release-date").eachText().toArray(new String[0]);
 
-        // create arraylist of song objects
-        ArrayList<Song> songList = new ArrayList<Song>();
-        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
-            if (songsArray[i] != null && datesArray[i] != null)
-                songList.add(new Song(songsArray[i], songArtist, datesArray[i]));
-        }
-        doc = null;
-        songs = null;
-        dates = null;
-        datesArray = null;
-        songsArray = null;
+        ArrayList<String> songsArrayList = new ArrayList<>(List.of(songsArray));
+        ArrayList<String> datesArrayList = new ArrayList<>(List.of(datesArray));
 
-        super.songList = songList;
         super.source = SourcesEnum.musicbrainz;
-        super.processInfo();
-        super.insertSet();
+        super.insertSet(
+                processInfo(
+                        artistToSongList(songsArrayList, songArtist, datesArrayList, null)));
     }
 
     private void reduceToID() {

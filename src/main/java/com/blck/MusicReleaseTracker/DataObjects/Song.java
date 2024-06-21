@@ -13,15 +13,17 @@ package com.blck.MusicReleaseTracker.DataObjects;
         You should have received a copy of the GNU General Public License
         along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 /** an object representing a song */
-public class Song {
-    private String songName;
+public class Song implements Comparable<Song> {
+    private final String songName;
     private final SortedSet<String> songArtists;
     private final String songDate;
-    private String songType;
+    private final String songType;
 
     public Song(String songName, String songArtists, String songDate, String songType) {
         this.songName = songName;
@@ -29,13 +31,6 @@ public class Song {
         this.songArtists.add(songArtists);
         this.songDate = songDate;
         this.songType = songType;
-    }
-
-    public Song(String songName, String songArtists, String songDate) {
-        this.songName = songName;
-        this.songArtists = new TreeSet<>();
-        this.songArtists.add(songArtists);
-        this.songDate = songDate;
     }
 
     public String getName() {
@@ -49,10 +44,6 @@ public class Song {
     }
     public String getType() {
         return songType;
-    }
-
-    public void setName(String songName) {
-        this.songName = songName;
     }
 
     public void appendArtist(String artist) {
@@ -69,4 +60,29 @@ public class Song {
         return null;
     }
 
+    public int compareDates(Song s, DateTimeFormatter formatter) {
+        return LocalDate.parse(getDate(), formatter)
+                .compareTo(LocalDate.parse(s.getDate(), formatter));
+    }
+
+    @Override
+    public int compareTo(Song s) {
+        return getName().toLowerCase().compareTo(s.getName().toLowerCase());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Song s))
+            return false;
+        return getName().equalsIgnoreCase(s.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return getName().toLowerCase().hashCode();
+    }
 }

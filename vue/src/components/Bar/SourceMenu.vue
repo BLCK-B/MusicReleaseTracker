@@ -10,12 +10,12 @@
     </div>
     
     <button @click="openSettings()" class="settingsButton" :disabled="!allowButtons">
-      <img v-if="primaryColor === 'Black'" class="image" src="./icons/optionsblack.png" alt="Settings"/>
-      <img v-else-if="primaryColor === 'Dark'" class="image" src="./icons/optionsdark.png" alt="Settings"/>
-      <img v-else-if="primaryColor === 'Light'" class="image" src="./icons/optionslight.png" alt="Settings"/>
+      <img v-if="primaryColor === 'Black'" class="image" src="../icons/optionsblack.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Dark'" class="image" src="../icons/optionsdark.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Light'" class="image" src="../icons/optionslight.png" alt="Settings"/>
     </button>
     <button @click="clickScrape()" @mouseover="scrapeHover()" @mouseleave="scrapeMouseOff()" class="scrapeButton" :class="{ 'scrapeActive': isActive }">
-      <img class="image" src="./icons/refreshuniversal.png" alt="Refresh"/>
+      <img class="image" src="../icons/refreshuniversal.png" alt="Refresh"/>
     </button>
 
     <transition name="fade">
@@ -140,6 +140,7 @@ export default {
     },
     // open settings
     openSettings() {
+      this.$router.push('/settings');
       this.$store.commit('SET_SETTINGS_OPEN', true);
     },
   },

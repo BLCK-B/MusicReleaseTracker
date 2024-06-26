@@ -8,12 +8,12 @@
         <div class="diag-actions">
             <input v-model="input" :class="{ 'invalid': !isValid }"/>
             <button @click="clickClose" class="imgbutton">
-                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="X"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
+                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X"/>
             </button>
             <button @click="clickAdd" class="imgbutton" :disabled="!isValid">
-                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
             </button>
         </div>
 

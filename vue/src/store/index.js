@@ -18,7 +18,6 @@ const state = {
 };
 
 const mutations = {
-  // synchronous updates of states
   SET_SOURCE_TAB(state, sourceTab) {
     state.sourceTab = sourceTab;
   },
@@ -64,11 +63,9 @@ const mutations = {
 };
 
 const actions = {
-  // actions to perform async operations
 };
 
 const getters = {
-  // getters to retrieve computed state values
 };
 
 export default createStore({

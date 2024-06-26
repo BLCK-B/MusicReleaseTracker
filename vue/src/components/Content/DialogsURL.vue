@@ -9,8 +9,8 @@
             <p>https://musicbrainz.org/artist/<span class="variabletext">id/...</span></p>
             <input v-model="input"/>
             <button @click="clickURL" class="imgbutton">
-                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
             </button>
         </div>
 
@@ -22,8 +22,8 @@
             <p>https://beatport.com/artist/<span class="variabletext">artistname/id/...</span></p>
             <input v-model="input"/>
             <button @click="clickURL" class="imgbutton">
-                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
             </button>
         </div>
 
@@ -35,8 +35,8 @@
             <p>https://junodownload.com/artists/<span class="variabletext">artistname/...</span></p>
             <input v-model="input"/>
             <button @click="clickURL" class="imgbutton">
-                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
             </button>
         </div>
 
@@ -54,8 +54,8 @@
             <p>https://youtube.com/channel/<span class="variabletext">UCwZEU0wAwIyZb...</span></p>
             <input v-model="input"/>
             <button @click="clickURL" class="imgbutton">
-                <img v-if="primaryColor !== 'Light'" class="image" src="./icons/confirmdark.png" alt="OK"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="./icons/confirmlight.png" alt="OK"/>
+                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
+                <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
             </button>
         </div>
 

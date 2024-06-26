@@ -2,8 +2,8 @@
   <div class="settings">
  
      <button @click="clickClose()" class="crossImgButton">
-       <img v-if="primaryColor !== 'Light'" class="image" src="./icons/crossdark.png" alt="X"/>
-       <img v-if="primaryColor === 'Light'" class="image" src="./icons/crosslight.png" alt="X"/>
+       <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X"/>
+       <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X"/>
      </button>
  
      <section class="filterscont">
@@ -100,10 +100,10 @@
  
      <section class="self">
        <a href="https://blck-b.github.io" target="_blank">
-         <img class="blckimg" src="./icons/blcktext.png" alt="logo"/>
+         <img class="blckimg" src="../icons/blcktext.png" alt="logo"/>
        </a>
        <a href="https://github.com/BLCK-B/MusicReleaseTracker" target="_blank">
-         <img class="mrtimg" src="./icons/MRTlogo.png" alt="logo"/>
+         <img class="mrtimg" src="../icons/MRTlogo.png" alt="logo"/>
        </a>
      </section>
  
@@ -162,6 +162,7 @@
      // close settings, trigger rebuild combview in app
      clickClose() {
        this.$store.commit('SET_SETTINGS_OPEN', false);
+       this.$router.push('/');
      },
      // write single setting in config
      setSetting(name, value) {

@@ -4,58 +4,52 @@
        <div class="appearancecont">
  
          <div class="theme-buttons">
-           <input type="radio" v-model="theme" value="Black" @change="setSetting('theme', 'Black')" :disabled="autoTheme">
+           <input type="radio" v-model="primaryColor" value="Black" @change="setSetting('theme', 'Black')" :disabled="autoTheme">
            <label :class="{ 'disabled': autoTheme }">Black</label>
-           <input type="radio" v-model="theme" value="Dark" @change="setSetting('theme', 'Dark')" :disabled="autoTheme">
+           <input type="radio" v-model="primaryColor" value="Dark" @change="setSetting('theme', 'Dark')" :disabled="autoTheme">
            <label :class="{ 'disabled': autoTheme }">Dark</label>
-           <input type="radio" v-model="theme" value="Light" @change="setSetting('theme', 'Light')" :disabled="autoTheme">
+           <input type="radio" v-model="primaryColor" value="Light" @change="setSetting('theme', 'Light')" :disabled="autoTheme">
            <label :class="{ 'disabled': autoTheme }">Light</label>
            
            <div class="colorindicator"></div>
          </div>
  
          <div class="accent-buttons">
-           <input type="radio" v-model="accent" value="Lavender" @change="setSetting('accent', 'Lavender')">
+           <input type="radio" v-model="accentColor" value="Lavender" @change="setSetting('accent', 'Lavender')">
            <label>Lavender</label>
-           <input type="radio" v-model="accent" value="Cactus" @change="setSetting('accent', 'Cactus')">
+           <input type="radio" v-model="accentColor" value="Cactus" @change="setSetting('accent', 'Cactus')">
            <label>Cactus</label>
-           <input type="radio" v-model="accent" value="Rose" @change="setSetting('accent', 'Rose')">
+           <input type="radio" v-model="accentColor" value="Rose" @change="setSetting('accent', 'Rose')">
            <label>Rose</label>
-           <input type="radio" v-model="accent" value="Warm" @change="setSetting('accent', 'Warm')">
+           <input type="radio" v-model="accentColor" value="Warm" @change="setSetting('accent', 'Warm')">
            <label>Warm</label>
-           <input type="radio" v-model="accent" value="Cloud" @change="setSetting('accent', 'Cloud')">
+           <input type="radio" v-model="accentColor" value="Cloud" @change="setSetting('accent', 'Cloud')">
            <label>Cloud</label>
-           <input type="radio" v-model="accent" value="Ocean" @change="setSetting('accent', 'Ocean')">
+           <input type="radio" v-model="accentColor" value="Ocean" @change="setSetting('accent', 'Ocean')">
            <label>Ocean</label>
          </div>
        </div>
  
        <div class="belowAppearance">
-         <input type="checkbox" v-model="autoTheme" @change="setSetting('autoTheme', $event.target.checked)">
+         <input type="checkbox" :checked="autoTheme" @change="setSetting('autoTheme', $event.target.checked)">
              <label>Match system theme</label>
        </div>
 
 </template>
 
-
-
 <script>
- import axios from 'axios';
- import { mapState, mapMutations } from 'vuex';
+ import { mapState } from 'vuex';
  
  export default {
-   data() {
-     return {
-       theme: "",
-       accent: "",
-       theme: {
-         Black: false,
-         Dark: false,
-         Light: false,
-       },
-       autoTheme: false,
-     }
-   },
+  computed: {
+     ...mapState([
+         'primaryColor',
+         'accentColor',
+     ]),
+  },
+  props: {
+    autoTheme: Boolean,
+  },
  };
  </script>
 

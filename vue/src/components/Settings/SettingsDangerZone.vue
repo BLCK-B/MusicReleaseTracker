@@ -18,12 +18,49 @@
  import { mapState, mapMutations } from 'vuex';
  
  export default {
-   data() {
-     return {
-       settingsProtection: true,
-       dbProtection: true,
-     }
-   },
+  data() {
+    return {
+      settingsProtection: true,
+      dbProtection: true,
+    }
+  },
+  methods: {
+    // default the settings
+    resetSettings() {
+      console.log("refistedterd");
+      if (this.settingsProtection == true) {
+        this.settingsProtection = false;
+      }
+      else {
+        axios.post('/api/resetSettings')
+        .then(() => {
+          this.clickClose();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+      }
+    },
+    // default database
+    resetDB() {
+      if (this.dbProtection == true) {
+        this.dbProtection = false;
+      }
+      else {
+        axios.post('/api/resetDB')
+        .then(() => {
+          this.clickClose();
+        })
+        .catch(error => {
+            console.error(error);
+        });
+      }
+    },
+    resetProtection() {
+      this.settingsProtection = true;
+      this.dbProtection = true;
+    }
+  },
  };
  </script>
 

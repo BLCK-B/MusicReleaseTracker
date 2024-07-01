@@ -2,16 +2,16 @@
   <div class="settings">
  
      <button @click="clickClose()" class="crossImgButton">
-       <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X"/>
-       <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X"/>
+       <img v-if="primaryColor !== 'Light'" class="image" src="../components/icons/crossdark.png" alt="X"/>
+       <img v-if="primaryColor === 'Light'" class="image" src="../components/icons/crosslight.png" alt="X"/>
      </button>
  
-     <section class="filterscont" :filters="filters">
-        <SettingsFilters/>
+     <section class="filterscont">
+        <SettingsFilters :filters="filters" @set-setting="setSetting"/>
      </section>
  
      <section class="appearance">
-        <SettingsAppearance/>
+        <SettingsAppearance :autoTheme="autoTheme"/>
      </section>
  
      <section class="other">
@@ -31,7 +31,7 @@
    
  <script>
  import axios from 'axios';
- import { mapState, mapMutations } from 'vuex';
+ import { mapState } from 'vuex';
  import SettingsOther from '../components/Settings/SettingsOther.vue';
  import SettingsDangerZone from '../components/Settings/SettingsDangerZone.vue';
  import SettingsFilters from '../components/Settings/SettingsFilters.vue';
@@ -62,25 +62,22 @@
          Acoustic: false,
          Extended: false,
          Remaster: false,
-       },
+      },
+      autoTheme: false,
     };
   },
   // on open, load setting states from HOCON
   created() {
-     axios.get('/api/settingsOpened')
-       .then(response => {
-         this.filters = response.data;
-         this.isoDates = response.data.isoDates;
-         this.autoTheme = response.data.autoTheme;
-       })
-       .catch((error) => {
-         console.error(error);
-       });
-       this.theme = this.primaryColor;
-       this.accent = this.accentColor;
+    axios.get('/api/settingsOpened')
+      .then(response => {
+        this.filters = response.data;
+        this.isoDates = response.data.isoDates;
+        this.autoTheme = response.data.autoTheme;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   },
-
-
   methods: {
     // close settings, trigger rebuild combview in app
     clickClose() {
@@ -90,106 +87,87 @@
     // write single setting in config
     setSetting(name, value) {
       switch(name) {
-        case ("theme"): this.$store.commit('SET_PRIMARY_COLOR', this.theme);
-        case ("accent"): this.$store.commit('SET_ACCENT_COLOR', this.accent);
-        case ("isoDates"): this.$store.commit("SET_ISODATES", this.isoDates);
+        case ("theme"):
+          this.$store.commit('SET_PRIMARY_COLOR', this.theme);
+          break;
+        case ("accent"):
+          this.$store.commit('SET_ACCENT_COLOR', this.accent);
+          break;
+        case ("isoDates"):
+          this.$store.commit("SET_ISODATES", this.isoDates);
+          break;
       }
       axios.post(`/api/setSetting`, { name: name, value: value })
       .catch(error => {
         console.error(error);
       });
     },
-    // default the settings
-    resetSettings() {
-      if (this.settingsProtection == true) {
-        this.settingsProtection = false;
-      }
-      else {
-        axios.post('/api/resetSettings')
-        .then(() => {
-          this.clickClose();
-        })
-        .catch(error => {
-            console.error(error);
-        });
-      }
-    },
-    // default database
-    resetDB() {
-      if (this.dbProtection == true) {
-        this.dbProtection = false;
-      }
-      else {
-        axios.post('/api/resetDB')
-        .then(() => {
-          this.clickClose();
-        })
-        .catch(error => {
-            console.error(error);
-        });
-      }
-    },
-    resetProtection() {
-      this.settingsProtection = true;
-      this.dbProtection = true;
-    }
   },
  };
  </script>
  
- <style scoped>
- * {
+<style scoped>
+* {
    transition: 0.1s;
- }
+}
  .settings {
-   font-family: 'arial', sans-serif;
-   font-size: 14px;
-   user-select: none;
-   background-color: var(--primary-color);
-   color: var(--contrast-color);
-   overflow-y: scroll;
-   overflow-x: hidden;
-   display: grid;
-   align-content: start;
-   width: 100%;
-   justify-content: center;
-   accent-color: var(--contrast-color);
- }
- @media screen and (min-width: 1050px) {
-   .settings {
-     display: grid;
-     grid-template-columns: repeat(2, 0fr);
-   }
-   section {
-     margin-right: 90px;
-   }
- }
- .crossImgButton {
-   position: absolute;
-   right: 55px;
-   top: 6px;
-   padding: 0;
-   background-color: transparent;
-   border: none;
-   transition: 0s;
- }
- .crossImgButton:hover {
-   opacity: 60%;
- }
- section {
-   position: relative;
-   margin-top: 20px;
-   left: 40px;
-   padding: 1px 15px 10px 15px;
-   background-color: var(--duller-color);
-   border-radius: 5px;
-   transition: 0.15s;
-   width: 345px;
- }
- .self {
-   justify-self: center;
-   width: 280px;
-   background-color: transparent;
- }
+  font-family: 'arial', sans-serif;
+  font-size: 14px;
+  user-select: none;
+  background-color: var(--primary-color);
+  color: var(--contrast-color);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: grid;
+  position: fixed;
+  align-content: start;
+  justify-content: center;
+  accent-color: var(--contrast-color);
+  top: 0;
+  left: 0;
+  padding-left: 5px;
+  padding-top: 3px;
+  width: 100%;
+  height: 100%;
+}
+@media screen and (min-width: 1050px) {
+  .settings {
+    display: grid;
+    grid-template-columns: repeat(2, 0fr);
+  }
+  section {
+    margin-right: 90px;
+  }
+}
+.image {
+   height: 33px;
+}
+.crossImgButton {
+  position: absolute;
+  right: 55px;
+  top: 6px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  transition: 0s;
+}
+.crossImgButton:hover {
+  opacity: 60%;
+}
+section {
+  position: relative;
+  margin-top: 20px;
+  left: 40px;
+  padding: 1px 15px 10px 15px;
+  background-color: var(--duller-color);
+  border-radius: 5px;
+  transition: 0.15s;
+  width: 345px;
+}
+.self {
+  justify-self: center;
+  width: 280px;
+  background-color: transparent;
+}
  
  </style>

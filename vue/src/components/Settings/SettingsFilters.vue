@@ -4,27 +4,27 @@
  
     <div class="filters-buttons">
         <div>
-            <input type="checkbox" :checked="filters.Remix" @change="setSetting('filters.Remix', $event.target.checked)">
+            <input type="checkbox" :checked="filters.Remix" @change="$emit('set-setting', 'filters.Remix', event.target.checked)">
             <label>Remix</label>
         </div>
         <div>
-            <input type="checkbox" :checked="filters.VIP" @change="setSetting('filters.VIP', $event.target.checked)">
+            <input type="checkbox" :checked="filters.VIP" @change="$emit('set-setting','filters.VIP', $event.target.checked)">
             <label>VIP</label>
         </div>
         <div>
-            <input type="checkbox" :checked="filters.Instrumental" @change="setSetting('filters.Instrumental', $event.target.checked)">
+            <input type="checkbox" :checked="filters.Instrumental" @change="$emit('set-setting', 'filters.Instrumental', $event.target.checked)">
             <label>Instrumental</label>
         </div>
         <div>
-            <input type="checkbox" :checked="filters.Acoustic" @change="setSetting('filters.Acoustic', $event.target.checked)">
+            <input type="checkbox" :checked="filters.Acoustic" @change="$emit('set-setting', 'filters.Acoustic', $event.target.checked)">
             <label>Acoustic</label>
         </div>
         <div>
-            <input type="checkbox" :checked="filters.Extended" @change="setSetting('filters.Extended', $event.target.checked)">
+            <input type="checkbox" :checked="filters.Extended" @change="$emit('set-setting', 'filters.Extended', $event.target.checked)">
             <label>Extended</label>
         </div>
         <div>
-            <input type="checkbox" :checked="filters.Remaster" @change="setSetting('filters.Remaster', $event.target.checked)">
+            <input type="checkbox" :checked="filters.Remaster" @change="$emit('set-setting', 'filters.Remaster', $event.target.checked)">
             <label>Remaster</label>
         </div>
     </div>
@@ -32,10 +32,8 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { mapState, mapMutations } from 'vuex';
-
 export default {
+  emits: ['set-setting'],
   props: {
     filters: Object,
   },

@@ -3,18 +3,17 @@
     <p class="title">Other</p>
        <div class="flex-items">
          <div class="flex-padding">
-           <input type="checkbox" :checked="isoDates" @change="setSetting('isoDates', $event.target.checked)">
-               <label>Dates in yyyy-MM-dd (ISO 8601)</label>
+           <input type="checkbox" :checked="isoDates" @change="$emit('set-setting', 'isoDates', $event.target.checked)">
+               <label>Dates as yyyy-MM-dd</label>
          </div>
        </div>
 
 </template>
 
 <script>
- import axios from 'axios';
- import { mapState, mapMutations } from 'vuex';
  
  export default {
+  emits: ['set-setting'],
   props: {
     isoDates: Boolean,
   },

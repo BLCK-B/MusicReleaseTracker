@@ -44,16 +44,8 @@ import AddArtistDialog from '@/components/Content/AddArtistDialog.vue';
 import ProgressBar from '@/components/Content/ProgressBar.vue';
 import PreviewDialog from '@/components/Artists/PreviewDialog.vue';
 import { mapState } from 'vuex';
-import axios from 'axios';
 
 export default {
-  data() {
-      return {
-        appliedStyles: [],
-        theme: "",
-        accent: "",
-      };
-  },
   components: {
     ArtistList,
     SourceMenu,
@@ -63,10 +55,6 @@ export default {
     ProgressBar,
     PreviewDialog,
   },
-  created() {
-    this.loadTheme();
-    this.detectTheme();
-  },
   computed: {
     ...mapState([
     "settingsOpen",
@@ -75,71 +63,8 @@ export default {
     "previewVis"
     ])
   },
-  watch: {
-    // load themes whenever store theme/accent change
-    primaryColor(theme) {
-      this.theme = theme;
-      this.applyTheme(theme, this.accent);
-    },
-    accentColor(accent) {
-      this.accent = accent;
-      this.applyTheme(this.theme, accent);
-    },
-  },
   methods: {
-    loadTheme() {
-      // on start, load themes from config
-      axios.get("/api/getThemeConfig")
-        .then(response => {
-          this.$store.commit('SET_PRIMARY_COLOR', response.data.theme);
-          this.$store.commit('SET_ACCENT_COLOR', response.data.accent);
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    },
-    detectTheme() {
-      // detecting system theme on load
-      axios.get('/api/settingsOpened')
-        .then(response => {
-          const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-          if (response.data.autoTheme == true) {
-            if (prefersDarkMode.matches)
-              this.$store.commit('SET_PRIMARY_COLOR', "Black");
-            else
-              this.$store.commit('SET_PRIMARY_COLOR', "Light");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    applyTheme(theme, accent) {
-      // remove previously applied css
-      this.appliedStyles.forEach(style => {
-      style.remove();
-      });
-      this.appliedStyles = [];
-      let themePath;
-      let linkElement;
-      
-      if (theme !== "") {
-        themePath = `./primary${theme}.css`;
-        linkElement = document.createElement('link');
-        linkElement.rel = 'stylesheet';
-        linkElement.href = themePath;
-        document.head.appendChild(linkElement);
-        this.appliedStyles.push(linkElement);
-      }
-      if (accent !== "") {
-        themePath = `./secondary${accent}.css`;
-        linkElement = document.createElement('link');
-        linkElement.rel = 'stylesheet';
-        linkElement.href = themePath;
-        document.head.appendChild(linkElement);
-        this.appliedStyles.push(linkElement);
-      }
-    },
+   
   },
     
 };

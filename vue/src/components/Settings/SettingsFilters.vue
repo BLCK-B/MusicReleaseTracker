@@ -4,7 +4,7 @@
  
     <div class="filters-buttons">
         <div>
-            <input type="checkbox" :checked="filters.Remix" @change="$emit('set-setting', 'filters.Remix', event.target.checked)">
+            <input type="checkbox" :checked="filters.Remix" @change="$emit('set-setting', 'filters.Remix', $event.target.checked)">
             <label>Remix</label>
         </div>
         <div>

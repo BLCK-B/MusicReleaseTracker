@@ -5,29 +5,96 @@
 </template>
 
 <script>
-import MainPage from './pages/MainPage.vue';
-import SettingsPage from './pages/SettingsPage.vue';
 
 import axios from 'axios';
+import { mapState } from 'vuex';
 axios.defaults.baseURL = 'http://localhost:57782';
-
-const routes = [
-  { path: '/', component: MainPage },
-  { path: '/settings', component: SettingsPage },
-]
 
 export default {
   data() {
       return {
+        appliedStyles: [],
+        theme: "",
+        accent: "",
       };
   },
-  components: {
-    MainPage,
-    SettingsPage,
+  computed: {
+    ...mapState([
+    "primaryColor",
+    "accentColor",
+    "previewVis"
+    ])
+  },
+  watch: {
+    // load themes whenever store theme/accent change
+    primaryColor(theme) {
+      console.log(theme);
+      this.theme = theme;
+      this.applyTheme(theme, this.accent);
+    },
+    accentColor(accent) {
+      this.accent = accent;
+      this.applyTheme(this.theme, accent);
+    },
   },
   created() {
+    this.loadTheme();
+    this.detectTheme();
   },
   methods: {
+    loadTheme() {
+      // on start, load themes from config
+      axios.get("/api/getThemeConfig")
+        .then(response => {
+          this.$store.commit('SET_PRIMARY_COLOR', response.data.theme);
+          this.$store.commit('SET_ACCENT_COLOR', response.data.accent);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    detectTheme() {
+      // detecting system theme on load
+      axios.get('/api/settingsOpened')
+        .then(response => {
+          const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+          if (response.data.autoTheme == true) {
+            if (prefersDarkMode.matches)
+              this.$store.commit('SET_PRIMARY_COLOR', "Black");
+            else
+              this.$store.commit('SET_PRIMARY_COLOR', "Light");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    applyTheme(theme, accent) {
+      // remove previously applied css
+      this.appliedStyles.forEach(style => {
+        style.remove();
+      });
+      this.appliedStyles = [];
+      let themePath;
+      let linkElement;
+      
+      if (theme !== "") {
+        themePath = `./primary${theme}.css`;
+        linkElement = document.createElement('link');
+        linkElement.rel = 'stylesheet';
+        linkElement.href = themePath;
+        document.head.appendChild(linkElement);
+        this.appliedStyles.push(linkElement);
+      }
+      if (accent !== "") {
+        themePath = `./secondary${accent}.css`;
+        linkElement = document.createElement('link');
+        linkElement.rel = 'stylesheet';
+        linkElement.href = themePath;
+        document.head.appendChild(linkElement);
+        this.appliedStyles.push(linkElement);
+      }
+    },
   },
     
 };

@@ -11,11 +11,11 @@
      </section>
  
      <section class="appearance">
-        <SettingsAppearance :autoTheme="autoTheme"/>
+        <SettingsAppearance :autoTheme="autoTheme" @set-setting="setSetting"/>
      </section>
  
      <section class="other">
-        <SettingsOther :isoDates="isoDates"/>
+        <SettingsOther :isoDates="isoDates" :primaryColor="primaryColor" :accentColor="accentColor" @set-setting="setSetting"/>
      </section>
  
      <section class="danger">
@@ -31,7 +31,6 @@
    
  <script>
  import axios from 'axios';
- import { mapState } from 'vuex';
  import SettingsOther from '../components/Settings/SettingsOther.vue';
  import SettingsDangerZone from '../components/Settings/SettingsDangerZone.vue';
  import SettingsFilters from '../components/Settings/SettingsFilters.vue';
@@ -46,12 +45,6 @@
     SettingsAppearance,
     SettingsSelf,
   },
-  computed: {
-     ...mapState([
-         'primaryColor',
-         'accentColor',
-     ]),
-  },
   data() {
     return {
       isoDates: false,
@@ -63,6 +56,8 @@
          Extended: false,
          Remaster: false,
       },
+      primaryColor: 'N',
+      accentColor: 'N',
       autoTheme: false,
     };
   },
@@ -88,13 +83,18 @@
     setSetting(name, value) {
       switch(name) {
         case ("theme"):
-          this.$store.commit('SET_PRIMARY_COLOR', this.theme);
+          this.$store.commit('SET_PRIMARY_COLOR', value);
+          this.primaryColor = value;
           break;
         case ("accent"):
-          this.$store.commit('SET_ACCENT_COLOR', this.accent);
+          this.$store.commit('SET_ACCENT_COLOR', value);
+          this.accentColor = value;
           break;
         case ("isoDates"):
-          this.$store.commit("SET_ISODATES", this.isoDates);
+          this.$store.commit("SET_ISODATES", value);
+          break;
+        case("autoTheme"):
+          this.autoTheme = value;
           break;
       }
       axios.post(`/api/setSetting`, { name: name, value: value })

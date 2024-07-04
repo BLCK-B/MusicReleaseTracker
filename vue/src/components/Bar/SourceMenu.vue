@@ -2,20 +2,19 @@
   <div class="wrapper">
 
     <div class="tabs">
-      <div @mousedown="setStoreTab('combview')" :class="{ 'active': activeTab === 'combview' }" class="cvtab">Combined view</div>
-      <div @mousedown="setStoreTab('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="stab">BP</div>
-      <div @mousedown="setStoreTab('musicbrainz')" :class="{ 'active': activeTab === 'musicbrainz' }" class="stab">MB</div>
-      <div @mousedown="setStoreTab('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="stab">JD</div>
-      <div @mousedown="setStoreTab('youtube')" :class="{ 'active': activeTab === 'youtube' }" class="stab">YT</div>
+      <div @mousedown="setStoreTab('beatport')" :class="{ 'active': activeTab === 'beatport' }" class="sourceTab">BP</div>
+      <div @mousedown="setStoreTab('musicbrainz')" :class="{ 'active': activeTab === 'musicbrainz' }" class="sourceTab">MB</div>
+      <div @mousedown="setStoreTab('junodownload')" :class="{ 'active': activeTab === 'junodownload' }" class="sourceTab">JD</div>
+      <div @mousedown="setStoreTab('youtube')" :class="{ 'active': activeTab === 'youtube' }" class="sourceTab">YT</div>
     </div>
     
     <button @click="openSettings()" class="settingsButton" :disabled="!allowButtons">
-      <img v-if="primaryColor === 'Black'" class="image" src="../icons/optionsblack.png" alt="Settings"/>
-      <img v-else-if="primaryColor === 'Dark'" class="image" src="../icons/optionsdark.png" alt="Settings"/>
-      <img v-else-if="primaryColor === 'Light'" class="image" src="../icons/optionslight.png" alt="Settings"/>
+      <img v-if="primaryColor === 'Black'" class="imageSettings" src="../icons/optionsblack.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Dark'" class="imageSettings" src="../icons/optionsdark.png" alt="Settings"/>
+      <img v-else-if="primaryColor === 'Light'" class="imageSettings" src="../icons/optionslight.png" alt="Settings"/>
     </button>
     <button @click="clickScrape()" @mouseover="scrapeHover()" @mouseleave="scrapeMouseOff()" class="scrapeButton" :class="{ 'scrapeActive': isActive }">
-      <img class="image" src="../icons/refreshuniversal.png" alt="Refresh"/>
+      <img class="imageScrape" src="../icons/refreshuniversal.png" alt="Refresh"/>
     </button>
 
     <transition name="fade">
@@ -29,7 +28,7 @@
 
 <script>
 import axios from 'axios';
-import { mapState, mapMutations } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   data() {
@@ -77,6 +76,8 @@ export default {
   methods: {
     // set store tab, trigger handleSourceClick
     setStoreTab(source) {
+      if (this.sourceTab === source)
+          source = 'combview';
       this.$store.commit('SET_SOURCE_TAB', source);
     },
     // load respective table
@@ -120,7 +121,7 @@ export default {
               month: '2-digit',
               hour: '2-digit',
               minute: '2-digit'
-            }).replace(/\//g, '.').replace(',', '').replace(/(\d{2})\.(\d{2})/, '\$1.\$2.');
+            }).replace(/\//g, '.').replace(',', '').replace(/(\d{2})\.(\d{2})/, '$1.$2.');
             this.scrapeLast = time;
             this.scrapeDateInfo = true;
             this.handleSourceClick("combview");
@@ -162,67 +163,61 @@ export default {
     flex-grow: 1;
     height: 38px;
   }
-  .image {
-    height: 32px;
-    width: 32px;
-  }
-  .settingsButton, .scrapeButton {
-    padding: 0;
-    margin-left: 8px;
-    margin-top: 2px;
-    height: 32px;
-    width: 32px;
-    border: none;
+  .imageSettings, .imageScrape {
+    height: 34px;
+    width: 34px;
   }
   .settingsButton:hover, .scrapeButton:hover {
     opacity: 70%;
   }
   .settingsButton {
-    height: 32px;
-    width: 32px;
+    border: none;
+    padding: 0;
+    height: 34px;
+    width: 34px;
     background-color: var(--accent-color);
+    margin-right: 8px;
   }
   .scrapeButton {
+    border: none;
+    padding: 0;
     background-color: var(--accent-color);
-    margin-right: 20px;
+    height: 34px;
+    width: 34px;
+    margin-right: 25px;
     border-radius: 50px;
   }
   .scrapeActive {
-    transition: 0.75s;
     rotate: 180deg;
     filter:hue-rotate(120deg);
   }
   .scrapeActive:hover {
     opacity: 1;
   }
-  .cvtab {
-    width: 80%;
-    max-width: 390px;
-    padding: 8px;
-    border: solid 3px transparent;
-    border-bottom: solid 3px var(--accent-color);
-  }
-  .stab {
+  .sourceTab {
+    border-radius: 5px;
     width: 20%;
-    max-width: 110px;
+    max-width: 85px;
     padding: 8px;
     border: solid 3px transparent;
-    border-bottom: solid 3px var(--accent-color);
     white-space: nowrap;
     overflow: hidden;
+    background-color: var(--duller-color);
+    margin-right: 6px;
+    opacity: 0.85;
   }
   .tabs :hover {
-    border-bottom: solid 3px var(--dull-color);;
+    opacity: 1;
   }
   .active {
-    transition: 0.15s;
+    transition: 0.1s;
+    opacity: 1;
     background-color: var(--accent-color);
     color: var(--accent-contrast);
-    border-bottom: solid 3px var(--accent-color);
-    border-radius: 5px;
+    border: solid 3px transparent;
   }
   .active:hover {
-    border-bottom: solid 3px var(--accent-color);
+    background-color: var(--accent-color);
   }
 
   .scrapenotice {

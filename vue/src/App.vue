@@ -28,7 +28,6 @@ export default {
   watch: {
     // load themes whenever store theme/accent change
     primaryColor(theme) {
-      console.log(theme);
       this.theme = theme;
       this.applyTheme(theme, this.accent);
     },

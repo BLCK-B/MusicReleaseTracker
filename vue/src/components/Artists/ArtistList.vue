@@ -1,6 +1,6 @@
 <template>
   <div class="buttonspace">
-    <button @mousedown="clickAddArtist()" class="addbtn" :disabled="!allowButtons">add</button>
+    <button @mousedown="clickAddArtist()" class="addbtn" :disabled="!allowButtons">add artist</button>
     <button @click="showMore()" class="morebtn">more</button>
     <div class="dropdown" v-if="showDrop">
       <button @click="deleteUrl()" :disabled="sourceTab == null || sourceTab == 'combview' || artist == '' || !allowButtons" class="deletebtn">delete selected URL</button>

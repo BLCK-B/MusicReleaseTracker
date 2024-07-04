@@ -66,6 +66,12 @@ const actions = {
 };
 
 const getters = {
+  getPrimaryColor(state) {
+    return state.primaryColor;
+  },
+  getAccentColor(state) {
+    return state.accentColor;
+  },
 };
 
 export default createStore({

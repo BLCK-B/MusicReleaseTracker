@@ -16,18 +16,18 @@
          </div>
  
          <div class="accent-buttons">
-           <input type="radio" :checked="accentColor === 'Lavender'" @change="$emit('set-setting', 'accent', 'Lavender')">
-           <label>Lavender</label>
-           <input type="radio" :checked="accentColor === 'Cactus'" @change="$emit('set-setting', 'accent', 'Cactus')">
-           <label>Cactus</label>
-           <input type="radio" :checked="accentColor === 'Rose'" @change="$emit('set-setting', 'accent', 'Rose')">
-           <label>Rose</label>
-           <input type="radio" :checked="accentColor === 'Warm'" @change="$emit('set-setting', 'accent', 'Warm')">
-           <label>Warm</label>
-           <input type="radio" :checked="accentColor === 'Cloud'" @change="$emit('set-setting', 'accent', 'Cloud')">
-           <label>Cloud</label>
-           <input type="radio" :checked="accentColor === 'Ocean'" @change="$emit('set-setting', 'accent', 'Ocean')">
-           <label>Ocean</label>
+            <input type="radio" :checked="accentColor === 'Cactus'" @change="$emit('set-setting', 'accent', 'Cactus')">
+            <label>Cactus</label>
+            <input type="radio" :checked="accentColor === 'Cloud'" @change="$emit('set-setting', 'accent', 'Cloud')">
+            <label>Cloud</label>
+            <input type="radio" :checked="accentColor === 'Lavender'" @change="$emit('set-setting', 'accent', 'Lavender')">
+            <label>Lavender</label>
+            <input type="radio" :checked="accentColor === 'Ocean'" @change="$emit('set-setting', 'accent', 'Ocean')">
+            <label>Ocean</label>
+            <input type="radio" :checked="accentColor === 'Rose'" @change="$emit('set-setting', 'accent', 'Rose')">
+            <label>Rose</label>
+            <input type="radio" :checked="accentColor === 'Warm'" @change="$emit('set-setting', 'accent', 'Warm')">
+            <label>Warm</label>
          </div>
        </div>
  
@@ -64,7 +64,7 @@
    display: grid;
    grid-template-columns: repeat(2, 1fr);
    width: 30%;
-   padding-right: 20px;
+   margin-right: 10px;
    line-height: 18px;
  }
  .accent-buttons {

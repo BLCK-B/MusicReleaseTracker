@@ -7,6 +7,8 @@
         <PreviewDialog v-if="previewVis" class="preview"/>
       </div>
 
+      <AddArtistDialog/>
+
       <div class="maincontent">
         
         <!-- top bar -->
@@ -15,7 +17,6 @@
         </div>
 
         <!-- content -->
-        <AddArtistDialog/>
 
         <div class ="sourcetable">
           <SourceTable/>
@@ -40,7 +41,7 @@ import ArtistList from '@/components/Artists/ArtistList.vue';
 import SourceMenu from '@/components/Bar/SourceMenu.vue';
 import SourceTable from '@/components/Content/SourceTable.vue';
 import DialogsURL from '@/components/Content/DialogsURL.vue';
-import AddArtistDialog from '@/components/Content/AddArtistDialog.vue';
+import AddArtistDialog from '@/components/Artists/AddArtistDialog.vue';
 import ProgressBar from '@/components/Content/ProgressBar.vue';
 import PreviewDialog from '@/components/Artists/PreviewDialog.vue';
 import { mapState } from 'vuex';

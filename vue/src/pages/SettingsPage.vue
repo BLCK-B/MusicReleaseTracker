@@ -11,11 +11,11 @@
      </section>
  
      <section class="appearance">
-        <SettingsAppearance :autoTheme="autoTheme" @set-setting="setSetting"/>
+        <SettingsAppearance :autoTheme="autoTheme" @set-setting="setSetting" :primaryColor="primaryColor" :accentColor="accentColor"/>
      </section>
  
      <section class="other">
-        <SettingsOther :isoDates="isoDates" :primaryColor="primaryColor" :accentColor="accentColor" @set-setting="setSetting"/>
+        <SettingsOther :isoDates="isoDates" @set-setting="setSetting"/>
      </section>
  
      <section class="danger">
@@ -68,6 +68,8 @@
         this.filters = response.data;
         this.isoDates = response.data.isoDates;
         this.autoTheme = response.data.autoTheme;
+        this.primaryColor = this.$store.getters.getPrimaryColor;
+        this.accentColor = this.$store.getters.getAccentColor;
       })
       .catch((error) => {
         console.error(error);

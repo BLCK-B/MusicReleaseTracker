@@ -1,12 +1,9 @@
 <template>
     <div v-if="addDialogVis" class="wrapper">
-
-        <div class="card-text">
-            <p class="text--primary">Type artist's name and confirm.</p>
-        </div>
     
-        <div class="diag-actions">
-            <input v-model="input" :class="{ 'invalid': !isValid }"/>
+        <input v-model="input" :class="{ 'invalid': !isValid }" placeholder="Artist's name"/>
+
+        <div class="buttons">
             <button @click="clickClose" class="imgbutton">
                 <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X"/>
                 <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X"/>
@@ -69,35 +66,38 @@ export default {
 
 <style scoped>
     .wrapper {
-        top: 25%;
-        left: 35%;
-        width: 325px;
-        height: 240px;
         position: absolute;
-        z-index: 3;
-        background-color: var(--primary-color);
-        border: 2px solid var(--contrast-color);
-        border-radius: 3px;
-        padding: 8px;
-    }
-    .diag-actions {
-        position: absolute;
-        bottom: 3px;
-        left: 5px;
+        display: flex;
+        gap: 4px;
+        top: 3px;
+        left: 2px;
+        width: 290px;
+        z-index: 4;
+        height: 38px;
     }
     button {
         border: none;
     }
     input {
+        position: relative;
+        height: 26px;
         background-color: var(--duller-color);
         color: var(--contrast-color);
-        width: 200px;
-        margin-right: 58px;
-        margin-left: 10px;
-        border: none;
+        width: 155px;
+        border: 2px solid var(--contrast-color);
+        border-radius: 4px;
+        padding-left: 6px;
     }
     input:focus {
         outline: none;
+    }
+    .buttons {
+        position: relative;
+        height: 28px;
+        background-color: var(--primary-color);
+        border: 2px solid var(--contrast-color);
+        border-radius: 4px;
+        align-content: center;
     }
     .imgbutton, .image {
         height: 23px;

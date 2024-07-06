@@ -71,6 +71,8 @@ export default {
     },
     // load respective table when artist selected
     handleItemClick(artist) {
+      if (artist === this.lastClickedItem)
+        return;
       this.lastClickedItem = artist;
       axios.post('/api/listOrTabClick', { item: artist, origin: "list" })
         .then(response => {

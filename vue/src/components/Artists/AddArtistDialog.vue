@@ -1,17 +1,19 @@
 <template>
-    <div v-if="addDialogVis" class="wrapper">
+    <div v-if="addDialogVis" class="barrier">
     
-        <input v-model="input" :class="{ 'invalid': !isValid }" placeholder="Artist's name"/>
+        <div class="pill">
+            <input v-model="input" :class="{ 'invalid': !isValid }" placeholder="Artist's name"/>
 
-        <div class="buttons">
-            <button @click="clickClose" class="imgbutton">
-                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X"/>
-            </button>
-            <button @click="clickAdd" class="imgbutton" :disabled="!isValid">
-                <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
-                <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
-            </button>
+            <div class="buttons">
+                <button @click="clickClose" class="imgbutton">
+                    <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X"/>
+                    <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X"/>
+                </button>
+                <button @click="clickAdd" class="imgbutton" :disabled="!isValid">
+                    <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
+                    <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
+                </button>
+            </div>
         </div>
 
     </div>
@@ -65,9 +67,8 @@ export default {
 </script>
 
 <style scoped>
-    .wrapper {
+    .barrier {
         position: absolute;
-        display: flex;
         gap: 4px;
         top: 3px;
         left: 2px;
@@ -75,28 +76,29 @@ export default {
         z-index: 4;
         height: 38px;
     }
+    .pill {
+        border: 2px solid var(--dull-color);
+        width: 220px;
+    }
     button {
         border: none;
     }
     input {
-        position: relative;
+        position: absolute;
         height: 26px;
-        background-color: var(--duller-color);
-        color: var(--contrast-color);
-        width: 155px;
-        border: 2px solid var(--contrast-color);
-        border-radius: 4px;
+        background-color: var(--accent-color);
+        color: black;
+        width: 152px;
         padding-left: 6px;
+        border: none;
+        display: inline-block;
     }
     input:focus {
         outline: none;
     }
     .buttons {
-        position: relative;
         height: 28px;
         background-color: var(--primary-color);
-        border: 2px solid var(--contrast-color);
-        border-radius: 4px;
         align-content: center;
     }
     .imgbutton, .image {

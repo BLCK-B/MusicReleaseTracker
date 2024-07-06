@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!urlExists && allowButtons && artist && !addDialogVis">
+    <div v-if="!urlExists && allowButtons && artist">
 
         <div v-if="sourceTab === 'musicbrainz'" class="dialog">
             <h1>MusicBrainz source</h1>
@@ -77,7 +77,6 @@ export default {
         "sourceTab",
         "allowButtons",
         "artist",
-        "addDialogVis",
         'primaryColor',
         "urlExists",
         ]),
@@ -134,14 +133,13 @@ export default {
     .dialog {
         width: 375px;
         height: 280px;
-        background-color: var(--primary-color);
-        border: 2px solid var(--contrast-color);
-        border-radius: 3px;
+        background-color: var(--duller-color);
         color: var(--contrast-color);
         padding: 8px;
+        border-radius: 8px;
     }
     input {
-        background-color: var(--duller-color);
+        background-color: var(--dull-color);
         color: var(--contrast-color);
         border: none;
         width: 345px;

@@ -1,50 +1,45 @@
 <template>
-
   <div class="app">
-      <!-- sidebar -->
-      <div class="list">
-        <ArtistList v-if="!previewVis"/>
-        <PreviewDialog v-if="previewVis" class="preview"/>
+    <!-- sidebar -->
+    <div class="list">
+      <ArtistList v-if="!previewVis" />
+      <PreviewDialog v-if="previewVis" class="preview" />
+    </div>
+
+    <AddArtistDialog />
+
+    <div class="maincontent">
+      <!-- top bar -->
+      <div v-if="!previewVis" class="topbar">
+        <SourceMenu />
       </div>
 
-      <AddArtistDialog/>
+      <!-- content -->
 
-      <div class="maincontent">
-        
-        <!-- top bar -->
-        <div v-if="!previewVis" class="topbar">
-          <SourceMenu/>
-        </div>
-
-        <!-- content -->
-
-        <div class ="sourcetable">
-          <SourceTable/>
-        </div>
-
-        <div class="dialogsurl" v-if="!previewVis">
-          <DialogsURL/>
-        </div>
-
+      <div class="sourcetable">
+        <SourceTable />
       </div>
 
-      <div class="progressbar">
-        <ProgressBar/>
+      <div class="dialogsurl" v-if="!previewVis">
+        <DialogsURL />
       </div>
-  
+    </div>
+
+    <div class="progressbar">
+      <ProgressBar />
+    </div>
   </div>
-  
 </template>
 
 <script>
-import ArtistList from '@/components/Artists/ArtistList.vue';
-import SourceMenu from '@/components/Bar/SourceMenu.vue';
-import SourceTable from '@/components/Content/SourceTable.vue';
-import DialogsURL from '@/components/Content/DialogsURL.vue';
-import AddArtistDialog from '@/components/Artists/AddArtistDialog.vue';
-import ProgressBar from '@/components/Content/ProgressBar.vue';
-import PreviewDialog from '@/components/Artists/PreviewDialog.vue';
-import { mapState } from 'vuex';
+import ArtistList from "@/components/Artists/ArtistList.vue";
+import SourceMenu from "@/components/Bar/SourceMenu.vue";
+import SourceTable from "@/components/Content/SourceTable.vue";
+import DialogsURL from "@/components/Content/DialogsURL.vue";
+import AddArtistDialog from "@/components/Artists/AddArtistDialog.vue";
+import ProgressBar from "@/components/Content/ProgressBar.vue";
+import PreviewDialog from "@/components/Artists/PreviewDialog.vue";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -57,22 +52,13 @@ export default {
     PreviewDialog,
   },
   computed: {
-    ...mapState([
-    "settingsOpen",
-    "primaryColor",
-    "accentColor",
-    "previewVis"
-    ])
+    ...mapState(["settingsOpen", "primaryColor", "accentColor", "previewVis"]),
   },
-  methods: {
-   
-  },
-    
+  methods: {},
 };
 </script>
 
 <style scoped>
-
 * {
   scrollbar-color: var(--dull-color) transparent;
 }
@@ -85,7 +71,7 @@ export default {
 }
 
 .app {
-  font-family: 'arial', sans-serif;
+  font-family: "arial", sans-serif;
   font-size: 14px;
   user-select: none;
   display: flex;
@@ -137,5 +123,4 @@ export default {
   z-index: 5;
   width: 100%;
 }
-
 </style>

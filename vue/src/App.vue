@@ -1,29 +1,22 @@
 <template>
-
-  <RouterView/>
-  
+  <RouterView />
 </template>
 
 <script>
-
-import axios from 'axios';
-import { mapState } from 'vuex';
-axios.defaults.baseURL = 'http://localhost:57782';
+import axios from "axios";
+import { mapState } from "vuex";
+axios.defaults.baseURL = "http://localhost:57782";
 
 export default {
   data() {
-      return {
-        appliedStyles: [],
-        theme: "",
-        accent: "",
-      };
+    return {
+      appliedStyles: [],
+      theme: "",
+      accent: "",
+    };
   },
   computed: {
-    ...mapState([
-    "primaryColor",
-    "accentColor",
-    "previewVis"
-    ])
+    ...mapState(["primaryColor", "accentColor", "previewVis"]),
   },
   watch: {
     // load themes whenever store theme/accent change
@@ -43,25 +36,25 @@ export default {
   methods: {
     loadTheme() {
       // on start, load themes from config
-      axios.get("/api/getThemeConfig")
-        .then(response => {
-          this.$store.commit('SET_PRIMARY_COLOR', response.data.theme);
-          this.$store.commit('SET_ACCENT_COLOR', response.data.accent);
+      axios
+        .get("/api/getThemeConfig")
+        .then((response) => {
+          this.$store.commit("SET_PRIMARY_COLOR", response.data.theme);
+          this.$store.commit("SET_ACCENT_COLOR", response.data.accent);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
         });
     },
     detectTheme() {
       // detecting system theme on load
-      axios.get('/api/settingsOpened')
-        .then(response => {
-          const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+      axios
+        .get("/api/settingsOpened")
+        .then((response) => {
+          const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
           if (response.data.autoTheme == true) {
-            if (prefersDarkMode.matches)
-              this.$store.commit('SET_PRIMARY_COLOR', "Black");
-            else
-              this.$store.commit('SET_PRIMARY_COLOR', "Light");
+            if (prefersDarkMode.matches) this.$store.commit("SET_PRIMARY_COLOR", "Black");
+            else this.$store.commit("SET_PRIMARY_COLOR", "Light");
           }
         })
         .catch((error) => {
@@ -70,37 +63,35 @@ export default {
     },
     applyTheme(theme, accent) {
       // remove previously applied css
-      this.appliedStyles.forEach(style => {
+      this.appliedStyles.forEach((style) => {
         style.remove();
       });
       this.appliedStyles = [];
       let themePath;
       let linkElement;
-      
+
       if (theme !== "") {
         themePath = `./primary${theme}.css`;
-        linkElement = document.createElement('link');
-        linkElement.rel = 'stylesheet';
+        linkElement = document.createElement("link");
+        linkElement.rel = "stylesheet";
         linkElement.href = themePath;
         document.head.appendChild(linkElement);
         this.appliedStyles.push(linkElement);
       }
       if (accent !== "") {
         themePath = `./secondary${accent}.css`;
-        linkElement = document.createElement('link');
-        linkElement.rel = 'stylesheet';
+        linkElement = document.createElement("link");
+        linkElement.rel = "stylesheet";
         linkElement.href = themePath;
         document.head.appendChild(linkElement);
         this.appliedStyles.push(linkElement);
       }
     },
   },
-    
 };
 </script>
 
 <style scoped>
-
 * {
   scrollbar-color: var(--dull-color) transparent;
 }
@@ -111,6 +102,4 @@ export default {
   width: 8px;
   background: transparent;
 }
-
 </style>
-

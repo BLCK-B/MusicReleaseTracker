@@ -85,7 +85,7 @@ public class GUIController {
     }
 
     public void cleanArtistSource() {
-        DB.clearArtistDataFrom(selectedSource.toString(), selectedArtist);
+        DB.clearArtistDataFrom(selectedArtist, selectedSource.toString());
     }
 
     public List<TableModel> getTableData(String item, String origin) {

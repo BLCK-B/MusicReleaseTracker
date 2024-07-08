@@ -1,39 +1,40 @@
 <template>
-    
-    <p><span class="title">Exclusion filters</span><br>Select types of songs to be hidden in Combined view.</p>
- 
-    <div class="filters-buttons">
-        <div>
-            <input type="checkbox" :checked="filters.Remix" @change="$emit('set-setting', 'filters.Remix', $event.target.checked)">
-            <label>Remix</label>
-        </div>
-        <div>
-            <input type="checkbox" :checked="filters.VIP" @change="$emit('set-setting','filters.VIP', $event.target.checked)">
-            <label>VIP</label>
-        </div>
-        <div>
-            <input type="checkbox" :checked="filters.Instrumental" @change="$emit('set-setting', 'filters.Instrumental', $event.target.checked)">
-            <label>Instrumental</label>
-        </div>
-        <div>
-            <input type="checkbox" :checked="filters.Acoustic" @change="$emit('set-setting', 'filters.Acoustic', $event.target.checked)">
-            <label>Acoustic</label>
-        </div>
-        <div>
-            <input type="checkbox" :checked="filters.Extended" @change="$emit('set-setting', 'filters.Extended', $event.target.checked)">
-            <label>Extended</label>
-        </div>
-        <div>
-            <input type="checkbox" :checked="filters.Remaster" @change="$emit('set-setting', 'filters.Remaster', $event.target.checked)">
-            <label>Remaster</label>
-        </div>
-    </div>
+  <p><span class="title">Exclusion filters</span><br />Select types of songs to be hidden in Combined view.</p>
 
+  <div class="filters-buttons">
+    <div>
+      <input type="checkbox" :checked="filters.Remix" @change="$emit('set-setting', 'filters.Remix', $event.target.checked)" />
+      <label>Remix</label>
+    </div>
+    <div>
+      <input type="checkbox" :checked="filters.VIP" @change="$emit('set-setting', 'filters.VIP', $event.target.checked)" />
+      <label>VIP</label>
+    </div>
+    <div>
+      <input
+        type="checkbox"
+        :checked="filters.Instrumental"
+        @change="$emit('set-setting', 'filters.Instrumental', $event.target.checked)" />
+      <label>Instrumental</label>
+    </div>
+    <div>
+      <input type="checkbox" :checked="filters.Acoustic" @change="$emit('set-setting', 'filters.Acoustic', $event.target.checked)" />
+      <label>Acoustic</label>
+    </div>
+    <div>
+      <input type="checkbox" :checked="filters.Extended" @change="$emit('set-setting', 'filters.Extended', $event.target.checked)" />
+      <label>Extended</label>
+    </div>
+    <div>
+      <input type="checkbox" :checked="filters.Remaster" @change="$emit('set-setting', 'filters.Remaster', $event.target.checked)" />
+      <label>Remaster</label>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
-  emits: ['set-setting'],
+  emits: ["set-setting"],
   props: {
     filters: Object,
   },
@@ -61,5 +62,4 @@ input {
 .disabled {
   opacity: 0.3;
 }
-
 </style>

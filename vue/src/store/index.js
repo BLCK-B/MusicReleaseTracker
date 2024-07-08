@@ -1,8 +1,8 @@
 // vuex store
-import { createStore } from 'vuex'
+import { createStore } from "vuex";
 
 const state = {
-  artist: "",
+  selectedArtist: "",
   sourceTab: "",
   tableData: [],
   addDialogVis: false,
@@ -21,8 +21,8 @@ const mutations = {
   SET_SOURCE_TAB(state, sourceTab) {
     state.sourceTab = sourceTab;
   },
-  SET_SELECTED_ARTIST(state, artist) {
-    state.artist = artist;
+  SET_SELECTED_ARTIST(state, selectedArtist) {
+    state.selectedArtist = selectedArtist;
   },
   SET_TABLE_CONTENT(state, tableData) {
     state.tableData = tableData;
@@ -39,8 +39,7 @@ const mutations = {
   },
   SET_PROGRESS(state, progress) {
     state.progress = progress * 100;
-    if (state.progress == 100)
-      state.progress = 0;
+    if (state.progress == 100) state.progress = 0;
   },
   SET_SETTINGS_OPEN(state, settingsOpen) {
     state.settingsOpen = settingsOpen;
@@ -62,8 +61,7 @@ const mutations = {
   },
 };
 
-const actions = {
-};
+const actions = {};
 
 const getters = {
   getPrimaryColor(state) {
@@ -78,5 +76,5 @@ export default createStore({
   state,
   mutations,
   actions,
-  getters
-})
+  getters,
+});

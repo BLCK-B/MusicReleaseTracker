@@ -186,6 +186,7 @@ export default {
   border-radius: 50px;
 }
 .scrapeActive {
+  transition: 0.75s;
   rotate: 180deg;
   filter: hue-rotate(120deg);
 }

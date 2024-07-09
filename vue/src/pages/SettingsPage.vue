@@ -111,11 +111,6 @@ export default {
   transition: 0.1s;
 }
 .settings {
-  font-family: "arial", sans-serif;
-  font-size: 14px;
-  user-select: none;
-  background-color: var(--primary-color);
-  color: var(--contrast-color);
   overflow-y: scroll;
   overflow-x: hidden;
   display: grid;
@@ -123,12 +118,6 @@ export default {
   align-content: start;
   justify-content: center;
   accent-color: var(--contrast-color);
-  top: 0;
-  left: 0;
-  padding-left: 5px;
-  padding-top: 3px;
-  width: 100%;
-  height: 100%;
 }
 @media screen and (min-width: 1050px) {
   .settings {

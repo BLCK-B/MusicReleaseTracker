@@ -67,7 +67,7 @@ public class GUIController {
         if (name.isEmpty() || name.isBlank())
             return;
         DB.insertIntoArtistList(name);
-        selectedArtist = null;
+        selectedArtist = name;
     }
 
     public void removeArtist() {

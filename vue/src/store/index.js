@@ -5,7 +5,6 @@ const state = {
   selectedArtist: "",
   sourceTab: "",
   tableData: [],
-  addDialogVis: false,
   loadListRequest: false,
   allowButtons: true,
   progress: 0,
@@ -26,10 +25,6 @@ const mutations = {
   },
   SET_TABLE_CONTENT(state, tableData) {
     state.tableData = tableData;
-    state.addDialogVis = false;
-  },
-  SET_ADD_VIS(state, addDialogVis) {
-    state.addDialogVis = addDialogVis;
   },
   SET_LOAD_REQUEST(state, loadListRequest) {
     state.loadListRequest = loadListRequest;

@@ -1,10 +1,10 @@
 <template>
-  <div v-if="addDialogVis" class="barrier">
+  <div v-if="this.addVisibility" class="barrier">
     <div class="pill">
       <input v-model="input" :class="{ invalid: !isValid }" placeholder="Artist's name" />
 
       <div class="buttons">
-        <button @click="clickClose" class="imgbutton">
+        <button @click="$emit('close-add-new')" class="imgbutton">
           <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X" />
           <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X" />
         </button>
@@ -22,6 +22,9 @@ import axios from "axios";
 import { mapState } from "vuex";
 
 export default {
+  props: {
+    addVisibility: Boolean,
+  },
   data: () => ({
     input: "",
     rules: [
@@ -31,7 +34,7 @@ export default {
     ],
   }),
   computed: {
-    ...mapState(["addDialogVis", "primaryColor"]),
+    ...mapState(["primaryColor"]),
     // if no rules in data broken, enable add button
     isValid() {
       return this.rules.every((rule) => rule(this.input) === true);
@@ -47,16 +50,12 @@ export default {
         .then(() => {
           this.input = "";
           this.$store.commit("SET_SELECTED_ARTIST", artistname);
-          this.$store.commit("SET_ADD_VIS", false);
+          this.$emit("close-add-new");
           this.$store.commit("SET_LOAD_REQUEST", true);
         })
         .catch((error) => {
           console.error(error);
         });
-    },
-    // close dialog
-    clickClose() {
-      this.$store.commit("SET_ADD_VIS", false);
     },
   },
 };

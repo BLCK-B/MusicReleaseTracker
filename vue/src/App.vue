@@ -16,7 +16,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["primaryColor", "accentColor", "previewVis"]),
+    ...mapState(["primaryColor", "accentColor"]),
   },
   watch: {
     // load themes whenever store theme/accent change
@@ -94,6 +94,17 @@ export default {
 <style scoped>
 * {
   scrollbar-color: var(--dull-color) transparent;
+  font-family: "arial", sans-serif;
+  font-size: 15px;
+  user-select: none;
+  background-color: var(--primary-color);
+  color: var(--contrast-color);
+  top: 0;
+  left: 0;
+  padding-left: 5px;
+  padding-top: 3px;
+  width: 100%;
+  height: 100%;
 }
 *::-webkit-scrollbar-thumb {
   background-color: var(--dull-color);

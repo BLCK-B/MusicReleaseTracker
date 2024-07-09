@@ -1,45 +1,65 @@
 <template>
-  <div class="buttonspace">
-    <button @mousedown="clickAddArtist()" class="addbtn" :disabled="!allowButtons">add artist</button>
-    <button @click="showMore()" class="morebtn">more</button>
-    <div class="dropdown" v-if="showDrop">
-      <button
-        @click="deleteUrl()"
-        :disabled="sourceTab == null || sourceTab == 'combview' || selectedArtist == '' || !allowButtons"
-        class="deletebtn">
-        delete selected URL
-      </button>
-      <button @click="clickDeleteArtist()" :disabled="selectedArtist == '' || !allowButtons" class="deletebtn">delete artist</button>
+  <div v-if="!previewVis">
+    <div class="artistListNormal">
+      <div class="buttonspace">
+        <button @mousedown="clickAddArtist()" class="addbtn" :disabled="!allowButtons">add artist</button>
+        <button @click="showMore()" class="morebtn">more</button>
+        <div class="dropdown" v-if="showDropdown">
+          <button
+            @click="deleteUrl()"
+            :disabled="sourceTab == null || sourceTab == 'combview' || selectedArtist == '' || !allowButtons"
+            class="deletebtn">
+            delete selected URL
+          </button>
+          <button @click="clickDeleteArtist()" :disabled="selectedArtist == '' || !allowButtons" class="deletebtn">
+            delete artist
+          </button>
+        </div>
+      </div>
+
+      <ArtistsAddNew :addVisibility="addVisibility" @close-add-new="closeAddNew" />
+
+      <div class="artistlist">
+        <!-- loop through the array and display each artist as a clickable list item -->
+        <li
+          v-for="item in artistsArrayList"
+          :key="item"
+          @mousedown="handleItemClick(item)"
+          :class="{ highlighted: item === selectedArtist }"
+          class="listbtn">
+          <div class="listitems">
+            {{ item }}
+          </div>
+        </li>
+        <!-- adding height for enabling scroll all the way -->
+        <li v-for="item in artistsArrayList" :key="item"></li>
+      </div>
     </div>
   </div>
 
-  <div class="artistlist">
-    <!-- loop through the array and display each artist as a clickable list item -->
-    <li
-      v-for="item in artistsArrayList"
-      :key="item"
-      @mousedown="handleItemClick(item)"
-      :class="{ highlighted: item === selectedArtist }"
-      class="listbtn">
-      <div class="listitems">
-        {{ item }}
-      </div>
-    </li>
-    <!-- adding height for enabling scroll all the way -->
-    <li v-for="item in artistsArrayList" :key="item"></li>
-  </div>
+  <ArtistsPreviewDialog v-if="previewVis" class="preview" />
 </template>
 
 <script>
+import ArtistsAddNew from "@/components/Artists/ArtistsAddNew.vue";
+import ArtistsPreviewDialog from "@/components/Artists/ArtistsPreviewDialog.vue";
 import axios from "axios";
 import { mapState } from "vuex";
 
 export default {
+  components: {
+    ArtistsAddNew,
+    ArtistsPreviewDialog,
+  },
   data() {
     return {
+      addVisibility: false,
       artistsArrayList: [],
-      showDrop: false,
+      showDropdown: false,
     };
+  },
+  computed: {
+    ...mapState(["allowButtons", "sourceTab", "selectedArtist", "previewVis"]),
   },
   created() {
     // load artist list, last clicked artist if not null
@@ -47,9 +67,6 @@ export default {
     axios.get("/api/getLastArtist").then((response) => {
       if (response.data !== "") this.lastClickedItem = response.data;
     });
-  },
-  computed: {
-    ...mapState(["allowButtons", "sourceTab", "selectedArtist"]),
   },
   watch: {
     "$store.state.loadListRequest"(loadListRequest) {
@@ -86,7 +103,10 @@ export default {
     },
     // show AddArtistDialog
     clickAddArtist() {
-      this.$store.commit("SET_ADD_VIS", true);
+      this.addVisibility = true;
+    },
+    closeAddNew() {
+      this.addVisibility = false;
     },
     // delete all (last selected) artist entries from db, rebuild combview
     clickDeleteArtist() {
@@ -104,7 +124,7 @@ export default {
       }
     },
     showMore() {
-      this.showDrop = !this.showDrop;
+      this.showDropdown = !this.showDropdown;
     },
     deleteUrl() {
       // set null specific URL, trigger table reload

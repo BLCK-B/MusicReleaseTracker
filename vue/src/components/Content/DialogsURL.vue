@@ -1,16 +1,14 @@
 <template>
   <div v-if="!urlExists && allowButtons && selectedArtist">
     <div v-if="sourceTab === 'musicbrainz'" class="dialog">
-      <h1>MusicBrainz source</h1>
-      <p class="artist">{{ selectedArtist }}</p>
+      <div class="nameLink">
+        <h1>MusicBrainz source</h1>
+        <a href="https://musicbrainz.org" target="_blank">musicbrainz.org</a>
+      </div>
       <p>
-        <a href="https://musicbrainz.org" target="_blank">https://musicbrainz.org</a>
-        > find artist > copy URL
+        Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
-      <br />
-      <p>Example link:</p>
-      <p>https://musicbrainz.org/artist/<span class="variabletext">id/...</span></p>
-      <input v-model="input" />
+      <input v-model="input" placeholder="https://musicbrainz.org/artist/id/..." />
       <button @click="clickURL" class="imgbutton">
         <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -18,16 +16,14 @@
     </div>
 
     <div v-else-if="sourceTab === 'beatport'" class="dialog">
-      <h1>Beatport source</h1>
-      <p class="artist">{{ selectedArtist }}</p>
+      <div class="nameLink">
+        <h1>Beatport source</h1>
+        <a href="https://beatport.com" target="_blank">beatport.com</a>
+      </div>
       <p>
-        <a href="https://beatport.com" target="_blank">https://beatport.com</a>
-        > find artist > copy URL
+        Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
-      <br />
-      <p>Example link:</p>
-      <p>https://beatport.com/artist/<span class="variabletext">artistname/id/...</span></p>
-      <input v-model="input" />
+      <input v-model="input" placeholder="https://beatport.com/artist/artistname/id/..." />
       <button @click="clickURL" class="imgbutton">
         <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -35,16 +31,14 @@
     </div>
 
     <div v-else-if="sourceTab === 'junodownload'" class="dialog">
-      <h1>Junodownload source</h1>
-      <p class="artist">{{ selectedArtist }}</p>
+      <div class="nameLink">
+        <h1>Junodownload source</h1>
+        <a href="https://junodownload.com" target="_blank">junodownload.com</a>
+      </div>
       <p>
-        <a href="https://junodownload.com" target="_blank">https://junodownload.com</a>
-        > find artist > copy URL
+        Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
-      <br />
-      <p>Example link:</p>
-      <p>https://junodownload.com/artists/<span class="variabletext">artistname/...</span></p>
-      <input v-model="input" />
+      <input v-model="input" placeholder="https://junodownload.com/artists/artistname/..." />
       <button @click="clickURL" class="imgbutton">
         <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -52,19 +46,15 @@
     </div>
 
     <div v-else-if="sourceTab === 'youtube'" class="dialog">
-      <h1>Youtube source</h1>
-      <p class="artist">{{ selectedArtist }}</p>
+      <div class="nameLink">
+        <h1>Youtube source</h1>
+        <a href="https://youtube.com" target="_blank">youtube.com</a>
+      </div>
       <p>
-        <a href="https://youtube.com" target="_blank">https://youtube.com</a>
+        Find an auto-generated channel of <span class="artistText">{{ selectedArtist }}</span> with "Topic" in its name. Both the
+        channel ID and URL are accepted. <br />Channel handles will not work.
       </p>
-      <p>
-        Find an auto-generated channel with "Topic" in its name.
-        <br />Obtain the ID (share > copy channel ID) or copy URL. <br />An ID needs to be provided, not a channel handle.
-      </p>
-
-      <p>Example link:</p>
-      <p>https://youtube.com/channel/<span class="variabletext">UCwZEU0wAwIyZb...</span></p>
-      <input v-model="input" />
+      <input v-model="input" placeholder="https://youtube.com/channel/UCwZEU0wAwIyZb..." />
       <button @click="clickURL" class="imgbutton">
         <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -137,62 +127,57 @@ p {
   line-height: 1.4;
 }
 .dialog {
-  width: 375px;
-  height: 280px;
-  background-color: var(--duller-color);
+  width: 400px;
+  height: 300px;
   color: var(--contrast-color);
-  padding: 8px;
+  padding: 10px;
+  padding-left: 12px;
   border-radius: 8px;
 }
+.nameLink {
+  display: flex;
+  align-items: center;
+}
 input {
-  background-color: var(--dull-color);
+  background-color: var(--duller-color);
   color: var(--contrast-color);
   border: none;
-  width: 345px;
-  position: absolute;
-  bottom: 5px;
-  left: 5px;
+  width: 360px;
+  position: relative;
   font-size: 13px;
-  height: 18px;
+  height: 25px;
+  border-radius: 3px;
+  padding-left: 5px;
 }
 input:focus {
   outline: none;
 }
-button {
-  color: black;
-  border: none;
-  position: absolute;
-  right: 5px;
-  bottom: 5px;
-}
-button:hover {
-  opacity: 70%;
-}
 a {
-  color: var(--accent-color);
+  margin-left: 30px;
+  padding: 4px;
+  border-radius: 5px;
+  background-color: var(--accent-color);
+  color: black;
   font-weight: bold;
   text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
 }
 h1 {
   font-size: 17px;
   font-weight: normal;
 }
-.variabletext {
-  color: var(--accent-color);
+button {
+  color: black;
+  border: none;
 }
-.artist {
-  user-select: text;
+button:hover {
+  opacity: 70%;
 }
 .imgbutton,
 .image {
-  height: 23px;
-  width: 23px;
+  height: 26px;
+  width: 26px;
   padding: 0;
   float: right;
-  margin-right: 2px;
   background-color: transparent;
 }
 .imgbutton:hover {
@@ -201,5 +186,9 @@ h1 {
 :disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+.artistText {
+  user-select: text;
+  font-weight: bold;
 }
 </style>

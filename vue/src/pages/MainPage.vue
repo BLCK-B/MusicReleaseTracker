@@ -2,11 +2,8 @@
   <div class="app">
     <!-- sidebar -->
     <div class="list">
-      <ArtistList v-if="!previewVis" />
-      <PreviewDialog v-if="previewVis" class="preview" />
+      <ArtistList />
     </div>
-
-    <AddArtistDialog />
 
     <div class="maincontent">
       <!-- top bar -->
@@ -36,9 +33,7 @@ import ArtistList from "@/components/Artists/ArtistList.vue";
 import SourceMenu from "@/components/Bar/SourceMenu.vue";
 import SourceTable from "@/components/Content/SourceTable.vue";
 import DialogsURL from "@/components/Content/DialogsURL.vue";
-import AddArtistDialog from "@/components/Artists/AddArtistDialog.vue";
 import ProgressBar from "@/components/Content/ProgressBar.vue";
-import PreviewDialog from "@/components/Artists/PreviewDialog.vue";
 import { mapState } from "vuex";
 
 export default {
@@ -47,9 +42,7 @@ export default {
     SourceMenu,
     SourceTable,
     DialogsURL,
-    AddArtistDialog,
     ProgressBar,
-    PreviewDialog,
   },
   computed: {
     ...mapState(["settingsOpen", "primaryColor", "accentColor", "previewVis"]),
@@ -71,19 +64,8 @@ export default {
 }
 
 .app {
-  font-family: "arial", sans-serif;
-  font-size: 14px;
-  user-select: none;
   display: flex;
   position: fixed;
-  top: 0;
-  left: 0;
-  padding-left: 5px;
-  padding-top: 3px;
-  width: 100%;
-  height: 100%;
-  background-color: var(--primary-color);
-  color: var(--contrast-color);
   transition: 0.15s;
 }
 .list {
@@ -105,9 +87,9 @@ export default {
   position: relative;
 }
 .dialogsurl {
-  top: 25%;
-  left: 35%;
-  position: absolute;
+  position: fixed;
+  top: 30%;
+  left: 30%;
 }
 .sourcetable {
   position: relative;

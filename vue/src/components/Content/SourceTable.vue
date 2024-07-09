@@ -30,7 +30,7 @@
   <div class="quickstart" v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'">
     <p>
       <span class="title">Quickstart guide</span> <br />
-      1. click "add" to add an artist, select the artist <br />
+      1. click "add artist" to insert an artist <br />
       2. click on any BP / MB / JD / YT button at the top to select a source <br />
       3. find the artist on the website, copy & paste the link or ID <br />
       4. to scrape, click refresh button in the top right corner <br />

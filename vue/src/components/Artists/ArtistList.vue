@@ -147,7 +147,7 @@ export default {
 .listbtn {
   width: 92%;
   height: 28px;
-  border-radius: 0px;
+  border-radius: 3px;
   margin: 0;
   display: flex;
   align-items: center;

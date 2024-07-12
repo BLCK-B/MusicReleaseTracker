@@ -133,7 +133,7 @@ export default {
 }
 .crossImgButton {
   position: absolute;
-  right: 55px;
+  right: 62px;
   top: 6px;
   padding: 0;
   background-color: transparent;

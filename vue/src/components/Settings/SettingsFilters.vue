@@ -1,5 +1,5 @@
 <template>
-  <p><span class="title">Exclusion filters</span><br />Select types of songs to be hidden in Combined view.</p>
+  <p><span class="title">Exclusion filters</span><br />Select song types to be hidden.</p>
 
   <div class="filters-buttons">
     <div>

@@ -2,7 +2,7 @@
   <div v-if="!urlExists && allowButtons && selectedArtist">
     <div v-if="sourceTab === 'musicbrainz'" class="dialog">
       <div class="nameLink">
-        <h1>MusicBrainz source</h1>
+        <h1>MusicBrainz</h1>
         <a href="https://musicbrainz.org" target="_blank">musicbrainz.org</a>
       </div>
       <p>
@@ -17,7 +17,7 @@
 
     <div v-else-if="sourceTab === 'beatport'" class="dialog">
       <div class="nameLink">
-        <h1>Beatport source</h1>
+        <h1>Beatport</h1>
         <a href="https://beatport.com" target="_blank">beatport.com</a>
       </div>
       <p>
@@ -32,7 +32,7 @@
 
     <div v-else-if="sourceTab === 'junodownload'" class="dialog">
       <div class="nameLink">
-        <h1>Junodownload source</h1>
+        <h1>Junodownload</h1>
         <a href="https://junodownload.com" target="_blank">junodownload.com</a>
       </div>
       <p>
@@ -47,12 +47,12 @@
 
     <div v-else-if="sourceTab === 'youtube'" class="dialog">
       <div class="nameLink">
-        <h1>Youtube source</h1>
+        <h1>Youtube</h1>
         <a href="https://youtube.com" target="_blank">youtube.com</a>
       </div>
       <p>
-        Find an auto-generated channel of <span class="artistText">{{ selectedArtist }}</span> with "Topic" in its name. Both the
-        channel ID and URL are accepted. <br />Channel handles will not work.
+        Find an auto-generated "Topic" channel of <span class="artistText">{{ selectedArtist }}</span
+        >. Either a channel ID or URL is accepted. <br />Channel handles will not work.
       </p>
       <input v-model="input" placeholder="https://youtube.com/channel/UCwZEU0wAwIyZb..." />
       <button @click="clickURL" class="imgbutton">
@@ -154,7 +154,7 @@ input:focus {
 }
 a {
   margin-left: 30px;
-  padding: 4px;
+  padding: 6px;
   border-radius: 5px;
   background-color: var(--accent-color);
   color: black;
@@ -162,7 +162,7 @@ a {
   text-decoration: none;
 }
 h1 {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: normal;
 }
 button {

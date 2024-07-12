@@ -12,7 +12,6 @@
       </div>
 
       <!-- content -->
-
       <div class="sourcetable">
         <SourceTable />
       </div>
@@ -67,6 +66,8 @@ export default {
   display: flex;
   position: fixed;
   transition: 0.15s;
+  width: 100%;
+  height: 100%;
 }
 .list {
   width: 170px;
@@ -80,7 +81,8 @@ export default {
 }
 .maincontent {
   flex-grow: 1;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .topbar {
   left: 5px;
@@ -88,14 +90,14 @@ export default {
 }
 .dialogsurl {
   position: fixed;
-  top: 30%;
-  left: 30%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .sourcetable {
-  position: relative;
-  top: 6px;
-  height: 100%;
-  overflow-y: scroll;
+  flex-grow: 1;
+  margin-top: 6px;
+  overflow-y: auto;
   margin-right: 4px;
 }
 .progressbar {

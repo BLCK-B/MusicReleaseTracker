@@ -60,8 +60,9 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: 30%;
-  margin-right: 10px;
   line-height: 18px;
+  padding-right: 5px;
+  border-right: 2px solid var(--dull-color);
 }
 .accent-buttons {
   display: grid;
@@ -69,11 +70,12 @@ export default {
 }
 .belowAppearance {
   margin-left: 15px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
-input {
-  margin-right: 5px;
+input[type="checkbox"] {
+  margin-right: 6px;
 }
+
 .colorindicator {
   position: absolute;
   right: 0;

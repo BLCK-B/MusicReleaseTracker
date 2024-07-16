@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class ConfigTools {
 
     public void writeSingleConfig(String name, String value) {
         // save single string option state in config file
-        Config config = ConfigFactory.parseFile(new File(store.getConfigPath()));
+        Config config = ConfigFactory.parseFile(store.getConfigPath().toFile());
         ConfigValue configValue;
         if (value.equals("true") || value.equals("false"))
             configValue = ConfigValueFactory.fromAnyRef(Boolean.parseBoolean(value));
@@ -55,7 +56,7 @@ public class ConfigTools {
 
         config = config.withValue(name, configValue);
         ConfigRenderOptions renderOptions = ConfigRenderOptions.defaults().setOriginComments(false).setJson(false).setFormatted(true);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(store.getConfigPath()))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(store.getConfigPath().toString()))) {
             writer.write(config.root().render(renderOptions));
         } catch (IOException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "could not save " + name + " in config");
@@ -65,7 +66,7 @@ public class ConfigTools {
     public void readConfig(configOptions o) {
         // any reading from config file
         try {
-            Config config = ConfigFactory.parseFile(new File(store.getConfigPath()));
+            Config config = ConfigFactory.parseFile(store.getConfigPath().toFile());
             switch (o) {
                 case filters -> {
                     ArrayList<String> filterWords = new ArrayList<>();
@@ -98,9 +99,9 @@ public class ConfigTools {
         // create config if it does not exist, change to latest structure and transfer data if structure is different
 
         // appData/MusicReleaseTracker/MRTsettings.hocon
-        final String configPath = store.getConfigPath();
+        final Path configPath = store.getConfigPath();
         // appData/MusicReleaseTracker/
-        final String configFolder = store.getAppDataPath();
+        final Path configFolder = store.getAppDataPath();
         // a default settings structure for current version
         final String templateContent = """
             filters {
@@ -125,7 +126,7 @@ public class ConfigTools {
             log.error(e, ErrorLogging.Severity.SEVERE, "could not overwrite templatecontent");
         }
         // create config file if not exist > write templateContent
-        File configFile = new File(configPath);
+        File configFile = configPath.toFile();
         if (!configFile.exists()) {
             try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
                 writer.write(templateContent);
@@ -134,7 +135,7 @@ public class ConfigTools {
             }
         }
         // comparing structure of existing config file and template
-        Config config = ConfigFactory.parseFile(new File(configPath));
+        Config config = ConfigFactory.parseFile(configPath.toFile());
         Config templateConfig = ConfigFactory.parseFile(new File(configFolder + "/MRTsettingsTemplate.hocon"));
 
         ArrayList<String> configStructure = extractStructure(config);
@@ -194,7 +195,7 @@ public class ConfigTools {
 
     public void resetSettings() {
         // default the settings
-        File configFile = new File(store.getConfigPath());
+        File configFile = store.getConfigPath().toFile();
         configFile.delete();
         updateSettings();
     }

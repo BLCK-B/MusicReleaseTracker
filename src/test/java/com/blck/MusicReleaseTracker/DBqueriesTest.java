@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public class DBqueriesTest {
     @BeforeEach
     void setUp() {
         helperDB.redoTestData();
-        lenient().when(store.getDBpath()).thenReturn(testDBpath);
+        lenient().when(store.getDBpathString()).thenReturn(testDBpath);
         dBqueriesClass = new DBqueries(store, log, config, manageMigrateDB);
         songList = new ArrayList<>();
         songList.add(new Song("song1", "artist1", "2022-01-01", "remix"));

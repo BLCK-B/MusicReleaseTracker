@@ -5,6 +5,9 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 /*      MusicReleaseTracker
         Copyright (C) 2023 BLCK
@@ -37,7 +40,7 @@ public class StartSetup {
 
     private void createPaths() {
         String appData = null;
-        String os = System.getProperty("os.name").toLowerCase();
+        final String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win"))
             appData = System.getenv("APPDATA");
         else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))
@@ -45,10 +48,10 @@ public class StartSetup {
         else
             throw new UnsupportedOperationException("unsupported OS");
 
-        String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
-        String DBpath = "jdbc:sqlite:" + appDataPath + "musicdata.db";
-        String configPath = appDataPath + "MRTsettings.hocon";
-        String errorLogsPath = appDataPath + "errorlogs.txt";
+        Path appDataPath = Paths.get(appData, "MusicReleaseTracker", "");
+        String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath.toString(), "musicdata.db");
+        Path configPath = Paths.get(appDataPath.toString(), "MRTsettings.hocon");
+        Path errorLogsPath = Paths.get(appDataPath.toString(), "errorlogs.txt");
 
         store.setAppDataPath(appDataPath);
         store.setConfigPath(configPath);
@@ -57,17 +60,14 @@ public class StartSetup {
     }
 
     private void createDirs() {
-        String appDataPath = store.getAppDataPath();
+        Path appDataPath = store.getAppDataPath();
         try {
-            File folder = new File(appDataPath);
-            if (!folder.exists())
-                folder.mkdirs();
+            appDataPath.toFile().mkdirs();
+
             // junk folder because sqlite did not delete temp files in "temp"
             File tempfolder = new File(appDataPath + "temp");
-            if (!tempfolder.exists())
-                tempfolder.mkdirs();
-            for (File file : tempfolder.listFiles())
-                file.delete();
+            tempfolder.mkdirs();
+            Arrays.stream(tempfolder.listFiles()).forEach(File::delete);
             System.setProperty("org.sqlite.tmpdir", appDataPath + "temp");
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "something went wrong in directory setup");

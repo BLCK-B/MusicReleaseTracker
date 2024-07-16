@@ -44,7 +44,7 @@ public class DBqueries {
 
     public List<String> getArtistList() {
         List<String> dataList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT artist FROM artists ORDER BY artist LIMIT 500");
             while (rs.next())
@@ -59,7 +59,7 @@ public class DBqueries {
 
     public List<TableModel> loadTable(SourcesEnum source, String name) {
         List<TableModel> tableContent = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC, song LIMIT 100");
             pstmt.setString(1, name);
@@ -79,7 +79,7 @@ public class DBqueries {
     public List<TableModel> loadCombviewTable() {
         if (!disableR().isEmpty()) return disableR();
         List<TableModel> tableContent = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist, song LIMIT 1000";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
@@ -96,7 +96,7 @@ public class DBqueries {
     }
 
     public void insertIntoArtistList(String name) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "INSERT INTO artists (artist) values(?)");
             pstmt.setString(1, name);
@@ -113,7 +113,7 @@ public class DBqueries {
             sql = "UPDATE artists SET url" + source + " = NULL WHERE artist = ?";
         else
             sql = "UPDATE artists SET url" + source + " = ? WHERE artist = ?";
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             if (newID == null) {
                 pstmt.setString(1, name);
@@ -129,7 +129,7 @@ public class DBqueries {
     }
 
     public Optional<String> getArtistSourceID(String name, SourcesEnum source) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT url" + source + " FROM artists WHERE artist = ?");
             pstmt.setString(1, name);
@@ -141,7 +141,7 @@ public class DBqueries {
     }
 
     public void clearArtistDataFrom(String name, String table) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "DELETE FROM " + table + " WHERE artist = ?");
             pstmt.setString(1, name);
@@ -152,12 +152,12 @@ public class DBqueries {
     }
 
     public void removeArtist(String name) {
-        for (String tableName : manageDB.getDBStructure(store.getDBpath()).keySet())
+        for (String tableName : manageDB.getDBStructure(store.getDBpathString()).keySet())
             clearArtistDataFrom(name, tableName);
     }
 
     public void truncateScrapeData(boolean all) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             Statement stmt = conn.createStatement();
             if (all) {
                 for (SourcesEnum sourceTable : SourcesEnum.values())
@@ -176,7 +176,7 @@ public class DBqueries {
     public ArrayList<Song> getSourceTablesDataForCombview() {
         config.readConfig(ConfigTools.configOptions.filters);
         ArrayList<Song> songObjectList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             for (SourcesEnum source : SourcesEnum.values()) {
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200");
@@ -211,7 +211,7 @@ public class DBqueries {
     public LinkedList<Scraper> getAllScrapers() {
         // creating a list of scraper objects: one scraper holds one URL
         LinkedList<Scraper> scrapers = new LinkedList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT artist FROM artists LIMIT 500");
             ResultSet artistResults = pstmt.executeQuery();
@@ -243,7 +243,7 @@ public class DBqueries {
     }
 
     public void batchInsertSongs(List<Song> songList, SourcesEnum source, int limit) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             String sql;
             boolean types = false;
             if (songList.get(0).getType() != null && source != null) {
@@ -278,7 +278,7 @@ public class DBqueries {
     }
 
     public void vacuum() {
-        try (Connection conn = DriverManager.getConnection(store.getDBpath())) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement("VACUUM;");
             pstmt.execute();
             pstmt.close();

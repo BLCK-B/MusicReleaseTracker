@@ -112,17 +112,17 @@ public class ManageMigrateDB {
 
         File templateFile = new File(templateFilePath);
         templateFile.delete();
-        createDBandSourceTables(store.getDBpath());
+        createDBandSourceTables(store.getDBpathString());
         createDBandSourceTables(DBtemplatePath);
 
         // if different structure, fill template artist table data from musicdata and then rename/delete, make new template
         // this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes
         // made to the "artists" table: change in order of columns, adding/removing a column or changing a column's name
-        Map<String, ArrayList<String>> DBMap = getDBStructure(store.getDBpath());
+        Map<String, ArrayList<String>> DBMap = getDBStructure(store.getDBpathString());
         Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(DBtemplatePath);
         if (!DBMap.equals(DBtemplateMap)) {
             try (
-                    Connection connDB = DriverManager.getConnection(store.getDBpath());
+                    Connection connDB = DriverManager.getConnection(store.getDBpathString());
                     Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath)
             ) {
                 // insert data from musicdata column to template column
@@ -195,7 +195,7 @@ public class ManageMigrateDB {
     public void resetDB() {
         File musicdata = new File(store.getAppDataPath() + "musicdata.db");
         musicdata.delete();
-        createDBandSourceTables(store.getDBpath());
+        createDBandSourceTables(store.getDBpathString());
     }
 
 }

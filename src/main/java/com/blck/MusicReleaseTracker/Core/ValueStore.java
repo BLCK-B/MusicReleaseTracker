@@ -1,6 +1,8 @@
 package com.blck.MusicReleaseTracker.Core;
 
 import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -24,38 +26,38 @@ public class ValueStore {
     public ValueStore() {
     }
 
-    private String appDataPath;
+    private Path appDataPath;
     private String DBpath;
-    private String configPath;
-    private String errorLogsPath;
+    private Path configPath;
+    private Path errorLogsPath;
     private ArrayList<String> filterWords;
     private Map<String,String> themesMap;
     private String scrapeDate;
     private boolean isoDates = false;
     private boolean autoTheme = false;
 
-    public void setAppDataPath(String appDataPath) {
+    public void setAppDataPath(Path appDataPath) {
         this.appDataPath = appDataPath;
     }
-    public String getAppDataPath() {
+    public Path getAppDataPath() {
         return appDataPath;
     }
     public void setDBpath(String DBpath) {
         this.DBpath = DBpath;
     }
-    public String getDBpath() {
-        return DBpath;
+    public String getDBpathString() {
+        return DBpath.toString();
     }
-    public void setConfigPath(String configPath) {
+    public void setConfigPath(Path configPath) {
         this.configPath = configPath;
     }
-    public String getConfigPath() {
+    public Path getConfigPath() {
         return configPath;
     }
-    public void setErrorLogsPath(String errorLogsPath) {
+    public void setErrorLogsPath(Path errorLogsPath) {
         this.errorLogsPath = errorLogsPath;
     }
-    public String getErrorLogsPath() {
+    public Path getErrorLogsPath() {
         return errorLogsPath;
     }
     public void setFilterWords(ArrayList<String> filterWords) {

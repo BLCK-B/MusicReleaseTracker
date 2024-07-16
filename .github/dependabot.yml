@@ -1,4 +1,5 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# https://jsonformatter.org/yaml-validator
 
 version: 2
 updates:
@@ -12,10 +13,10 @@ updates:
           - "patch"
           - "minor"
   - package-ecosystem: "npm"
-    directory: "/vue"
+    directory: "/vue" 
     schedule:
-      interval: "weekly:
+      interval: "weekly"
     groups:
       all-dependencies:
-        patterns: 
+        patterns:
           - "*"

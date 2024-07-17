@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
@@ -66,7 +66,7 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
         songsArray = Arrays.copyOfRange(songsArray, 1, songsArray.length);
         datesArray = Arrays.copyOfRange(datesArray, 1, datesArray.length);
 
-        super.source = SourcesEnum.youtube;
+        super.source = TablesEnum.youtube;
         super.insertSet(
                 processInfo(
                         artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));

@@ -92,7 +92,7 @@ export default {
     handleItemClick(artist) {
       if (artist === this.selectedArtist) return;
       axios
-        .post("/api/listOrTabClick", { item: artist, origin: "list" })
+        .post("/api/getTableArtistClick", { item: artist })
         .then((response) => {
           this.$store.commit("SET_SELECTED_ARTIST", artist);
           this.$store.commit("SET_TABLE_CONTENT", response.data);

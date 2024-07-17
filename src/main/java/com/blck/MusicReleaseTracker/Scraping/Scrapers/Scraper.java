@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
@@ -31,7 +31,7 @@ public class Scraper {
 
     protected final ErrorLogging log;
     private final DBqueries DB;
-    public SourcesEnum source;
+    public TablesEnum source;
 
     public Scraper(ErrorLogging errorLogging, DBqueries DB) {
         this.log = errorLogging;

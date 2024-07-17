@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker;
 
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -71,7 +71,7 @@ public class helperDB {
     private static void clearTables() {
         try (Connection conn = DriverManager.getConnection(testDBpath)) {
             Statement stmt = conn.createStatement();
-            for (SourcesEnum sourceTable : SourcesEnum.values()) {
+            for (TablesEnum sourceTable : TablesEnum.values()) {
                 stmt.addBatch("DELETE FROM " + sourceTable);
             }
             stmt.addBatch("DELETE FROM combview");

@@ -90,15 +90,10 @@ export default {
         axios
           .post("/api/clickAddURL", url)
           .then(() => {
-            axios
-              .post("/api/listOrTabClick", {
-                item: this.selectedArtist,
-                origin: "list",
-              })
-              .then((response) => {
-                this.$store.commit("SET_TABLE_CONTENT", response.data);
-                this.$store.commit("SET_PREVIEW_VIS", true);
-              });
+            axios.post("/api/getTableArtistClick", { item: this.selectedArtist }).then((response) => {
+              this.$store.commit("SET_TABLE_CONTENT", response.data);
+              this.$store.commit("SET_PREVIEW_VIS", true);
+            });
           })
           .catch((error) => {
             console.error(error);

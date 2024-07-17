@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
@@ -105,7 +105,7 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
             }
         }
 
-        super.source = SourcesEnum.junodownload;
+        super.source = TablesEnum.junodownload;
         super.insertSet(
                 processInfo(
                         artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));

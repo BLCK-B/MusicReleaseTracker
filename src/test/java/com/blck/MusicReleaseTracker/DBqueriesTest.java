@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,7 +69,7 @@ public class DBqueriesTest {
 
     @Test
     void batchInsertIntoSource() {
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
 
         assertEquals(3, helperDB.getNumEntries("beatport"));
     }
@@ -91,9 +90,9 @@ public class DBqueriesTest {
 
     @Test
     void getArtistEntriesInSourceTable() {
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
 
-        assertEquals(2, dBqueriesClass.loadTable(SourcesEnum.beatport, "artist1").size());
+        assertEquals(2, dBqueriesClass.loadTable(TablesEnum.beatport, "artist1").size());
     }
 
     @Test
@@ -105,20 +104,20 @@ public class DBqueriesTest {
 
     @Test
     void newArtistSourceID() {
-        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).get());
+        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", TablesEnum.beatport).get());
 
-        dBqueriesClass.updateArtistSourceID("artist1", SourcesEnum.beatport, "newID");
+        dBqueriesClass.updateArtistSourceID("artist1", TablesEnum.beatport, "newID");
 
-        assertEquals("newID", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).get());
+        assertEquals("newID", dBqueriesClass.getArtistSourceID("artist1", TablesEnum.beatport).get());
     }
 
     @Test
     void nullArtistSourceID() {
-        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).get());
+        assertEquals("IDBP", dBqueriesClass.getArtistSourceID("artist1", TablesEnum.beatport).get());
 
-        dBqueriesClass.updateArtistSourceID("artist1", SourcesEnum.beatport, null);
+        dBqueriesClass.updateArtistSourceID("artist1", TablesEnum.beatport, null);
 
-        assertTrue(dBqueriesClass.getArtistSourceID("artist1", SourcesEnum.beatport).isEmpty());
+        assertTrue(dBqueriesClass.getArtistSourceID("artist1", TablesEnum.beatport).isEmpty());
     }
 
     @Test
@@ -144,18 +143,18 @@ public class DBqueriesTest {
     void getDataFromSourceTablesForCombviewWithFiltering() {
         ArrayList<String> filters = new ArrayList<>(Arrays.asList("remix", "filterme"));
         when(store.getFilterWords()).thenReturn(filters);
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         songList.clear();
         songList.add(new Song("song1filterme", "artist1", "2022-01-01", null));
         songList.add(new Song("FILTERMEsong2", "artist2", "2022-01-01", null));
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.youtube, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.youtube, 10);
 
         assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
     }
 
     @Test
     void truncateOnlyCombviewTable() {
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         dBqueriesClass.batchInsertSongs(songList, null, 10);
         int entries = helperDB.getNumEntries("combview", "beatport");
         assertEquals(6, entries);
@@ -171,8 +170,8 @@ public class DBqueriesTest {
         songList = new ArrayList<>();
         songList.add(new Song("song1", "artist1", "2022-01-01", null));
         songList.add(new Song("song2", "artist1", "2022-01-01", null));
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.musicbrainz, 10);
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.junodownload, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
         dBqueriesClass.batchInsertSongs(songList, null, 10);
         int entries = helperDB.getNumEntries("combview", "musicbrainz", "junodownload");
         assertEquals(6, entries);
@@ -190,7 +189,7 @@ public class DBqueriesTest {
 
     @Test
     void clearArtistDataFrom() {;
-        dBqueriesClass.batchInsertSongs(songList, SourcesEnum.beatport, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         assertEquals(2, helperDB.getCountOf("beatport", "artist", "artist1"));
 
         dBqueriesClass.clearArtistDataFrom("artist1", "beatport");

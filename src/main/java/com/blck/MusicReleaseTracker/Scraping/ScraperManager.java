@@ -1,6 +1,6 @@
 package com.blck.MusicReleaseTracker.Scraping;
 
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
@@ -32,15 +32,21 @@ public class ScraperManager {
     public ScraperManager(ErrorLogging log, DBqueries DB) {
         this.log = log;
         this.DB = DB;
-        for (SourcesEnum source : SourcesEnum.values())
+        for (TablesEnum source : TablesEnum.values()) {
+            if (source == TablesEnum.combview)
+                continue;
             sourceTimes.put(source.toString(), 0.0);
+        }
     }
     public ScraperManager(ErrorLogging log, DBqueries DB, int customSleepTime) {
         this.log = log;
         this.DB = DB;
         minDelay = customSleepTime;
-        for (SourcesEnum source : SourcesEnum.values())
+        for (TablesEnum source : TablesEnum.values()) {
+            if (source == TablesEnum.combview)
+                continue;
             sourceTimes.put(source.toString(), 0.0);
+        }
     }
 
     public int loadWithScrapers() {

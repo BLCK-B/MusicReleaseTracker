@@ -3,6 +3,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.sqlite.core.DB;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -38,7 +39,7 @@ public class StartSetup {
         createDirs();
     }
 
-    private void createPaths() {
+    public void createPaths() {
         String appData = null;
         final String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win"))
@@ -48,8 +49,8 @@ public class StartSetup {
         else
             throw new UnsupportedOperationException("unsupported OS");
 
-        Path appDataPath = Paths.get(appData, "MusicReleaseTracker", "");
-        String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath.toString(), "musicdata.db");
+        String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
+        String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath.toString(),  "musicdata.db");
         Path configPath = Paths.get(appDataPath.toString(), "MRTsettings.hocon");
         Path errorLogsPath = Paths.get(appDataPath.toString(), "errorlogs.txt");
 
@@ -60,10 +61,9 @@ public class StartSetup {
     }
 
     private void createDirs() {
-        Path appDataPath = store.getAppDataPath();
+        String appDataPath = store.getAppDataPath();
         try {
-            appDataPath.toFile().mkdirs();
-
+            new File(appDataPath).mkdirs();
             // junk folder because sqlite did not delete temp files in "temp"
             File tempfolder = new File(appDataPath + "temp");
             tempfolder.mkdirs();

@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
@@ -38,7 +38,7 @@ public class GUIController {
     private final DBqueries DB;
     private final ManageMigrateDB manageDB;
 
-    private SourcesEnum selectedSource;
+    private TablesEnum selectedSource = TablesEnum.combview;
     private String selectedArtist;
     private String tempID;
 
@@ -51,12 +51,6 @@ public class GUIController {
         this.config = config;
         this.DB = dBqueries;
         this.manageDB = manageDB;
-    }
-
-    public void setTestData(String lastClickedArtist, SourcesEnum selectedSource) {
-        this.selectedArtist = lastClickedArtist;
-        this.selectedSource = selectedSource;
-        tempID = "testingUrl";
     }
 
     public List<String> loadList() {
@@ -78,7 +72,7 @@ public class GUIController {
     }
 
     public void deleteSourceID() {
-        if (selectedArtist != null && selectedSource != null) {
+        if (selectedArtist != null && selectedSource != null && selectedSource != TablesEnum.combview) {
             DB.updateArtistSourceID(selectedArtist, selectedSource, null);
             DB.clearArtistDataFrom(selectedArtist, selectedSource.toString());
         }
@@ -88,17 +82,17 @@ public class GUIController {
         DB.clearArtistDataFrom(selectedArtist, selectedSource.toString());
     }
 
-    public List<TableModel> getTableData(String item, String origin) {
-        if (origin.equals("list"))
-            selectedArtist = item;
-        else if (origin.equals("tab"))
-            selectedSource = item.equals("combview") ? null : SourcesEnum.valueOf(item);
+    public List<TableModel> getTableData(String artist) {
+        selectedArtist = artist;
+        return selectedSource == TablesEnum.combview ? DB.loadCombviewTable() : DB.loadTable(selectedSource, selectedArtist);
+    }
 
-        if (selectedSource == null)
+    public List<TableModel> getTableData(TablesEnum source) {
+        selectedSource = source;
+        if (selectedSource == TablesEnum.combview)
             return DB.loadCombviewTable();
         else if (selectedArtist != null)
             return DB.loadTable(selectedSource, selectedArtist);
-
         return null;
     }
 
@@ -107,7 +101,7 @@ public class GUIController {
     }
 
     public void scrapePreview(String url) {
-        if (selectedArtist == null || selectedSource == null || url.isBlank())
+        if (url.isBlank())
             return;
 
         tempID = null;
@@ -134,11 +128,8 @@ public class GUIController {
     }
 
     public boolean checkExistURL() {
-        try {
-            SourcesEnum.valueOf(String.valueOf(selectedSource));
-        } catch (IllegalArgumentException e) {
+        if (selectedSource == TablesEnum.combview)
             return false;
-        }
         return DB.getArtistSourceID(selectedArtist, selectedSource).isPresent();
     }
 

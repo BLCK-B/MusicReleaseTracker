@@ -1,17 +1,14 @@
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Node;
-import org.jsoup.select.Elements;
 
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.List;
 
 /*      MusicReleaseTracker
@@ -62,7 +59,7 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
         String[] datesArray = doc.select("first-release-date").eachText().toArray(new String[0]);
 
-        super.source = SourcesEnum.musicbrainz;
+        super.source = TablesEnum.musicbrainz;
         super.insertSet(
                 processInfo(
                         artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));

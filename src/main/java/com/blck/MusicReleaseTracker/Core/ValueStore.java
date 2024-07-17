@@ -26,7 +26,7 @@ public class ValueStore {
     public ValueStore() {
     }
 
-    private Path appDataPath;
+    private String appDataPath;
     private String DBpath;
     private Path configPath;
     private Path errorLogsPath;
@@ -36,10 +36,10 @@ public class ValueStore {
     private boolean isoDates = false;
     private boolean autoTheme = false;
 
-    public void setAppDataPath(Path appDataPath) {
+    public void setAppDataPath(String appDataPath) {
         this.appDataPath = appDataPath;
     }
-    public Path getAppDataPath() {
+    public String getAppDataPath() {
         return appDataPath;
     }
     public void setDBpath(String DBpath) {

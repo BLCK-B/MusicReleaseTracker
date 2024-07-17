@@ -2,7 +2,7 @@ package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.ConfigTools;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
@@ -57,7 +57,7 @@ public class DBqueries {
         return dataList;
     }
 
-    public List<TableModel> loadTable(SourcesEnum source, String name) {
+    public List<TableModel> loadTable(TablesEnum source, String name) {
         List<TableModel> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
@@ -107,7 +107,7 @@ public class DBqueries {
         }
     }
 
-    public void updateArtistSourceID(String name, SourcesEnum source, String newID) {
+    public void updateArtistSourceID(String name, TablesEnum source, String newID) {
         String sql;
         if (newID == null)
             sql = "UPDATE artists SET url" + source + " = NULL WHERE artist = ?";
@@ -128,7 +128,7 @@ public class DBqueries {
         }
     }
 
-    public Optional<String> getArtistSourceID(String name, SourcesEnum source) {
+    public Optional<String> getArtistSourceID(String name, TablesEnum source) {
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT url" + source + " FROM artists WHERE artist = ?");
@@ -159,11 +159,11 @@ public class DBqueries {
     public void truncateScrapeData(boolean all) {
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             Statement stmt = conn.createStatement();
-            if (all) {
-                for (SourcesEnum sourceTable : SourcesEnum.values())
-                    stmt.addBatch("DELETE FROM " + sourceTable);
+            for (TablesEnum table : TablesEnum.values()) {
+                if (!all && table == TablesEnum.combview)
+                    continue;
+                stmt.addBatch("DELETE FROM " + table);
             }
-            stmt.addBatch("DELETE FROM combview");
             conn.setAutoCommit(false);
             stmt.executeBatch();
             conn.setAutoCommit(true);
@@ -177,9 +177,11 @@ public class DBqueries {
         config.readConfig(ConfigTools.configOptions.filters);
         ArrayList<Song> songObjectList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
-            for (SourcesEnum source : SourcesEnum.values()) {
+            for (TablesEnum table : TablesEnum.values()) {
+                if (table == TablesEnum.combview)
+                    continue;
                 Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM " + source + " ORDER BY date DESC LIMIT 200");
+                ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + " ORDER BY date DESC LIMIT 200");
                 while (rs.next()) {
                     String songName = rs.getString("song");
                     String songArtist = rs.getString("artist");
@@ -219,7 +221,9 @@ public class DBqueries {
             while (artistResults.next()) {
                 String artist = artistResults.getString("artist");
                 // cycling sources
-                for (SourcesEnum webSource : SourcesEnum.values()) {
+                for (TablesEnum webSource : TablesEnum.values()) {
+                    if (webSource == TablesEnum.combview)
+                        continue;
                     pstmt = conn.prepareStatement(
                             "SELECT * FROM artists WHERE artist = ? LIMIT 100");
                     pstmt.setString(1, artist);
@@ -242,7 +246,7 @@ public class DBqueries {
         return scrapers;
     }
 
-    public void batchInsertSongs(List<Song> songList, SourcesEnum source, int limit) {
+    public void batchInsertSongs(List<Song> songList, TablesEnum source, int limit) {
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             String sql;
             boolean types = false;

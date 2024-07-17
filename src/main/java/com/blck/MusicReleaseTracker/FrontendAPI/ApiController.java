@@ -1,5 +1,6 @@
 package com.blck.MusicReleaseTracker.FrontendAPI;
 
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.GUIController;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +41,14 @@ public class ApiController {
         return sendRequest.loadList();
     }
 
-    @PostMapping ("/listOrTabClick")
-    public List<TableModel> listOrTabClick(@RequestBody Map<String, String> requestData) {
-        return sendRequest.getTableData(requestData.get("item"), requestData.get("origin"));
+    @PostMapping ("/getTableArtistClick")
+    public List<TableModel> getTableArtistClick(@RequestBody Map<String, String> requestData) {
+        return sendRequest.getTableData(requestData.get("item"));
+    }
+
+    @PostMapping ("/getTableSourceClick")
+    public List<TableModel> getTableSourceClick(@RequestBody Map<String, String> requestData) {
+        return sendRequest.getTableData(TablesEnum.valueOf(requestData.get("item")));
     }
 
     @PostMapping("/clickArtistAdd")

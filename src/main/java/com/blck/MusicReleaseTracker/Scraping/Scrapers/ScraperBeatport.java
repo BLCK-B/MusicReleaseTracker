@@ -1,7 +1,7 @@
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
@@ -80,7 +80,7 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
             datesArrayList.add(matcher.group(3));
         }
 
-        super.source = SourcesEnum.beatport;
+        super.source = TablesEnum.beatport;
         super.insertSet(
                 processInfo(
                         artistToSongList(songsArrayList, songArtist, datesArrayList, typesArrayList)));

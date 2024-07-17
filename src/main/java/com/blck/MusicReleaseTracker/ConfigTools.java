@@ -101,7 +101,7 @@ public class ConfigTools {
         // appData/MusicReleaseTracker/MRTsettings.hocon
         final Path configPath = store.getConfigPath();
         // appData/MusicReleaseTracker/
-        final Path configFolder = store.getAppDataPath();
+        final String configFolder = store.getAppDataPath();
         // a default settings structure for current version
         final String templateContent = """
             filters {

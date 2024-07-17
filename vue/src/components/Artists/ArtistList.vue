@@ -144,6 +144,21 @@ export default {
 *::-webkit-scrollbar-thumb {
   background-color: var(--dull-color);
 }
+
+button {
+  border: none;
+  border-radius: 5px;
+  background-color: var(--duller-color);
+  color: var(--contrast-color);
+  opacity: 0.85;
+}
+button:hover {
+  opacity: 1;
+}
+button:active {
+  opacity: 75%;
+}
+
 .listbtn {
   width: 92%;
   height: 28px;
@@ -167,28 +182,9 @@ export default {
 }
 .addbtn,
 .morebtn {
-  font-size: 12px;
+  font-size: 13px;
   width: 75px;
   height: 28px;
-  border: 2px solid var(--dull-color);
-  border-radius: 6px;
-  background-color: transparent;
-  color: var(--contrast-color);
-}
-.addbtn {
-  margin-left: 5px;
-}
-.addbtn:hover,
-.morebtn:hover {
-  background-color: var(--accent-color);
-  border: 2px solid var(--accent-color);
-  color: var(--accent-contrast);
-}
-.addbtn:active,
-.morebtn:active {
-  opacity: 75%;
-}
-.morebtn {
   margin-left: 5px;
 }
 .dropdown {
@@ -200,17 +196,12 @@ export default {
   padding-left: 6px;
 }
 .dropdown .deletebtn {
-  font-size: 12px;
+  font-size: 13px;
   height: 25px;
-  margin-top: 3px;
-  border: 2px solid var(--dull-color);
-  border-radius: 6px;
-  background-color: transparent;
-  color: var(--contrast-color);
+  margin-top: 5px;
 }
 .deletebtn:hover {
   background-color: red;
-  border: 2px solid red;
 }
 .listbtn:hover {
   background-color: var(--duller-color);

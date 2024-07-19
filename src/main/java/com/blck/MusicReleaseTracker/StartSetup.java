@@ -60,7 +60,7 @@ public class StartSetup {
         store.setErrorLogsPath(errorLogsPath);
     }
 
-    private void createDirs() {
+    public void createDirs() {
         String appDataPath = store.getAppDataPath();
         try {
             new File(appDataPath).mkdirs();

@@ -140,7 +140,7 @@ public class DBqueries {
         return Optional.empty();
     }
 
-    public void clearArtistDataFrom(String name, String table) {
+    public void clearArtistDataFrom(String name, TablesEnum table) {
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "DELETE FROM " + table + " WHERE artist = ?");
@@ -150,10 +150,10 @@ public class DBqueries {
             log.error(e, ErrorLogging.Severity.SEVERE, "error deleting artists data in " + table);
         }
     }
-
+    // TODO: deleteURL method to force TablesEnum + test
     public void removeArtist(String name) {
-        for (String tableName : manageDB.getDBStructure(store.getDBpathString()).keySet())
-            clearArtistDataFrom(name, tableName);
+//        for (String tableName : manageDB.getDBStructure(store.getDBpathString()).keySet())
+//            clearArtistDataFrom(name, tableName);
     }
 
     public void truncateAllTables() {

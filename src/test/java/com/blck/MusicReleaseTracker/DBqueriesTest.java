@@ -191,7 +191,7 @@ public class DBqueriesTest {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         assertEquals(2, helperDB.getCountOf("beatport", "artist", "artist1"));
 
-        dBqueriesClass.clearArtistDataFrom("artist1", "beatport");
+        dBqueriesClass.clearArtistDataFrom("artist1", TablesEnum.beatport);
 
         assertEquals(0, helperDB.getCountOf("beatport", "artist", "artist1"));
         assertEquals(1, helperDB.getCountOf("beatport", "artist", "artist2"));

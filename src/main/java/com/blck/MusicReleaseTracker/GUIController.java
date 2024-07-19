@@ -72,14 +72,14 @@ public class GUIController {
     }
 
     public void deleteSourceID() {
-        if (selectedArtist != null && selectedSource != null && selectedSource != TablesEnum.combview) {
+        if (selectedArtist != null && selectedSource != TablesEnum.combview) {
             DB.updateArtistSourceID(selectedArtist, selectedSource, null);
-            DB.clearArtistDataFrom(selectedArtist, selectedSource.toString());
+            DB.clearArtistDataFrom(selectedArtist, selectedSource);
         }
     }
 
     public void cleanArtistSource() {
-        DB.clearArtistDataFrom(selectedArtist, selectedSource.toString());
+        DB.clearArtistDataFrom(selectedArtist, selectedSource);
     }
 
     public List<TableModel> getTableData(String artist) {

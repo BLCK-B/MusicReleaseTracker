@@ -74,7 +74,6 @@ public class helperDB {
             for (TablesEnum sourceTable : TablesEnum.values()) {
                 stmt.addBatch("DELETE FROM " + sourceTable);
             }
-            stmt.addBatch("DELETE FROM combview");
             stmt.addBatch("DELETE FROM artists");
             conn.setAutoCommit(false);
             stmt.executeBatch();

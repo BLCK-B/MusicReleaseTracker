@@ -156,17 +156,24 @@ public class DBqueries {
             clearArtistDataFrom(name, tableName);
     }
 
-    public void truncateScrapeData(boolean all) {
+    public void truncateAllTables() {
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             Statement stmt = conn.createStatement();
-            for (TablesEnum table : TablesEnum.values()) {
-                if (!all && table == TablesEnum.combview)
-                    continue;
+            for (TablesEnum table : TablesEnum.values())
                 stmt.addBatch("DELETE FROM " + table);
-            }
             conn.setAutoCommit(false);
             stmt.executeBatch();
             conn.setAutoCommit(true);
+            stmt.close();
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.WARNING, "error clearing DB");
+        }
+    }
+
+    public void truncateCombview() {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("DELETE FROM combview");
             stmt.close();
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error clearing DB");

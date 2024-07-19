@@ -46,7 +46,7 @@ public class ScrapeProcess {
 
     public void scrapeData(ScraperManager scraperManager) {
         scrapeCancel = false;
-        DB.truncateScrapeData(true);
+        DB.truncateAllTables();
         final int initSize = scraperManager.loadWithScrapers();
         if (initSize == 0)
             return;
@@ -54,6 +54,7 @@ public class ScrapeProcess {
         double progress = 0.0;
         while (remaining != 0 && !scrapeCancel) {
             remaining = scraperManager.scrapeNext();
+
             progress = ((double) initSize - (double) remaining) / (double) initSize;
             if (progress != 1.0)
                 if (SSE.sendProgress(progress))
@@ -64,7 +65,7 @@ public class ScrapeProcess {
     }
 
     public void fillCombviewTable() {
-        DB.truncateScrapeData(false);
+        DB.truncateCombview();
         ArrayList<Song> songObjectList = DB.getSourceTablesDataForCombview();
         if (songObjectList.isEmpty())
             return;

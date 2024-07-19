@@ -153,20 +153,19 @@ public class DBqueriesTest {
     }
 
     @Test
-    void truncateOnlyCombviewTable() {
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
+    void truncateCombviewTable() {
         dBqueriesClass.batchInsertSongs(songList, null, 10);
         int entries = helperDB.getNumEntries("combview", "beatport");
-        assertEquals(6, entries);
+        assertEquals(3, entries);
 
-        dBqueriesClass.truncateScrapeData(false);
+        dBqueriesClass.truncateCombview();
 
         entries = helperDB.getNumEntries("combview", "beatport");
-        assertEquals(3, entries);
+        assertEquals(0, entries);
     }
 
     @Test
-    void truncateAllTables() {
+    void truncateAllScrapeTables() {
         songList = new ArrayList<>();
         songList.add(new Song("song1", "artist1", "2022-01-01", null));
         songList.add(new Song("song2", "artist1", "2022-01-01", null));
@@ -176,7 +175,7 @@ public class DBqueriesTest {
         int entries = helperDB.getNumEntries("combview", "musicbrainz", "junodownload");
         assertEquals(6, entries);
 
-        dBqueriesClass.truncateScrapeData(true);
+        dBqueriesClass.truncateAllTables();
 
         entries = helperDB.getNumEntries("combview", "musicbrainz", "junodownload");
         assertEquals(0, entries);

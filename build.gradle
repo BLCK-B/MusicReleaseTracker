@@ -6,7 +6,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.beryx.jlink
     id("org.beryx.jlink") version "3.0.1"
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.3.1"
+    id("org.springframework.boot") version "3.3.2"
     // https://plugins.gradle.org/plugin/io.spring.dependency-management
     id("io.spring.dependency-management") version "1.1.6"
     // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#_adding_the_plugin
@@ -63,8 +63,8 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.1'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.1'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.2'
 }
 
 bootJar {

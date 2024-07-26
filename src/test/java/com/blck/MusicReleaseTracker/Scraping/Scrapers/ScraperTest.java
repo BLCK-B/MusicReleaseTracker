@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 
 /*      MusicReleaseTracker
@@ -34,7 +35,7 @@ public class ScraperTest {
 
     @Test
     void emptySongListFromScraper() {
-        assertThrows(Exception.class, () -> scraper.processInfo(new ArrayList<>()));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> scraper.processInfo(new ArrayList<>()));
     }
 
     @Test

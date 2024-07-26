@@ -13,7 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import static com.blck.MusicReleaseTracker.Scraping.SongAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -95,10 +98,10 @@ public class ScrapeProcessTest {
         songList.add(new Song("song", "artist", "2023-01-01", null));
         songList.add(new Song("song", "artist", "2022-01-01", null));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        List<Song> output = scrapeProcess.mergeNameArtistDuplicates(songList);
 
         Song expected = new Song("song", "artist", "2022-01-01", null);
-        assertEquals(expected.toString(), output.getFirst().toString());
+        assertThat(expected).dataMatches(output.getFirst());
     }
 
     @Test
@@ -107,7 +110,7 @@ public class ScrapeProcessTest {
         songList.add(new Song("song", "artist", "2022", null));
         songList.add(new Song("song", "artist", "2022-01-01", null));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        Collection<Song> output = scrapeProcess.mergeNameArtistDuplicates(songList);
 
         verify(log).error(any(), eq(ErrorLogging.Severity.SEVERE), contains("incorrect date format"));
     }
@@ -120,10 +123,10 @@ public class ScrapeProcessTest {
         songList.add(new Song("song", "joe", "2022-01-01", null));
         songList.add(new Song("song", "joe", "2022-01-01", null));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        List<Song> output = scrapeProcess.mergeNameDateDuplicates(songList);
 
         Song expected = new Song("song", "bob, joe, zilch", "2022-01-01", null);
-        assertEquals(expected.toString(), output.getFirst().toString());
+        assertThat(expected).dataMatches(output.getFirst());
     }
 
     @Test
@@ -137,10 +140,112 @@ public class ScrapeProcessTest {
         expected.add(new Song("song2", "artist", "2023-01-01", null));
         expected.add(new Song("song3", "artist", "2020-01-01", null));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        List<Song> output = scrapeProcess.sortByNewestDate(songList);
 
-        for (int i = 0; i < expected.size(); i++)
-            assertEquals(expected.get(i).toString(), output.get(i).toString());
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void datesApartByDays() {
+        Song s1 = new Song("song", "artist", "2020-01-01", null);
+        Song s2 = new Song("song", "artist", "2020-01-05", null);
+
+        int dayDiff = scrapeProcess.getDayDifference(s1, s2);
+
+        assertEquals(4, dayDiff);
+    }
+
+    @Test
+    void sameDateApart() {
+        Song s1 = new Song("song", "artist", "2020-01-01", null);
+
+        int dayDiff = scrapeProcess.getDayDifference(s1, s1);
+
+        assertEquals(0, dayDiff);
+    }
+
+    @Test
+    void positiveTimeApart() {
+        Song s1 = new Song("song", "artist", "2020-01-01", null);
+        Song s2 = new Song("song", "artist", "2020-01-05", null);
+
+        int dayDiff = scrapeProcess.getDayDifference(s2, s1);
+
+        assertTrue(dayDiff > 0);
+    }
+
+    @Test
+    void mergeSongsWithinDaysApart() {
+        ArrayList<Song> songList = new ArrayList<>();
+        songList.add(new Song("song", "artist", "2020-01-05", null));
+        songList.add(new Song("song", "artist", "2020-01-04", null));
+        songList.add(new Song("song", "artist", "2022-10-01", null));
+        ArrayList<Song> expected = new ArrayList<>();
+        expected.add(new Song("song", "artist", "2020-01-04", null));
+        expected.add(new Song("song", "artist", "2022-10-01", null));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void mergeSongsWithinDaysApartAppendArtists() {
+        ArrayList<Song> songList = new ArrayList<>();
+        songList.add(new Song("song", "joe", "2020-01-05", null));
+        songList.add(new Song("song", "bob", "2020-01-03", null));
+        songList.add(new Song("song", "zilch", "2020-01-04", null));
+        Song expected = new Song("song", "bob, joe, zilch", "2020-01-03", null);
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
+
+        assertThat(expected).dataMatches(output.getFirst());
+    }
+
+    @Test
+    void noSongsToMergeByDaysApart() {
+        ArrayList<Song> songList = new ArrayList<>();
+        songList.add(new Song("song", "artist", "2020-01-05", null));
+        songList.add(new Song("song", "artist", "2021-01-05", null));
+        songList.add(new Song("song", "artist", "2022-01-05", null));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 1);
+
+        for (int i = 0; i < songList.size(); ++i)
+            assertThat(songList.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void identicalSongsSameDate() {
+        ArrayList<Song> songList = new ArrayList<>();
+        songList.add(new Song("song", "artist", "2020-01-05", null));
+        songList.add(new Song("song", "artist", "2020-01-05", null));
+        ArrayList<Song> expected = new ArrayList<>();
+        expected.add(new Song("song", "artist", "2020-01-05", null));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 1);
+
+        assertEquals(1, output.size());
+    }
+
+    @Test
+    void justOutsideMaxDaysApart() {
+        ArrayList<Song> songList = new ArrayList<>();
+        songList.add(new Song("song", "artist", "2020-01-04", null));
+        songList.add(new Song("song", "artist", "2020-01-01", null));
+        songList.add(new Song("song", "artist", "2020-01-02", null));
+        songList.add(new Song("song", "artist", "2020-01-03", null));
+        songList.add(new Song("song", "artist", "2020-01-05", null));
+        ArrayList<Song> expected = new ArrayList<>();
+        expected.add(new Song("song", "artist", "2020-01-01", null));
+        expected.add(new Song("song", "artist", "2020-01-04", null));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
     }
 
 

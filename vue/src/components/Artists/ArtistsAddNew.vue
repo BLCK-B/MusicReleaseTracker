@@ -66,7 +66,7 @@ export default {
   position: absolute;
   gap: 4px;
   top: 3px;
-  left: 2px;
+  left: 6px;
   width: 290px;
   z-index: 4;
   height: 38px;

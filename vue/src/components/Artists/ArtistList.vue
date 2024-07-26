@@ -163,12 +163,13 @@ button:active {
   width: 92%;
   height: 28px;
   border-radius: 3px;
-  margin: 0;
   display: flex;
   align-items: center;
   white-space: nowrap;
   overflow: hidden;
-  padding-left: 7px;
+  padding-left: 6px;
+  margin: 0;
+  margin-left: 2px;
 }
 .artistlist {
   height: calc(100vh - 40px);
@@ -185,15 +186,15 @@ button:active {
   font-size: 13px;
   width: 75px;
   height: 28px;
-  margin-left: 5px;
+  margin-left: 7px;
 }
 .dropdown {
   position: relative;
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   background-color: var(--subtle-color);
-  padding-right: 10px;
-  padding-left: 6px;
+  padding-right: 11px;
+  padding-left: 7px;
 }
 .dropdown .deletebtn {
   font-size: 13px;

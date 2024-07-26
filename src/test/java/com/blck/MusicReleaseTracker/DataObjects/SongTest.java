@@ -2,7 +2,7 @@ package com.blck.MusicReleaseTracker.DataObjects;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SongTest {
 
@@ -19,6 +19,20 @@ public class SongTest {
         song.appendArtist("joe");
         song.appendArtist("joe");
         assertEquals("bob, joe, zilch", song.getArtists());
+    }
+
+    @Test
+    void correctStringNoType() {
+        Song song = new Song("song", "artist","date", null);
+
+        assertEquals("song artist date", song.toString());
+    }
+
+    @Test
+    void correctStringWithType() {
+        Song song = new Song("song", "artist","date", "type");
+
+        assertEquals("song artist date type", song.toString());
     }
 
 }

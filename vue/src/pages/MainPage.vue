@@ -70,8 +70,8 @@ export default {
   height: 100%;
 }
 .list {
-  width: 170px;
-  min-width: 170px;
+  width: 175px;
+  min-width: 175px;
   padding-top: 5px;
   padding-left: 2px;
   top: -3px;

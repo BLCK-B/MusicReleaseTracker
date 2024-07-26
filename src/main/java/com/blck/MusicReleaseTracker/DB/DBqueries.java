@@ -150,10 +150,17 @@ public class DBqueries {
             log.error(e, ErrorLogging.Severity.SEVERE, "error deleting artists data in " + table);
         }
     }
-    // TODO: deleteURL method to force TablesEnum + test
-    public void removeArtist(String name) {
-//        for (String tableName : manageDB.getDBStructure(store.getDBpathString()).keySet())
-//            clearArtistDataFrom(name, tableName);
+
+    public void removeArtistFromAllTables(String name) {
+        for (TablesEnum table : TablesEnum.values())
+            clearArtistDataFrom(name, table);
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM artists WHERE artist = ?");
+            pstmt.setString(1, name);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error deleting " + name + "in artists");
+        }
     }
 
     public void truncateAllTables() {
@@ -254,18 +261,14 @@ public class DBqueries {
     }
 
     public void batchInsertSongs(List<Song> songList, TablesEnum source, int limit) {
+        if (source == null)
+            throw new NullPointerException("null table");
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             String sql;
-            boolean types = false;
-            if (songList.get(0).getType() != null && source != null) {
+            if (songList.getFirst().getType() != null && source != TablesEnum.combview)
                 sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
-                types = true;
-            } else {
-                if (source != null)
-                    sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
-                else
-                    sql = "insert into combview(song, artist, date) values(?, ?, ?)";
-            }
+            else
+                sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             int i = 0;
             for (Song songObject : songList) {
@@ -274,7 +277,7 @@ public class DBqueries {
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
-                if (types)
+                if (songList.getFirst().getType() != null && source != TablesEnum.combview)
                     pstmt.setString(4, songObject.getType());
                 ++i;
                 pstmt.addBatch();

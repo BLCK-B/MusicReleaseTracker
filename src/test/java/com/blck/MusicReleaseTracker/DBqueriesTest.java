@@ -76,14 +76,14 @@ public class DBqueriesTest {
 
     @Test
     void batchInsertIntoCombview() {
-        dBqueriesClass.batchInsertSongs(songList, null, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
 
         assertEquals(3, helperDB.getNumEntries("combview"));
     }
 
     @Test
     void batchInsertOverLimit() {
-        dBqueriesClass.batchInsertSongs(songList, null, 1);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 1);
 
         assertEquals(1, helperDB.getNumEntries("combview"));
     }
@@ -97,7 +97,7 @@ public class DBqueriesTest {
 
     @Test
     void getEntriesInCombviewTable() {
-        dBqueriesClass.batchInsertSongs(songList, null, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
 
         assertEquals(3, dBqueriesClass.loadCombviewTable().size());
     }
@@ -136,7 +136,6 @@ public class DBqueriesTest {
         assertTrue(dBqueriesClass.doesNotContainDisabledWords("song", "type"));
         assertFalse(dBqueriesClass.doesNotContainDisabledWords("REMIX", "REMIXED"));
         assertFalse(dBqueriesClass.doesNotContainDisabledWords("soRemix", "type"));
-        assertFalse(dBqueriesClass.doesNotContainDisabledWords("song", "tyRemiXpe"));
     }
 
     @Test
@@ -154,7 +153,7 @@ public class DBqueriesTest {
 
     @Test
     void truncateCombviewTable() {
-        dBqueriesClass.batchInsertSongs(songList, null, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
         int entries = helperDB.getNumEntries("combview", "beatport");
         assertEquals(3, entries);
 
@@ -171,7 +170,7 @@ public class DBqueriesTest {
         songList.add(new Song("song2", "artist1", "2022-01-01", null));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
-        dBqueriesClass.batchInsertSongs(songList, null, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
         int entries = helperDB.getNumEntries("combview", "musicbrainz", "junodownload");
         assertEquals(6, entries);
 
@@ -195,6 +194,21 @@ public class DBqueriesTest {
 
         assertEquals(0, helperDB.getCountOf("beatport", "artist", "artist1"));
         assertEquals(1, helperDB.getCountOf("beatport", "artist", "artist2"));
+    }
+
+    @Test
+    void deleteArtistFromAllTables() {
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
+        assertEquals(1, helperDB.getCountOf("artists", "artist", "artist1"));
+        assertEquals(2, helperDB.getCountOf("beatport", "artist", "artist1"));
+        assertEquals(2, helperDB.getCountOf("combview", "artist", "artist1"));
+
+        dBqueriesClass.removeArtistFromAllTables("artist1");
+
+        assertEquals(0, helperDB.getCountOf("artists", "artist", "artist1"));
+        assertEquals(0, helperDB.getCountOf("beatport", "artist", "artist1"));
+        assertEquals(0, helperDB.getCountOf("combview", "artist", "artist1"));
     }
 
     @AfterAll

@@ -67,7 +67,7 @@ public class GUIController {
     public void removeArtist() {
         if (selectedArtist == null)
             return;
-        DB.removeArtist(selectedArtist);
+        DB.removeArtistFromAllTables(selectedArtist);
         selectedArtist = null;
     }
 

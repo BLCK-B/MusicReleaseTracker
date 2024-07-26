@@ -71,9 +71,8 @@ public class helperDB {
     private static void clearTables() {
         try (Connection conn = DriverManager.getConnection(testDBpath)) {
             Statement stmt = conn.createStatement();
-            for (TablesEnum sourceTable : TablesEnum.values()) {
+            for (TablesEnum sourceTable : TablesEnum.values())
                 stmt.addBatch("DELETE FROM " + sourceTable);
-            }
             stmt.addBatch("DELETE FROM artists");
             conn.setAutoCommit(false);
             stmt.executeBatch();

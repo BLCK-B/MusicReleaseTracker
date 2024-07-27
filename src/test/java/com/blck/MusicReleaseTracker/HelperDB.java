@@ -21,7 +21,7 @@ import java.sql.*;
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-public class helperDB {
+public class HelperDB {
 
     final static String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
     final static Path DBfilePath = Paths.get("src", "test", "testresources", "testdb.db");

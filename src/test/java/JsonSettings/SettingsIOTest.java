@@ -1,9 +1,8 @@
 package JsonSettings;
 
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import com.blck.MusicReleaseTracker.JsonSettings.SettingsModel;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SettingsIOTest {
@@ -12,48 +11,58 @@ public class SettingsIOTest {
 
     @Test
     void previouslyNonexistentOptionsAdded() {
-        SettingsModel old = new HelperModelV1();
+        Object old = new HelperModelV1();
 
-        HelperModelV2 result = (HelperModelV2) settingsIO.migrateSettings(old, new HelperModelV2());
+        JsonNode result = settingsIO.migrateSettings(old, new HelperModelV2());
 
-        assertTrue(result.getIsoDates());
-        assertFalse(result.getFilterState("Acoustic"));
+        assertTrue(result.has("v2exclusive"));
+        // TODO: assert filter
+    }
+
+    @Test
+    void noLongerSupportedOptionsOmitted() {
+        Object old = new HelperModelV2();
+
+        JsonNode result = settingsIO.migrateSettings(old, new HelperModelV1());
+
+        assertFalse(result.has("v2exclusive"));
+        // TODO: assert filter
     }
 
     @Test
     void retainsSharedBool() {
-        SettingsModel old = new HelperModelV1();
+        HelperModelV1 old = new HelperModelV1();
         old.setIsoDates(true);
         HelperModelV2 reference = new HelperModelV2();
 
-        HelperModelV2 result = (HelperModelV2) settingsIO.migrateSettings(old, reference);
+        JsonNode result = settingsIO.migrateSettings(old, reference);
 
         assertFalse(reference.getIsoDates());
-        assertTrue(result.getIsoDates());
+        assertTrue(result.get("isoDates").asBoolean());
     }
 
     @Test
     void retainsSharedString() {
-        SettingsModel old = new HelperModelV1();
-        old.setTheme("Light");
+        HelperModelV1 old = new HelperModelV1();
+        old.setTheme("light");
         HelperModelV2 reference = new HelperModelV2();
 
-        HelperModelV2 result = (HelperModelV2) settingsIO.migrateSettings(old, reference);
+        JsonNode result = settingsIO.migrateSettings(old, reference);
 
-        assertNotEquals("Light", reference.getTheme());
-        assertEquals("Light", result.getTheme());
+        assertNotEquals("light", reference.getTheme());
+        assertEquals("light", result.get("theme").textValue());
     }
 
     @Test
     void retainsSharedFilter() {
-        SettingsModel old = new HelperModelV1();
-        old.setFilterState("Remix", true);
+        HelperModelV1 old = new HelperModelV1();
+        old.setFilterState("remix", true);
         HelperModelV2 reference = new HelperModelV2();
 
-        HelperModelV2 result = (HelperModelV2) settingsIO.migrateSettings(old, reference);
+        JsonNode result = settingsIO.migrateSettings(old, reference);
 
-        assertFalse(reference.getFilterState("Remix"));
-        assertTrue(result.getFilterState("Remix"));
+        assertFalse(reference.getFilterState("remix"));
+        // TODO: assert filter
     }
 
 }

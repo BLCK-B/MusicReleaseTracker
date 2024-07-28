@@ -5,16 +5,16 @@ import com.blck.MusicReleaseTracker.JsonSettings.SettingsModel;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HelperModelV2 extends SettingsModel {
-    private String theme = "Black";
+public class HelperModelV2 {
+    private String theme = "black";
     private boolean isoDates = false;
-    private boolean autoTheme = true;
+    private boolean V2exclusive = true;
 
-    private Map<String, Boolean> filters = new HashMap();
+    private Map<String, Boolean> filters = new HashMap<>();
 
     public HelperModelV2() {
-        filters.put("Acoustic", false);
-        filters.put("Remix", false);
+        filters.put("acoustic", false);
+        filters.put("remix", false);
     }
 
     public void setFilterState(String filter, boolean state) {
@@ -44,11 +44,11 @@ public class HelperModelV2 extends SettingsModel {
         this.isoDates = isoDates;
     }
 
-    public boolean getAutoTheme() {
-        return autoTheme;
+    public boolean getV2exclusive() {
+        return V2exclusive;
     }
 
-    public void setAutoTheme(boolean autoTheme) {
-        this.autoTheme = autoTheme;
+    public void setV2exclusive(boolean autoTheme) {
+        this.V2exclusive = autoTheme;
     }
 }

@@ -4,20 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SettingsModel {
-    private String theme = "Black";
-    private String accent = "Cactus";
+    private String theme = "black";
+    private String accent = "cactus";
     private String lastScrape = "-";
     private boolean isoDates = false;
     private boolean autoTheme = true;
-    private Map<String, Boolean> filters = new HashMap();
+    private Map<String, Boolean> filters = new HashMap<>();
 
     public SettingsModel() {
-        filters.put("Acoustic", false);
-        filters.put("Extended", false);
-        filters.put("Instrumental", false);
-        filters.put("Remaster", false);
-        filters.put("Remix", false);
-        filters.put("VIP", false);
+        filters.put("acoustic", false);
+        filters.put("extended", false);
+        filters.put("instrumental", false);
+        filters.put("remaster", false);
+        filters.put("remix", false);
+        filters.put("vip", false);
     }
 
     public void setFilterState(String filter, boolean state) {

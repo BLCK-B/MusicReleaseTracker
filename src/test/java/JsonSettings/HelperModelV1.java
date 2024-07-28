@@ -5,14 +5,14 @@ import com.blck.MusicReleaseTracker.JsonSettings.SettingsModel;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HelperModelV1 extends SettingsModel {
-    private String theme = "Black";
+public class HelperModelV1 {
+    private String theme = "black";
     private boolean isoDates = false;
 
-    private Map<String, Boolean> filters = new HashMap();
+    private Map<String, Boolean> filters = new HashMap<>();
 
     public HelperModelV1() {
-        filters.put("Remix", false);
+        filters.put("remix", false);
     }
 
     public void setFilterState(String filter, boolean state) {

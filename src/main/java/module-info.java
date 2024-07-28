@@ -9,6 +9,7 @@ module com.blck.MusicReleaseTracker {
     requires spring.boot;
     requires spring.webmvc;
     requires org.xerial.sqlitejdbc;
+    requires com.fasterxml.jackson.databind;
 
     opens com.blck.MusicReleaseTracker;
 

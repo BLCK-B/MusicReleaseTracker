@@ -2,6 +2,7 @@ package JsonSettings;
 
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,58 +12,44 @@ public class SettingsIOTest {
 
     @Test
     void previouslyNonexistentOptionsAdded() {
-        Object old = new HelperModelV1();
+        JsonNode current = ModelFactory.getModelV1();
+        JsonNode reference = ModelFactory.getModelV2();
 
-        JsonNode result = settingsIO.migrateSettings(old, new HelperModelV2());
-
-        assertTrue(result.has("v2exclusive"));
-        // TODO: assert filter
+        assertFalse(current.has("V2exclusive"));
+        settingsIO.migrateDataToReference(reference, current);
+        assertTrue(reference.has("V2exclusive"));
     }
 
     @Test
     void noLongerSupportedOptionsOmitted() {
-        Object old = new HelperModelV2();
+        JsonNode current = ModelFactory.getModelV2();
+        JsonNode reference = ModelFactory.getModelV1();
 
-        JsonNode result = settingsIO.migrateSettings(old, new HelperModelV1());
-
-        assertFalse(result.has("v2exclusive"));
-        // TODO: assert filter
+        assertTrue(current.has("V2exclusive"));
+        settingsIO.migrateDataToReference(reference, current);
+        assertFalse(reference.has("V2exclusive"));
     }
 
     @Test
     void retainsSharedBool() {
-        HelperModelV1 old = new HelperModelV1();
-        old.setIsoDates(true);
-        HelperModelV2 reference = new HelperModelV2();
+        JsonNode current = ModelFactory.getModelV1();
+        ((ObjectNode) current).put("autoTheme", true);
+        JsonNode reference = ModelFactory.getModelV2();
 
-        JsonNode result = settingsIO.migrateSettings(old, reference);
-
-        assertFalse(reference.getIsoDates());
-        assertTrue(result.get("isoDates").asBoolean());
+        assertFalse(reference.get("autoTheme").asBoolean());
+        settingsIO.migrateDataToReference(reference, current);
+        assertTrue(reference.get("autoTheme").asBoolean());
     }
 
     @Test
     void retainsSharedString() {
-        HelperModelV1 old = new HelperModelV1();
-        old.setTheme("light");
-        HelperModelV2 reference = new HelperModelV2();
+        JsonNode current = ModelFactory.getModelV1();
+        ((ObjectNode) current).put("theme", "light");
+        JsonNode reference = ModelFactory.getModelV2();
 
-        JsonNode result = settingsIO.migrateSettings(old, reference);
-
-        assertNotEquals("light", reference.getTheme());
-        assertEquals("light", result.get("theme").textValue());
-    }
-
-    @Test
-    void retainsSharedFilter() {
-        HelperModelV1 old = new HelperModelV1();
-        old.setFilterState("remix", true);
-        HelperModelV2 reference = new HelperModelV2();
-
-        JsonNode result = settingsIO.migrateSettings(old, reference);
-
-        assertFalse(reference.getFilterState("remix"));
-        // TODO: assert filter
+        assertNotEquals("light", reference.get("theme").textValue());
+        settingsIO.migrateDataToReference(reference, current);
+        assertEquals("light", reference.get("theme").textValue());
     }
 
 }

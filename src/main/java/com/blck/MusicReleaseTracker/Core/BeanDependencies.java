@@ -3,6 +3,7 @@ package com.blck.MusicReleaseTracker.Core;
 import com.blck.MusicReleaseTracker.*;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,11 @@ public class BeanDependencies {
     @Bean
     public ConfigTools configTools(ValueStore valueStore, ErrorLogging errorLogging) {
         return new ConfigTools(valueStore, errorLogging);
+    }
+
+    @Bean
+    public SettingsIO settingsIO(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new SettingsIO(valueStore, errorLogging);
     }
 
     @Bean

@@ -4,20 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SettingsModel {
-    final String theme = "black";
-    final String accent = "cactus";
-    final String lastScrape = "-";
-    final boolean isoDates = false;
-    final boolean autoTheme = true;
-    final boolean filterAcoustic = false;
-    final boolean filterExtended = false;
-    final boolean filterInstrumental = false;
-    final boolean filterRemaster = false;
-    final boolean filterRemix = false;
-    final boolean filterVIP = false;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JsonNode getSettingsModel() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.valueToTree(this);
+    public final String theme = "black";
+    public final String accent = "cactus";
+    public final String lastScrape = "-";
+    public final boolean isoDates = false;
+    public final boolean autoTheme = true;
+    public final boolean filterAcoustic = false;
+    public final boolean filterExtended = false;
+    public final boolean filterInstrumental = false;
+    public final boolean filterRemaster = false;
+    public final boolean filterRemix = false;
+    public final boolean filterVIP = false;
+
+    public static JsonNode getSettingsModel() {
+        return objectMapper.valueToTree(new SettingsModel());
     }
 }

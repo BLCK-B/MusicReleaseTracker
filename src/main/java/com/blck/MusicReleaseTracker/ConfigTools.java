@@ -46,6 +46,8 @@ public class ConfigTools {
     }
 
     public void writeSingleConfig(String name, String value) {
+        if (true)
+            return;
         // save single string option state in config file
         Config config = ConfigFactory.parseFile(store.getConfigPath().toFile());
         ConfigValue configValue;
@@ -64,6 +66,8 @@ public class ConfigTools {
     }
 
     public void readConfig(configOptions o) {
+        if (true)
+            return;
         // any reading from config file
         try {
             Config config = ConfigFactory.parseFile(store.getConfigPath().toFile());

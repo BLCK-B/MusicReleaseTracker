@@ -2,6 +2,7 @@ package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -29,13 +30,15 @@ public class Main {
         SpringApplication.run(Main.class, args);
     }
 
+    private final SettingsIO settingsIO;
     private final ConfigTools config;
     private final ErrorLogging log;
     private final ManageMigrateDB manageDB;
     private final StartSetup startSetup;
 
     @Autowired
-    public Main(ConfigTools configTools, ErrorLogging errorLogging, StartSetup startSetup, ManageMigrateDB manageDB) {
+    public Main(SettingsIO settingsIO, ConfigTools configTools, ErrorLogging errorLogging, StartSetup startSetup, ManageMigrateDB manageDB) {
+        this.settingsIO = settingsIO;
         this.config = configTools;
         this.log = errorLogging;
         this.startSetup = startSetup;
@@ -58,7 +61,8 @@ public class Main {
             """);
             startSetup.initializeSystem();
             manageDB.migrateDB();
-            config.updateSettings();
+//            config.updateSettings();
+            settingsIO.updateSettings();
             // open port in web browser
             try {
                 String os = System.getProperty("os.name").toLowerCase();

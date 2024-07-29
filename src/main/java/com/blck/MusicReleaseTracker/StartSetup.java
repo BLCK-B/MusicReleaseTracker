@@ -50,9 +50,9 @@ public class StartSetup {
             throw new UnsupportedOperationException("unsupported OS");
 
         String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
-        String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath.toString(),  "musicdata.db");
-        Path configPath = Paths.get(appDataPath.toString(), "MRTsettings.hocon");
-        Path errorLogsPath = Paths.get(appDataPath.toString(), "errorlogs.txt");
+        String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath,  "musicdata.db");
+        Path configPath = Paths.get(appDataPath, "MRTsettings.json");
+        Path errorLogsPath = Paths.get(appDataPath, "errorlogs.txt");
 
         store.setAppDataPath(appDataPath);
         store.setConfigPath(configPath);

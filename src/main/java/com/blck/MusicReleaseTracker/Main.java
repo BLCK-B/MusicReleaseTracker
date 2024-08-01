@@ -61,7 +61,6 @@ public class Main {
             """);
             startSetup.initializeSystem();
             manageDB.migrateDB();
-//            config.updateSettings();
             settingsIO.updateSettings();
             // open port in web browser
             try {

@@ -3,22 +3,32 @@ package com.blck.MusicReleaseTracker.JsonSettings;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class SettingsModel {
+/** the default settings file definition */
+public enum SettingsModel {
+    theme("black"),
+    accent("cactus"),
+    lastScrape("-"),
+    isoDates(false),
+    autoTheme(true),
+    filterAcoustic(false),
+    filterExtended(false),
+    filterInstrumental(false),
+    filterRemaster(false),
+    filterRemix(false),
+    filterVIP(false);
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    public final String theme = "black";
-    public final String accent = "cactus";
-    public final String lastScrape = "-";
-    public final boolean isoDates = false;
-    public final boolean autoTheme = true;
-    public final boolean filterAcoustic = false;
-    public final boolean filterExtended = false;
-    public final boolean filterInstrumental = false;
-    public final boolean filterRemaster = false;
-    public final boolean filterRemix = false;
-    public final boolean filterVIP = false;
-
+    private final Object value;
+    SettingsModel(Object value) {
+        this.value = value;
+    }
+    public Object getValue() {
+        return value;
+    }
     public static JsonNode getSettingsModel() {
-        return objectMapper.valueToTree(new SettingsModel());
+        var model = objectMapper.createObjectNode();
+        for (SettingsModel setting : SettingsModel.values())
+            model.put(setting.name(), setting.getValue().toString());
+        return model;
     }
 }

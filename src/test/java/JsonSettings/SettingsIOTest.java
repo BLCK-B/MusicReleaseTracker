@@ -1,20 +1,58 @@
 package JsonSettings;
 
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.blck.MusicReleaseTracker.JsonSettings.SettingsModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 public class SettingsIOTest {
 
-    SettingsIO settingsIO = new SettingsIO(null, null);
+    final static Path testSettingsPath = Paths.get("src", "test", "testresources", "testSettings.json");
+    final static File settingsFile = new File(testSettingsPath.toString());
+
+    static String testingBlbost = "";
+
+    @Mock
+    ValueStore valueStore;
+    @InjectMocks
+    SettingsIO settingsIO;
+
+    @BeforeEach
+    void setUp() {
+        try (FileWriter writer = new FileWriter(settingsFile)) {
+            settingsFile.createNewFile();
+            writer.write("""
+                    {
+                      "theme" : "black",
+                      "filterRemix" : false
+                    }
+                    """);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     void previouslyNonexistentOptionsAdded() {
-        JsonNode current = ModelFactory.getModelV1();
-        JsonNode reference = ModelFactory.getModelV2();
+        var current = ModelFactory.getModelV1();
+        var reference = ModelFactory.getModelV2();
 
         assertFalse(current.has("V2exclusive"));
         settingsIO.migrateDataToReference(reference, current);
@@ -23,8 +61,8 @@ public class SettingsIOTest {
 
     @Test
     void noLongerSupportedOptionsOmitted() {
-        JsonNode current = ModelFactory.getModelV2();
-        JsonNode reference = ModelFactory.getModelV1();
+        var current = ModelFactory.getModelV2();
+        var reference = ModelFactory.getModelV1();
 
         assertTrue(current.has("V2exclusive"));
         settingsIO.migrateDataToReference(reference, current);
@@ -33,9 +71,9 @@ public class SettingsIOTest {
 
     @Test
     void retainsOldStateOfSharedBool() {
-        JsonNode current = ModelFactory.getModelV1();
-        ((ObjectNode) current).put("autoTheme", true);
-        JsonNode reference = ModelFactory.getModelV2();
+        var current = ModelFactory.getModelV1();
+        current.put("autoTheme", true);
+        var reference = ModelFactory.getModelV2();
 
         assertFalse(reference.get("autoTheme").asBoolean());
         settingsIO.migrateDataToReference(reference, current);
@@ -44,9 +82,9 @@ public class SettingsIOTest {
 
     @Test
     void retainsOldStateOfSharedString() {
-        JsonNode current = ModelFactory.getModelV1();
-        ((ObjectNode) current).put("theme", "light");
-        JsonNode reference = ModelFactory.getModelV2();
+        var current = ModelFactory.getModelV1();
+        current.put("theme", "light");
+        var reference = ModelFactory.getModelV2();
 
         assertNotEquals("light", reference.get("theme").textValue());
         settingsIO.migrateDataToReference(reference, current);
@@ -55,8 +93,8 @@ public class SettingsIOTest {
 
     @Test
     void sameSharedValueRemainsUnchanged() {
-        JsonNode current = ModelFactory.getModelV1();
-        JsonNode reference = ModelFactory.getModelV2();
+        var current = ModelFactory.getModelV1();
+        var reference = ModelFactory.getModelV2();
 
         assertEquals("black", reference.get("theme").textValue());
         settingsIO.migrateDataToReference(reference, current);
@@ -64,13 +102,32 @@ public class SettingsIOTest {
     }
 
     @Test
-    void emptyCurrentFile() {
+    void currentSettingsFileEmpty() {
         ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode current = objectMapper.createObjectNode();
-        JsonNode reference = ModelFactory.getModelV1();
+        var current = objectMapper.createObjectNode();
+        var reference = ModelFactory.getModelV1();
 
         settingsIO.migrateDataToReference(reference, current);
         assertFalse(reference.isEmpty());
+    }
+
+    @Test
+    void readSetting() {
+        // TODO: inject enum - not production
+        when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
+
+        assertEquals("false", settingsIO.readSetting(SettingsModel.filterRemix));
+    }
+
+    @Test
+    void readSettingWhenEmptyFile() throws IOException {
+        when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
+        try (FileWriter writer = new FileWriter(settingsFile)) {
+            writer.write("");
+        }
+
+        // TODO: mock errorlog
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> settingsIO.readSetting(SettingsModel.filterRemix));
     }
 
 }

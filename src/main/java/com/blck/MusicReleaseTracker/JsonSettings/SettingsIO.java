@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 
 @Component
 public class SettingsIO {
@@ -72,6 +71,29 @@ public class SettingsIO {
             if (reference.has(fieldName))
                 ((ObjectNode) reference).set(fieldName, current.get(fieldName));
         });
+    }
+
+    public void changeSetting(SettingsModel setting, String newState) {
+
+    }
+
+    public void changeSetting(SettingsModel setting, boolean newState) {
+
+    }
+
+    public String readSetting(SettingsModel setting) {
+        File jsonFile = new File(String.valueOf(store.getConfigPath()));
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(jsonFile);
+            return jsonNode.get(setting.toString()).asText();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void writeSettings(SettingsModel setting, String value) {
+
     }
 
 }

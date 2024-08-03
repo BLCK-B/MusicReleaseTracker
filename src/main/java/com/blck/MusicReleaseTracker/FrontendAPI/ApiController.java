@@ -98,7 +98,7 @@ public class ApiController {
     }
 
     @GetMapping("/settingsOpened")
-    public HashMap<String, String> settingsOpened() {
+    public Map<String, String> settingsOpened() {
         return sendRequest.settingsOpened();
     }
 

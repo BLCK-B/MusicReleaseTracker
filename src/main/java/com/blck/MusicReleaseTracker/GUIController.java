@@ -144,13 +144,8 @@ public class GUIController {
         scrapeProcess.scrapeCancel = true;
     }
 
-    public HashMap<String, String> settingsOpened() {
-        // gather all settings states and return them to frontend when settings are opened
-        HashMap<String, String> settingsStates = new HashMap<>();
-        settingsStates.putAll(settingsIO.getFilterValues());
-        settingsStates.put("isoDates", settingsIO.readSetting("isoDates"));
-        settingsStates.put("autoTheme", settingsIO.readSetting("autoTheme"));
-        return settingsStates;
+    public Map<String, String> settingsOpened() {
+        return settingsIO.readAllSettings();
     }
 
     public void setSetting(String name, String value) {

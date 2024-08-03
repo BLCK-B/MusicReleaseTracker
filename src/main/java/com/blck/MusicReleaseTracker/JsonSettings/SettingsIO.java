@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /*      MusicReleaseTracker
     Copyright (C) 2023 BLCK
@@ -113,6 +116,15 @@ public class SettingsIO {
             log.error(e, ErrorLogging.Severity.WARNING, "setting " + setting  + " does not exist");
         }
         return null;
+    }
+
+    public Map<String, String> readAllSettings() {
+        File jsonFile = new File(String.valueOf(store.getConfigPath()));
+        var allSettings = readJsonFile(jsonFile);
+        return Arrays.stream(SettingsModel.values())
+                .collect(Collectors.toMap(
+                        Enum::name, setting -> allSettings.get(setting.name()).asText()
+                ));
     }
 
     public void writeSetting(String setting, String value) {

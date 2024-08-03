@@ -170,14 +170,16 @@ public class DBqueriesTest {
     }
 
     @Test
-    void getDataFromSourceTablesForCombview() {
+    void getDataFromSourceTablesForCombviewWithFiltering() {
+        HashMap<String, String> filterWords = new HashMap<>();
+        filterWords.put("remix", "true");
+        when(settingsIO.getFilterValues()).thenReturn(filterWords);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         songList.clear();
-        songList.add(new Song("song", "artist", "2022-01-01", null));
-        songList.add(new Song("song", "artist", "2022-01-01", null));
+        songList.add(new Song("songRemixed", "artist", "2022-01-01", null));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.youtube, 10);
 
-        assertEquals(5, dBqueriesClass.getSourceTablesDataForCombview().size());
+        assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
     }
 
     @Test

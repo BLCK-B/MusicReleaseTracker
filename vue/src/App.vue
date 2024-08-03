@@ -53,8 +53,8 @@ export default {
         .then((response) => {
           const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
           if (response.data.autoTheme == true) {
-            if (prefersDarkMode.matches) this.$store.commit("SET_PRIMARY_COLOR", "Black");
-            else this.$store.commit("SET_PRIMARY_COLOR", "Light");
+            if (prefersDarkMode.matches) this.$store.commit("SET_PRIMARY_COLOR", "black");
+            else this.$store.commit("SET_PRIMARY_COLOR", "light");
           }
         })
         .catch((error) => {

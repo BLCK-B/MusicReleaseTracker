@@ -3,8 +3,6 @@ package JsonSettings;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +19,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+
+/*      MusicReleaseTracker
+    Copyright (C) 2023 BLCK
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @ExtendWith(MockitoExtension.class)
 public class SettingsIOTest {
@@ -57,14 +68,14 @@ public class SettingsIOTest {
     }
 
     @Test
-    void readNonexistentSetting() {
+    void readNonexistentSettingLogsWarning() {
         settingsIO.readSetting("doesNotExist");
 
         verify(log, times(1)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("does not exist"));
     }
 
     @Test
-    void readSettingWhenEmptyFile() throws IOException {
+    void readSettingWhenEmptyFileLogsWarning() throws IOException {
         try (FileWriter writer = new FileWriter(settingsFile)) {
             writer.write("");
         }
@@ -82,7 +93,7 @@ public class SettingsIOTest {
     }
 
     @Test
-    void writingSettingThatDoesNotExist() {
+    void writingSettingThatDoesNotExistLogsWarning() {
         settingsIO.writeSetting("doesNotExist", "true");
 
         verify(log, times(1)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("does not exist"));

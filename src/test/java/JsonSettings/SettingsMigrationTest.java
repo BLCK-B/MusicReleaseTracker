@@ -76,7 +76,7 @@ public class SettingsMigrationTest {
     }
 
     @Test
-    void currentSettingsFileEmpty() {
+    void currentSettingsFileEmptyIsDefaulted() {
         ObjectMapper objectMapper = new ObjectMapper();
         var current = objectMapper.createObjectNode();
         var reference = ModelFactory.getModelV1();

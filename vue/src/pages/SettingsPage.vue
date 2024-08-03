@@ -6,7 +6,14 @@
     </button>
 
     <section class="filterscont">
-      <SettingsFilters :filters="filters" @set-setting="setSetting" />
+      <SettingsFilters
+        :filterRemix="filterRemix"
+        :filterVIP="filterVIP"
+        :filterInstrumental="filterInstrumental"
+        :filterAcoustic="filterAcoustic"
+        :filterExtended="filterExtended"
+        :filterRemaster="filterRemaster"
+        @set-setting="setSetting" />
     </section>
 
     <section class="appearance">
@@ -45,30 +52,32 @@ export default {
   },
   data() {
     return {
+      filterRemix: false,
+      filterVIP: false,
+      filterInstrumental: false,
+      filterAcoustic: false,
+      filterExtended: false,
+      filterRemaster: false,
       isoDates: false,
-      filters: {
-        Remix: false,
-        VIP: false,
-        Instrumental: false,
-        Acoustic: false,
-        Extended: false,
-        Remaster: false,
-      },
       primaryColor: "N",
       accentColor: "N",
       autoTheme: false,
     };
   },
-  // on open, load setting states from HOCON
   created() {
     axios
       .get("/api/settingsOpened")
       .then((response) => {
-        this.filters = response.data;
-        this.isoDates = response.data.isoDates;
-        this.autoTheme = response.data.autoTheme;
-        this.primaryColor = this.$store.getters.getPrimaryColor;
-        this.accentColor = this.$store.getters.getAccentColor;
+        this.filterRemix = response.data.filterRemix === "true";
+        this.filterVIP = response.data.filterVIP === "true";
+        this.filterInstrumental = response.data.filterInstrumental === "true";
+        this.filterAcoustic = response.data.filterAcoustic === "true";
+        this.filterExtended = response.data.filterExtended === "true";
+        this.filterRemaster = response.data.filterRemaster === "true";
+        this.isoDates = response.data.isoDates === "true";
+        this.autoTheme = response.data.autoTheme === "true";
+        this.primaryColor = response.data.theme;
+        this.accentColor = response.data.accent;
       })
       .catch((error) => {
         console.error(error);

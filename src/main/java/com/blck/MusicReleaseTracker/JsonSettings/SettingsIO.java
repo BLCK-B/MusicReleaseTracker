@@ -11,6 +11,20 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+
+/*      MusicReleaseTracker
+    Copyright (C) 2023 BLCK
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @Component
 public class SettingsIO {
@@ -25,30 +39,15 @@ public class SettingsIO {
         this.log = errorLogging;
     }
 
-    public String serializeJsonNode(JsonNode jsonNode) {
-        try {
-            return objectMapper
-                    .writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(jsonNode);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public JsonNode readJsonFile(File file) {
-        try {
-            return objectMapper.readTree(file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void writeJsonFile(File file, String json) {
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(json);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public HashMap<String, String> getFilterValues() {
+        File jsonFile = new File(String.valueOf(store.getConfigPath()));
+        var fileContents = readJsonFile(jsonFile);
+        HashMap<String, String> filterWords = new HashMap<>();
+        fileContents.fieldNames().forEachRemaining(fieldName -> {
+            if (fieldName.contains("filter"))
+                filterWords.put(fieldName, fileContents.get(fieldName).asText());
+        });
+        return filterWords;
     }
 
     public void updateSettings() {
@@ -62,8 +61,13 @@ public class SettingsIO {
 
             writeJsonFile(jsonFile, serializeJsonNode(reference));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e, ErrorLogging.Severity.SEVERE, "error updating settings file");
         }
+    }
+
+    public void defaultSettings() {
+        new File(String.valueOf(store.getConfigPath())).delete();
+        updateSettings();
     }
 
     public void migrateDataToReference(JsonNode reference, JsonNode current) {
@@ -73,27 +77,52 @@ public class SettingsIO {
         });
     }
 
-    public void changeSetting(SettingsModel setting, String newState) {
-
-    }
-
-    public void changeSetting(SettingsModel setting, boolean newState) {
-
-    }
-
-    public String readSetting(SettingsModel setting) {
-        File jsonFile = new File(String.valueOf(store.getConfigPath()));
-        ObjectMapper mapper = new ObjectMapper();
+    public String serializeJsonNode(JsonNode jsonNode) {
         try {
-            JsonNode jsonNode = mapper.readTree(jsonFile);
-            return jsonNode.get(setting.toString()).asText();
+            return objectMapper
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(jsonNode);
+        } catch (Exception e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error serialising JsonNode");
+        }
+        return null;
+    }
+
+    public JsonNode readJsonFile(File file) {
+        try {
+            return objectMapper.readTree(file);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e, ErrorLogging.Severity.SEVERE, "settings file could not be read");
+        }
+        return null;
+    }
+
+    private void writeJsonFile(File file, String json) {
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(json);
+        } catch (IOException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "settings file could not be written");
         }
     }
 
-    public void writeSettings(SettingsModel setting, String value) {
-
+    public String readSetting(String setting) {
+        File jsonFile = new File(String.valueOf(store.getConfigPath()));
+        try {
+            return readJsonFile(jsonFile).get(setting).asText();
+        } catch (NullPointerException e) {
+            log.error(e, ErrorLogging.Severity.WARNING, "setting " + setting  + " does not exist");
+        }
+        return null;
     }
+
+    public void writeSetting(String setting, String value) {
+        File jsonFile = new File(String.valueOf(store.getConfigPath()));
+        JsonNode jsonNode = readJsonFile(jsonFile);
+        if (!jsonNode.has(setting))
+            log.error(new IllegalArgumentException(), ErrorLogging.Severity.WARNING, "setting " + setting  + " does not exist");
+        ((ObjectNode) jsonNode).put(setting, value);
+        writeJsonFile(jsonFile, serializeJsonNode(jsonNode));
+    }
+
 
 }

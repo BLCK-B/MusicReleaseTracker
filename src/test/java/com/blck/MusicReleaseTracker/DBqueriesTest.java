@@ -5,6 +5,7 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
+import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,8 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
@@ -45,7 +45,7 @@ public class DBqueriesTest {
     @Mock
     ErrorLogging log;
     @Mock
-    ConfigTools config;
+    SettingsIO settingsIO;
     @InjectMocks
     DBqueries dBqueriesClass;
 
@@ -60,7 +60,7 @@ public class DBqueriesTest {
     void setUp() {
         HelperDB.redoTestData();
         lenient().when(store.getDBpathString()).thenReturn(testDBpath);
-        dBqueriesClass = new DBqueries(store, log, config, manageMigrateDB);
+        dBqueriesClass = new DBqueries(store, log, settingsIO, manageMigrateDB);
         songList = new ArrayList<>();
         songList.add(new Song("song1", "artist1", "2022-01-01", "remix"));
         songList.add(new Song("song2", "artist1", "2022-01-01", "type"));
@@ -130,25 +130,54 @@ public class DBqueriesTest {
     }
 
     @Test
-    void filtersUnwantedNameAndTypeWords() {
-        when(store.getFilterWords()).thenReturn(new ArrayList<String>(Collections.singletonList("remix")));
+    void noFilterMatchSongPasses() {
+        HashMap<String, String> filterWords = new HashMap<>();
+        filterWords.put("remix", "true");
 
-        assertTrue(dBqueriesClass.doesNotContainDisabledWords("song", "type"));
-        assertFalse(dBqueriesClass.doesNotContainDisabledWords("REMIX", "REMIXED"));
-        assertFalse(dBqueriesClass.doesNotContainDisabledWords("soRemix", "type"));
+        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", "type"), filterWords));
     }
 
     @Test
-    void getDataFromSourceTablesForCombviewWithFiltering() {
-        ArrayList<String> filters = new ArrayList<>(Arrays.asList("remix", "filterme"));
-        when(store.getFilterWords()).thenReturn(filters);
+    void filtersSongDueToUnwantedName() {
+        HashMap<String, String> filterWords = new HashMap<>();
+        filterWords.put("remix", "true");
+
+        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("REMIXsong", "", "", "type"), filterWords));
+    }
+
+    @Test
+    void filtersSongDueToUnwantedType() {
+        HashMap<String, String> filterWords = new HashMap<>();
+        filterWords.put("remix", "true");
+
+        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", "typeRemix"), filterWords));
+    }
+
+    @Test
+    void noFilterMatchSongWithNullTypePasses() {
+        HashMap<String, String> filterWords = new HashMap<>();
+        filterWords.put("remix", "true");
+
+        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", null), filterWords));
+    }
+
+    @Test
+    void filtersSongWithNullTypeDueToUnwantedName() {
+        HashMap<String, String> filterWords = new HashMap<>();
+        filterWords.put("remix", "true");
+
+        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("songRemix)", "", "", null), filterWords));
+    }
+
+    @Test
+    void getDataFromSourceTablesForCombview() {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         songList.clear();
-        songList.add(new Song("song1filterme", "artist1", "2022-01-01", null));
-        songList.add(new Song("FILTERMEsong2", "artist2", "2022-01-01", null));
+        songList.add(new Song("song", "artist", "2022-01-01", null));
+        songList.add(new Song("song", "artist", "2022-01-01", null));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.youtube, 10);
 
-        assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
+        assertEquals(5, dBqueriesClass.getSourceTablesDataForCombview().size());
     }
 
     @Test

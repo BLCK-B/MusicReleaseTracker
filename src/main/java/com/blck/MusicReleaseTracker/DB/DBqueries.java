@@ -1,17 +1,18 @@
 package com.blck.MusicReleaseTracker.DB;
 
-import com.blck.MusicReleaseTracker.ConfigTools;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
+import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /*      MusicReleaseTracker
     Copyright (C) 2023 BLCK
@@ -32,14 +33,14 @@ public class DBqueries {
     private final ValueStore store;
     private final ErrorLogging log;
     private final ManageMigrateDB manageDB;
-    private final ConfigTools config;
+    private final SettingsIO settingsIO;
 
     @Autowired
-    public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, ManageMigrateDB manageDB) {
+    public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.manageDB = manageDB;
-        this.config = configTools;
+        this.settingsIO = settingsIO;
     }
 
     public List<String> getArtistList() {
@@ -103,7 +104,7 @@ public class DBqueries {
             pstmt.executeUpdate();
             pstmt.close();
         } catch (SQLException e) {
-            System.out.println("artist already exists");
+            log.error(e, ErrorLogging.Severity.INFO, "artist already exists");
         }
     }
 
@@ -188,7 +189,7 @@ public class DBqueries {
     }
 
     public ArrayList<Song> getSourceTablesDataForCombview() {
-        config.readConfig(ConfigTools.configOptions.filters);
+        var filterWords = settingsIO.getFilterValues();
         ArrayList<Song> songObjectList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             for (TablesEnum table : TablesEnum.values()) {
@@ -204,7 +205,8 @@ public class DBqueries {
                     try {
                         songType = rs.getString("type");
                     } catch (Exception ignored){} // check column count?
-                    if (doesNotContainDisabledWords(songName, songType))
+
+                    if (songPassesFilterCheck(new Song(songName, songArtist, songDate, songType), filterWords))
                         songObjectList.add(new Song(songName, songArtist, songDate, songType));
                 }
             }
@@ -214,14 +216,25 @@ public class DBqueries {
         return songObjectList;
     }
 
-    public boolean doesNotContainDisabledWords(String songName, String songType) {
-        if (songType == null)
-            return store.getFilterWords().stream()
-                    .noneMatch(disabledWord -> songName.toLowerCase().contains(disabledWord.toLowerCase()));
+    public boolean songPassesFilterCheck(Song song, HashMap<String, String> filterWords) {
+        Set<String> disabledWords = filterWords.entrySet().stream()
+                .filter(entry -> Boolean.parseBoolean(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        if (song.getType() == null)
+            return disabledWords.stream()
+                    .map(this::getRealFilterName)
+                    .noneMatch(disabledWord -> song.getName().toLowerCase().contains(disabledWord.toLowerCase()));
         else
-            return store.getFilterWords().stream()
-                    .noneMatch(disabledWord -> songType.toLowerCase().contains(disabledWord.toLowerCase()) ||
-                            songName.toLowerCase().contains(disabledWord.toLowerCase()));
+            return disabledWords.stream()
+                    .map(this::getRealFilterName)
+                    .noneMatch(disabledWord -> song.getType().toLowerCase().contains(disabledWord.toLowerCase()) ||
+                            song.getName().toLowerCase().contains(disabledWord.toLowerCase()));
+    }
+
+    private String getRealFilterName(String settingName) {
+        return settingName.replace("filter", "").trim();
     }
 
     public LinkedList<Scraper> getAllScrapers() {

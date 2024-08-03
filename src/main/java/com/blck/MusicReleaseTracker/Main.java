@@ -31,15 +31,13 @@ public class Main {
     }
 
     private final SettingsIO settingsIO;
-    private final ConfigTools config;
     private final ErrorLogging log;
     private final ManageMigrateDB manageDB;
     private final StartSetup startSetup;
 
     @Autowired
-    public Main(SettingsIO settingsIO, ConfigTools configTools, ErrorLogging errorLogging, StartSetup startSetup, ManageMigrateDB manageDB) {
+    public Main(SettingsIO settingsIO, ErrorLogging errorLogging, StartSetup startSetup, ManageMigrateDB manageDB) {
         this.settingsIO = settingsIO;
-        this.config = configTools;
         this.log = errorLogging;
         this.startSetup = startSetup;
         this.manageDB = manageDB;
@@ -59,7 +57,7 @@ public class Main {
                 | |  | |  _ < | |
                 |_|  |_|_| \\_\\|_|
             """);
-            startSetup.initializeSystem();
+            startSetup.createPathsAndDirs();
             manageDB.migrateDB();
             settingsIO.updateSettings();
             // open port in web browser

@@ -1,8 +1,8 @@
 package JsonSettings;
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import com.blck.MusicReleaseTracker.JsonSettings.SettingsModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,16 +10,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SettingsIOTest {
@@ -31,6 +31,8 @@ public class SettingsIOTest {
 
     @Mock
     ValueStore valueStore;
+    @Mock
+    ErrorLogging log;
     @InjectMocks
     SettingsIO settingsIO;
 
@@ -113,10 +115,18 @@ public class SettingsIOTest {
 
     @Test
     void readSetting() {
-        // TODO: inject enum - not production
         when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
 
-        assertEquals("false", settingsIO.readSetting(SettingsModel.filterRemix));
+        assertEquals("false", settingsIO.readSetting("filterRemix"));
+    }
+
+    @Test
+    void readNonexistentSetting() {
+        when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
+
+        settingsIO.readSetting("doesNotExist");
+
+        verify(log, times(1)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("does not exist"));
     }
 
     @Test
@@ -126,8 +136,38 @@ public class SettingsIOTest {
             writer.write("");
         }
 
-        // TODO: mock errorlog
-        assertThatExceptionOfType(Exception.class).isThrownBy(() -> settingsIO.readSetting(SettingsModel.filterRemix));
+        settingsIO.readSetting("filterRemix");
+
+        verify(log, times(1)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("does not exist"));
     }
+
+    @Test
+    void writeSetting() {
+        when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
+
+        settingsIO.writeSetting("theme", "light");
+
+        assertEquals("light", settingsIO.readSetting("theme"));
+    }
+
+    @Test
+    void writingSettingThatDoesNotExist() {
+        when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
+
+        settingsIO.writeSetting("doesNotExist", "true");
+
+        verify(log, times(1)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("does not exist"));
+    }
+
+    @Test
+    void defaultSettings() {
+        when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
+        settingsIO.writeSetting("theme", "light");
+
+        settingsIO.defaultSettings();
+
+        assertEquals("black", settingsIO.readSetting("theme"));
+    }
+
 
 }

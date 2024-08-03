@@ -3,30 +3,30 @@
 
   <div class="filters-buttons">
     <div>
-      <input type="checkbox" :checked="filters.Remix" @change="$emit('set-setting', 'filters.Remix', $event.target.checked)" />
+      <input type="checkbox" :checked="filterRemix" @change="$emit('set-setting', 'filterRemix', $event.target.checked)" />
       <label>Remix</label>
     </div>
     <div>
-      <input type="checkbox" :checked="filters.VIP" @change="$emit('set-setting', 'filters.VIP', $event.target.checked)" />
+      <input type="checkbox" :checked="filterVIP" @change="$emit('set-setting', 'filterVIP', $event.target.checked)" />
       <label>VIP</label>
     </div>
     <div>
       <input
         type="checkbox"
-        :checked="filters.Instrumental"
-        @change="$emit('set-setting', 'filters.Instrumental', $event.target.checked)" />
+        :checked="filterInstrumental"
+        @change="$emit('set-setting', 'filterInstrumental', $event.target.checked)" />
       <label>Instrumental</label>
     </div>
     <div>
-      <input type="checkbox" :checked="filters.Acoustic" @change="$emit('set-setting', 'filters.Acoustic', $event.target.checked)" />
+      <input type="checkbox" :checked="filterAcoustic" @change="$emit('set-setting', 'filterAcoustic', $event.target.checked)" />
       <label>Acoustic</label>
     </div>
     <div>
-      <input type="checkbox" :checked="filters.Extended" @change="$emit('set-setting', 'filters.Extended', $event.target.checked)" />
+      <input type="checkbox" :checked="filterExtended" @change="$emit('set-setting', 'filterExtended', $event.target.checked)" />
       <label>Extended</label>
     </div>
     <div>
-      <input type="checkbox" :checked="filters.Remaster" @change="$emit('set-setting', 'filters.Remaster', $event.target.checked)" />
+      <input type="checkbox" :checked="filterRemaster" @change="$emit('set-setting', 'filterRemaster', $event.target.checked)" />
       <label>Remaster</label>
     </div>
   </div>
@@ -36,7 +36,12 @@
 export default {
   emits: ["set-setting"],
   props: {
-    filters: Object,
+    filterRemix: Boolean,
+    filterVIP: Boolean,
+    filterInstrumental: Boolean,
+    filterAcoustic: Boolean,
+    filterExtended: Boolean,
+    filterRemaster: Boolean,
   },
 };
 </script>

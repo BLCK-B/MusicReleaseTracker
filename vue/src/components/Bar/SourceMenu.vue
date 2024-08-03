@@ -8,9 +8,9 @@
     </div>
 
     <button @click="openSettings()" class="settingsButton" :disabled="!allowButtons">
-      <img v-if="primaryColor === 'Black'" class="imageSettings" src="../icons/optionsblack.png" alt="Settings" />
-      <img v-else-if="primaryColor === 'Dark'" class="imageSettings" src="../icons/optionsdark.png" alt="Settings" />
-      <img v-else-if="primaryColor === 'Light'" class="imageSettings" src="../icons/optionslight.png" alt="Settings" />
+      <img v-if="primaryColor === 'black'" class="imageSettings" src="../icons/optionsblack.png" alt="Settings" />
+      <img v-else-if="primaryColor === 'dark'" class="imageSettings" src="../icons/optionsdark.png" alt="Settings" />
+      <img v-else-if="primaryColor === 'light'" class="imageSettings" src="../icons/optionslight.png" alt="Settings" />
     </button>
     <button
       @click="clickScrape()"

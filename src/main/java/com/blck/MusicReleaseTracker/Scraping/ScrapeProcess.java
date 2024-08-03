@@ -77,7 +77,6 @@ public class ScrapeProcess {
         songList = sortByNewestDate(songList);
 
         DB.batchInsertSongs(songList, TablesEnum.combview, 115);
-        System.gc();
     }
 
     public List<Song> mergeNameArtistDuplicates(List<Song> songList) {

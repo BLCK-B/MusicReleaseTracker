@@ -29,14 +29,9 @@ public class BeanDependencies {
 
     @Bean
     public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging,
-                                       ScrapeProcess scrapeProcess, ConfigTools config,
+                                       ScrapeProcess scrapeProcess, SettingsIO settingsIO,
                                        ManageMigrateDB manageMigrateDB, DBqueries dBqueries) {
-        return new GUIController(valueStore, errorLogging, scrapeProcess, config, dBqueries, manageMigrateDB);
-    }
-
-    @Bean
-    public ConfigTools configTools(ValueStore valueStore, ErrorLogging errorLogging) {
-        return new ConfigTools(valueStore, errorLogging);
+        return new GUIController(valueStore, errorLogging, scrapeProcess, settingsIO, dBqueries, manageMigrateDB);
     }
 
     @Bean
@@ -50,8 +45,8 @@ public class BeanDependencies {
     }
 
     @Bean
-    public DBqueries dBqueries(ValueStore valueStore, ErrorLogging errorLogging, ConfigTools configTools, ManageMigrateDB manageMigrateDB) {
-        return new DBqueries(valueStore, errorLogging, configTools, manageMigrateDB);
+    public DBqueries dBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, ManageMigrateDB manageMigrateDB) {
+        return new DBqueries(valueStore, errorLogging, settingsIO, manageMigrateDB);
     }
 
     @Bean

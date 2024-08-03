@@ -30,11 +30,7 @@ public class ValueStore {
     private String DBpath;
     private Path configPath;
     private Path errorLogsPath;
-    private ArrayList<String> filterWords;
-    private Map<String,String> themesMap;
     private String scrapeDate;
-    private boolean isoDates = false;
-    private boolean autoTheme = false;
 
     public void setAppDataPath(String appDataPath) {
         this.appDataPath = appDataPath;
@@ -60,35 +56,11 @@ public class ValueStore {
     public Path getErrorLogsPath() {
         return errorLogsPath;
     }
-    public void setFilterWords(ArrayList<String> filterWords) {
-        this.filterWords = filterWords;
-    }
-    public ArrayList<String> getFilterWords() {
-        return filterWords;
-    }
-    public void setThemes(Map<String,String> themesMap) {
-        this.themesMap = themesMap;
-    }
-    public Map<String,String> getThemes() {
-        return themesMap;
-    }
     public void setScrapeDate(String scrapeDate) {
         this.scrapeDate = scrapeDate;
     }
     public String getScrapeDate() {
         return scrapeDate;
-    }
-    public void setIsoDates(boolean isoDates) {
-        this.isoDates = isoDates;
-    }
-    public boolean getIsoDates() {
-        return isoDates;
-    }
-    public void setAutoTheme(boolean autoTheme) {
-        this.autoTheme = autoTheme;
-    }
-    public boolean getAutoTheme() {
-        return autoTheme;
     }
 
     @Override

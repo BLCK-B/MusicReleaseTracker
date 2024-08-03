@@ -61,6 +61,7 @@ public class ApiController {
     public void clickArtistDelete() {
         sendRequest.removeArtist();
     }
+
     @PostMapping("/deleteUrl")
     public void deleteUrl() {
         sendRequest.deleteSourceID();
@@ -97,7 +98,7 @@ public class ApiController {
     }
 
     @GetMapping("/settingsOpened")
-    public HashMap<String, Boolean> settingsOpened() {
+    public HashMap<String, String> settingsOpened() {
         return sendRequest.settingsOpened();
     }
 
@@ -130,6 +131,7 @@ public class ApiController {
     public void resetSettings() {
         sendRequest.resetSettings();
     }
+
     @PostMapping("/resetDB")
     public void resetDB() {
         sendRequest.resetDB();

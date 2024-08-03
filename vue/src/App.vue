@@ -62,6 +62,8 @@ export default {
         });
     },
     applyTheme(theme, accent) {
+      theme = theme.toLowerCase();
+      accent = accent.toLowerCase();
       // remove previously applied css
       this.appliedStyles.forEach((style) => {
         style.remove();
@@ -71,7 +73,7 @@ export default {
       let linkElement;
 
       if (theme !== "") {
-        themePath = `./primary${theme}.css`;
+        themePath = `./theme-${theme}.css`;
         linkElement = document.createElement("link");
         linkElement.rel = "stylesheet";
         linkElement.href = themePath;
@@ -79,7 +81,7 @@ export default {
         this.appliedStyles.push(linkElement);
       }
       if (accent !== "") {
-        themePath = `./secondary${accent}.css`;
+        themePath = `./accent-${accent}.css`;
         linkElement = document.createElement("link");
         linkElement.rel = "stylesheet";
         linkElement.href = themePath;

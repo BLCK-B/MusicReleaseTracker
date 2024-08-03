@@ -6,6 +6,7 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.TableModel;
+import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
@@ -34,7 +35,7 @@ public class GUIController {
     private final ValueStore store;
     private final ErrorLogging log;
     private final ScrapeProcess scrapeProcess;
-    private final ConfigTools config;
+    private final SettingsIO settingsIO;
     private final DBqueries DB;
     private final ManageMigrateDB manageDB;
 
@@ -44,11 +45,11 @@ public class GUIController {
 
     @Autowired
     public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                         ConfigTools config, DBqueries dBqueries, ManageMigrateDB manageDB) {
+                         SettingsIO settingsIO, DBqueries dBqueries, ManageMigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
-        this.config = config;
+        this.settingsIO = settingsIO;
         this.DB = dBqueries;
         this.manageDB = manageDB;
     }
@@ -143,37 +144,29 @@ public class GUIController {
         scrapeProcess.scrapeCancel = true;
     }
 
-    public HashMap<String, Boolean> settingsOpened() {
+    public HashMap<String, String> settingsOpened() {
         // gather all settings states and return them to frontend when settings are opened
-        HashMap<String, Boolean> configData = new HashMap<>();
-
-        config.readConfig(ConfigTools.configOptions.filters);
-        ArrayList<String> filterWords = store.getFilterWords();
-
-        String[] allFilters = new String[]{"Acoustic", "Extended", "Instrumental", "Remaster", "Remix", "VIP"};
-        Arrays.stream(allFilters)
-                .forEach(filter -> configData.put(filter, filterWords.contains(filter)));
-
-        config.readConfig(ConfigTools.configOptions.isoDates);
-        configData.put("isoDates", store.getIsoDates());
-        config.readConfig(ConfigTools.configOptions.autoTheme);
-        configData.put("autoTheme", store.getAutoTheme());
-
-        return configData;
+        HashMap<String, String> settingsStates = new HashMap<>();
+        settingsStates.putAll(settingsIO.getFilterValues());
+        settingsStates.put("isoDates", settingsIO.readSetting("isoDates"));
+        settingsStates.put("autoTheme", settingsIO.readSetting("autoTheme"));
+        return settingsStates;
     }
 
     public void setSetting(String name, String value) {
         // write any setting in config, note: "name" = config name
-        config.writeSingleConfig(name, value);
+        settingsIO.writeSetting(name, value);
     }
 
     public Map<String, String> getThemeConfig() {
-        config.readConfig(ConfigTools.configOptions.themes);
-        return store.getThemes();
+        Map<String, String> themesMap = new HashMap<>();
+        themesMap.put("theme", settingsIO.readSetting("theme"));
+        themesMap.put("accent", settingsIO.readSetting("accent"));
+        return themesMap;
     }
 
     public String getScrapeDate() {
-        config.readConfig(ConfigTools.configOptions.lastScrape);
+        store.setScrapeDate(settingsIO.readSetting("lastScrape"));
         return store.getScrapeDate();
     }
 
@@ -182,7 +175,7 @@ public class GUIController {
     }
 
     public void resetSettings() {
-        config.resetSettings();
+        settingsIO.defaultSettings();
     }
 
     public void resetDB() {

@@ -3,7 +3,6 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.sqlite.core.DB;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -34,7 +33,7 @@ public class StartSetup {
         this.log = errorLogging;
     }
 
-    public void initializeSystem() {
+    public void createPathsAndDirs() {
         createPaths();
         createDirs();
     }

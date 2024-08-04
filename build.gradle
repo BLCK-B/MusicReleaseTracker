@@ -14,7 +14,7 @@ plugins {
 }
 
 group 'com.blck'
-version '8.3'
+version '9'
 
 repositories {
     mavenCentral()
@@ -55,7 +55,6 @@ dependencies {
 
     implementation 'org.xerial:sqlite-jdbc:3.46.0.1'
     implementation 'org.jsoup:jsoup:1.18.1'
-    implementation 'com.typesafe:config:1.4.3'
 
     testImplementation(platform('org.junit:junit-bom:5.10.3'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'

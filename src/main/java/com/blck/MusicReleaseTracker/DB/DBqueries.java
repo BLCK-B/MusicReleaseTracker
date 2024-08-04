@@ -78,7 +78,7 @@ public class DBqueries {
     }
 
     public List<TableModel> loadCombviewTable() {
-        if (!disableR().isEmpty()) return disableR();
+        if (disableR() != null) return disableR();
         List<TableModel> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist, song LIMIT 1000";
@@ -315,13 +315,12 @@ public class DBqueries {
     }
 
     private List<TableModel> disableR() {
-        List<TableModel> tableContent = new ArrayList<>();
-        Locale locale = Locale.getDefault();
-        if (locale.getLanguage().equals("ru")) {
-            tableContent.add(new TableModel("For security, russian is disallowed.", "", "01-01-2000"));
-            tableContent.add(new TableModel("This can be disabled by changing system language.", "", "01-02-2000"));
+        if (Locale.getDefault().getLanguage().equals("ru")) {
+            return List.of(
+                new TableModel("For security, russian is disallowed.", "", "01-01-2000"),
+                new TableModel("This can be disabled by changing system language.", "", "01-02-2000"));
         }
-        return tableContent;
+        return null;
     }
 }
 

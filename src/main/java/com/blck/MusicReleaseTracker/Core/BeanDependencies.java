@@ -1,11 +1,12 @@
 package com.blck.MusicReleaseTracker.Core;
 
-import com.blck.MusicReleaseTracker.*;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
+import com.blck.MusicReleaseTracker.GUIController;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
-import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
+import com.blck.MusicReleaseTracker.StartSetup;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +24,11 @@ public class BeanDependencies {
     }
 
     @Bean
+    public SettingsIO settingsIO(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new SettingsIO(valueStore, errorLogging);
+    }
+
+    @Bean
     public ScrapeProcess scrapeProcess(ErrorLogging errorLogging, DBqueries dBqueries, SSEController sseController) {
         return new ScrapeProcess(errorLogging, dBqueries, sseController);
     }
@@ -32,11 +38,6 @@ public class BeanDependencies {
                                        ScrapeProcess scrapeProcess, SettingsIO settingsIO,
                                        ManageMigrateDB manageMigrateDB, DBqueries dBqueries) {
         return new GUIController(valueStore, errorLogging, scrapeProcess, settingsIO, dBqueries, manageMigrateDB);
-    }
-
-    @Bean
-    public SettingsIO settingsIO(ValueStore valueStore, ErrorLogging errorLogging) {
-        return new SettingsIO(valueStore, errorLogging);
     }
 
     @Bean

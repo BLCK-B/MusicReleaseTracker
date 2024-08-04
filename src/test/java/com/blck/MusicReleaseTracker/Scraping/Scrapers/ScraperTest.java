@@ -55,17 +55,18 @@ public class ScraperTest {
 
     @Test
     void leaveOldestDuplicatesOnlyAndSortByNewest() {
-        ArrayList<Song> inputList = new ArrayList<>();
-        inputList.add(new Song("Song1", "", "2023-01-01"));
-        inputList.add(new Song("SONG1", "", "2005-05-05"));
-        inputList.add(new Song("song1", "", "2005-05-06"));
-        inputList.add(new Song("Song3", "", "2021-01-01"));
-        inputList.add(new Song("Song3", "", "2019-01-01"));
-        inputList.add(new Song("song2", "", "2017-01-01"));
-        ArrayList<Song> expectedList = new ArrayList<>();
-        expectedList.add(new Song("Song3", "", "2019-01-01"));
-        expectedList.add(new Song("song2", "", "2017-01-01"));
-        expectedList.add(new Song("SONG1", "", "2005-05-05"));
+        List<Song> inputList = List.of(
+            new Song("Song1", "", "2023-01-01"),
+            new Song("SONG1", "", "2005-05-05"),
+            new Song("song1", "", "2005-05-06"),
+            new Song("Song3", "", "2021-01-01"),
+            new Song("Song3", "", "2019-01-01"),
+            new Song("song2", "", "2017-01-01"));
+
+        List<Song> expectedList = List.of(
+            new Song("Song3", "", "2019-01-01"),
+            new Song("song2", "", "2017-01-01"),
+            new Song("SONG1", "", "2005-05-05"));
 
         List<Song> resultList = scraper.processInfo(inputList);
 

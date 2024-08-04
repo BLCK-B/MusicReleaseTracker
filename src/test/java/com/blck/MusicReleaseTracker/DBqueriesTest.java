@@ -1,4 +1,5 @@
 package com.blck.MusicReleaseTracker;
+
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
@@ -6,15 +7,18 @@ import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
@@ -49,11 +53,16 @@ public class DBqueriesTest {
     @InjectMocks
     DBqueries dBqueriesClass;
 
-    ArrayList<Song> songList;
+    List<Song> songList;
 
     @BeforeAll
     static void setUpDB() {
         HelperDB.redoTestDB();
+    }
+
+    @AfterAll
+    static void cleanUp() {
+        HelperDB.redoTestData();
     }
 
     @BeforeEach
@@ -61,10 +70,10 @@ public class DBqueriesTest {
         HelperDB.redoTestData();
         lenient().when(store.getDBpathString()).thenReturn(testDBpath);
         dBqueriesClass = new DBqueries(store, log, settingsIO, manageMigrateDB);
-        songList = new ArrayList<>();
-        songList.add(new Song("song1", "artist1", "2022-01-01", "remix"));
-        songList.add(new Song("song2", "artist1", "2022-01-01", "type"));
-        songList.add(new Song("song3", "artist2", "2022-01-01", "Remixed"));
+        songList = List.of(
+            new Song("song1", "artist1", "2022-01-01", "remix"),
+            new Song("song2", "artist1", "2022-01-01", "type"),
+            new Song("song3", "artist2", "2022-01-01", "Remixed"));
     }
 
     @Test
@@ -175,8 +184,8 @@ public class DBqueriesTest {
         filterWords.put("remix", "true");
         when(settingsIO.getFilterValues()).thenReturn(filterWords);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
-        songList.clear();
-        songList.add(new Song("songRemixed", "artist", "2022-01-01"));
+        songList = List.of(
+                new Song("songRemixed", "artist", "2022-01-01"));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.youtube, 10);
 
         assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
@@ -196,9 +205,9 @@ public class DBqueriesTest {
 
     @Test
     void truncateAllScrapeTables() {
-        songList = new ArrayList<>();
-        songList.add(new Song("song1", "artist1", "2022-01-01"));
-        songList.add(new Song("song2", "artist1", "2022-01-01"));
+        songList = List.of(
+           new Song("song1", "artist1", "2022-01-01"),
+           new Song("song2", "artist1", "2022-01-01"));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
@@ -240,11 +249,6 @@ public class DBqueriesTest {
         assertEquals(0, HelperDB.getCountOf("artists", "artist", "artist1"));
         assertEquals(0, HelperDB.getCountOf("beatport", "artist", "artist1"));
         assertEquals(0, HelperDB.getCountOf("combview", "artist", "artist1"));
-    }
-
-    @AfterAll
-    static void cleanUp() {
-        HelperDB.redoTestData();
     }
 
 

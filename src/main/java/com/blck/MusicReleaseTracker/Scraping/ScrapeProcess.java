@@ -7,6 +7,7 @@ import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.util.stream.Collectors;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,143 +33,143 @@ import java.util.*;
 @Component
 public class ScrapeProcess {
 
-    private final ErrorLogging log;
-    private final DBqueries DB;
-    private final SSEController SSE;
+	private final ErrorLogging log;
+	private final DBqueries DB;
+	private final SSEController SSE;
+	public boolean scrapeCancel = false;
 
-    @Autowired
-    public ScrapeProcess(ErrorLogging errorLogging, DBqueries dBqueries, SSEController sseController) {
-        this.log = errorLogging;
-        this.DB = dBqueries;
-        this.SSE = sseController;
-    }
+	@Autowired
+	public ScrapeProcess(ErrorLogging errorLogging, DBqueries dBqueries, SSEController sseController) {
+		this.log = errorLogging;
+		this.DB = dBqueries;
+		this.SSE = sseController;
+	}
 
-    public boolean scrapeCancel = false;
+	public void scrapeData(ScraperManager scraperManager) {
+		scrapeCancel = false;
+		DB.truncateAllTables();
+		final int initSize = scraperManager.loadWithScrapers();
+		if (initSize == 0)
+			return;
+		int remaining = 1;
+		double progress = 0.0;
+		while (remaining != 0 && !scrapeCancel) {
+			remaining = scraperManager.scrapeNext();
 
-    public void scrapeData(ScraperManager scraperManager) {
-        scrapeCancel = false;
-        DB.truncateAllTables();
-        final int initSize = scraperManager.loadWithScrapers();
-        if (initSize == 0)
-            return;
-        int remaining = 1;
-        double progress = 0.0;
-        while (remaining != 0 && !scrapeCancel) {
-            remaining = scraperManager.scrapeNext();
+			progress = ((double) initSize - (double) remaining) / (double) initSize;
+			if (progress != 1.0)
+				if (SSE.sendProgress(progress))
+					scrapeCancel = true;
+		}
+		SSE.sendProgress(1.0);
+		System.gc();
+	}
 
-            progress = ((double) initSize - (double) remaining) / (double) initSize;
-            if (progress != 1.0)
-                if (SSE.sendProgress(progress))
-                    scrapeCancel = true;
-        }
-        SSE.sendProgress(1.0);
-        System.gc();
-    }
+	public void fillCombviewTable() {
+		DB.truncateCombview();
+		List<Song> songList = DB.getSourceTablesDataForCombview();
+		if (songList.isEmpty())
+			return;
 
-    public void fillCombviewTable() {
-        DB.truncateCombview();
-        List<Song> songList = DB.getSourceTablesDataForCombview();
-        if (songList.isEmpty())
-            return;
+		songList = mergeNameArtistDuplicates(songList);
+		songList = mergeNameDateDuplicates(songList);
+		songList = mergeSongsWithinDaysApart(songList, 7);
+		songList = sortByNewestDate(songList);
 
-        songList = mergeNameArtistDuplicates(songList);
-        songList = mergeNameDateDuplicates(songList);
-        songList = mergeSongsWithinDaysApart(songList, 7);
-        songList = sortByNewestDate(songList);
+		DB.batchInsertSongs(songList, TablesEnum.combview, 115);
+	}
 
-        DB.batchInsertSongs(songList, TablesEnum.combview, 115);
-    }
+	public List<Song> mergeNameArtistDuplicates(List<Song> songList) {
+		Map<String, Song> nameArtistMap =
+				songList.stream()
+						.collect(Collectors.toUnmodifiableMap(
+								key -> noSpacesLowerCase(key.getName() + key.getArtists()),
+								key -> key, this::getOlderDateSong
+						));
+		return new ArrayList<>(nameArtistMap.values());
+	}
 
-    public List<Song> mergeNameArtistDuplicates(List<Song> songList) {
-        Map<String, Song> nameArtistMap =
-                songList.stream()
-                        .collect(Collectors.toUnmodifiableMap(
-                                key -> noSpacesLowerCase(key.getName() + key.getArtists()),
-                                key -> key, this::getOlderDateSong
-                        ));
-        return new ArrayList<>(nameArtistMap.values());
-    }
+	public List<Song> mergeNameDateDuplicates(List<Song> songList) {
+		Map<String, Song> nameDateMap =
+				songList.stream()
+						.collect(Collectors.toUnmodifiableMap(
+								key -> noSpacesLowerCase(noSpacesLowerCase(key.getName() + key.getDate())),
+								key -> key, (existingValue, newValue) -> {
+									existingValue.appendArtist(newValue.getArtists());
+									return existingValue;
+								}
+						));
+		return new ArrayList<>(nameDateMap.values());
+	}
 
-    public List<Song> mergeNameDateDuplicates(List<Song> songList) {
-        Map<String, Song> nameDateMap =
-                songList.stream()
-                        .collect(Collectors.toUnmodifiableMap(
-                                key -> noSpacesLowerCase(noSpacesLowerCase(key.getName() + key.getDate())),
-                                key -> key, (existingValue, newValue) -> {
-                                    existingValue.appendArtist(newValue.getArtists());
-                                    return existingValue;
-                                }
-                        ));
-        return new ArrayList<>(nameDateMap.values());
-    }
+	public List<Song> mergeSongsWithinDaysApart(List<Song> songList, int maxDays) {
+		List<Song> tempList = new ArrayList<>();
+		Map<String, Song> nameArtistMap = songList.stream()
+				.collect(Collectors.toMap(
+						key -> noSpacesLowerCase(key.getName()),
+						key -> key, (existing, replacement) -> {
+							Song older = getOlderDateSong(existing, replacement);
+							Song newer = getNewerDateSong(existing, replacement);
+							if (!existing.getArtists().equalsIgnoreCase(replacement.getArtists()))
+								older.appendArtist(newer.getArtists());
+							if (getDayDifference(existing, replacement) > maxDays)
+								tempList.add(newer);
+							return older;
+						},
+						LinkedHashMap::new
+				));
+		tempList.forEach(s -> nameArtistMap.put(s.getDate() + s.getArtists(), s));
+		return new ArrayList<>(
+				nameArtistMap.values()).stream()
+				.sorted(Comparator.comparing(Song::getDate))
+				.toList();
+	}
 
-    public List<Song> mergeSongsWithinDaysApart(List<Song> songList, int maxDays) {
-        List<Song> tempList = new ArrayList<>();
-        Map<String, Song> nameArtistMap = songList.stream()
-                .collect(Collectors.toMap(
-                        key -> noSpacesLowerCase(key.getName()),
-                        key -> key, (existing, replacement) -> {
-                            Song older = getOlderDateSong(existing, replacement);
-                            Song newer = getNewerDateSong(existing, replacement);
-                            if (!existing.getArtists().equalsIgnoreCase(replacement.getArtists()))
-                                older.appendArtist(newer.getArtists());
-                            if (getDayDifference(existing, replacement) > maxDays)
-                                tempList.add(newer);
-                            return older;
-                        },
-                        LinkedHashMap::new
-                ));
-        tempList.forEach(s -> nameArtistMap.put(s.getDate() + s.getArtists(), s));
-        return new ArrayList<>(
-                nameArtistMap.values()).stream()
-                .sorted(Comparator.comparing(Song::getDate))
-                .toList();
-    }
+	public List<Song> sortByNewestDate(List<Song> songObjectList) {
+		return songObjectList.stream()
+				.sorted(Comparator.comparing(Song::getDate).reversed())
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
 
-    public List<Song> sortByNewestDate(List<Song> songObjectList) {
-        return songObjectList.stream()
-                .sorted(Comparator.comparing(Song::getDate).reversed())
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
+	private String noSpacesLowerCase(String s) {
+		return s.replaceAll("\\s+", "").toLowerCase();
+	}
 
-    private String noSpacesLowerCase(String s) {
-        return s.replaceAll("\\s+", "").toLowerCase();
-    }
+	private Song getOlderDateSong(Song song1, Song song2) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			Date existingDate = dateFormat.parse(song1.getDate());
+			Date newDate = dateFormat.parse(song2.getDate());
+			return existingDate.before(newDate) ? song1 : song2;
+		} catch (ParseException e) {
+			log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
+		}
+		return song1;
+	}
 
-    private Song getOlderDateSong(Song song1, Song song2) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date existingDate = dateFormat.parse(song1.getDate());
-            Date newDate = dateFormat.parse(song2.getDate());
-            return existingDate.before(newDate) ? song1 : song2;
-        } catch (ParseException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
-        }
-        return song1;
-    }
-    private Song getNewerDateSong(Song song1, Song song2) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date existingDate = dateFormat.parse(song1.getDate());
-            Date newDate = dateFormat.parse(song2.getDate());
-            return existingDate.after(newDate) ? song1 : song2;
-        } catch (ParseException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
-        }
-        return song1;
-    }
+	private Song getNewerDateSong(Song song1, Song song2) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			Date existingDate = dateFormat.parse(song1.getDate());
+			Date newDate = dateFormat.parse(song2.getDate());
+			return existingDate.after(newDate) ? song1 : song2;
+		} catch (ParseException e) {
+			log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
+		}
+		return song1;
+	}
 
-    public int getDayDifference(Song s1, Song s2) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date date1 = dateFormat.parse(s1.getDate());
-            Date date2 = dateFormat.parse(s2.getDate());
-            long diffMillisec = date2.getTime() - date1.getTime();
-            long diffDays = diffMillisec / (1000 * 3600 * 24);
-            return (int) Math.abs(Math.floor(diffDays));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public int getDayDifference(Song s1, Song s2) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			Date date1 = dateFormat.parse(s1.getDate());
+			Date date2 = dateFormat.parse(s2.getDate());
+			long diffMillisec = date2.getTime() - date1.getTime();
+			long diffDays = diffMillisec / (1000 * 3600 * 24);
+			return (int) Math.abs(Math.floor(diffDays));
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }

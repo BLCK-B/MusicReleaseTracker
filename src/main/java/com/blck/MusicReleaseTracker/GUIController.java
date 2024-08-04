@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -12,20 +27,9 @@ import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
-
-/*      MusicReleaseTracker
-        Copyright (C) 2023 BLCK
-        This program is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
-        You should have received a copy of the GNU General Public License
-        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * class with methods called from ApiController
@@ -110,10 +114,10 @@ public class GUIController {
         try {
             Scraper scraper = null;
             switch (selectedSource) {
-                case musicbrainz -> scraper = new ScraperMusicbrainz(log, DB, selectedArtist, url);
-                case beatport -> scraper = new ScraperBeatport(log, DB, selectedArtist, url);
-                case junodownload -> scraper = new ScraperJunodownload(log, DB, selectedArtist, url);
-                case youtube -> scraper = new ScraperYoutube(log, DB, selectedArtist, url);
+                case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, DB, selectedArtist, url);
+                case beatport -> scraper = new ScraperBeatport(store, log, DB, selectedArtist, url);
+                case junodownload -> scraper = new ScraperJunodownload(store, log, DB, selectedArtist, url);
+                case youtube -> scraper = new ScraperYoutube(store, log, DB, selectedArtist, url);
             }
             id = scraper.getID();
             scraper.scrape(25000);

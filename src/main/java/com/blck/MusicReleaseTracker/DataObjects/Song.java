@@ -1,17 +1,20 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.DataObjects;
 
-/*      MusicReleaseTracker
-        Copyright (C) 2023 BLCK
-        This program is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
-        You should have received a copy of the GNU General Public License
-        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +22,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-/** an object representing a song */
 public class Song implements Comparable<Song> {
     private final String songName;
     private final SortedSet<String> songArtists;
@@ -31,7 +33,12 @@ public class Song implements Comparable<Song> {
         this.songArtists = new TreeSet<>();
         this.songArtists.add(songArtists);
         this.songDate = songDate;
-        this.songType = songType != null ? Optional.of(songType) : Optional.empty();
+        if (songType == null)
+            this.songType = Optional.empty();
+        else if (songType.isBlank())
+            this.songType = Optional.empty();
+        else
+            this.songType = Optional.of(songType);
     }
 
     public Song(String songName, String songArtists, String songDate) {

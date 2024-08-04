@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -13,19 +28,6 @@ import org.springframework.stereotype.Component;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
-
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @Component
 public class DBqueries {
@@ -259,10 +261,10 @@ public class DBqueries {
                     if (url == null)
                         continue;
                     switch (webSource) {
-                        case musicbrainz -> scrapers.add(new ScraperMusicbrainz(log, this, artist, url));
-                        case beatport -> scrapers.add(new ScraperBeatport(log, this, artist, url));
-                        case junodownload -> scrapers.add(new ScraperJunodownload(log, this, artist, url));
-                        case youtube -> scrapers.add(new ScraperYoutube(log, this, artist, url));
+                        case musicbrainz -> scrapers.add(new ScraperMusicbrainz(store, log, this, artist, url));
+                        case beatport -> scrapers.add(new ScraperBeatport(store, log, this, artist, url));
+                        case junodownload -> scrapers.add(new ScraperJunodownload(store, log, this, artist, url));
+                        case youtube -> scrapers.add(new ScraperYoutube(store, log, this, artist, url));
                     }
                 }
             }

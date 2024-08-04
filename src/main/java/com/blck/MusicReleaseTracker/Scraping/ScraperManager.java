@@ -1,33 +1,36 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping;
 
-import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
 
-import java.util.*;
-
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class ScraperManager {
 
     private final ErrorLogging log;
     private final DBqueries DB;
-    private LinkedList<Scraper> scrapers;
-    private int minDelay = 2800; // ms
     private final int jsoupTimeout = 25000; // ms
     private final HashMap<String, Double> sourceTimes = new HashMap<>();
+    private LinkedList<Scraper> scrapers;
+    private int minDelay = 2800; // ms
 
     public ScraperManager(ErrorLogging log, DBqueries DB) {
         this.log = log;

@@ -15,6 +15,7 @@ package com.blck.MusicReleaseTracker.DataObjects;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -23,14 +24,22 @@ public class Song implements Comparable<Song> {
     private final String songName;
     private final SortedSet<String> songArtists;
     private final String songDate;
-    private final String songType;
+    private final Optional<String> songType;
 
     public Song(String songName, String songArtists, String songDate, String songType) {
         this.songName = songName;
         this.songArtists = new TreeSet<>();
         this.songArtists.add(songArtists);
         this.songDate = songDate;
-        this.songType = songType;
+        this.songType = songType != null ? Optional.of(songType) : Optional.empty();
+    }
+
+    public Song(String songName, String songArtists, String songDate) {
+        this.songName = songName;
+        this.songArtists = new TreeSet<>();
+        this.songArtists.add(songArtists);
+        this.songDate = songDate;
+        this.songType = Optional.empty();
     }
 
     public String getName() {
@@ -42,7 +51,7 @@ public class Song implements Comparable<Song> {
     public String getDate() {
         return songDate;
     }
-    public String getType() {
+    public Optional<String> getType() {
         return songType;
     }
 
@@ -52,12 +61,8 @@ public class Song implements Comparable<Song> {
 
     @Override
     public String toString() {
-        if (this.songType != null)
-            return songName + " " + getArtists() + " " + songDate + " " + songType;
-        if (this.songType == null)
-            return songName + " " + getArtists() + " " + songDate;
-
-        return null;
+        return songName + " " + getArtists() + " " + songDate +
+                (songType.map(type -> " " + type).orElse(""));
     }
 
     public int compareDates(Song s, DateTimeFormatter formatter) {

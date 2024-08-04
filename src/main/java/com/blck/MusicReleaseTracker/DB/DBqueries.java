@@ -222,14 +222,14 @@ public class DBqueries {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
 
-        if (song.getType() == null)
+        if (song.getType().isEmpty())
             return disabledWords.stream()
                     .map(this::getRealFilterName)
                     .noneMatch(disabledWord -> song.getName().toLowerCase().contains(disabledWord.toLowerCase()));
         else
             return disabledWords.stream()
                     .map(this::getRealFilterName)
-                    .noneMatch(disabledWord -> song.getType().toLowerCase().contains(disabledWord.toLowerCase()) ||
+                    .noneMatch(disabledWord -> song.getType().get().toLowerCase().contains(disabledWord.toLowerCase()) ||
                             song.getName().toLowerCase().contains(disabledWord.toLowerCase()));
     }
 
@@ -278,7 +278,7 @@ public class DBqueries {
             throw new NullPointerException("null table");
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             String sql;
-            if (songList.getFirst().getType() != null && source != TablesEnum.combview)
+            if (songList.getFirst().getType().isPresent() && source != TablesEnum.combview)
                 sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
             else
                 sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
@@ -290,8 +290,8 @@ public class DBqueries {
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
-                if (songList.getFirst().getType() != null && source != TablesEnum.combview)
-                    pstmt.setString(4, songObject.getType());
+                if (songList.getFirst().getType().isPresent() && source != TablesEnum.combview)
+                    pstmt.setString(4, songObject.getType().get());
                 ++i;
                 pstmt.addBatch();
             }

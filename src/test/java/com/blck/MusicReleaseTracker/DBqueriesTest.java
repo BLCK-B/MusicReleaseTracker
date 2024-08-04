@@ -158,7 +158,7 @@ public class DBqueriesTest {
         HashMap<String, String> filterWords = new HashMap<>();
         filterWords.put("remix", "true");
 
-        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", null), filterWords));
+        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", ""), filterWords));
     }
 
     @Test
@@ -166,7 +166,7 @@ public class DBqueriesTest {
         HashMap<String, String> filterWords = new HashMap<>();
         filterWords.put("remix", "true");
 
-        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("songRemix)", "", "", null), filterWords));
+        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("songRemix)", "", ""), filterWords));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class DBqueriesTest {
         when(settingsIO.getFilterValues()).thenReturn(filterWords);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         songList.clear();
-        songList.add(new Song("songRemixed", "artist", "2022-01-01", null));
+        songList.add(new Song("songRemixed", "artist", "2022-01-01"));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.youtube, 10);
 
         assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
@@ -197,8 +197,8 @@ public class DBqueriesTest {
     @Test
     void truncateAllScrapeTables() {
         songList = new ArrayList<>();
-        songList.add(new Song("song1", "artist1", "2022-01-01", null));
-        songList.add(new Song("song2", "artist1", "2022-01-01", null));
+        songList.add(new Song("song1", "artist1", "2022-01-01"));
+        songList.add(new Song("song2", "artist1", "2022-01-01"));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);

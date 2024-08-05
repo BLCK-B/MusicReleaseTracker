@@ -165,7 +165,7 @@ public class ScrapeProcessTest {
 
         int dayDiff = scrapeProcess.getDayDifference(s1, s1);
 
-        assertEquals(5555, dayDiff);
+        assertEquals(0, dayDiff);
     }
 
     @Test

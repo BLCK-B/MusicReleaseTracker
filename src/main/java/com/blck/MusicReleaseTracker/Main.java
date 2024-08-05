@@ -68,7 +68,6 @@ public class Main {
                 |_|  |_|_| \\_\\|_|
             """);
             store.setAppVersion(appConfig.version());
-            System.out.println(store.getAppVersion());
             startSetup.createPathsAndDirs();
             manageDB.migrateDB();
             settingsIO.updateSettings();

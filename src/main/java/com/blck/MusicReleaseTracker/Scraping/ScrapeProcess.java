@@ -16,7 +16,6 @@
 package com.blck.MusicReleaseTracker.Scraping;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
@@ -76,55 +75,87 @@ public class ScrapeProcess {
 		songList = mergeNameArtistDuplicates(songList);
 		songList = mergeNameDateDuplicates(songList);
 		songList = mergeSongsWithinDaysApart(songList, 7);
+		songList = groupSameDateArtistSongs(songList, 3);
 		songList = sortByNewestDate(songList);
 
-		DB.batchInsertSongs(songList, TablesEnum.combview, 115);
+		DB.batchInsertCombview(songList);
 	}
 
 	public List<Song> mergeNameArtistDuplicates(List<Song> songList) {
 		Map<String, Song> nameArtistMap =
-				songList.stream()
-						.collect(Collectors.toUnmodifiableMap(
-								key -> noSpacesLowerCase(key.getName() + key.getArtists()),
-								key -> key, this::getOlderDateSong
-						));
+			songList.stream()
+				.collect(Collectors.toUnmodifiableMap(
+					key -> noSpacesLowerCase(key.getName() + key.getArtists()),
+					key -> key, this::getOlderDateSong
+				));
 		return new ArrayList<>(nameArtistMap.values());
 	}
 
 	public List<Song> mergeNameDateDuplicates(List<Song> songList) {
 		Map<String, Song> nameDateMap =
-				songList.stream()
-						.collect(Collectors.toUnmodifiableMap(
-								key -> noSpacesLowerCase(noSpacesLowerCase(key.getName() + key.getDate())),
-								key -> key, (existingValue, newValue) -> {
-									existingValue.appendArtist(newValue.getArtists());
-									return existingValue;
-								}
-						));
+			songList.stream()
+				.collect(Collectors.toUnmodifiableMap(
+					key -> noSpacesLowerCase(key.getName() + key.getDate()),
+					key -> key, (existingValue, newValue) -> {
+						existingValue.appendArtist(newValue.getArtists());
+						return existingValue;
+					}
+				));
 		return new ArrayList<>(nameDateMap.values());
 	}
 
 	public List<Song> mergeSongsWithinDaysApart(List<Song> songList, int maxDays) {
 		List<Song> tempList = new ArrayList<>();
-		Map<String, Song> nameArtistMap = songList.stream()
-				.collect(Collectors.toMap(
-						key -> noSpacesLowerCase(key.getName()),
-						key -> key, (existing, replacement) -> {
-							Song older = getOlderDateSong(existing, replacement);
-							Song newer = getNewerDateSong(existing, replacement);
-							if (!existing.getArtists().equalsIgnoreCase(replacement.getArtists()))
-								older.appendArtist(newer.getArtists());
-							if (getDayDifference(existing, replacement) > maxDays)
-								tempList.add(newer);
-							return older;
-						},
-						LinkedHashMap::new
-				));
+		Map<String, Song> nameArtistMap =
+			songList.stream()
+			.collect(Collectors.toMap(
+				key -> noSpacesLowerCase(key.getName()),
+				key -> key, (existing, replacement) -> {
+					Song older = getOlderDateSong(existing, replacement);
+					Song newer = getNewerDateSong(existing, replacement);
+					if (!existing.getArtists().equalsIgnoreCase(replacement.getArtists()))
+						older.appendArtist(newer.getArtists());
+					if (getDayDifference(existing, replacement) > maxDays)
+						tempList.add(newer);
+					return older;
+				},
+				LinkedHashMap::new
+			));
 		tempList.forEach(s -> nameArtistMap.put(s.getDate() + s.getArtists(), s));
 		return new ArrayList<>(
 				nameArtistMap.values()).stream()
 				.sorted(Comparator.comparing(Song::getDate))
 				.toList();
+	}
+
+	public List<Song> groupSameDateArtistSongs(List<Song> songList, int atLeast) {
+		Map<String, List<Song>> artistSameDayCounts =
+				songList.stream()
+				.collect(Collectors.groupingBy(
+						song -> noSpacesLowerCase(song.getArtists() + song.getDate())
+				));
+
+		for (List<Song> group : artistSameDayCounts.values()) {
+			if (group.size() >= atLeast)
+				group.forEach(song -> song.setAlbumID("[" + group.size() + "] releases"));
+		}
+
+		return artistSameDayCounts.values().stream()
+				.flatMap(Collection::stream)
+				.toList();
+
+//		List<MediaItem> albums = artistSameDayCounts.values().stream()
+//				.filter(group -> group.size() >= atLeast)
+//				.map(group -> (MediaItem) new Album("[" + group.size() + "] releases", group))
+//				.toList();
+//
+//		ArrayList<MediaItem> mediaItems = new ArrayList<>(albums);
+//
+//		artistSameDayCounts.values().stream()
+//				.filter(group -> group.size() < atLeast)
+//				.flatMap(Collection::stream)
+//				.map(item -> (MediaItem) item)
+//				.forEach(mediaItems::add);
 	}
 
 	public List<Song> sortByNewestDate(List<Song> songObjectList) {

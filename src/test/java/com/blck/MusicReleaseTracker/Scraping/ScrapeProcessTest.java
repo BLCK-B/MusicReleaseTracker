@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -17,22 +32,9 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.blck.MusicReleaseTracker.Scraping.SongAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/*      MusicReleaseTracker
-        Copyright (C) 2023 BLCK
-        This program is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
-        You should have received a copy of the GNU General Public License
-        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 @ExtendWith(MockitoExtension.class)
 public class ScrapeProcessTest {
 
@@ -249,5 +251,46 @@ public class ScrapeProcessTest {
             assertThat(expected.get(i)).dataMatches(output.get(i));
     }
 
+    @Test
+    void assignAlbumForAtLeastXSameDayReleasesByAnArtist() {
+        List<Song> songList = List.of(
+                new Song("song1", "artist", "2020-01-04"),
+                new Song("song2", "artist", "2020-01-04"),
+                new Song("song3", "artist", "2020-01-04"));
+
+        List<Song> output = scrapeProcess.groupSameDateArtistSongs(songList, 2);
+
+        for (Song song : output)
+            assertNotNull(song.getAlbum());
+    }
+
+    @Test
+    void lessThanAtLeastSameDayReleasesRemainSongs() {
+        List<Song> songList = List.of(
+                new Song("song1", "artist", "2020-01-04"),
+                new Song("song2", "artist", "2020-01-04"));
+
+        List<Song> output = scrapeProcess.groupSameDateArtistSongs(songList, 3);
+
+        for (Song song : output)
+            assertNull(song.getAlbum());
+    }
+
+    @Test
+    void bothGroupAndNotGroupCases() {
+        List<Song> songList = List.of(
+                new Song("song1", "artist", "2020-01-04"),
+                new Song("song2", "notGroup", "2020-01-04"),
+                new Song("song3", "artist", "2020-01-04"),
+                new Song("song4", "neitherGroup", "2020-01-04"),
+                new Song("song4", "artist", "2020-01-04"));
+
+        List<Song> output = scrapeProcess.groupSameDateArtistSongs(songList, 2);
+
+        assertEquals(2, output.stream()
+                .filter(song -> song.getAlbum() == null)
+                .count()
+        );
+    }
 
 }

@@ -278,9 +278,11 @@ public class DBqueries {
     public void batchInsertSongs(List<Song> songList, TablesEnum source, int limit) {
         if (source == null)
             throw new NullPointerException("null table");
+        if (source == TablesEnum.combview)
+            throw new RuntimeException("use dedicated combview insert method");
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             String sql;
-            if (songList.getFirst().getType().isPresent() && source != TablesEnum.combview)
+            if (songList.getFirst().getType().isPresent())
                 sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
             else
                 sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
@@ -294,6 +296,31 @@ public class DBqueries {
                 pstmt.setString(3, songObject.getDate());
                 if (songList.getFirst().getType().isPresent() && source != TablesEnum.combview)
                     pstmt.setString(4, songObject.getType().get());
+                ++i;
+                pstmt.addBatch();
+            }
+            conn.setAutoCommit(false);
+            pstmt.executeBatch();
+            conn.setAutoCommit(true);
+            pstmt.close();
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error inserting a batch of songs");
+        }
+    }
+
+    public void batchInsertCombview(List<Song> songList) {
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "insert into combview (song, artist, date, album) values(?, ?, ?, ?)"
+            );
+            int i = 0;
+            for (Song songObject : songList) {
+                if (i == 115)
+                    break;
+                pstmt.setString(1, songObject.getName());
+                pstmt.setString(2, songObject.getArtists());
+                pstmt.setString(3, songObject.getDate());
+                pstmt.setString(4, songObject.getAlbum());
                 ++i;
                 pstmt.addBatch();
             }

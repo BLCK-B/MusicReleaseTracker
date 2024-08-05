@@ -92,7 +92,8 @@ public class ManageMigrateDB {
                     CREATE TABLE IF NOT EXISTS combview (
                     song text NOT NULL,
                     artist text NOT NULL,
-                    date text NOT NULL
+                    date text NOT NULL,
+                    album text
                     );
                     """;
             stmt.addBatch(sql);

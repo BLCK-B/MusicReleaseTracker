@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -23,19 +38,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
-
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 @ExtendWith(MockitoExtension.class)
 public class DBqueriesTest {
@@ -85,16 +87,16 @@ public class DBqueriesTest {
 
     @Test
     void batchInsertIntoCombview() {
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
+        dBqueriesClass.batchInsertCombview(songList);
 
         assertEquals(3, HelperDB.getNumEntries("combview"));
     }
 
     @Test
     void batchInsertOverLimit() {
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 1);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 1);
 
-        assertEquals(1, HelperDB.getNumEntries("combview"));
+        assertEquals(1, HelperDB.getNumEntries("beatport"));
     }
 
     @Test
@@ -106,7 +108,7 @@ public class DBqueriesTest {
 
     @Test
     void getEntriesInCombviewTable() {
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
+        dBqueriesClass.batchInsertCombview(songList);
 
         assertEquals(3, dBqueriesClass.loadCombviewTable().size());
     }
@@ -193,7 +195,7 @@ public class DBqueriesTest {
 
     @Test
     void truncateCombviewTable() {
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
+        dBqueriesClass.batchInsertCombview(songList);
         int entries = HelperDB.getNumEntries("combview", "beatport");
         assertEquals(3, entries);
 
@@ -210,7 +212,7 @@ public class DBqueriesTest {
            new Song("song2", "artist1", "2022-01-01"));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
+        dBqueriesClass.batchInsertCombview(songList);
         int entries = HelperDB.getNumEntries("combview", "musicbrainz", "junodownload");
         assertEquals(6, entries);
 
@@ -239,7 +241,7 @@ public class DBqueriesTest {
     @Test
     void deleteArtistFromAllTables() {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.combview, 10);
+        dBqueriesClass.batchInsertCombview(songList);
         assertEquals(1, HelperDB.getCountOf("artists", "artist", "artist1"));
         assertEquals(2, HelperDB.getCountOf("beatport", "artist", "artist1"));
         assertEquals(2, HelperDB.getCountOf("combview", "artist", "artist1"));

@@ -22,11 +22,12 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class Song implements Comparable<Song> {
+public class Song implements Comparable<Song>, MediaItem {
     private final String songName;
     private final SortedSet<String> songArtists;
     private final String songDate;
     private final Optional<String> songType;
+    private String album;
 
     public Song(String songName, String songArtists, String songDate, String songType) {
         this.songName = songName;
@@ -49,15 +50,26 @@ public class Song implements Comparable<Song> {
         this.songType = Optional.empty();
     }
 
+    public String getAlbum() {
+        return album;
+    }
+
+    public void setAlbumID(String album) {
+        this.album = album;
+    }
+
     public String getName() {
         return songName;
     }
+
     public String getArtists() {
         return String.join(", ", songArtists);
     }
+
     public String getDate() {
         return songDate;
     }
+
     public Optional<String> getType() {
         return songType;
     }

@@ -16,7 +16,7 @@
 package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
-import com.blck.MusicReleaseTracker.DataObjects.TableModel;
+import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.GUIController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,12 +44,12 @@ public class ApiController {
     }
 
     @PostMapping ("/getTableArtistClick")
-    public List<TableModel> getTableArtistClick(@RequestBody Map<String, String> requestData) {
+    public List<MediaItem> getTableArtistClick(@RequestBody Map<String, String> requestData) {
         return sendRequest.getTableData(requestData.get("item"));
     }
 
     @PostMapping ("/getTableSourceClick")
-    public List<TableModel> getTableSourceClick(@RequestBody Map<String, String> requestData) {
+    public List<MediaItem> getTableSourceClick(@RequestBody Map<String, String> requestData) {
         return sendRequest.getTableData(TablesEnum.valueOf(requestData.get("item")));
     }
 

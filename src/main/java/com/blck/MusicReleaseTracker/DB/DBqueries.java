@@ -18,8 +18,9 @@ package com.blck.MusicReleaseTracker.DB;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DataObjects.Album;
+import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
-import com.blck.MusicReleaseTracker.DataObjects.TableModel;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,42 +61,79 @@ public class DBqueries {
         return dataList;
     }
 
-    public List<TableModel> loadTable(TablesEnum source, String name) {
-        List<TableModel> tableContent = new ArrayList<>();
+    public List<MediaItem> loadTable(TablesEnum source, String name) {
+        List<MediaItem> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             PreparedStatement pstmt = conn.prepareStatement(
-                    "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC, song LIMIT 100");
+                    "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC, song LIMIT 50");
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                tableContent.add(new TableModel(
-                        rs.getString("song"), null, rs.getString("date")));
-            }
-            pstmt.close();
-            rs.close();
+            while (rs.next())
+                tableContent.add(new Song(
+                        rs.getString("song"),
+                        name,
+                        rs.getString("date")));
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error loading table");
         }
         return tableContent;
     }
 
-    public List<TableModel> loadCombviewTable() {
-        if (disableR() != null) return disableR();
-        List<TableModel> tableContent = new ArrayList<>();
+    public List<MediaItem> loadCombviewTable() {
+        if (disableR() != null) return disableR(); // TODO: test
+        ArrayList<MediaItem> tableContent = new ArrayList<>();
+        tableContent.addAll(readCombviewAlbums());
+        tableContent.addAll(readCombviewSingles());
+        // TODO: unique keys
+        return tableContent.stream()
+                .sorted(Comparator.comparing(MediaItem::getDate))
+                .toList().reversed();
+    }
+
+    public List<Album> readCombviewAlbums() {
+        List<Album> albums = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
-            String sql = "SELECT song, artist, date FROM combview ORDER BY date DESC, artist, song LIMIT 1000";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                tableContent.add(new TableModel(
-                        rs.getString("song"), rs.getString("artist"), rs.getString("date")));
+            Statement stmt = conn.createStatement();
+            ResultSet rs1 = stmt.executeQuery(
+                    "SELECT DISTINCT album FROM combview WHERE album IS NOT NULL LIMIT 300"
+            );
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT song, artist, date FROM combview WHERE album = ? LIMIT 100"
+            );
+            while (rs1.next()) {
+                final String albumName =  rs1.getString("album");
+                pstmt.setString(1, albumName);
+                ResultSet rs2 = pstmt.executeQuery();
+                ArrayList<Song> albumSongs = new ArrayList<>();
+                while (rs2.next())
+                    albumSongs.add(new Song(
+                            rs2.getString("song"),
+                            rs2.getString("artist"),
+                            rs2.getString("date")));
+                albums.add(new Album(albumName, albumSongs));
             }
-            pstmt.close();
-            rs.close();
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview albums");
+        }
+        return albums;
+    }
+
+    public List<Song> readCombviewSingles() {
+        List<Song> singles = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT song, artist, date FROM combview WHERE album IS NULL LIMIT 1000"
+            );
+            while (rs.next())
+                singles.add(new Song(
+                        rs.getString("song"),
+                        rs.getString("artist"),
+                        rs.getString("date")));
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview table");
         }
-        return tableContent;
+        return singles;
     }
 
     public void insertIntoArtistList(String name) {
@@ -294,7 +332,7 @@ public class DBqueries {
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
-                if (songList.getFirst().getType().isPresent() && source != TablesEnum.combview)
+                if (songList.getFirst().getType().isPresent())
                     pstmt.setString(4, songObject.getType().get());
                 ++i;
                 pstmt.addBatch();
@@ -343,11 +381,11 @@ public class DBqueries {
         }
     }
 
-    private List<TableModel> disableR() {
+    private List<MediaItem> disableR() {
         if (Locale.getDefault().getLanguage().equals("ru")) {
             return List.of(
-                new TableModel("For security, russian is disallowed.", "", "01-01-2000"),
-                new TableModel("This can be disabled by changing system language.", "", "01-02-2000"));
+                new Song("For security, russian is disallowed.", "", "01-01-2000"),
+                new Song("This can be disabled by changing system language.", "", "01-02-2000"));
         }
         return null;
     }

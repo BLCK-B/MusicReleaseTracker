@@ -20,7 +20,7 @@ import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
-import com.blck.MusicReleaseTracker.DataObjects.TableModel;
+import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
@@ -87,12 +87,12 @@ public class GUIController {
         DB.clearArtistDataFrom(selectedArtist, selectedSource);
     }
 
-    public List<TableModel> getTableData(String artist) {
+    public List<MediaItem> getTableData(String artist) {
         selectedArtist = artist;
         return selectedSource == TablesEnum.combview ? DB.loadCombviewTable() : DB.loadTable(selectedSource, selectedArtist);
     }
 
-    public List<TableModel> getTableData(TablesEnum source) {
+    public List<MediaItem> getTableData(TablesEnum source) {
         selectedSource = source;
         if (selectedSource == TablesEnum.combview)
             return DB.loadCombviewTable();

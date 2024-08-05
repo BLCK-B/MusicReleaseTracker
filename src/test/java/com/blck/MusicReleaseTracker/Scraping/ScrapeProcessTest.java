@@ -31,7 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collection;
 import java.util.List;
 
-import static com.blck.MusicReleaseTracker.Scraping.SongAssert.assertThat;
+import static com.blck.MusicReleaseTracker.Scraping.Helpers.SongAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

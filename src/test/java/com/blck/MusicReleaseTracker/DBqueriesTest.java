@@ -20,6 +20,8 @@ import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.DataObjects.Album;
+import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import org.junit.jupiter.api.AfterAll;
@@ -100,17 +102,79 @@ public class DBqueriesTest {
     }
 
     @Test
-    void getArtistEntriesInSourceTable() {
+    void getArtist1EntriesInSourceTable() {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
 
         assertEquals(2, dBqueriesClass.loadTable(TablesEnum.beatport, "artist1").size());
     }
 
     @Test
-    void getEntriesInCombviewTable() {
+    void getSinglesOnlyFromCombview() {
         dBqueriesClass.batchInsertCombview(songList);
 
-        assertEquals(3, dBqueriesClass.loadCombviewTable().size());
+        assertEquals(3,dBqueriesClass.readCombviewSingles().size());
+    }
+
+    @Test
+    void getAlbumsOnlyFromCombview() {
+        songList.get(0).setAlbumID("albumOne");
+        songList.get(1).setAlbumID("albumTwo");
+        songList.get(2).setAlbumID("albumTwo");
+        dBqueriesClass.batchInsertCombview(songList);
+
+        List<Album> albums = dBqueriesClass.readCombviewAlbums();
+
+        assertEquals(2, albums.size());
+        assertEquals(2, albums.get(1).getAlbumSongs().size());
+    }
+
+    @Test
+    void mixedSinglesAndAlbumsReadSingles() {
+        songList.get(0).setAlbumID("album");
+        dBqueriesClass.batchInsertCombview(songList);
+
+        assertEquals(2,dBqueriesClass.readCombviewSingles().size());
+    }
+
+    @Test
+    void mixedSinglesAndAlbumsReadAlbums() {
+        songList.get(0).setAlbumID("album");
+        dBqueriesClass.batchInsertCombview(songList);
+
+        assertEquals(1,dBqueriesClass.readCombviewAlbums().size());
+    }
+
+    @Test
+    void getMediaItemsFromCombview() {
+        songList.get(0).setAlbumID("album");
+        dBqueriesClass.batchInsertCombview(songList);
+
+        List<MediaItem> mediaItems = dBqueriesClass.loadCombviewTable();
+
+        assertEquals(3, mediaItems.size());
+        assertEquals(1, mediaItems.stream()
+                .filter(item -> item.getAlbum() != null)
+                .count()
+        );
+    }
+
+    @Test
+    void mediaItemsFromCombviewAreSortedByNewestDate() {
+        songList = List.of(
+                new Song("song", "artist", "2022-01-03"),
+                new Song("song", "artist", "2022-01-02"),
+                new Song("albumSong", "artist", "2022-01-04"));
+        songList.get(2).setAlbumID("album");
+        dBqueriesClass.batchInsertCombview(songList);
+        List<Song> expected = List.of(
+                new Song("albumSong", "artist", "2022-01-04"),
+                new Song("song", "artist", "2022-01-03"),
+                new Song("song", "artist", "2022-01-02"));
+
+        List<MediaItem> mediaItems = dBqueriesClass.loadCombviewTable();
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertEquals(expected.get(i).getDate(), mediaItems.get(i).getDate());
     }
 
     @Test

@@ -13,8 +13,10 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker.DataObjects;/*
+package com.blck.MusicReleaseTracker.DataObjects;
 
 /** container for songs and albums intended for frontend */
 public interface MediaItem {
+	String getDate();
+	String getAlbum();
 }

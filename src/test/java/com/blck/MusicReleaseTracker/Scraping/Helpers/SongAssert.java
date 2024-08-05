@@ -13,21 +13,24 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker.DataObjects;
+package com.blck.MusicReleaseTracker.Scraping.Helpers;
 
-import java.util.List;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
+import org.assertj.core.api.AbstractAssert;
 
-public record Album(String albumName, List<Song> songs) implements MediaItem {
-	public List<Song> getAlbumSongs() {
-		return songs;
-	}
-	@Override
-	public String getDate() {
-		return songs.getFirst().getDate();
-	}
+public class SongAssert extends AbstractAssert<SongAssert, Song> {
 
-	@Override
-	public String getAlbum() {
-		return albumName;
-	}
+    public SongAssert(Song actual) {
+        super(actual, SongAssert.class);
+    }
+
+    public static SongAssert assertThat(Song actual) {
+        return new SongAssert(actual);
+    }
+
+    public SongAssert dataMatches(Song s) {
+        if (!actual.toString().equalsIgnoreCase(s.toString()))
+            failWithMessage(actual + " does not match " + s);
+        return this;
+    }
 }

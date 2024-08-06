@@ -19,7 +19,7 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
-import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
@@ -41,7 +41,7 @@ public class GUIController {
     private final ScrapeProcess scrapeProcess;
     private final SettingsIO settingsIO;
     private final DBqueries DB;
-    private final ManageMigrateDB manageDB;
+    private final MigrateDB manageDB;
 
     private TablesEnum selectedSource = TablesEnum.combview;
     private String selectedArtist;
@@ -49,7 +49,7 @@ public class GUIController {
 
     @Autowired
     public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                         SettingsIO settingsIO, DBqueries dBqueries, ManageMigrateDB manageDB) {
+                         SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;

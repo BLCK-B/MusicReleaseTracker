@@ -35,11 +35,11 @@ public class DBqueries {
 
     private final ValueStore store;
     private final ErrorLogging log;
-    private final ManageMigrateDB manageDB;
+    private final MigrateDB manageDB;
     private final SettingsIO settingsIO;
 
     @Autowired
-    public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, ManageMigrateDB manageDB) {
+    public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, MigrateDB manageDB) {
         this.store = valueStore;
         this.log = errorLogging;
         this.manageDB = manageDB;
@@ -84,7 +84,6 @@ public class DBqueries {
         ArrayList<MediaItem> tableContent = new ArrayList<>();
         tableContent.addAll(readCombviewAlbums());
         tableContent.addAll(readCombviewSingles());
-        // TODO: unique keys
         return tableContent.stream()
                 .sorted(Comparator.comparing(MediaItem::getDate))
                 .toList().reversed();

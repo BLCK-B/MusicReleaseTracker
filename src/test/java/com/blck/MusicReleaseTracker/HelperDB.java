@@ -16,7 +16,7 @@
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
-import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.DB.MigrateDB;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +35,7 @@ public class HelperDB {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ManageMigrateDB manageDB = new ManageMigrateDB(null, null);
+        MigrateDB manageDB = new MigrateDB(null, null);
         manageDB.createDBandSourceTables(testDBpath);
     }
 

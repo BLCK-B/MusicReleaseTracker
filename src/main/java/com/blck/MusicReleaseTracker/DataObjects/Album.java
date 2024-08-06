@@ -17,7 +17,7 @@ package com.blck.MusicReleaseTracker.DataObjects;
 
 import java.util.List;
 
-public record Album(String albumName, List<Song> songs) implements MediaItem {
+public record Album(String album, List<Song> songs) implements MediaItem {
 	public List<Song> getAlbumSongs() {
 		return songs;
 	}
@@ -28,6 +28,6 @@ public record Album(String albumName, List<Song> songs) implements MediaItem {
 
 	@Override
 	public String getAlbum() {
-		return albumName;
+		return album;
 	}
 }

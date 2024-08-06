@@ -18,7 +18,7 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.AppConfig;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -34,13 +34,13 @@ public class Main {
 
     private final SettingsIO settingsIO;
     private final ErrorLogging log;
-    private final ManageMigrateDB manageDB;
+    private final MigrateDB manageDB;
     private final StartSetup startSetup;
     private final ValueStore store;
     private final AppConfig appConfig;
     @Autowired
     public Main(AppConfig appConfig, ValueStore store, SettingsIO settingsIO,
-                ErrorLogging errorLogging, StartSetup startSetup, ManageMigrateDB manageDB) {
+                ErrorLogging errorLogging, StartSetup startSetup, MigrateDB manageDB) {
         this.settingsIO = settingsIO;
         this.log = errorLogging;
         this.startSetup = startSetup;

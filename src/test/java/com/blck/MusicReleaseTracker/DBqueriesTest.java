@@ -19,7 +19,7 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
-import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.Album;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
@@ -49,7 +49,7 @@ public class DBqueriesTest {
     @Mock
     ValueStore store;
     @Mock
-    ManageMigrateDB manageMigrateDB;
+    MigrateDB migrateDB;
     @Mock
     ErrorLogging log;
     @Mock
@@ -73,7 +73,7 @@ public class DBqueriesTest {
     void setUp() {
         HelperDB.redoTestData();
         lenient().when(store.getDBpathString()).thenReturn(testDBpath);
-        dBqueriesClass = new DBqueries(store, log, settingsIO, manageMigrateDB);
+        dBqueriesClass = new DBqueries(store, log, settingsIO, migrateDB);
         songList = List.of(
             new Song("song1", "artist1", "2022-01-01", "remix"),
             new Song("song2", "artist1", "2022-01-01", "type"),

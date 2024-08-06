@@ -16,7 +16,7 @@
 package com.blck.MusicReleaseTracker.Core;
 
 import com.blck.MusicReleaseTracker.DB.DBqueries;
-import com.blck.MusicReleaseTracker.DB.ManageMigrateDB;
+import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.FrontendAPI.SSEController;
 import com.blck.MusicReleaseTracker.GUIController;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
@@ -52,18 +52,18 @@ public class BeanDependencies {
     @Bean
     public GUIController guiController(ValueStore valueStore, ErrorLogging errorLogging,
                                        ScrapeProcess scrapeProcess, SettingsIO settingsIO,
-                                       ManageMigrateDB manageMigrateDB, DBqueries dBqueries) {
-        return new GUIController(valueStore, errorLogging, scrapeProcess, settingsIO, dBqueries, manageMigrateDB);
+                                       MigrateDB migrateDB, DBqueries dBqueries) {
+        return new GUIController(valueStore, errorLogging, scrapeProcess, settingsIO, dBqueries, migrateDB);
     }
 
     @Bean
-    public ManageMigrateDB manageMigrateDB(ValueStore valueStore, ErrorLogging errorLogging) {
-        return new ManageMigrateDB(valueStore, errorLogging);
+    public MigrateDB manageMigrateDB(ValueStore valueStore, ErrorLogging errorLogging) {
+        return new MigrateDB(valueStore, errorLogging);
     }
 
     @Bean
-    public DBqueries dBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, ManageMigrateDB manageMigrateDB) {
-        return new DBqueries(valueStore, errorLogging, settingsIO, manageMigrateDB);
+    public DBqueries dBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, MigrateDB migrateDB) {
+        return new DBqueries(valueStore, errorLogging, settingsIO, migrateDB);
     }
 
     @Bean

@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ManageMigrateDB {
+public class MigrateDB {
 
     private final ValueStore store;
     private final ErrorLogging log;
 
     @Autowired
-    public ManageMigrateDB(ValueStore valueStore, ErrorLogging errorLogging) {
+    public MigrateDB(ValueStore valueStore, ErrorLogging errorLogging) {
         this.store = valueStore;
         this.log = errorLogging;
     }

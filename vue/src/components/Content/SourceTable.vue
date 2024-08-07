@@ -15,6 +15,7 @@
     <div class="table-body">
       <table>
         <tbody>
+          <br /><br />
           <tr
             v-for="(mediaItem, mediaIndex) in processedTableData"
             :key="mediaIndex"
@@ -40,7 +41,7 @@
       <span class="title">Quickstart guide</span> <br />
       1. click "add artist" to insert an artist <br />
       2. select any source at the top <br />
-      3. find the artist on the website, copy & paste the link or ID <br />
+      3. find the artist on the website, copy and paste link or ID <br />
       4. to scrape, click refresh button in the top right corner <br />
     </p>
   </div>
@@ -65,10 +66,12 @@ export default {
                 name: item.album,
                 date: item.date,
               },
-              ...item.songs.map((song) => ({
-                isAlbumSong: true,
-                name: song.name,
-              })),
+              ...item.songs
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((song) => ({
+                  isAlbumSong: true,
+                  name: song.name,
+                })),
             ];
           } else {
             return {

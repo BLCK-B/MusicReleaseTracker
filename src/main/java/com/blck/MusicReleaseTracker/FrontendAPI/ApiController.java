@@ -138,5 +138,9 @@ public class ApiController {
     public void resetDB() {
         sendRequest.resetDB();
     }
+    @GetMapping("/getAppVersion")
+    public String getAppVersion() {
+        return sendRequest.getAppVersion();
+    }
 
 }

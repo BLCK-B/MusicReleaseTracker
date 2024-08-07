@@ -4,6 +4,7 @@
       <img v-if="primaryColor !== 'light'" class="image" src="../components/icons/crossdark.png" alt="X" />
       <img v-if="primaryColor === 'light'" class="image" src="../components/icons/crosslight.png" alt="X" />
     </button>
+    <div class="version">version {{ appVersion }}</div>
 
     <section class="filterscont">
       <SettingsFilters
@@ -62,6 +63,7 @@ export default {
       primaryColor: "N",
       accentColor: "N",
       autoTheme: false,
+      appVersion: "",
     };
   },
   created() {
@@ -78,6 +80,16 @@ export default {
         this.autoTheme = response.data.autoTheme === "true";
         this.primaryColor = response.data.theme;
         this.accentColor = response.data.accent;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  },
+  mounted() {
+    axios
+      .get("/api/getAppVersion")
+      .then((response) => {
+        this.appVersion = response.data;
       })
       .catch((error) => {
         console.error(error);
@@ -152,6 +164,11 @@ export default {
 .crossImgButton:hover {
   opacity: 60%;
 }
+.version {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+}
 section {
   position: relative;
   margin-top: 20px;
@@ -163,8 +180,6 @@ section {
   width: 345px;
 }
 .self {
-  justify-self: center;
-  width: 280px;
   background-color: transparent;
 }
 </style>

@@ -180,4 +180,8 @@ public class GUIController {
     public void resetDB() {
         manageDB.resetDB();
     }
+
+    public String getAppVersion() {
+        return store.getAppVersion();
+    }
 }

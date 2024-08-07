@@ -1,8 +1,8 @@
 <template>
   <div class="settings">
     <button @click="clickClose()" class="crossImgButton">
-      <img v-if="primaryColor !== 'Light'" class="image" src="../components/icons/crossdark.png" alt="X" />
-      <img v-if="primaryColor === 'Light'" class="image" src="../components/icons/crosslight.png" alt="X" />
+      <img v-if="primaryColor !== 'light'" class="image" src="../components/icons/crossdark.png" alt="X" />
+      <img v-if="primaryColor === 'light'" class="image" src="../components/icons/crosslight.png" alt="X" />
     </button>
 
     <section class="filterscont">

@@ -75,7 +75,7 @@ public class ScrapeProcess {
 		songList = mergeNameArtistDuplicates(songList);
 		songList = mergeNameDateDuplicates(songList);
 		songList = mergeSongsWithinDaysApart(songList, 7);
-		songList = groupSameDateArtistSongs(songList, 3);
+		songList = groupSameDateArtistSongs(songList, 4);
 		songList = sortByNewestDate(songList);
 
 		DB.batchInsertCombview(songList);
@@ -137,25 +137,12 @@ public class ScrapeProcess {
 
 		for (List<Song> group : artistSameDayCounts.values()) {
 			if (group.size() >= atLeast)
-				group.forEach(song -> song.setAlbumID("[" + group.size() + "] releases"));
+				group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.get(0).getArtists()));
 		}
 
 		return artistSameDayCounts.values().stream()
 				.flatMap(Collection::stream)
 				.toList();
-
-//		List<MediaItem> albums = artistSameDayCounts.values().stream()
-//				.filter(group -> group.size() >= atLeast)
-//				.map(group -> (MediaItem) new Album("[" + group.size() + "] releases", group))
-//				.toList();
-//
-//		ArrayList<MediaItem> mediaItems = new ArrayList<>(albums);
-//
-//		artistSameDayCounts.values().stream()
-//				.filter(group -> group.size() < atLeast)
-//				.flatMap(Collection::stream)
-//				.map(item -> (MediaItem) item)
-//				.forEach(mediaItems::add);
 	}
 
 	public List<Song> sortByNewestDate(List<Song> songObjectList) {

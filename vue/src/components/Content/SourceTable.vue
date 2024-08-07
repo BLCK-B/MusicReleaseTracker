@@ -21,27 +21,28 @@
             :class="{
               'album-header': mediaItem.isAlbumHeader,
               'album-song': mediaItem.isAlbumSong,
+              'future-date': isDateInFuture(mediaItem.date),
             }">
             <td class="tdsong">{{ mediaItem.name }}</td>
             <td class="tdartist" v-if="!hideArtistColumn">{{ mediaItem.artists }}</td>
-            <td class="tddate">{{ mediaItem.date }}</td>
+            <td class="tddate">{{ this.formatDate(mediaItem.date) }}</td>
           </tr>
         </tbody>
       </table>
     </div>
+  </div>
 
-    <div class="emptynotice" v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'">
-      <p>table empty</p>
-    </div>
-    <div class="quickstart" v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'">
-      <p>
-        <span class="title">Quickstart guide</span> <br />
-        1. click "add artist" to insert an artist <br />
-        2. click on any BP / MB / JD / YT button at the top to select a source <br />
-        3. find the artist on the website, copy & paste the link or ID <br />
-        4. to scrape, click refresh button in the top right corner <br />
-      </p>
-    </div>
+  <div class="emptynotice" v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'">
+    <p>table empty</p>
+  </div>
+  <div class="quickstart" v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'">
+    <p>
+      <span class="title">Quickstart guide</span> <br />
+      1. click "add artist" to insert an artist <br />
+      2. select any source at the top <br />
+      3. find the artist on the website, copy & paste the link or ID <br />
+      4. to scrape, click refresh button in the top right corner <br />
+    </p>
   </div>
 </template>
 
@@ -62,7 +63,6 @@ export default {
               {
                 isAlbumHeader: true,
                 name: item.album,
-                artists: item.songs[0].artists,
                 date: item.date,
               },
               ...item.songs.map((song) => ({
@@ -82,7 +82,7 @@ export default {
         .flat();
     },
     hideArtistColumn() {
-      return this.tableData.some((item) => item.artist === null);
+      return this.sourceTab !== "combview";
     },
     hideTable() {
       return this.tableData.some((item) => item.song !== null);
@@ -95,6 +95,7 @@ export default {
     },
     formatDate(dateString) {
       if (!this.isoDates) {
+        if (dateString === undefined) return dateString;
         const date = new Date(dateString);
         const day = date.getDate();
         const month = date.getMonth() + 1;
@@ -156,21 +157,19 @@ th {
   width: 100px;
   min-width: 100px;
 }
-.future-date {
-  opacity: 40%;
-}
 .emptynotice {
-  position: absolute;
-  left: 40%;
-  top: 40%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: var(--dull-color);
 }
 .quickstart {
   position: relative;
   font-size: 15px;
   line-height: 22px;
-  left: 5%;
-  top: 5%;
+  left: 80px;
+  top: 50px;
 }
 .quickstart .title {
   font-weight: bold;
@@ -185,5 +184,8 @@ th {
 }
 .album-song {
   border-left: 30px solid var(--primary-color);
+}
+.future-date {
+  opacity: 40%;
 }
 </style>

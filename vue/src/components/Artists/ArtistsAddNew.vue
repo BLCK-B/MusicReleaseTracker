@@ -5,12 +5,12 @@
 
       <div class="buttons">
         <button @click="$emit('close-add-new')" class="imgbutton">
-          <img v-if="primaryColor !== 'Light'" class="image" src="../icons/crossdark.png" alt="X" />
-          <img v-if="primaryColor === 'Light'" class="image" src="../icons/crosslight.png" alt="X" />
+          <img v-if="primaryColor !== 'light'" class="image" src="../icons/crossdark.png" alt="X" />
+          <img v-if="primaryColor === 'light'" class="image" src="../icons/crosslight.png" alt="X" />
         </button>
         <button @click="clickAdd" class="imgbutton" :disabled="!isValid">
-          <img v-if="primaryColor !== 'Light'" class="image" src="../icons/confirmdark.png" alt="OK" />
-          <img v-if="primaryColor === 'Light'" class="image" src="../icons/confirmlight.png" alt="OK" />
+          <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
+          <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
         </button>
       </div>
     </div>

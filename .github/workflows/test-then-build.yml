@@ -1,0 +1,42 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  gradle-test-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: current
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+    - name: Run tests
+      run: |
+        ./gradlew test --info
+        if [ $? -ne 0 ]; then exit 1; fi
+    - name: Fail job if tests failed
+      if: failure()
+      run: echo "Tests failed, stopping the job"
+    - name: Build with Gradle Wrapper
+      run: ./gradlew build
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MRT-artifact
+        path: build/libs/*.jar
+        retention-days: 7
+        overwrite: true

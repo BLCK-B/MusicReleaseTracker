@@ -1,0 +1,23 @@
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# https://jsonformatter.org/yaml-validator
+
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    target-branch: "dev"
+    groups:
+      minor-and-patches:
+        update-types:
+          - "patch"
+          - "minor"
+  - package-ecosystem: "npm"
+    directory: "/vue" 
+    schedule:
+      interval: "weekly"
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"

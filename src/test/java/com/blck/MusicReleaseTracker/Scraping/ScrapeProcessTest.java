@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -12,23 +27,14 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.ArrayList;
+
+import java.util.Collection;
 import java.util.List;
+
+import static com.blck.MusicReleaseTracker.Scraping.Helpers.SongAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/*      MusicReleaseTracker
-        Copyright (C) 2023 BLCK
-        This program is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
-        You should have received a copy of the GNU General Public License
-        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 @ExtendWith(MockitoExtension.class)
 public class ScrapeProcessTest {
 
@@ -90,58 +96,217 @@ public class ScrapeProcessTest {
 
     @Test
     void takeOlderSongArtistDuplicate() {
-        ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song", "artist", "2022-02-02"));
-        songList.add(new Song("song", "artist", "2023-01-01"));
-        songList.add(new Song("song", "artist", "2022-01-01"));
+        List<Song> songList = List.of(
+            new Song("song", "artist", "2022-02-02"),
+            new Song("song", "artist", "2023-01-01"),
+            new Song("song", "artist", "2022-01-01"));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        List<Song> output = scrapeProcess.mergeNameArtistDuplicates(songList);
 
         Song expected = new Song("song", "artist", "2022-01-01");
-        assertEquals(expected.toString(), output.getFirst().toString());
+        assertThat(expected).dataMatches(output.getFirst());
     }
 
     @Test
     void wrongDateFormatException() {
-        ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song", "artist", "2022"));
-        songList.add(new Song("song", "artist", "2022-01-01"));
+        List<Song> songList = List.of(
+            new Song("song", "artist", "2022"),
+            new Song("song", "artist", "2022-01-01"));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        Collection<Song> output = scrapeProcess.mergeNameArtistDuplicates(songList);
 
         verify(log).error(any(), eq(ErrorLogging.Severity.SEVERE), contains("incorrect date format"));
     }
 
     @Test
     void appendArtistsSortedAlphabeticallyWhenSameSongAndDate() {
-        ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song", "zilch", "2022-01-01"));
-        songList.add(new Song("song", "bob", "2022-01-01"));
-        songList.add(new Song("song", "joe", "2022-01-01"));
-        songList.add(new Song("song", "joe", "2022-01-01"));
+        List<Song> songList = List.of(
+            new Song("song", "zilch", "2022-01-01"),
+            new Song("song", "bob", "2022-01-01"),
+            new Song("song", "joe", "2022-01-01"),
+            new Song("song", "joe", "2022-01-01"));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        List<Song> output = scrapeProcess.mergeNameDateDuplicates(songList);
 
         Song expected = new Song("song", "bob, joe, zilch", "2022-01-01");
-        assertEquals(expected.toString(), output.getFirst().toString());
+        assertThat(expected).dataMatches(output.getFirst());
     }
 
     @Test
-    void sortByNewest() {
-        ArrayList<Song> songList = new ArrayList<>();
-        songList.add(new Song("song3", "artist", "2020-01-01"));
-        songList.add(new Song("song1", "artist", "2023-01-05"));
-        songList.add(new Song("song2", "artist", "2023-01-01"));
-        ArrayList<Song> expected = new ArrayList<>();
-        expected.add(new Song("song1", "artist", "2023-01-05"));
-        expected.add(new Song("song2", "artist", "2023-01-01"));
-        expected.add(new Song("song3", "artist", "2020-01-01"));
+    void sortByNewestDate() {
+        List<Song> songList = List.of(
+            new Song("song3", "artist", "2020-01-01"),
+            new Song("song1", "artist", "2023-01-05"),
+            new Song("song2", "artist", "2023-01-01"));
+        List<Song> expected = List.of(
+            new Song("song1", "artist", "2023-01-05"),
+            new Song("song2", "artist", "2023-01-01"),
+            new Song("song3", "artist", "2020-01-01"));
 
-        List<Song> output = scrapeProcess.processSongs(songList);
+        List<Song> output = scrapeProcess.sortByNewestAndByName(songList);
 
-        for (int i = 0; i < expected.size(); i++)
-            assertEquals(expected.get(i).toString(), output.get(i).toString());
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
     }
 
+    @Test
+    void sameDateThenSortedAlphabeticallyByName() {
+        List<Song> songList = List.of(
+                new Song("C", "artist", "2020-01-01"),
+                new Song("A", "artist", "2020-01-01"),
+                new Song("B", "artist", "2020-01-01"));
+        List<Song> expected = List.of(
+                new Song("A", "artist", "2020-01-01"),
+                new Song("B", "artist", "2020-01-01"),
+                new Song("C", "artist", "2020-01-01"));
 
+        List<Song> output = scrapeProcess.sortByNewestAndByName(songList);
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void datesApartByDays() {
+        Song s1 = new Song("song", "artist", "2020-01-01");
+        Song s2 = new Song("song", "artist", "2020-01-05");
+
+        int dayDiff = scrapeProcess.getDayDifference(s1, s2);
+
+        assertEquals(4, dayDiff);
+    }
+
+    @Test
+    void sameDateApart() {
+        Song s1 = new Song("song", "artist", "2020-01-01");
+
+        int dayDiff = scrapeProcess.getDayDifference(s1, s1);
+
+        assertEquals(0, dayDiff);
+    }
+
+    @Test
+    void positiveTimeApart() {
+        Song s1 = new Song("song", "artist", "2020-01-01");
+        Song s2 = new Song("song", "artist", "2020-01-05");
+
+        int dayDiff = scrapeProcess.getDayDifference(s2, s1);
+
+        assertTrue(dayDiff > 0);
+    }
+
+    @Test
+    void mergeSongsWithinDaysApart() {
+        List<Song> songList = List.of(
+            new Song("song", "artist", "2020-01-05"),
+            new Song("song", "artist", "2020-01-04"),
+            new Song("song", "artist", "2022-10-01"));
+        List<Song> expected = List.of(
+            new Song("song", "artist", "2020-01-04"),
+            new Song("song", "artist", "2022-10-01"));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void mergeSongsWithinDaysApartAppendArtists() {
+        List<Song> songList = List.of(
+            new Song("song", "joe", "2020-01-05"),
+            new Song("song", "bob", "2020-01-03"),
+            new Song("song", "zilch", "2020-01-04"));
+        Song expected = new Song("song", "bob, joe, zilch", "2020-01-03");
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
+
+        assertThat(expected).dataMatches(output.getFirst());
+    }
+
+    @Test
+    void noSongsToMergeByDaysApart() {
+        List<Song> songList = List.of(
+            new Song("song", "artist", "2020-01-05"),
+            new Song("song", "artist", "2021-01-05"),
+            new Song("song", "artist", "2022-01-05"));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 1);
+
+        for (int i = 0; i < songList.size(); ++i)
+            assertThat(songList.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void identicalSongsSameDate() {
+        List<Song> songList = List.of(
+            new Song("song", "artist", "2020-01-05"),
+            new Song("song", "artist", "2020-01-05"));
+        List<Song> expected = List.of(
+            new Song("song", "artist", "2020-01-05"));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 1);
+
+        assertEquals(1, output.size());
+    }
+
+    @Test
+    void justOutsideMaxDaysApart() {
+        List<Song> songList = List.of(
+            new Song("song", "artist", "2020-01-04"),
+            new Song("song", "artist", "2020-01-01"),
+            new Song("song", "artist", "2020-01-02"),
+            new Song("song", "artist", "2020-01-03"),
+            new Song("song", "artist", "2020-01-05"));
+        List<Song> expected = List.of(
+            new Song("song", "artist", "2020-01-01"),
+            new Song("song", "artist", "2020-01-04"));
+
+        List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void assignAlbumForAtLeastXSameDayReleasesByAnArtist() {
+        List<Song> songList = List.of(
+                new Song("song1", "artist", "2020-01-04"),
+                new Song("song2", "artist", "2020-01-04"),
+                new Song("song3", "artist", "2020-01-04"));
+
+        List<Song> output = scrapeProcess.groupSameDateArtistSongs(songList, 2);
+
+        for (Song song : output)
+            assertNotNull(song.getAlbum());
+    }
+
+    @Test
+    void lessThanAtLeastSameDayReleasesRemainSongs() {
+        List<Song> songList = List.of(
+                new Song("song1", "artist", "2020-01-04"),
+                new Song("song2", "artist", "2020-01-04"));
+
+        List<Song> output = scrapeProcess.groupSameDateArtistSongs(songList, 3);
+
+        for (Song song : output)
+            assertNull(song.getAlbum());
+    }
+
+    @Test
+    void bothGroupAndNotGroupCases() {
+        List<Song> songList = List.of(
+                new Song("song1", "artist", "2020-01-04"),
+                new Song("song2", "notGroup", "2020-01-04"),
+                new Song("song3", "artist", "2020-01-04"),
+                new Song("song4", "neitherGroup", "2020-01-04"),
+                new Song("song4", "artist", "2020-01-04"));
+
+        List<Song> output = scrapeProcess.groupSameDateArtistSongs(songList, 2);
+
+        assertEquals(2, output.stream()
+                .filter(song -> song.getAlbum() == null)
+                .count()
+        );
+    }
 }

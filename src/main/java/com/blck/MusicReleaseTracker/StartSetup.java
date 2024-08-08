@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -5,24 +20,14 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-
-/*      MusicReleaseTracker
-        Copyright (C) 2023 BLCK
-        This program is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
-        You should have received a copy of the GNU General Public License
-        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 public class StartSetup {
+    final String slash = File.separator;
     private final ValueStore store;
     private final ErrorLogging log;
-    final String slash = File.separator;
 
     @Autowired
     public StartSetup(ValueStore valueStore, ErrorLogging errorLogging) {
@@ -30,14 +35,14 @@ public class StartSetup {
         this.log = errorLogging;
     }
 
-    public void initializeSystem() {
+    public void createPathsAndDirs() {
         createPaths();
         createDirs();
     }
 
-    private void createPaths() {
+    public void createPaths() {
         String appData = null;
-        String os = System.getProperty("os.name").toLowerCase();
+        final String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win"))
             appData = System.getenv("APPDATA");
         else if (os.contains("nix") || os.contains("nux") || os.contains("mac"))
@@ -46,9 +51,9 @@ public class StartSetup {
             throw new UnsupportedOperationException("unsupported OS");
 
         String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
-        String DBpath = "jdbc:sqlite:" + appDataPath + "musicdata.db";
-        String configPath = appDataPath + "MRTsettings.hocon";
-        String errorLogsPath = appDataPath + "errorlogs.txt";
+        String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath,  "musicdata.db");
+        Path configPath = Paths.get(appDataPath, "MRTsettings.json");
+        Path errorLogsPath = Paths.get(appDataPath, "errorlogs.txt");
 
         store.setAppDataPath(appDataPath);
         store.setConfigPath(configPath);
@@ -56,18 +61,18 @@ public class StartSetup {
         store.setErrorLogsPath(errorLogsPath);
     }
 
-    private void createDirs() {
+    public void createDirs() {
         String appDataPath = store.getAppDataPath();
         try {
-            File folder = new File(appDataPath);
-            if (!folder.exists())
-                folder.mkdirs();
+            // remove next version
+            new File(appDataPath + "MRTsettings.hocon").delete();
+            new File(appDataPath + "MRTsettingsTemplate.hocon").delete();
+
+            new File(appDataPath).mkdirs();
             // junk folder because sqlite did not delete temp files in "temp"
             File tempfolder = new File(appDataPath + "temp");
-            if (!tempfolder.exists())
-                tempfolder.mkdirs();
-            for (File file : tempfolder.listFiles())
-                file.delete();
+            tempfolder.mkdirs();
+            Arrays.stream(tempfolder.listFiles()).forEach(File::delete);
             System.setProperty("org.sqlite.tmpdir", appDataPath + "temp");
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "something went wrong in directory setup");

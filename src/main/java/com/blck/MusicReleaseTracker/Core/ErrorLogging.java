@@ -2,6 +2,8 @@ package com.blck.MusicReleaseTracker.Core;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,15 +42,13 @@ public class ErrorLogging {
     public void error(Exception e, Severity level, String message) {
         FileHandler fileHandler = null;
         try {
-            final String errorLogs = store.getErrorLogsPath();
-            fileHandler = new FileHandler(errorLogs, true);
+            final Path errorLogsPath = store.getErrorLogsPath();
+            fileHandler = new FileHandler(errorLogsPath.toString(), true);
             fileHandler.setFormatter(new SimpleFormatter());
             // clear log when it reaches approx 0.1 MB
-            Path path = Paths.get(errorLogs);
-            final long logFileSize = Files.size(path);
-            if (logFileSize > 100000) {
-                Files.write(path, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
-            }
+            final long logFileSize = Files.size(errorLogsPath);
+            if (logFileSize > 100000)
+                Files.write(errorLogsPath, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
             logger.addHandler(fileHandler);
             switch (level) {
                 case SEVERE -> logger.log(Level.SEVERE, message, e);

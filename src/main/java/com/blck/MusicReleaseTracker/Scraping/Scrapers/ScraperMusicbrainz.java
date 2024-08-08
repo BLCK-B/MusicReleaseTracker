@@ -1,39 +1,40 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+import java.util.List;
 
 public final class ScraperMusicbrainz extends Scraper implements ScraperInterface {
 
     private final String songArtist;
-    private String id;
     private final boolean isIDnull;
+    private String id;
 
-    public ScraperMusicbrainz(ErrorLogging log, DBqueries DB, String songArtist, String id) {
-        super(log, DB);
+    public ScraperMusicbrainz(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
+        super(store, log, DB);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -49,7 +50,8 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(url).userAgent("MusicReleaseTracker ( https://github.com/BLCK-B/MusicReleaseTracker )")
+            doc = Jsoup.connect(url).userAgent(
+                    "MusicReleaseTracker/v" + store.getAppVersion() +  " ( https://github.com/BLCK-B/MusicReleaseTracker )")
                     .timeout(timeout).get();
         }
         catch (SocketTimeoutException e) {
@@ -58,34 +60,18 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         catch (Exception e) {
             throw new ScraperGenericException(url);
         }
-        Elements songs = doc.select("title");
-        Elements dates = doc.select("first-release-date");
-        String[] songsArray = songs.eachText().toArray(new String[0]);
-        String[] datesArray = dates.eachText().toArray(new String[0]);
+        String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
+        String[] datesArray = doc.select("first-release-date").eachText().toArray(new String[0]);
 
-        // create arraylist of song objects
-        ArrayList<Song> songList = new ArrayList<Song>();
-        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
-            if (songsArray[i] != null && datesArray[i] != null)
-                songList.add(new Song(songsArray[i], songArtist, datesArray[i]));
-        }
-        doc = null;
-        songs = null;
-        dates = null;
-        datesArray = null;
-        songsArray = null;
-
-        super.songList = songList;
-        super.source = SourcesEnum.musicbrainz;
-        super.processInfo();
-        super.insertSet();
+        super.source = TablesEnum.musicbrainz;
+        super.insertSet(
+                processInfo(
+                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings

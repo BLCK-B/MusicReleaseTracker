@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -10,26 +25,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-
-public class ManageMigrateDB {
+public class MigrateDB {
 
     private final ValueStore store;
     private final ErrorLogging log;
 
     @Autowired
-    public ManageMigrateDB(ValueStore valueStore, ErrorLogging errorLogging) {
+    public MigrateDB(ValueStore valueStore, ErrorLogging errorLogging) {
         this.store = valueStore;
         this.log = errorLogging;
     }
@@ -90,7 +92,8 @@ public class ManageMigrateDB {
                     CREATE TABLE IF NOT EXISTS combview (
                     song text NOT NULL,
                     artist text NOT NULL,
-                    date text NOT NULL
+                    date text NOT NULL,
+                    album text
                     );
                     """;
             stmt.addBatch(sql);
@@ -112,17 +115,17 @@ public class ManageMigrateDB {
 
         File templateFile = new File(templateFilePath);
         templateFile.delete();
-        createDBandSourceTables(store.getDBpath());
+        createDBandSourceTables(store.getDBpathString());
         createDBandSourceTables(DBtemplatePath);
 
         // if different structure, fill template artist table data from musicdata and then rename/delete, make new template
         // this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes
         // made to the "artists" table: change in order of columns, adding/removing a column or changing a column's name
-        Map<String, ArrayList<String>> DBMap = getDBStructure(store.getDBpath());
+        Map<String, ArrayList<String>> DBMap = getDBStructure(store.getDBpathString());
         Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(DBtemplatePath);
         if (!DBMap.equals(DBtemplateMap)) {
             try (
-                    Connection connDB = DriverManager.getConnection(store.getDBpath());
+                    Connection connDB = DriverManager.getConnection(store.getDBpathString());
                     Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath)
             ) {
                 // insert data from musicdata column to template column
@@ -195,7 +198,7 @@ public class ManageMigrateDB {
     public void resetDB() {
         File musicdata = new File(store.getAppDataPath() + "musicdata.db");
         musicdata.delete();
-        createDBandSourceTables(store.getDBpath());
+        createDBandSourceTables(store.getDBpathString());
     }
 
 }

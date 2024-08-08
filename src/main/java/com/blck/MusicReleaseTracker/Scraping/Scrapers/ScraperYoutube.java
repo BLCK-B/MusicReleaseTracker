@@ -1,39 +1,40 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.Arrays;
-
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+import java.util.List;
 
 public final class ScraperYoutube extends Scraper implements ScraperInterface {
 
     private final String songArtist;
-    private String id;
     private final boolean isIDnull;
-    public ScraperYoutube(ErrorLogging log, DBqueries DB, String songArtist, String id) {
-        super(log, DB);
+    private String id;
+    public ScraperYoutube(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
+        super(store, log, DB);
         this.songArtist = songArtist;
         this.id = id;
 
@@ -58,11 +59,8 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
         catch (Exception e) {
             throw new ScraperGenericException(url);
         }
-        Elements songs = doc.select("title");
-        Elements dates = doc.select("published");
-        String[] songsArray = songs.eachText().toArray(new String[0]);
-        String[] datesDirtyArray = dates.eachText().toArray(new String[0]);
-
+        String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
+        String[] datesDirtyArray = doc.select("published").eachText().toArray(new String[0]);
         // cut date to yyyy-MM-dd
         String[] datesArray = Arrays.stream(datesDirtyArray)
                 .map(date -> date.substring(0, 10))
@@ -71,29 +69,15 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
         songsArray = Arrays.copyOfRange(songsArray, 1, songsArray.length);
         datesArray = Arrays.copyOfRange(datesArray, 1, datesArray.length);
 
-        // create arraylist of song objects
-        ArrayList<Song> songList = new ArrayList<Song>();
-        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
-            if (songsArray[i] != null && datesArray[i] != null)
-                songList.add(new Song(songsArray[i], songArtist, datesArray[i]));
-        }
-        doc = null;
-        songs = null;
-        dates = null;
-        songsArray = null;
-        datesArray = null;
-
-        super.songList = songList;
-        super.source = SourcesEnum.youtube;
-        super.processInfo();
-        super.insertSet();
+        super.source = TablesEnum.youtube;
+        super.insertSet(
+                processInfo(
+                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://www.youtube.com/channel/UCWaKvFOf-a7vENyuEsZkNqg

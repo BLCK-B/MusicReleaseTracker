@@ -1,11 +1,26 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -15,32 +30,21 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-
 public final class ScraperBeatport extends Scraper implements ScraperInterface {
 
     private final String songArtist;
-    private String id;
     private final boolean isIDnull;
-    public ScraperBeatport(ErrorLogging log, DBqueries DB, String songArtist, String id) {
-        super(log, DB);
+    private String id;
+
+    public ScraperBeatport(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
+        super(store, log, DB);
         this.songArtist = songArtist;
         this.id = id;
 
         isIDnull = (id == null);
         reduceToID();
     }
+
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
@@ -81,31 +85,15 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
             datesArrayList.add(matcher.group(3));
         }
 
-        // create arraylist of song objects
-        ArrayList<Song> songList = new ArrayList<>();
-        for (int i = 0; i < Math.min(songsArrayList.size(), datesArrayList.size()); i++) {
-            if (songsArrayList.get(i) != null && datesArrayList.get(i) != null && typesArrayList.get(i) != null)
-                songList.add(new Song(songsArrayList.get(i), songArtist, datesArrayList.get(i), typesArrayList.get(i)));
-        }
-
-        doc = null;
-        script = null;
-        JSON = null;
-        songsArrayList = null;
-        typesArrayList = null;
-        datesArrayList = null;
-
-        super.songList = songList;
-        super.source = SourcesEnum.beatport;
-        super.processInfo();
-        super.insertSet();
+        super.source = TablesEnum.beatport;
+        super.insertSet(
+                processInfo(
+                        artistToSongList(songsArrayList, songArtist, datesArrayList, typesArrayList)));
     }
 
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://beatport.com/artist/koven/245904/charts

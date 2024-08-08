@@ -1,7 +1,5 @@
-.gradle/
 .idea/
 build/
-gradle/
 META-INF/
 MRT/
 out/

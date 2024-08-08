@@ -1,57 +1,52 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.String.valueOf;
 
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-
 public final class ScraperJunodownload extends Scraper implements ScraperInterface {
 
-    private enum MonthNumbers {
-        JAN("01"), FEB("02"), MAR("03"), APR("04"),
-        MAY("05"), JUN("06"), JUL("07"), AUG("08"),
-        SEP("09"), OCT("10"), NOV("11"), DEC("12");
-        public final String abbr;
-        MonthNumbers(String abbr) {
-            this.abbr = abbr;
-        }
-    }
     private final String songArtist;
-    private String id;
     private final boolean isIDnull;
-    public ScraperJunodownload(ErrorLogging log, DBqueries DB, String songArtist, String id) {
-        super(log, DB);
+    private String id;
+
+    public ScraperJunodownload(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
+        super(store, log, DB);
         this.songArtist = songArtist;
         this.id = id;
 
         isIDnull = (id == null);
         reduceToID();
     }
+
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
@@ -70,14 +65,12 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
         catch (Exception e) {
             throw new ScraperGenericException(url);
         }
-        Elements songs = doc.select("a.juno-title");
+        String[] songsArray = doc.select("a.juno-title").eachText().toArray(new String[0]);
         Elements dates = doc.select("div.text-sm.text-muted.mt-3");
-        String[] songsArray = songs.eachText().toArray(new String[0]);
 
         String[] datesArray = new String[dates.size()];
-        doc = null;
         // processing dates into correct format
-        /* example:
+        /*
             <div class="text-sm mb-3 mb-lg-3">
              LIQ 202
              <br>
@@ -86,53 +79,34 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
              Drum &amp; Bass / Jungle
             </div>
         */
+        Pattern pattern = Pattern.compile("\\b (\\d{1,2} [A-Za-z]{3} \\d{2}) \\b");
         for (int i = 0; i < dates.size(); i++) {
             try {
+                // <div class="text-sm mb-3 mb-lg-3"> LIQ 202 28 Jun 23 Drum &amp; Bass / Jungle </div>
                 String cleanWhitespace = valueOf(dates.get(i))
                         .replaceAll("<br>", " ")
                         .replaceAll("\\s+", " ")
                         .trim();
-                // cleanWhitespace: <div class="text-sm mb-3 mb-lg-3"> LIQ 202 28 Jun 23 Drum &amp; Bass / Jungle </div>
-
-                Pattern pattern = Pattern.compile("\\b (\\d{1,2} [A-Za-z]{3} \\d{2}) \\b");
                 Matcher matcher = pattern.matcher(cleanWhitespace);
-                String extractedDate = null;
-                if (matcher.find())
-                    extractedDate = matcher.group(1);
-                // extractedDate: 28 Jun 23
-                String[] parts = extractedDate.split(" ");
-                String monthNumber = MonthNumbers.valueOf(parts[1].toUpperCase()).abbr;
-                // only assuming songs from 21st century
-                datesArray[i] = "20" + parts[2] + "-" + monthNumber + "-" + parts[0];
-                // datesArray[i]: 2023-06-28
+                String[] extractedParts = matcher.find() ? matcher.group(1).split(" ") : null;
+                // 28 Jun 23
+                String monthNumber = MonthNumbers.valueOf(extractedParts[1].toUpperCase()).abbr;
+                datesArray[i] = "20" + extractedParts[2] + "-" + monthNumber + "-" + extractedParts[0];
+                // 2023-06-28
             } catch (Exception e) {
                 log.error(e, ErrorLogging.Severity.WARNING, "error processing junodownload date");
             }
         }
 
-        // create arraylist of song objects
-        ArrayList<Song> songList = new ArrayList<>();
-        for (int i = 0; i < Math.min(songsArray.length, datesArray.length); i++) {
-            if (songsArray[i] != null && datesArray[i] != null)
-                songList.add(new Song(songsArray[i], songArtist, datesArray[i]));
-        }
-
-        songs = null;
-        dates = null;
-        songsArray = null;
-        datesArray = null;
-
-        super.songList = songList;
-        super.source = SourcesEnum.junodownload;
-        super.processInfo();
-        super.insertSet();
+        super.source = TablesEnum.junodownload;
+        super.insertSet(
+                processInfo(
+                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
     private void reduceToID() {
         if (isIDnull)
             return;
-        // reduce url to only the identifier
-        // this method is not meant to discard wrong input, it reduces to id when possible
         int idStartIndex;
         int idEndIndex;
         // https://www.junodownload.com/artists/Koven/releases/
@@ -157,6 +131,16 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
     @Override
     public String toString() {
         return "junodownload";
+    }
+
+    private enum MonthNumbers {
+        JAN("01"), FEB("02"), MAR("03"), APR("04"),
+        MAY("05"), JUN("06"), JUL("07"), AUG("08"),
+        SEP("09"), OCT("10"), NOV("11"), DEC("12");
+        public final String abbr;
+        MonthNumbers(String abbr) {
+            this.abbr = abbr;
+        }
     }
 
 }

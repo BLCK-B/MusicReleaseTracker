@@ -1,3 +1,18 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // https://services.gradle.org/distributions - in gradle-wrapper.properties
 
 plugins {
@@ -6,15 +21,20 @@ plugins {
     // https://plugins.gradle.org/plugin/org.beryx.jlink
     id("org.beryx.jlink") version "3.0.1"
     // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.3.2"
     // https://plugins.gradle.org/plugin/io.spring.dependency-management
-    id("io.spring.dependency-management") version "1.1.4"
+    id("io.spring.dependency-management") version "1.1.6"
     // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#_adding_the_plugin
-    id 'org.graalvm.buildtools.native' version '0.10.0'
+    id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 
 group 'com.blck'
-version '8.3'
+def applicationProperties = file('src/main/resources/application.properties')
+def properties = new Properties()
+applicationProperties.withInputStream { stream ->
+    properties.load(stream)
+}
+version = properties.getProperty('app.version')
 
 repositories {
     mavenCentral()
@@ -53,18 +73,17 @@ application {
 
 dependencies {
 
-    implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
-    implementation 'org.jsoup:jsoup:1.17.2'
-    implementation 'com.typesafe:config:1.4.3'
+    implementation 'org.xerial:sqlite-jdbc:3.46.0.1'
+    implementation 'org.jsoup:jsoup:1.18.1'
 
-    testImplementation(platform('org.junit:junit-bom:5.10.2'))
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation(platform('org.junit:junit-bom:5.10.3'))
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.6'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.6'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.2'
 }
 
 bootJar {

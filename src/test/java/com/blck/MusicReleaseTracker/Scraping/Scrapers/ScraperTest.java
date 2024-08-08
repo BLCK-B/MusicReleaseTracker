@@ -1,25 +1,30 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
-
-/*      MusicReleaseTracker
-        Copyright (C) 2023 BLCK
-        This program is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
-        You should have received a copy of the GNU General Public License
-        along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 public class ScraperTest {
 
@@ -27,97 +32,92 @@ public class ScraperTest {
 
     @BeforeEach
     void setUp() {
-        scraper = new Scraper(null, null);
+        scraper = new Scraper(null, null, null);
     }
 
     @Test
     void emptySongListFromScraper() {
-        assertThrows(Exception.class, () -> scraper.processInfo());
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> scraper.processInfo(new ArrayList<>()));
     }
 
     @Test
     void unifyApostrophesBackticksAndAccents() {
-        scraper.songList.add(new Song("S’o´n'g", "artistName", "2023-01-01"));
-
-        scraper.unifyApostrophes();
-
-        assertEquals(scraper.songList.get(0).toString(),
-                new Song("S'o'n'g", "artistName", "2023-01-01").toString());
+        assertEquals("S'o'n'g", scraper.unifyAphostrophes("S’o´n'g"));
     }
 
     @Test
-    void incorrectDatesAreDiscarded() {
-        scraper.songList.add(new Song("Song1", "artistName", "2023"));
-        scraper.songList.add(new Song("Song2", "artistName", "-"));
-        scraper.songList.add(new Song("Song3", "artistName", "08-05-2023"));
-        scraper.songList.add(new Song("Song3", "artistName", ""));
+    void checkDateValidity() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        scraper.enforceDateFormat();
-
-        assertTrue(scraper.songList.isEmpty());
+        assertFalse(scraper.isValidDate("2023", formatter));
+        assertFalse(scraper.isValidDate("-", formatter));
+        assertFalse(scraper.isValidDate("08-05-2023", formatter));
+        assertTrue(scraper.isValidDate("2023-10-05", formatter));
     }
 
     @Test
     void leaveOldestDuplicatesOnlyAndSortByNewest() {
-        scraper.songList.add(new Song("Song1", "", "2023-01-01"));
-        scraper.songList.add(new Song("SONG1", "", "2005-05-05"));
-        scraper.songList.add(new Song("song1", "", "2005-05-06"));
-        scraper.songList.add(new Song("Song3", "", "2021-01-01"));
-        scraper.songList.add(new Song("Song3", "", "2019-01-01"));
-        scraper.songList.add(new Song("song2", "", "2017-01-01"));
-        ArrayList<Song> expectedList = new ArrayList<>();
-        expectedList.add(new Song("Song3", "", "2019-01-01"));
-        expectedList.add(new Song("song2", "", "2017-01-01"));
-        expectedList.add(new Song("SONG1", "", "2005-05-05"));
+        List<Song> inputList = List.of(
+            new Song("Song1", "", "2023-01-01"),
+            new Song("SONG1", "", "2005-05-05"),
+            new Song("song1", "", "2005-05-06"),
+            new Song("Song3", "", "2021-01-01"),
+            new Song("Song3", "", "2019-01-01"),
+            new Song("song2", "", "2017-01-01"));
 
-        scraper.sortAndRemoveNameDuplicates();
+        List<Song> expectedList = List.of(
+            new Song("Song3", "", "2019-01-01"),
+            new Song("song2", "", "2017-01-01"),
+            new Song("SONG1", "", "2005-05-05"));
 
-        for (int i = 0; i < scraper.songList.size(); i++)
-            assertEquals(expectedList.get(i).toString(), scraper.songList.get(i).toString());
+        List<Song> resultList = scraper.processInfo(inputList);
+
+        assertArrayEquals(expectedList.toArray(), resultList.toArray());
     }
 
     @Test
     void reduceToIDBeatport() {
-        scraper = new ScraperBeatport(null, null, null, "https://www.beatport.com/artist/artistname/1234/tracks");
+        scraper = new ScraperBeatport(null,null, null, null, "https://www.beatport.com/artist/artistname/1234/tracks");
         assertEquals("artistname/1234", scraper.getID());
 
-        scraper = new ScraperBeatport(null, null, null, "https://www.beatport.com/artist/artistname/1234");
+        scraper = new ScraperBeatport(null,null, null, null, "https://www.beatport.com/artist/artistname/1234");
         assertEquals("artistname/1234", scraper.getID());
 
-        scraper = new ScraperBeatport(null, null, null, "artistname/1234");
+        scraper = new ScraperBeatport(null,null, null, null, "artistname/1234");
         assertEquals("artistname/1234", scraper.getID());
     }
 
     @Test
     void reduceToIDMusicbrainz() {
-        scraper = new ScraperMusicbrainz(null, null, null, "https://musicbrainz.org/artist/123-id-123/releases");
+        scraper = new ScraperMusicbrainz(null,null, null, null, "https://musicbrainz.org/artist/123-id-123/releases");
         assertEquals("123-id-123", scraper.getID());
 
-        scraper = new ScraperMusicbrainz(null, null, null, "https://musicbrainz.org/artist/123-id-123");
+        scraper = new ScraperMusicbrainz(null,null, null, null, "https://musicbrainz.org/artist/123-id-123");
         assertEquals("123-id-123", scraper.getID());
 
-        scraper = new ScraperMusicbrainz(null, null, null, "123-id-123");
+        scraper = new ScraperMusicbrainz(null,null, null, null, "123-id-123");
         assertEquals("123-id-123", scraper.getID());
     }
 
     @Test
     void reduceToIDJunodownload() {
-        scraper = new ScraperJunodownload(null, null, null, "https://www.junodownload.com/artists/artistname/releases/");
+        scraper = new ScraperJunodownload(null,null, null, null, "https://www.junodownload" +
+                ".com/artists/artistname/releases/");
         assertEquals("artistname", scraper.getID());
 
-        scraper = new ScraperJunodownload(null, null, null, "https://www.junodownload.com/artists/artistname");
+        scraper = new ScraperJunodownload(null,null, null, null, "https://www.junodownload.com/artists/artistname");
         assertEquals("artistname", scraper.getID());
 
-        scraper = new ScraperJunodownload(null, null, null, "artistname");
+        scraper = new ScraperJunodownload(null,null, null, null, "artistname");
         assertEquals("artistname", scraper.getID());
     }
 
     @Test
     void reduceToIDYoutube() {
-        scraper = new ScraperYoutube(null, null, null, "https://www.youtube.com/channel/123-id-123");
+        scraper = new ScraperYoutube(null,null, null, null, "https://www.youtube.com/channel/123-id-123");
         assertEquals("123-id-123", scraper.getID());
 
-        scraper = new ScraperYoutube(null, null, null, "123-id-123");
+        scraper = new ScraperYoutube(null,null, null, null, "123-id-123");
         assertEquals("123-id-123", scraper.getID());
     }
 

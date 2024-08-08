@@ -1,7 +1,6 @@
 module com.blck.MusicReleaseTracker {
     requires org.jsoup;
     requires java.sql;
-    requires typesafe.config;
     requires spring.web;
     requires spring.context;
     requires spring.beans;
@@ -9,8 +8,10 @@ module com.blck.MusicReleaseTracker {
     requires spring.boot;
     requires spring.webmvc;
     requires org.xerial.sqlitejdbc;
+    requires com.fasterxml.jackson.databind;
+	requires java.desktop;
 
-    opens com.blck.MusicReleaseTracker;
+	opens com.blck.MusicReleaseTracker;
 
     exports com.blck.MusicReleaseTracker;
     exports com.blck.MusicReleaseTracker.Core;

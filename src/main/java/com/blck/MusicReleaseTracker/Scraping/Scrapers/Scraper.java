@@ -1,43 +1,46 @@
+/*
+ *         MusicReleaseTracker
+ *         Copyright (C) 2023 - 2024 BLCK
+ *         This program is free software: you can redistribute it and/or modify
+ *         it under the terms of the GNU General Public License as published by
+ *         the Free Software Foundation, either version 3 of the License, or
+ *         (at your option) any later version.
+ *         This program is distributed in the hope that it will be useful,
+ *         but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *         GNU General Public License for more details.
+ *         You should have received a copy of the GNU General Public License
+ *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
-import com.blck.MusicReleaseTracker.Core.SourcesEnum;
+import com.blck.MusicReleaseTracker.Core.TablesEnum;
+import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-/*      MusicReleaseTracker
-    Copyright (C) 2023 BLCK
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Scraper {
 
     protected final ErrorLogging log;
+    protected final ValueStore store;
     private final DBqueries DB;
-    public ArrayList<Song> songList = new ArrayList<>();
-    public SourcesEnum source;
+    public TablesEnum source;
 
-    public Scraper(ErrorLogging errorLogging, DBqueries DB) {
+    public Scraper(ValueStore store, ErrorLogging errorLogging, DBqueries DB) {
         this.log = errorLogging;
         this.DB = DB;
+        this.store = store;
     }
 
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
@@ -48,58 +51,48 @@ public class Scraper {
         return "The method getID() is to be overriden.";
     }
 
-    public void processInfo() {
+    public List<Song> artistToSongList(List<String> names, String artist, List<String> dates, List<String> types) {
+        return IntStream.range(0, Math.min(names.size(), dates.size()))
+                .filter(i -> names.get(i) != null && artist != null && dates.get(i) != null)
+                .mapToObj(i -> new Song(
+                        names.get(i),
+                        artist,
+                        dates.get(i),
+                        types == null ? null : types.get(i)))
+                .collect(Collectors.toList());
+    }
+
+    public List<Song> processInfo(List<Song> songList) {
         if (songList.isEmpty()) {
             log.error(new Exception(), ErrorLogging.Severity.WARNING, "song list produced by scraper is empty");
-            return;
+            return null;
         }
-        unifyApostrophes();
-        enforceDateFormat();
-        sortAndRemoveNameDuplicates();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return songList.stream()
+                .filter(song -> isValidDate(song.getDate(), formatter))
+                .map(song -> new Song(unifyAphostrophes(song.getName()), song.getArtists(), song.getDate(), song.getType().orElse("")))
+                .sorted((song1, song2) -> song1.compareDates(song2, formatter))
+                .distinct() // remove all name duplicates but the oldest by date
+                .toList().reversed(); // newest by date
     }
 
-    public void unifyApostrophes() {
-        for (Song song : songList) {
-            String songName = song.getName().replace("’", "'").replace("`", "'").replace("´", "'");
-            song.setName(songName);
+    public String unifyAphostrophes(String input) {
+        return input.replace("’", "'")
+                .replace("`", "'")
+                .replace("´", "'");
+    }
+
+    public boolean isValidDate(String date, DateTimeFormatter formatter) {
+        try {
+            LocalDate.parse(date, formatter);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
         }
     }
 
-    public void enforceDateFormat() {
-        songList.removeIf(obj -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            try {
-                LocalDate.parse(obj.getDate(), formatter);
-                return false;
-            } catch (DateTimeParseException e) {
-                return true;
-            }
-        });
-    }
-
-    public void sortAndRemoveNameDuplicates() {
-        // oldest to newest
-        songList.sort((obj1, obj2) -> {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate date1 = LocalDate.parse(obj1.getDate(), formatter);
-            LocalDate date2 = LocalDate.parse(obj2.getDate(), formatter);
-            return date1.compareTo(date2);
-        });
-        Set<String> recordedNames = new HashSet<>();
-        songList.removeIf(obj -> {
-            String name = obj.getName().toLowerCase();
-            if (recordedNames.contains(name))
-                return true;
-            else {
-                recordedNames.add(name);
-                return false;
-            }
-        });
-        // newest to oldest
-        Collections.reverse(songList);
-    }
-
-    public void insertSet() {
+    public void insertSet(List<Song> songList) {
         DB.batchInsertSongs(songList, source, 15);
     }
 }

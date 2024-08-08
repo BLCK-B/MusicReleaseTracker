@@ -66,12 +66,10 @@ export default {
                 name: item.album,
                 date: item.date,
               },
-              ...item.songs
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((song) => ({
-                  isAlbumSong: true,
-                  name: song.name,
-                })),
+              ...item.songs.map((song) => ({
+                isAlbumSong: true,
+                name: song.name,
+              })),
             ];
           } else {
             return {

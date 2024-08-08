@@ -85,8 +85,27 @@ public class DBqueries {
         tableContent.addAll(readCombviewAlbums());
         tableContent.addAll(readCombviewSingles());
         return tableContent.stream()
-                .sorted(Comparator.comparing(MediaItem::getDate))
+                .sorted(Comparator.comparing(MediaItem::getDate)
+                        .thenComparing(MediaItem::getName, Comparator.reverseOrder()))
                 .toList().reversed();
+    }
+
+    public List<Song> readCombviewSingles() {
+        List<Song> singles = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT song, artist, date FROM combview WHERE album IS NULL ORDER BY date DESC, song LIMIT 1000"
+            );
+            while (rs.next())
+                singles.add(new Song(
+                        rs.getString("song"),
+                        rs.getString("artist"),
+                        rs.getString("date")));
+        } catch (SQLException e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview table");
+        }
+        return singles;
     }
 
     public List<Album> readCombviewAlbums() {
@@ -94,10 +113,10 @@ public class DBqueries {
         try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
             Statement stmt = conn.createStatement();
             ResultSet rs1 = stmt.executeQuery(
-                    "SELECT DISTINCT album FROM combview WHERE album IS NOT NULL LIMIT 300"
+                    "SELECT DISTINCT album FROM combview WHERE album IS NOT NULL ORDER BY date LIMIT 300"
             );
             PreparedStatement pstmt = conn.prepareStatement(
-                    "SELECT song, artist, date FROM combview WHERE album = ? LIMIT 100"
+                    "SELECT song, artist, date FROM combview WHERE album = ? ORDER BY song LIMIT 100"
             );
             while (rs1.next()) {
                 final String albumName =  rs1.getString("album");
@@ -115,24 +134,6 @@ public class DBqueries {
             log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview albums");
         }
         return albums;
-    }
-
-    public List<Song> readCombviewSingles() {
-        List<Song> singles = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT song, artist, date FROM combview WHERE album IS NULL LIMIT 1000"
-            );
-            while (rs.next())
-                singles.add(new Song(
-                        rs.getString("song"),
-                        rs.getString("artist"),
-                        rs.getString("date")));
-        } catch (SQLException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview table");
-        }
-        return singles;
     }
 
     public void insertIntoArtistList(String name) {

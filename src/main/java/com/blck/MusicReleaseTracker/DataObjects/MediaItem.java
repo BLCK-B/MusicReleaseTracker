@@ -18,5 +18,6 @@ package com.blck.MusicReleaseTracker.DataObjects;
 /** container for songs and albums intended for frontend */
 public interface MediaItem {
 	String getDate();
+	String getName();
 	String getAlbum();
 }

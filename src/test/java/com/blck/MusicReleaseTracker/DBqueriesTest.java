@@ -129,6 +129,27 @@ public class DBqueriesTest {
     }
 
     @Test
+    void albumSongsSortedByName() {
+        songList = List.of(
+                new Song("C", "artist", "2022-01-01"),
+                new Song("A", "artist", "2022-01-01"),
+                new Song("B", "artist", "2022-01-01"));
+        songList.get(0).setAlbumID("album");
+        songList.get(1).setAlbumID("album");
+        songList.get(2).setAlbumID("album");
+        dBqueriesClass.batchInsertCombview(songList);
+        List<Song> expected = List.of(
+                new Song("A", "artist", "2022-01-01"),
+                new Song("B", "artist", "2022-01-01"),
+                new Song("C", "artist", "2022-01-01"));
+
+        List<Song> output = dBqueriesClass.readCombviewAlbums().getFirst().getAlbumSongs();
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertEquals(expected.get(i).getName(), output.get(i).getName());
+    }
+
+    @Test
     void mixedSinglesAndAlbumsReadSingles() {
         songList.get(0).setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
@@ -159,7 +180,7 @@ public class DBqueriesTest {
     }
 
     @Test
-    void mediaItemsFromCombviewAreSortedByNewestDate() {
+    void dataFromCombviewIsSortedByNewestDate() {
         songList = List.of(
                 new Song("song", "artist", "2022-01-03"),
                 new Song("song", "artist", "2022-01-02"),
@@ -170,6 +191,25 @@ public class DBqueriesTest {
                 new Song("albumSong", "artist", "2022-01-04"),
                 new Song("song", "artist", "2022-01-03"),
                 new Song("song", "artist", "2022-01-02"));
+
+        List<MediaItem> mediaItems = dBqueriesClass.loadCombviewTable();
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertEquals(expected.get(i).getDate(), mediaItems.get(i).getDate());
+    }
+
+    @Test
+    void dataFromCombviewIsSecondarilySortedByName() {
+        songList = List.of(
+                new Song("B", "artist", "2022-01-01"),
+                new Song("A", "artist", "2022-01-01"),
+                new Song("C", "artist", "2022-01-01"));
+        songList.get(2).setAlbumID("album");
+        dBqueriesClass.batchInsertCombview(songList);
+        List<Song> expected = List.of(
+                new Song("A", "artist", "2022-01-01"),
+                new Song("B", "artist", "2022-01-01"),
+                new Song("C", "artist", "2022-01-01"));
 
         List<MediaItem> mediaItems = dBqueriesClass.loadCombviewTable();
 

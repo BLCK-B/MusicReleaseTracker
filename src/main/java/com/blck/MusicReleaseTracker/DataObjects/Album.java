@@ -30,4 +30,9 @@ public record Album(String album, List<Song> songs) implements MediaItem {
 	public String getAlbum() {
 		return album;
 	}
+
+	@Override
+	public String getName() {
+		return songs.getFirst().getName();
+	}
 }

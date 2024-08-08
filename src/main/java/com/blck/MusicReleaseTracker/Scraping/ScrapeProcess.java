@@ -76,7 +76,7 @@ public class ScrapeProcess {
 		songList = mergeNameDateDuplicates(songList);
 		songList = mergeSongsWithinDaysApart(songList, 7);
 		songList = groupSameDateArtistSongs(songList, 4);
-		songList = sortByNewestDate(songList);
+		songList = sortByNewestAndByName(songList);
 
 		DB.batchInsertCombview(songList);
 	}
@@ -134,20 +134,19 @@ public class ScrapeProcess {
 				.collect(Collectors.groupingBy(
 						song -> noSpacesLowerCase(song.getArtists() + song.getDate())
 				));
-
 		for (List<Song> group : artistSameDayCounts.values()) {
 			if (group.size() >= atLeast)
 				group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.get(0).getArtists()));
 		}
-
 		return artistSameDayCounts.values().stream()
 				.flatMap(Collection::stream)
 				.toList();
 	}
 
-	public List<Song> sortByNewestDate(List<Song> songObjectList) {
+	public List<Song> sortByNewestAndByName(List<Song> songObjectList) {
 		return songObjectList.stream()
-				.sorted(Comparator.comparing(Song::getDate).reversed())
+				.sorted(Comparator.comparing(Song::getDate).reversed()
+						.thenComparing(Song::getName))
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 

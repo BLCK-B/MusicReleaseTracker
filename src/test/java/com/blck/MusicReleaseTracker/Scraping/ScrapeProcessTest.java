@@ -133,7 +133,7 @@ public class ScrapeProcessTest {
     }
 
     @Test
-    void sortByNewest() {
+    void sortByNewestDate() {
         List<Song> songList = List.of(
             new Song("song3", "artist", "2020-01-01"),
             new Song("song1", "artist", "2023-01-05"),
@@ -143,7 +143,24 @@ public class ScrapeProcessTest {
             new Song("song2", "artist", "2023-01-01"),
             new Song("song3", "artist", "2020-01-01"));
 
-        List<Song> output = scrapeProcess.sortByNewestDate(songList);
+        List<Song> output = scrapeProcess.sortByNewestAndByName(songList);
+
+        for (int i = 0; i < expected.size(); ++i)
+            assertThat(expected.get(i)).dataMatches(output.get(i));
+    }
+
+    @Test
+    void sameDateThenSortedAlphabeticallyByName() {
+        List<Song> songList = List.of(
+                new Song("C", "artist", "2020-01-01"),
+                new Song("A", "artist", "2020-01-01"),
+                new Song("B", "artist", "2020-01-01"));
+        List<Song> expected = List.of(
+                new Song("A", "artist", "2020-01-01"),
+                new Song("B", "artist", "2020-01-01"),
+                new Song("C", "artist", "2020-01-01"));
+
+        List<Song> output = scrapeProcess.sortByNewestAndByName(songList);
 
         for (int i = 0; i < expected.size(); ++i)
             assertThat(expected.get(i)).dataMatches(output.get(i));
@@ -292,5 +309,4 @@ public class ScrapeProcessTest {
                 .count()
         );
     }
-
 }

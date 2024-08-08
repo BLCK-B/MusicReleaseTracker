@@ -1,10 +1,8 @@
-name: Java CI with Gradle
+name: CI on PR
 
 on:
-  push:
-    branches: [ "dev" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "*" ]
 
 jobs:
   gradle-test-build:
@@ -33,7 +31,7 @@ jobs:
       run: echo "Tests failed, stopping the job"
     - name: Build with Gradle Wrapper
       run: ./gradlew build
-    - name: Upload JAR artifact
+    - name: Upload JAR artifact on main only
       uses: actions/upload-artifact@v4
       with:
         name: MRT-artifact

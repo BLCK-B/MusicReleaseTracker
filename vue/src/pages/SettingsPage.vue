@@ -4,7 +4,7 @@
       <img v-if="primaryColor !== 'light'" class="image" src="../components/icons/crossdark.png" alt="X" />
       <img v-if="primaryColor === 'light'" class="image" src="../components/icons/crosslight.png" alt="X" />
     </button>
-    <div class="version">version {{ appVersion }}</div>
+    <div class="version">MRT v{{ appVersion }}</div>
 
     <section class="filterscont">
       <SettingsFilters
@@ -37,6 +37,7 @@
 
 <script>
 import axios from "axios";
+import { mapState } from "vuex";
 import SettingsOther from "../components/Settings/SettingsOther.vue";
 import SettingsDangerZone from "../components/Settings/SettingsDangerZone.vue";
 import SettingsFilters from "../components/Settings/SettingsFilters.vue";
@@ -60,11 +61,13 @@ export default {
       filterExtended: false,
       filterRemaster: false,
       isoDates: false,
-      primaryColor: "N",
       accentColor: "N",
       autoTheme: false,
       appVersion: "",
     };
+  },
+  computed: {
+    ...mapState(["primaryColor"]),
   },
   created() {
     axios
@@ -78,14 +81,12 @@ export default {
         this.filterRemaster = response.data.filterRemaster === "true";
         this.isoDates = response.data.isoDates === "true";
         this.autoTheme = response.data.autoTheme === "true";
-        this.primaryColor = response.data.theme;
+        if (this.autoTheme == "false") this.primaryColor = response.data.theme;
         this.accentColor = response.data.accent;
       })
       .catch((error) => {
         console.error(error);
       });
-  },
-  mounted() {
     axios
       .get("/api/getAppVersion")
       .then((response) => {
@@ -106,7 +107,6 @@ export default {
       switch (name) {
         case "theme":
           this.$store.commit("SET_PRIMARY_COLOR", value);
-          this.primaryColor = value;
           break;
         case "accent":
           this.$store.commit("SET_ACCENT_COLOR", value);
@@ -168,6 +168,7 @@ export default {
   position: absolute;
   left: 10px;
   top: 8px;
+  font-weight: bold;
 }
 section {
   position: relative;

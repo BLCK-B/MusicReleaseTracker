@@ -52,7 +52,7 @@ export default {
         .get("/api/settingsOpened")
         .then((response) => {
           const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
-          if (response.data.autoTheme == true) {
+          if (response.data.autoTheme === "true") {
             if (prefersDarkMode.matches) this.$store.commit("SET_PRIMARY_COLOR", "black");
             else this.$store.commit("SET_PRIMARY_COLOR", "light");
           }

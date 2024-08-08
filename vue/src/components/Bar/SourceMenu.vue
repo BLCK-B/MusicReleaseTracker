@@ -119,6 +119,7 @@ export default {
             .replace(/\//g, ".")
             .replace(",", "")
             .replace(/(\d{2})\.(\d{2})/, "$1.$2.");
+
           this.scrapeLast = time;
           this.scrapeDateInfo = true;
           this.handleSourceClick("combview");
@@ -221,13 +222,16 @@ export default {
 
 .scrapenotice {
   position: absolute;
-  z-index: 50;
-  background-color: var(--duller-color);
+  right: 65px;
+  top: 2px;
+  height: 35px;
+  z-index: 3;
   border-radius: 5px;
-  padding-right: 10px;
-  padding-left: 10px;
-  right: 14px;
-  top: 42px;
+  background-color: var(--duller-color);
+  padding-right: 8px;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
 }
 
 .fade-enter-from,

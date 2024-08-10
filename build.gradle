@@ -18,8 +18,6 @@
 plugins {
     id 'java'
     id 'application'
-    // https://plugins.gradle.org/plugin/org.beryx.jlink
-    id("org.beryx.jlink") version "3.0.1"
     // https://plugins.gradle.org/plugin/org.springframework.boot
     id("org.springframework.boot") version "3.3.2"
     // https://plugins.gradle.org/plugin/io.spring.dependency-management
@@ -41,11 +39,6 @@ repositories {
     gradlePluginPortal()
 }
 
-configurations {
-    runtime
-    compile
-}
-
 graalvmNative {
     binaries {
         main {
@@ -56,19 +49,9 @@ graalvmNative {
 }
 
 java {
-    // minimal supported
-    sourceCompatibility = JavaVersion.VERSION_19
-    // target
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-application {
-    mainModule = 'com.blck.MusicReleaseTracker'
-    mainClass = 'com.blck.MusicReleaseTracker.Main'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 dependencies {
@@ -82,20 +65,15 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.2'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.2'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 bootJar {
     duplicatesStrategy = 'exclude'
     archiveFileName = "MRT-${version}-linux-mac.jar"
-}
-
-jlink {
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    launcher {
-        name = 'MusicReleaseTracker'
-    }
 }
 
 sourceSets {

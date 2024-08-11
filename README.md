@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/f432e824-6772-401e-8419-90da707887f4" width="180px" alt="MusicReleaseTracker Image">
+  <img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/f432e824-6772-401e-8419-90da707887f4" width="130px" alt="MusicReleaseTracker Image">
 </p>
 
 <h2 align="center">MusicReleaseTracker</h2>
@@ -22,7 +22,8 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 
 ##
 
-Latest info about your defined artists is gathered and combined into a simple overview.
+Latest information is compiled into a simple overview. This is achieved through advanced processing.
+
 You will no longer have to search social media or streaming services. Never miss a new song again.
 
 Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
@@ -36,16 +37,15 @@ Setup
 
 **Linux:** Run jar by ```java -jar XXX.jar```
 
-**macOS:** *Should be same as Linux. Not tested. Could someone please confirm?
+**macOS:** *Should be same as Linux. Not tested. Can someone confirm?
 
 ---
 
 **Responsibility**:
 
 Delays during scraping prevent excessive traffic.
-To avoid granting admin permission, one can run the exe from unzipped installer.
 
-I have no affiliation with Musicbrainz, Beatport, Junodownload, Youtube. I can only recommend contributing to [crowdsourced](https://musicbrainz.org/doc/How_to_Contribute) projects and directly supporting artists via Bandcamp and other means.
+I have no affiliation with Musicbrainz, Beatport, Junodownload or Youtube.
 
 ---
 
@@ -53,5 +53,3 @@ License
 -
 
 MusicReleaseTracker is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-key words: java sqlite jsoup spring vue.js graalvm

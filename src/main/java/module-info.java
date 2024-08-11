@@ -2,6 +2,7 @@ module com.blck.MusicReleaseTracker {
     requires org.jsoup;
     requires java.sql;
     requires spring.web;
+    requires spring.core;
     requires spring.context;
     requires spring.beans;
     requires spring.boot.autoconfigure;

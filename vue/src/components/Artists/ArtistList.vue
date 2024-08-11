@@ -20,7 +20,6 @@
       <ArtistsAddNew :addVisibility="addVisibility" @close-add-new="closeAddNew" />
 
       <div class="artistlist">
-        <!-- loop through the array and display each artist as a clickable list item -->
         <li
           v-for="item in artistsArrayList"
           :key="item"
@@ -64,9 +63,8 @@ export default {
   created() {
     // load artist list, last clicked artist if not null
     this.loadList();
-    axios.get("/api/getLastArtist").then((response) => {
-      if (response.data !== "") this.lastClickedItem = response.data;
-    });
+    console.log("replace by storage");
+    // if (response.data !== "") this.lastClickedItem = response.data;
   },
   watch: {
     "$store.state.loadListRequest"(loadListRequest) {
@@ -92,10 +90,11 @@ export default {
     handleItemClick(artist) {
       if (artist === this.selectedArtist) return;
       axios
-        .post("/api/getTableArtistClick", { item: artist })
+        .post("/api/getTableData", { source: this.sourceTab, artist: artist })
         .then((response) => {
           this.$store.commit("SET_SELECTED_ARTIST", artist);
           this.$store.commit("SET_TABLE_CONTENT", response.data);
+          this.$forceUpdate();
         })
         .catch((error) => {
           console.error(error);
@@ -112,7 +111,7 @@ export default {
     clickDeleteArtist() {
       if (this.lastClickedItem !== "") {
         axios
-          .get("/api/clickArtistDelete")
+          .post("/api/deleteArtist", this.selectedArtist)
           .then(() => {
             this.$store.commit("SET_SELECTED_ARTIST", "");
             this.$store.commit("SET_SOURCE_TAB", "combview");
@@ -128,7 +127,7 @@ export default {
     },
     deleteUrl() {
       // set null specific URL, trigger table reload
-      axios.post("/api/deleteUrl").then(() => {
+      axios.post("/api/deleteUrl", { source: this.sourceTab, artist: this.selectedArtist }).then(() => {
         this.handleItemClick(this.lastClickedItem);
       });
     },

@@ -88,9 +88,9 @@ export default {
       this.input = "";
       if (url) {
         axios
-          .post("/api/clickAddURL", url)
+          .post("/api/clickAddURL", { source: this.sourceTab, artist: this.selectedArtist, url: url })
           .then(() => {
-            axios.post("/api/getTableArtistClick", { item: this.selectedArtist }).then((response) => {
+            axios.post("/api/getTableData", { source: this.sourceTab, artist: this.selectedArtist }).then((response) => {
               this.$store.commit("SET_TABLE_CONTENT", response.data);
               this.$store.commit("SET_PREVIEW_VIS", true);
             });
@@ -104,7 +104,7 @@ export default {
     determineDiagShow() {
       if (this.tableData.length === 0) {
         axios
-          .get("/api/checkExistURL")
+          .post("/api/checkExistURL", { source: this.sourceTab, artist: this.selectedArtist })
           .then((response) => {
             this.$store.commit("SET_URL_EXISTS", response.data);
           })

@@ -44,7 +44,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["sourceTab", "allowButtons", "primaryColor"]),
+    ...mapState(["sourceTab", "allowButtons", "primaryColor", "selectedArtist"]),
   },
   // load last clicked tab, otherwise combview as default, load scrapeLast time
   created() {
@@ -78,7 +78,7 @@ export default {
     // load respective table
     handleSourceClick(source) {
       axios
-        .post("/api/getTableSourceClick", { item: source })
+        .post("/api/getTableData", { source: source, artist: this.selectedArtist })
         .then((response) => {
           this.$store.commit("SET_TABLE_CONTENT", response.data);
         })

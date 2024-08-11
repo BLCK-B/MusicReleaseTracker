@@ -20,7 +20,7 @@ import { mapState } from "vuex";
 
 export default {
   computed: {
-    ...mapState(["tableData", "primaryColor"]),
+    ...mapState(["tableData", "primaryColor", "sourceTab", "selectedArtist"]),
     hideTable() {
       return this.tableData.length == 0;
     },
@@ -28,14 +28,14 @@ export default {
   methods: {
     // close dialog, delete scraped preview from db
     clickCancel() {
-      axios.request("/api/cleanArtistSource").catch((error) => {
+      axios.post("/api/cleanArtistSource", { source: this.sourceTab, artist: this.selectedArtist }).catch((error) => {
         console.error(error);
       });
       this.$store.commit("SET_PREVIEW_VIS", false);
     },
     // close dialog, save url used for preview
     clickConfirm() {
-      axios.request("/api/saveUrl").catch((error) => {
+      axios.post("/api/saveUrl", { source: this.sourceTab, artist: this.selectedArtist }).catch((error) => {
         console.error(error);
       });
       this.$store.commit("SET_PREVIEW_VIS", false);

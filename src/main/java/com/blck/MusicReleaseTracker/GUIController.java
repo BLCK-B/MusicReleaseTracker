@@ -42,9 +42,6 @@ public class GUIController {
     private final SettingsIO settingsIO;
     private final DBqueries DB;
     private final MigrateDB manageDB;
-
-    private TablesEnum selectedSource = TablesEnum.combview;
-    private String selectedArtist;
     private String tempID;
 
     @Autowired
@@ -66,76 +63,65 @@ public class GUIController {
         if (name.isEmpty() || name.isBlank())
             return;
         DB.insertIntoArtistList(name);
-        selectedArtist = name;
     }
 
-    public void removeArtist() {
-        if (selectedArtist == null)
+    public void deleteArtist(String artist) {
+        if (artist == null)
             return;
-        DB.removeArtistFromAllTables(selectedArtist);
-        selectedArtist = null;
+        DB.removeArtistFromAllTables(artist);
     }
 
-    public void deleteSourceID() {
-        if (selectedArtist != null && selectedSource != TablesEnum.combview) {
-            DB.updateArtistSourceID(selectedArtist, selectedSource, null);
-            DB.clearArtistDataFrom(selectedArtist, selectedSource);
+    public void deleteSourceID(TablesEnum source, String artist) {
+        if (artist != null && source != TablesEnum.combview) {
+            DB.updateArtistSourceID(artist, source, null);
+            DB.clearArtistDataFrom(artist, source);
         }
     }
 
-    public void cleanArtistSource() {
-        DB.clearArtistDataFrom(selectedArtist, selectedSource);
+    public void cleanArtistSource(TablesEnum table, String artist) {
+        DB.clearArtistDataFrom(artist, table);
     }
 
-    public List<MediaItem> getTableData(String artist) {
-        selectedArtist = artist;
-        return selectedSource == TablesEnum.combview ? DB.loadCombviewTable() : DB.loadTable(selectedSource, selectedArtist);
-    }
-
-    public List<MediaItem> getTableData(TablesEnum source) {
-        selectedSource = source;
-        if (selectedSource == TablesEnum.combview)
+    public List<MediaItem> getTableData(TablesEnum source, String artist) {
+        if (source == TablesEnum.combview || artist.isBlank())
             return DB.loadCombviewTable();
-        else if (selectedArtist != null)
-            return DB.loadTable(selectedSource, selectedArtist);
-        return null;
+        else
+            return DB.loadTable(source, artist);
     }
 
     public void fillCombview() {
         scrapeProcess.fillCombviewTable();
     }
 
-    public void scrapePreview(String url) {
+    public void scrapePreview(TablesEnum source, String artist, String url) {
         if (url.isBlank())
             return;
 
-        tempID = null;
         String id = null;
         try {
             Scraper scraper = null;
-            switch (selectedSource) {
-                case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, DB, selectedArtist, url);
-                case beatport -> scraper = new ScraperBeatport(store, log, DB, selectedArtist, url);
-                case junodownload -> scraper = new ScraperJunodownload(store, log, DB, selectedArtist, url);
-                case youtube -> scraper = new ScraperYoutube(store, log, DB, selectedArtist, url);
+            switch (source) {
+                case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, DB, artist, url);
+                case beatport -> scraper = new ScraperBeatport(store, log, DB, artist, url);
+                case junodownload -> scraper = new ScraperJunodownload(store, log, DB, artist, url);
+                case youtube -> scraper = new ScraperYoutube(store, log, DB, artist, url);
             }
             id = scraper.getID();
             scraper.scrape(25000);
+            tempID = id;
         } catch (Exception e) {
-            log.error(e, ErrorLogging.Severity.WARNING, "error scraping " + selectedSource + ", perhaps an incorrect link");
+            log.error(e, ErrorLogging.Severity.WARNING, "error scraping " + source + ", perhaps an incorrect link");
         }
-
-        tempID = id;
     }
 
-    public void saveUrl() {
-       DB.updateArtistSourceID(selectedArtist, selectedSource, tempID);
+    public void saveUrl(TablesEnum source, String artist) {
+       DB.updateArtistSourceID(artist, source, tempID);
     }
 
-    public boolean checkExistURL() {
-        if (selectedSource == TablesEnum.combview)
+    public boolean checkExistURL(TablesEnum source, String artist) {
+        if (source == TablesEnum.combview)
             return false;
-        return DB.getArtistSourceID(selectedArtist, selectedSource).isPresent();
+        return DB.getArtistSourceID(artist, source).isPresent();
     }
 
     public void clickScrape() {
@@ -167,10 +153,6 @@ public class GUIController {
     public String getScrapeDate() {
         store.setScrapeDate(settingsIO.readSetting("lastScrape"));
         return store.getScrapeDate();
-    }
-
-    public String getLastArtist() {
-        return selectedArtist;
     }
 
     public void resetSettings() {

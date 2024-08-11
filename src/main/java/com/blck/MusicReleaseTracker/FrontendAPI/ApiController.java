@@ -43,14 +43,9 @@ public class ApiController {
         return sendRequest.loadList();
     }
 
-    @PostMapping ("/getTableArtistClick")
-    public List<MediaItem> getTableArtistClick(@RequestBody Map<String, String> requestData) {
-        return sendRequest.getTableData(requestData.get("item"));
-    }
-
-    @PostMapping ("/getTableSourceClick")
-    public List<MediaItem> getTableSourceClick(@RequestBody Map<String, String> requestData) {
-        return sendRequest.getTableData(TablesEnum.valueOf(requestData.get("item")));
+    @PostMapping ("/getTableData")
+    public List<MediaItem> getTableData(@RequestBody Map<String, String> requestData) {
+        return sendRequest.getTableData(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
     }
 
     @PostMapping("/clickArtistAdd")
@@ -59,29 +54,31 @@ public class ApiController {
         sendRequest.addNewArtist(artistname);
     }
 
-    @RequestMapping ("/clickArtistDelete")
-    public void clickArtistDelete() {
-        sendRequest.removeArtist();
+    @PostMapping ("/deleteArtist")
+    public void deleteArtist(@RequestBody String artist) {
+        artist = URLDecoder.decode(artist, StandardCharsets.UTF_8).replace("=" , "").trim();
+        sendRequest.deleteArtist(artist);
     }
 
     @PostMapping("/deleteUrl")
-    public void deleteUrl() {
-        sendRequest.deleteSourceID();
+    public void deleteUrl(@RequestBody Map<String, String> requestData) {
+        sendRequest.deleteSourceID(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
     }
 
-    @RequestMapping ("/cleanArtistSource")
-    public void cleanArtistSource() {
-        sendRequest.cleanArtistSource();
+    @PostMapping ("/cleanArtistSource")
+    public void cleanArtistSource(@RequestBody Map<String, String> requestData) {
+        sendRequest.cleanArtistSource(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
     }
-    @RequestMapping ("/saveUrl")
-    public void saveUrl() {
-        sendRequest.saveUrl();
+
+    @PostMapping ("/saveUrl")
+    public void saveUrl(@RequestBody Map<String, String> requestData) {
+        sendRequest.saveUrl(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
     }
 
     @PostMapping ("/clickAddURL")
-    public void clickAddURL(@RequestBody String url) {
-        url = URLDecoder.decode(url, StandardCharsets.UTF_8).replace("=" , "").trim();
-        sendRequest.scrapePreview(url);
+    public void clickAddURL(@RequestBody Map<String, String> requestData) {
+        String url = URLDecoder.decode( requestData.get("url"), StandardCharsets.UTF_8);
+		sendRequest.scrapePreview(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"), url);
     }
 
     @RequestMapping ("/clickScrape")
@@ -90,8 +87,8 @@ public class ApiController {
     }
 
     @PostMapping("/setSetting")
-    public void setSetting(@RequestBody Map<String, String> params) {
-        sendRequest.setSetting(params.get("name"), params.get("value"));
+    public void setSetting(@RequestBody Map<String, String> requestData) {
+        sendRequest.setSetting(requestData.get("name"), requestData.get("value"));
     }
 
     @GetMapping("/getThemeConfig")
@@ -114,19 +111,14 @@ public class ApiController {
         sendRequest.fillCombview();
     }
 
-    @GetMapping("/checkExistURL")
-    public boolean checkExistURL() {
-        return sendRequest.checkExistURL();
+    @PostMapping("/checkExistURL")
+    public boolean checkExistURL(@RequestBody Map<String, String> requestData) {
+        return sendRequest.checkExistURL(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
     }
 
     @GetMapping("/getScrapeDate")
     public String getScrapeDate() {
         return sendRequest.getScrapeDate();
-    }
-
-    @GetMapping("/getLastArtist")
-    public String getLastArtist() {
-        return sendRequest.getLastArtist();
     }
 
     @PostMapping("/resetSettings")

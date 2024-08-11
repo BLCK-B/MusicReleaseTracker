@@ -55,7 +55,7 @@ export default {
     this.isDateInFuture;
   },
   computed: {
-    ...mapState(["tableData", "previewVis", "artist", "isoDates", "sourceTab", "urlExists"]),
+    ...mapState(["tableData", "previewVis", "selectedArtist", "isoDates", "sourceTab", "urlExists"]),
     processedTableData() {
       return this.tableData
         .map((item) => {
@@ -83,7 +83,7 @@ export default {
         .flat();
     },
     hideArtistColumn() {
-      return this.sourceTab !== "combview";
+      return this.sourceTab !== "combview" && this.selectedArtist !== "";
     },
     hideTable() {
       return this.tableData.some((item) => item.song !== null);

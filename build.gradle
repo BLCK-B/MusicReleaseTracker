@@ -17,12 +17,8 @@
 
 plugins {
     id 'java'
-    id 'application'
-    // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.3.2"
-    // https://plugins.gradle.org/plugin/io.spring.dependency-management
-    id("io.spring.dependency-management") version "1.1.6"
-    // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#_adding_the_plugin
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
     id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 
@@ -44,22 +40,23 @@ graalvmNative {
         main {
             imageName.set("MusicReleaseTracker")
             buildArgs.add('--verbose')
+            // quick build
+//            buildArgs.add('-Ob')
         }
     }
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(22)
     }
 }
 
 dependencies {
-
     implementation 'org.xerial:sqlite-jdbc:3.46.0.1'
     implementation 'org.jsoup:jsoup:1.18.1'
 
-    testImplementation(platform('org.junit:junit-bom:5.10.3'))
+    testImplementation(platform('org.junit:junit-bom:5.11.0'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
     testImplementation 'org.mockito:mockito-core:5.12.0'

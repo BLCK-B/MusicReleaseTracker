@@ -6,8 +6,8 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "monthly"
-    target-branch: "dev"
+      interval: "weekly"
+    target-branch: "main"
     groups:
       minor-and-patches:
         update-types:

@@ -15,6 +15,8 @@
 
 // https://services.gradle.org/distributions - in gradle-wrapper.properties
 
+// TODO: build/resources/aot/META-INF/native-image tracing CI integration or git
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.2'
@@ -36,13 +38,13 @@ repositories {
 }
 
 graalvmNative {
-    binaries {
-        main {
+    binaries.all {
             imageName.set("MusicReleaseTracker")
             buildArgs.add('--verbose')
+            // sqlite
+            buildArgs.add('--initialize-at-build-time=org.sqlite.util.ProcessRunner')
             // quick build
 //            buildArgs.add('-Ob')
-        }
     }
 }
 

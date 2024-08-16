@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [ "*" ]
 
+env:
+  JAVA_VERSION: '22'
+
 jobs:
   gradle-test-build:
     runs-on: ubuntu-latest
@@ -14,7 +17,7 @@ jobs:
     - name: Setup JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4

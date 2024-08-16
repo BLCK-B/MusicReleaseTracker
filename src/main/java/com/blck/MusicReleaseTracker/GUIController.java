@@ -83,7 +83,9 @@ public class GUIController {
     }
 
     public List<MediaItem> getTableData(TablesEnum source, String artist) {
-        if (source == TablesEnum.combview || artist.isBlank())
+        if (artist == null)
+            return DB.loadCombviewTable();
+        else if (source == TablesEnum.combview || artist.isBlank())
             return DB.loadCombviewTable();
         else
             return DB.loadTable(source, artist);

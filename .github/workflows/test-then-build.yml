@@ -9,6 +9,7 @@ env:
 
 jobs:
   gradle-test-build:
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -1,20 +1,3 @@
-import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.StartSetup;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-
 /*
  *         MusicReleaseTracker
  *         Copyright (C) 2023 - 2024 BLCK
@@ -29,6 +12,24 @@ import static org.mockito.Mockito.verify;
  *         You should have received a copy of the GNU General Public License
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+package com.blck.MusicReleaseTracker;
+
+import com.blck.MusicReleaseTracker.Core.ValueStore;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class StartSetupTest {

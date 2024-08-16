@@ -15,16 +15,12 @@
 
 // https://services.gradle.org/distributions - in gradle-wrapper.properties
 
+// TODO: build/resources/aot/META-INF/native-image tracing CI integration or git
+
 plugins {
     id 'java'
-    id 'application'
-    // https://plugins.gradle.org/plugin/org.beryx.jlink
-    id("org.beryx.jlink") version "3.0.1"
-    // https://plugins.gradle.org/plugin/org.springframework.boot
-    id("org.springframework.boot") version "3.3.2"
-    // https://plugins.gradle.org/plugin/io.spring.dependency-management
-    id("io.spring.dependency-management") version "1.1.6"
-    // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#_adding_the_plugin
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
     id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 
@@ -41,42 +37,28 @@ repositories {
     gradlePluginPortal()
 }
 
-configurations {
-    runtime
-    compile
-}
-
 graalvmNative {
-    binaries {
-        main {
+    binaries.all {
             imageName.set("MusicReleaseTracker")
             buildArgs.add('--verbose')
-        }
+            // sqlite
+            buildArgs.add('--initialize-at-build-time=org.sqlite.util.ProcessRunner')
+            // quick build
+//            buildArgs.add('-Ob')
     }
 }
 
 java {
-    // minimal supported
-    sourceCompatibility = JavaVersion.VERSION_19
-    // target
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-application {
-    mainModule = 'com.blck.MusicReleaseTracker'
-    mainClass = 'com.blck.MusicReleaseTracker.Main'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(22)
+    }
 }
 
 dependencies {
-
     implementation 'org.xerial:sqlite-jdbc:3.46.0.1'
     implementation 'org.jsoup:jsoup:1.18.1'
 
-    testImplementation(platform('org.junit:junit-bom:5.10.3'))
+    testImplementation(platform('org.junit:junit-bom:5.11.0'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.3'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.3'
     testImplementation 'org.mockito:mockito-core:5.12.0'
@@ -89,13 +71,6 @@ dependencies {
 bootJar {
     duplicatesStrategy = 'exclude'
     archiveFileName = "MRT-${version}-linux-mac.jar"
-}
-
-jlink {
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    launcher {
-        name = 'MusicReleaseTracker'
-    }
 }
 
 sourceSets {

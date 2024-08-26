@@ -1,9 +1,7 @@
 name: Dependabot auto-approve
 on:
-  workflow_run:
-    workflows: ["CI-on-PR"]
-    types:
-      - completed
+  pull_request:
+    types: [opened, reopened]
 
 permissions:
   contents: write
@@ -11,8 +9,8 @@ permissions:
 
 jobs:
   merge-PR:
-    if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
     steps:
       - name: Dependabot metadata
         id: metadata

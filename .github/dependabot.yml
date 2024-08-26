@@ -1,5 +1,4 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-# https://jsonformatter.org/yaml-validator
 
 version: 2
 updates:

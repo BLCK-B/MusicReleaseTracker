@@ -16,13 +16,12 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 
 ##
 
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/82621c39-73fb-43c0-b5b9-eab7313eb417" width="480px"/> <br>
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/3de8e98a-eee8-4eca-baf3-06fa56a9543e" width="480px"/> <br>
-<img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/b9120ff1-e74a-4eae-b702-699fcf2b769d" width="480px"/>
+<img src="https://github.com/user-attachments/assets/45c03cce-bccb-491f-848e-4e1c0d6c7b60" width="500px"/> <br>
+<img src="https://github.com/user-attachments/assets/11ef4c87-c21b-4c7c-bb55-fc76b835f63a" width="500px"/>
 
 ##
 
-Latest information is compiled into a simple overview. This is achieved through advanced processing.
+Latest information is compiled into a simple overview. This is achieved through custom processing.
 
 You will no longer have to search social media or streaming services. Never miss a new song again.
 

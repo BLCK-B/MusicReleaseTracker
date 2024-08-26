@@ -64,10 +64,6 @@ public class StartSetup {
     public void createDirs() {
         String appDataPath = store.getAppDataPath();
         try {
-            // remove next version
-            new File(appDataPath + "MRTsettings.hocon").delete();
-            new File(appDataPath + "MRTsettingsTemplate.hocon").delete();
-
             new File(appDataPath).mkdirs();
             // junk folder because sqlite did not delete temp files in "temp"
             File tempfolder = new File(appDataPath + "temp");

@@ -80,7 +80,7 @@ public class DBqueries {
     }
 
     public List<MediaItem> loadCombviewTable() {
-        if (disableR() != null) return disableR(); // TODO: test
+        if (disableR() != null) return disableR();
         ArrayList<MediaItem> tableContent = new ArrayList<>();
         tableContent.addAll(readCombviewAlbums());
         tableContent.addAll(readCombviewSingles());

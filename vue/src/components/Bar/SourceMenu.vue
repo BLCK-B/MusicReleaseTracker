@@ -109,16 +109,14 @@ export default {
           this.isActive = false;
           this.$store.commit("SET_ALLOW_BUTTONS", true);
           this.eventSource.close();
-          let time = new Date()
-            .toLocaleString("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-            .replace(/\//g, ".")
-            .replace(",", "")
-            .replace(/(\d{2})\.(\d{2})/, "$1.$2.");
+
+          const currentTime = new Date();
+          let time = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}.${currentTime.getHours().toString().padStart(2, "0")}:${currentTime
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`;
 
           this.scrapeLast = time;
           this.scrapeDateInfo = true;

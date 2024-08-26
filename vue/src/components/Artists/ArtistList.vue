@@ -63,7 +63,6 @@ export default {
   created() {
     // load artist list, last clicked artist if not null
     this.loadList();
-    console.log("replace by storage");
     // if (response.data !== "") this.lastClickedItem = response.data;
   },
   watch: {

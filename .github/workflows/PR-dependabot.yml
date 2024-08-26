@@ -1,7 +1,10 @@
 name: Dependabot auto-approve
-on:
-  pull_request:
-    types: [opened, reopened]
+# disabled for now
+# on:
+#   pull_request:
+#     types: [opened, reopened]
+
+on: workflow_dispatch
 
 permissions:
   contents: write

@@ -28,7 +28,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  externalEXE = spawn("buildResources/MusicReleaseTracker.exe", {
+    externalEXE = spawn("buildResources/MusicReleaseTracker.exe", {
     detached: true,
     stdio: "ignore", // ignore stdio to prevent blocking
   });

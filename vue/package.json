@@ -6,30 +6,60 @@
   "type": "module",
   "main": "electron-main.js",
   "private": true,
+  "build": {
+    "directories": {
+      "output": "distribution",
+      "buildResources": "buildResources"
+    },
+    "appId": "blck.mrt",
+    "productName": "MusicReleaseTracker",
+    "extraFiles": [
+      {
+        "from": "buildResources/MusicReleaseTracker.exe",
+        "to": "buildResources/MusicReleaseTracker.exe"
+      }
+    ],
+    "win": {
+      "asar": true,
+      "target": {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      },
+      "icon": "buildResources/MRTicon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "installerIcon": "buildResources/MRTicon.ico",
+      "uninstallerIcon": "buildResources/MRTicon.ico",
+      "uninstallDisplayName": "MusicReleaseTracker",
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MusicReleaseTracker",
+      "installerHeaderIcon": "buildResources/MRTicon.ico",
+      "license": "../../license.txt"
+    },
+    "artifactName": "MRT-${version}-win.${ext}"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "buildVue": "vite build",
     "preview": "vite preview",
     "electron": "electron .",
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "distExe": "electron-builder --dir",
+    "distInstaller": "electron-builder"
   },
   "dependencies": {
     "axios": "^1.7.5",
-    "electron-squirrel-startup": "^1.0.1",
     "vue": "^3.4.38",
     "vue-router": "^4.4.3",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.4.0",
-    "@electron-forge/maker-deb": "^7.4.0",
-    "@electron-forge/maker-rpm": "^7.4.0",
-    "@electron-forge/maker-squirrel": "^7.4.0",
-    "@electron-forge/maker-zip": "^7.4.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
-    "@electron-forge/plugin-fuses": "^7.4.0",
+    "electron-builder": "^24.13.3",
     "@electron/fuses": "^1.8.0",
     "@eslint/js": "^9.9.1",
     "@vitejs/plugin-vue": "^5.1.2",

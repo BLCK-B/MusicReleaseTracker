@@ -49,3 +49,6 @@ bin/
 .DS_Store
 MRTicon.ico
 distrflow.txt
+
+/vue/distribution/*
+vue/buildResources/MusicReleaseTracker.exe

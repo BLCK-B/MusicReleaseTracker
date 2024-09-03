@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
@@ -10,11 +10,16 @@ const __dirname = path.dirname(__filename);
 let externalEXE;
 
 function createWindow() {
+  Menu.setApplicationMenu(null);
+
   const win = new BrowserWindow({
+    icon: path.join(__dirname, "buildResources/MRTicon.ico"),
     show: false,
     backgroundColor: "#000000",
-    width: 800,
-    height: 600,
+    width: 900,
+    height: 650,
+    minHeight: 450,
+    minWidth: 700,
     webPreferences: {
       preload: path.join(__dirname, "electron-preload.js"),
     },

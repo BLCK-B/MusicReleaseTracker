@@ -1,7 +1,7 @@
 {
   "author": "BLCK",
   "name": "mrt",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "description": "MusicReleaseTracker",
   "type": "module",
   "main": "electron-main.js",
@@ -22,25 +22,20 @@
     "win": {
       "asar": true,
       "target": {
-        "target": "nsis",
+        "target": "msi",
         "arch": [
           "x64"
         ]
       },
       "icon": "buildResources/MRTicon.ico"
     },
-    "nsis": {
+    "msi": {
+      "perMachine": false,
       "oneClick": false,
-      "perMachine": true,
-      "allowElevation": true,
-      "installerIcon": "buildResources/MRTicon.ico",
-      "uninstallerIcon": "buildResources/MRTicon.ico",
-      "uninstallDisplayName": "MusicReleaseTracker",
       "createDesktopShortcut": false,
       "createStartMenuShortcut": true,
       "shortcutName": "MusicReleaseTracker",
-      "installerHeaderIcon": "buildResources/MRTicon.ico",
-      "license": "../../license.txt"
+      "runAfterFinish": false
     },
     "artifactName": "MRT-${version}-win.${ext}"
   },

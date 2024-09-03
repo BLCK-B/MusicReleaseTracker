@@ -39,10 +39,11 @@ repositories {
 
 graalvmNative {
     binaries.all {
-            imageName.set("MusicReleaseTracker")
-            buildArgs.add('--verbose')
-            // quick build
-//            buildArgs.add('-Ob')
+        imageName.set("MusicReleaseTracker")
+        buildArgs.add('--verbose')
+        // https://graalvm.org/dev/reference-manual/native-image/optimizations-and-performance
+        buildArgs.add('-O1')
+//        buildArgs.add('-Ob')
     }
 }
 

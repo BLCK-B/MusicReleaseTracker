@@ -7,11 +7,12 @@ import { spawn } from "child_process";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.disableHardwareAcceleration();
+
 let externalEXE;
 
 function createWindow() {
   Menu.setApplicationMenu(null);
-
   const win = new BrowserWindow({
     icon: path.join(__dirname, "buildResources/MRTicon.ico"),
     show: false,

@@ -6,6 +6,7 @@
   "type": "module",
   "main": "electron-main.js",
   "private": true,
+  "artifactName": "MRT-${version}-win.${ext}",
   "build": {
     "directories": {
       "output": "distribution",
@@ -37,7 +38,18 @@
       "shortcutName": "MusicReleaseTracker",
       "runAfterFinish": false
     },
-    "artifactName": "MRT-${version}-win.${ext}"
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "buildResources/MRTicon.ico",
+      "category": "Utility"
+    }
   },
   "scripts": {
     "dev": "vite",

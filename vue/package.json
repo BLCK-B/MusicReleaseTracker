@@ -6,7 +6,6 @@
   "type": "module",
   "main": "electron-main.js",
   "private": true,
-  "artifactName": "MRT-${version}-win.${ext}",
   "build": {
     "directories": {
       "output": "distribution",
@@ -16,11 +15,12 @@
     "productName": "MusicReleaseTracker",
     "extraFiles": [
       {
-        "from": "buildResources/MusicReleaseTracker.exe",
-        "to": "buildResources/MusicReleaseTracker.exe"
+        "from": "buildResources/MusicReleaseTracker.${ext}",
+        "to": "buildResources/MusicReleaseTracker.${ext}"
       }
     ],
     "win": {
+      "artifactName": "MRT-${version}-win.${ext}",
       "asar": true,
       "target": {
         "target": "msi",
@@ -39,6 +39,7 @@
       "runAfterFinish": false
     },
     "linux": {
+      "artifactName": "MRT-${version}-linux.${ext}",
       "target": [
         {
           "target": "AppImage",

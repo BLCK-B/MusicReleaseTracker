@@ -71,22 +71,6 @@ public class Main {
             startSetup.createPathsAndDirs();
             manageDB.migrateDB();
             settingsIO.updateSettings();
-            // open port in web browser
-            try {
-                String os = System.getProperty("os.name").toLowerCase();
-
-                String[] cmd = null;
-                if (os.contains("win"))
-                    cmd = new String[]{"cmd.exe", "/c", "start", "http://localhost:57782"};
-                else if (os.contains("nix") || os.contains("nux"))
-                    cmd = new String[]{"xdg-open", "http://localhost:57782"};
-                else if (os.contains("mac"))
-                    cmd = new String[]{"open", "http://localhost:57782"};
-
-                Runtime.getRuntime().exec(cmd);
-            } catch (Exception e) {
-                log.error(e, ErrorLogging.Severity.WARNING, "could not open port in browser");
-            }
         }
     }
 

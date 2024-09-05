@@ -65,10 +65,11 @@ jobs:
       run: |
         cd vue
         npm run distInstaller
+        echo "installer_name=$(ls vue/distribution/MRT-*.*)" >> $GITHUB_ENV
     - name: Upload installer
       uses: actions/upload-artifact@v4
       with:
-        name: installer
+        name: ${{ env.installer_name }}
         path: vue/distribution/MRT-*.*
         if-no-files-found: error
         overwrite: true

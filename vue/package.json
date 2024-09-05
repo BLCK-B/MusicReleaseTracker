@@ -13,14 +13,14 @@
     },
     "appId": "blck.mrt",
     "productName": "MusicReleaseTracker",
-    "extraFiles": [
-      {
-        "from": "buildResources/MusicReleaseTracker.${ext}",
-        "to": "buildResources/MusicReleaseTracker.${ext}"
-      }
-    ],
     "win": {
       "artifactName": "MRT-${version}-win.${ext}",
+      "extraFiles": [
+        {
+          "from": "buildResources/MusicReleaseTracker.exe",
+          "to": "buildResources/MusicReleaseTracker.exe"
+        }
+      ],
       "asar": true,
       "target": {
         "target": "msi",
@@ -40,6 +40,12 @@
     },
     "linux": {
       "artifactName": "MRT-${version}-linux.${ext}",
+      "extraFiles": [
+        {
+          "from": "buildResources/MusicReleaseTracker",
+          "to": "buildResources/MusicReleaseTracker"
+        }
+      ],
       "target": [
         {
           "target": "AppImage",

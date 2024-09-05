@@ -65,7 +65,10 @@ jobs:
       run: |
         cd vue
         npm run distInstaller
-        echo "installer_name=$(ls vue/distribution/MRT-*.*)" >> $GITHUB_ENV
+    - name: Output name
+      run: |
+        cd vue
+        echo "installer_name=$(ls vue/distribution/MRT-*)" >> $GITHUB_ENV
     - name: Upload installer
       uses: actions/upload-artifact@v4
       with:

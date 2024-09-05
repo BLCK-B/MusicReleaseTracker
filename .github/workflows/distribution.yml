@@ -49,8 +49,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 22
-        cache: 'npm'
-        cache-dependency-path: 'vue/package-lock.json'
     - run: npm ci
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew

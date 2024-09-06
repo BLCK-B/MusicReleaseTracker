@@ -68,11 +68,12 @@ jobs:
     - name: Output name
       run: |
         cd vue
-        echo "installer_name=$(ls vue/distribution/MRT-*)" >> $GITHUB_ENV
+        installer_name=$(ls vue/distribution/MRT-*)
+        echo "installer_name=${installer_name}" >> $GITHUB_ENV
     - name: Upload installer
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.installer_name }}
+        name: ${env.installer_name}
         path: vue/distribution/MRT-*.*
         if-no-files-found: error
         overwrite: true

@@ -12,8 +12,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: downloaded
-          pattern: '*-latest*'
-          merge-multiple: true
+          name: windows-latest
+          #merge-multiple: true
       - name: Release
         uses: softprops/action-gh-release@v2
         with:

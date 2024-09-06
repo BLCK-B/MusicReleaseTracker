@@ -6,7 +6,7 @@ on:
       proceed:
         description: 'Build native executables and package with electron-builder? yes/no'
         required: true
-        default: 'no'
+        default: 'yes'
 env:
   JAVA_VERSION: '22'
 
@@ -87,12 +87,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: downloaded
-          pattern: MRT-*
+          pattern: '*-latest'
           merge-multiple: true
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.MRT-draft-token }}
           draft: true
           name: Draft release
           files: downloaded/**

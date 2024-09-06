@@ -6,7 +6,6 @@
   "type": "module",
   "main": "electron-main.js",
   "private": true,
-  "artifactName": "MRT-${version}-win.${ext}",
   "build": {
     "directories": {
       "output": "distribution",
@@ -14,13 +13,14 @@
     },
     "appId": "blck.mrt",
     "productName": "MusicReleaseTracker",
-    "extraFiles": [
-      {
-        "from": "buildResources/MusicReleaseTracker.exe",
-        "to": "buildResources/MusicReleaseTracker.exe"
-      }
-    ],
     "win": {
+      "artifactName": "MRT-${version}-win.${ext}",
+      "extraFiles": [
+        {
+          "from": "buildResources/MusicReleaseTracker.exe",
+          "to": "buildResources/MusicReleaseTracker.exe"
+        }
+      ],
       "asar": true,
       "target": {
         "target": "msi",
@@ -39,6 +39,13 @@
       "runAfterFinish": false
     },
     "linux": {
+      "artifactName": "MRT-${version}-linux.${ext}",
+      "extraFiles": [
+        {
+          "from": "buildResources/MusicReleaseTracker",
+          "to": "buildResources/MusicReleaseTracker"
+        }
+      ],
       "target": [
         {
           "target": "AppImage",
@@ -47,7 +54,7 @@
           ]
         }
       ],
-      "icon": "buildResources/MRTicon.ico",
+      "icon": "buildResources/MRTicon.png",
       "category": "Utility"
     }
   },

@@ -72,7 +72,7 @@ dependencies {
 
 bootJar {
     duplicatesStrategy = 'exclude'
-    archiveFileName = "MRT-${version}-.jar"
+    archiveFileName = "MRT-${version}.jar"
 }
 
 sourceSets {

@@ -3,10 +3,15 @@ name: distribution
 on:
   workflow_dispatch:
     inputs:
-      proceed:
+      make-native:
         description: 'Build native executables and package with electron-builder? yes/no'
         required: true
-        default: 'no'
+        default: 'yes'
+      make-draft:
+        description: 'Make draft release? yes/no'
+        required: true
+        default: 'yes'
+      
 env:
   JAVA_VERSION: '22'
 
@@ -39,8 +44,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest] # , macos-latest
-        proceed: [yes]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        make-native: [yes]
+        make-draft: [yes]
       fail-fast: true
     steps:
     - uses: actions/checkout@v4
@@ -75,4 +81,22 @@ jobs:
         name: ${{ matrix.os }}
         path: vue/distribution/MRT-*.*
         if-no-files-found: error
-        overwrite: true
+
+  draft-release:
+    runs-on: ubuntu-latest
+    needs: native-and-electron
+    if: ${{ inputs.proceed == 'yes' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download candidate artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded
+          pattern: '*-latest'
+          merge-multiple: true
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: downloaded/**
+          name: Draft release
+          draft: true

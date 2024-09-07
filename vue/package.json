@@ -22,12 +22,9 @@
         }
       ],
       "asar": true,
-      "target": {
-        "target": "msi",
-        "arch": [
-          "x64"
-        ]
-      },
+      "target": [
+        "msi"
+      ],
       "icon": "buildResources/MRTicon.ico"
     },
     "msi": {
@@ -47,15 +44,25 @@
         }
       ],
       "target": [
-        {
-          "target": "AppImage",
-          "arch": [
-            "x64"
-          ]
-        }
+        "AppImage"
       ],
       "icon": "buildResources/MRTicon.png",
       "category": "Utility"
+    },
+    "mac": {
+      "artifactName": "MRT-${version}-mac.${ext}",
+      "extraFiles": [
+        {
+          "from": "buildResources/MusicReleaseTracker",
+          "to": "buildResources/MusicReleaseTracker"
+        }
+      ],
+      "target": [
+        "DMG"
+      ],
+      "icon": "buildResources/AplIcon.png",
+      "category": "public.app-category.utilities",
+      "darkModeSupport": true
     }
   },
   "scripts": {

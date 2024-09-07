@@ -13,6 +13,7 @@
     },
     "appId": "blck.mrt",
     "productName": "MusicReleaseTracker",
+    "asar": true,
     "win": {
       "artifactName": "MRT-${version}-win.${ext}",
       "extraFiles": [
@@ -21,7 +22,6 @@
           "to": "buildResources/MusicReleaseTracker.exe"
         }
       ],
-      "asar": true,
       "target": [
         "msi"
       ],

@@ -58,7 +58,12 @@
         }
       ],
       "target": [
-        "DMG"
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
       ],
       "icon": "buildResources/AplIcon.png",
       "category": "public.app-category.utilities",

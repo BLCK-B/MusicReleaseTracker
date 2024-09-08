@@ -42,8 +42,9 @@ graalvmNative {
         imageName.set("MusicReleaseTracker")
         buildArgs.add('--verbose')
         // https://graalvm.org/dev/reference-manual/native-image/optimizations-and-performance
-        buildArgs.add('-O1')
-//        buildArgs.add('-Ob')
+//        buildArgs.add('-O1')
+        buildArgs.add('-H:Log=registerResource:3')
+        buildArgs.add('-Ob')
     }
 }
 

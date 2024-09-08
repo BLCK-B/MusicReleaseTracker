@@ -160,8 +160,8 @@ export default {
 }
 .imageSettings,
 .imageScrape {
-  height: 34px;
-  width: 34px;
+  height: 35px;
+  width: 35px;
 }
 .settingsButton:hover,
 .scrapeButton:hover {
@@ -170,8 +170,8 @@ export default {
 .settingsButton {
   border: none;
   padding: 0;
-  height: 34px;
-  width: 34px;
+  height: 35px;
+  width: 35px;
   background-color: var(--accent-color);
   margin-right: 8px;
 }
@@ -179,9 +179,9 @@ export default {
   border: none;
   padding: 0;
   background-color: var(--accent-color);
-  height: 34px;
-  width: 34px;
-  margin-right: 25px;
+  height: 35px;
+  width: 35px;
+  margin-right: 15px;
   border-radius: 50px;
 }
 .scrapeActive {
@@ -201,10 +201,10 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   background-color: var(--duller-color);
-  margin-right: 6px;
+  margin-right: 5px;
   opacity: 0.85;
 }
-.tabs :hover {
+.tabs:hover {
   opacity: 1;
 }
 .active {

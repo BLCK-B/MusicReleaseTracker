@@ -1,12 +1,22 @@
 .idea/
-build/
 META-INF/
 MRT/
 out/
 musicdata.db
 
+# include (only) graal aot tracing
+!build/
+build/*
+!build/resources/
+build/resources/*
+!build/resources/aot/
+build/resources/aot/*
+!build/resources/aot/META-INF/
+build/resources/aot/META-INF/*
+!build/resources/aot/META-INF/native-image/
+
 .gradle
-build/
+# include graal AoT tracing
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
@@ -19,7 +29,6 @@ build/
 *.iws
 *.iml
 *.ipr
-out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 

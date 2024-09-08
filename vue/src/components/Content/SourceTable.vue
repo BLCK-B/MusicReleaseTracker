@@ -185,6 +185,7 @@ th {
 }
 .album-song {
   border-left: 30px solid var(--primary-color);
+  border-right: 0px solid transparent;
 }
 .future-date {
   opacity: 40%;

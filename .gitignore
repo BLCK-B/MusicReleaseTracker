@@ -7,6 +7,10 @@ musicdata.db
 
 .gradle
 build/
+# include graal AoT tracing
+!build/resources/
+!build/resources/aot/
+!build/resources/aot/META-INF
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

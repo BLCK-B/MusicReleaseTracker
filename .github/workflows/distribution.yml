@@ -38,16 +38,14 @@ jobs:
         with:
           name: MRT.jar
           path: build/libs/MRT-*.jar
-          overwrite: true
 
   native-and-electron:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         make-native: [yes]
-
-      fail-fast: true
     steps:
       - uses: actions/checkout@v4
       - name: Setup GraalVM

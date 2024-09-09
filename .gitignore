@@ -5,15 +5,7 @@ out/
 musicdata.db
 
 # include (only) graal aot tracing
-!build/
-build/*
-!build/resources/
-build/resources/*
-!build/resources/aot/
-build/resources/aot/*
-!build/resources/aot/META-INF/
-build/resources/aot/META-INF/*
-!build/resources/aot/META-INF/native-image/
+build/
 
 .gradle
 # include graal AoT tracing

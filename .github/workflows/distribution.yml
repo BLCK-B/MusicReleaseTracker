@@ -63,10 +63,16 @@ jobs:
         run: |
           cd vue
           npm ci
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: Build bootJar to create file structure
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bootJar
+      - name: Copy AOT tracing info
+        run: cp vue/buildResources/graal-tracing/* build/resources/aot/META-INF/native-image/
       - name: Build native executable
-        run: ./gradlew nativeCompile
+        run: |
+          chmod +x ./gradlew
+          ./gradlew nativeCompile
       - name: Move native executable
         run: mv build/native/nativeCompile/MusicReleaseTracker* vue/buildResources/
       - name: Electron builder
@@ -95,6 +101,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: downloaded/**
+          files: downloaded/**/*.{AppImage,dmg,msi}
           name: Draft release
           draft: true

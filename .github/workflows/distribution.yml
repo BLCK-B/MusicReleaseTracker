@@ -101,6 +101,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: downloaded/**
+          files: downloaded/**/*.{AppImage,dmg,msi}
           name: Draft release
           draft: true

@@ -181,7 +181,7 @@ export default {
   background-color: var(--accent-color);
   height: 35px;
   width: 35px;
-  margin-right: 15px;
+  margin-right: 19px;
   border-radius: 50px;
 }
 .scrapeActive {

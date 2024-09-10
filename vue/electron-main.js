@@ -12,7 +12,7 @@ app.disableHardwareAcceleration();
 let externalEXE;
 
 function createWindow() {
-  Menu.setApplicationMenu(null);
+  if (process.env.NODE_ENV !== "development") Menu.setApplicationMenu(null);
   const win = new BrowserWindow({
     icon: path.join(__dirname, "buildResources/MRTicon.ico"),
     show: false,
@@ -40,12 +40,14 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  externalEXE = spawn("buildResources/MusicReleaseTracker", {
-    detached: true,
-    stdio: "ignore", // ignore stdio to prevent blocking
-  });
+  if (process.env.NODE_ENV !== "development") {
+    externalEXE = spawn("buildResources/MusicReleaseTracker", {
+      detached: true,
+      stdio: "ignore", // ignore stdio to prevent blocking
+    });
 
-  externalEXE.unref(); // allow the parent process to exit independently
+    externalEXE.unref(); // allow the parent process to exit independently
+  }
 
   createWindow();
 

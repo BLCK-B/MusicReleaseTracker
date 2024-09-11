@@ -28,7 +28,7 @@
       "icon": "buildResources/MRTicon.ico"
     },
     "msi": {
-      "perMachine": false,
+      "perMachine": true,
       "oneClick": false,
       "createDesktopShortcut": false,
       "createStartMenuShortcut": true,

@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Menu, shell } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
@@ -20,10 +20,15 @@ function createWindow() {
     width: 900,
     height: 650,
     minHeight: 450,
-    minWidth: 700,
+    minWidth: 720,
     webPreferences: {
       preload: path.join(__dirname, "electron-preload.js"),
     },
+  });
+
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: "deny" };
   });
 
   win.loadURL("http://localhost:57782");

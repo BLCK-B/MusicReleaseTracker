@@ -1,0 +1,37 @@
+name: Bug Report
+description: Report an issue or unexpected behavior
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        - For questions or suggestions, use the discussions page.
+  - type: checkboxes
+    attributes:
+      label: Guidelines
+      options:
+        - label: I have searched the issue tracker for similar issues.
+          required: true
+        - label: This issue contains only one bug or bugs with a common origin.
+          required: true
+  - type: input
+    attributes:
+      label: MusicReleaseTracker version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Operating system
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Bug description and reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: |
+        You can include screenshots or log files.

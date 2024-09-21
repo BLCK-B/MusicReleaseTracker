@@ -27,16 +27,6 @@ You will no longer have to search social media or streaming services. Never miss
 
 Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
 
-Setup
--
-
-**dependencies:** A web browser: UI is rendered there. Works best with firefox. Linux: OpenJDK.
-
-**Windows:** Download and install. When launched, Spring terminal and browser window/tab will open.
-
-**Linux:** Run jar by ```java -jar XXX.jar```
-
-**macOS:** *Should be same as Linux. Not tested. Can someone confirm?
 
 ---
 

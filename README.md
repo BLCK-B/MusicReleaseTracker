@@ -5,7 +5,7 @@
 <h2 align="center">MusicReleaseTracker</h2>
 
 <p align="center">
-Multi-source music scraper that helps you follow latest songs. <br> Available for Windows, Linux, macOS*.
+Multi-source music scraper that helps you follow latest songs. <br> Available for Windows, Linux, macOS.
 </p>
 
 <p align="center">

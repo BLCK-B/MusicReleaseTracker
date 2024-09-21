@@ -1,40 +1,37 @@
 name: Bug Report
-description: File a bug report.
+description: Report an issue or unexpected behavior
 title: "[Bug]: "
 labels: ["bug"]
 body:
-  - type: dropdown
-    id: version
+  - type: markdown
     attributes:
-      label: Version
-      description: What version of our software are you running?
+      value: |
+        - For questions or suggestions, use the discussions page.
+  - type: checkboxes
+    attributes:
+      label: Guidelines
       options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
-      default: 0
+        - label: I have searched the issue tracker for similar issues.
+          required: true
+        - label: This issue contains only one bug or bugs with a common origin.
+          required: true
+  - type: input
+    attributes:
+      label: MusicReleaseTracker version
     validations:
       required: true
-  - type: dropdown
-    id: browsers
+  - type: input
     attributes:
-      label: What browsers are you seeing the problem on?
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
+      label: Operating system
+    validations:
+      required: true
   - type: textarea
-    id: logs
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
-  - type: checkboxes
-    id: terms
+      label: Bug description and reproduction steps
+    validations:
+      required: true
+  - type: textarea
     attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com). 
-      options:
-        - label: I agree to follow this project's Code of Conduct
-          required: true
+      label: Additional information
+      description: |
+        You can include screenshots or log files.

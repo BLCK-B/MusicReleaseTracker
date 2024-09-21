@@ -1,0 +1,33 @@
+name: Critical
+description: Changes on the side of sources or errors causing program unable to function
+title: "[Critical]: "
+labels: ["critical"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Guidelines
+      options:
+        - label: The issue renders the program or its part unusable.
+          required: true
+        - label: I have searched the issue tracker for similar issues.
+          required: true
+  - type: input
+    attributes:
+      label: MusicReleaseTracker version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Operating system
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Issue description
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Stack trace / log files / screenshots
+    validations:
+      required: true

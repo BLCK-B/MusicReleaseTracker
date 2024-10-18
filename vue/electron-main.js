@@ -44,14 +44,19 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(() => {
-  if (process.env.NODE_ENV !== "development") {
+function startBackend() {
+  return new Promise((resolve, reject) => {
     externalEXE = spawn("buildResources/MusicReleaseTracker", {
       detached: true,
-      stdio: "ignore", // ignore stdio to prevent blocking
+      stdio: "ignore",
     });
+    externalEXE.unref();
+  });
+}
 
-    externalEXE.unref(); // allow the parent process to exit independently
+app.whenReady().then(async () => {
+  if (process.env.NODE_ENV !== "development") {
+    await startBackend();
   }
 
   createWindow();

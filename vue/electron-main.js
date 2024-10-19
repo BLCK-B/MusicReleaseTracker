@@ -14,7 +14,6 @@ app.disableHardwareAcceleration();
 let externalEXE;
 
 function createWindow() {
-  if (process.env.NODE_ENV !== "development") Menu.setApplicationMenu(null);
   const win = new BrowserWindow({
     icon: path.join(__dirname, "buildResources/MRTicon.ico"),
     show: false,

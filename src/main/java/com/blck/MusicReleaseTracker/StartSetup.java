@@ -53,7 +53,7 @@ public class StartSetup {
         String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
         String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath,  "musicdata.db");
         Path configPath = Paths.get(appDataPath, "MRTsettings.json");
-        Path errorLogsPath = Paths.get(appDataPath, "errorlogs.txt");
+        Path errorLogsPath = Paths.get("errorlogs.txt");
 
         store.setAppDataPath(appDataPath);
         store.setConfigPath(configPath);

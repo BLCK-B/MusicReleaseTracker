@@ -3,6 +3,8 @@ import { app, BrowserWindow, Menu, shell } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
+import axios from "axios";
+axios.defaults.baseURL = "http://localhost:57782";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,28 +46,24 @@ function createWindow() {
   });
 }
 
-function startBackend() {
-  return new Promise((resolve, reject) => {
-    externalEXE = spawn("buildResources/MusicReleaseTracker", {
-      detached: true,
-      stdio: "ignore",
+app.whenReady().then(() => {
+  // if (process.env.NODE_ENV !== "development") {
+  externalEXE = spawn("buildResources/MusicReleaseTracker", {
+    detached: true,
+    stdio: "ignore",
+  });
+  externalEXE.unref();
+  // }
+
+  setTimeout(() => {
+    createWindow();
+
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
     });
-    externalEXE.unref();
-  });
-}
-
-app.whenReady().then(async () => {
-  if (process.env.NODE_ENV !== "development") {
-    await startBackend();
-  }
-
-  createWindow();
-
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
+  }, 150);
 });
 
 app.on("window-all-closed", () => {

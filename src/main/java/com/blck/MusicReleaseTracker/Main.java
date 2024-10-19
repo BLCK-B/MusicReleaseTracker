@@ -68,8 +68,7 @@ public class Main {
 
     @Component
     public class StartupRunner implements CommandLineRunner {
-
-        // on startup of springboot server
+        // on startup of spring boot server
         @Override
         public void run(String... args) {
             System.out.println("----------LOCAL SERVER STARTED----------");

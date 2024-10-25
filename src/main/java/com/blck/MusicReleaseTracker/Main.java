@@ -84,6 +84,7 @@ public class Main {
             startSetup.createPathsAndDirs();
             manageDB.migrateDB();
             settingsIO.updateSettings();
+            store.setBackendReady();
         }
     }
 

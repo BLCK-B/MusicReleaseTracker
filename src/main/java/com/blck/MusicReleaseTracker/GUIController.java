@@ -55,6 +55,10 @@ public class GUIController {
         this.manageDB = manageDB;
     }
 
+    public boolean isBackendReady() {
+        return store.isBackendReady();
+    }
+
     public List<String> loadList() {
         return DB.getArtistList();
     }

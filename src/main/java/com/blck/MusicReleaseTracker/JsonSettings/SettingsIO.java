@@ -76,6 +76,8 @@ public class SettingsIO {
     }
 
     public void migrateDataToReference(JsonNode reference, JsonNode current) {
+        if (current == null)
+            return;
         current.fieldNames().forEachRemaining(fieldName -> {
             if (reference.has(fieldName))
                 ((ObjectNode) reference).set(fieldName, current.get(fieldName));
@@ -97,7 +99,8 @@ public class SettingsIO {
         try {
             return objectMapper.readTree(file);
         } catch (IOException e) {
-            log.error(e, ErrorLogging.Severity.SEVERE, "settings file could not be read");
+            log.error(e, ErrorLogging.Severity.WARNING, "error reading settings file - defaulting");
+            defaultSettings();
         }
         return null;
     }

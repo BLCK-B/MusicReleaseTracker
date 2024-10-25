@@ -3,6 +3,8 @@ import { app, BrowserWindow, Menu, shell } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
+import axios from "axios";
+axios.defaults.baseURL = "http://localhost:57782";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,18 +46,26 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(() => {
-  if (process.env.NODE_ENV !== "development") {
-    externalEXE = spawn("buildResources/MusicReleaseTracker", {
-      detached: true,
-      stdio: "ignore", // ignore stdio to prevent blocking
-    });
-
-    externalEXE.unref(); // allow the parent process to exit independently
+// could be better than this polling
+async function checkBackendReady() {
+  while (true) {
+    try {
+      const response = await axios.get("/api/isBackendReady");
+      if (response.data === true) break;
+    } catch (error) {
+      console.error();
+    }
+    await new Promise((resolve) => setTimeout(resolve, 5));
   }
+}
+
+app.whenReady().then(async () => {
+  if (process.env.NODE_ENV !== "development") {
+    externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
+  }
+  await checkBackendReady();
 
   createWindow();
-
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();

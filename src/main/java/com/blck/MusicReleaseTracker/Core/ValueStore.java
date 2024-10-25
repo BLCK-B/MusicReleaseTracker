@@ -29,8 +29,14 @@ public class ValueStore {
     private Path errorLogsPath;
     private String scrapeDate;
     private String appVersion;
+    private boolean backendReady = false;
 
-    public ValueStore() {
+    public boolean isBackendReady() {
+        return backendReady;
+    }
+
+    public void setBackendReady() {
+        backendReady = true;
     }
 
     public String getAppVersion() {

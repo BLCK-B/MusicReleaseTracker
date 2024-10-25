@@ -38,6 +38,11 @@ public class ApiController {
         this.sendRequest = guiController;
     }
 
+    @GetMapping("/isBackendReady")
+    public boolean isBackendReady() {
+        return sendRequest.isBackendReady();
+    }
+
     @GetMapping("/loadList")
     public List<String> loadList() {
         return sendRequest.loadList();

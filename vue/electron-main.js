@@ -62,7 +62,6 @@ async function checkBackendReady() {
 app.whenReady().then(async () => {
   if (process.env.NODE_ENV !== "development") {
     externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
-    externalEXE.unref();
   }
   await checkBackendReady();
 
@@ -72,4 +71,10 @@ app.whenReady().then(async () => {
       createWindow();
     }
   });
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });

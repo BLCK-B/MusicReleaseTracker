@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -61,6 +61,24 @@ public class SettingsIOTest {
             throw new RuntimeException(e);
         }
         lenient().when(valueStore.getConfigPath()).thenReturn(testSettingsPath);
+    }
+
+    @Test
+    void readJsonFile() {
+        assertTrue(settingsIO.readJsonFile(settingsFile).size() > 1);
+    }
+
+
+    @Test
+    void readJsonFileParseExceptionTriggersReset() throws IOException {
+        try (FileWriter writer = new FileWriter(settingsFile)) {
+            writer.write("broken json ^%gb#%.#*-*");
+        }
+
+        var json = settingsIO.readJsonFile(settingsFile);
+
+		assertNull(json);
+        verify(log, times(1)).error(any(), eq(ErrorLogging.Severity.WARNING), contains("error reading"));
     }
 
     @Test

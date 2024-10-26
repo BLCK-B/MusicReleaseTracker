@@ -171,6 +171,7 @@ th {
   line-height: 22px;
   left: 80px;
   top: 50px;
+  width: 400px;
 }
 .quickstart .title {
   font-weight: bold;

@@ -1,6 +1,6 @@
 <template>
   <div class="table-container" v-if="hideTable">
-    <div class="table-header">
+    <!-- <div class="table-header">
       <table>
         <thead>
           <tr>
@@ -10,26 +10,39 @@
           </tr>
         </thead>
       </table>
-    </div>
+    </div> -->
 
     <div class="table-body">
-      <table>
-        <tbody>
-          <br /><br />
-          <tr
-            v-for="(mediaItem, mediaIndex) in processedTableData"
-            :key="mediaIndex"
-            :class="{
-              'album-header': mediaItem.isAlbumHeader,
-              'album-song': mediaItem.isAlbumSong,
-              'future-date': isDateInFuture(mediaItem.date),
-            }">
-            <td class="tdsong">{{ mediaItem.name }}</td>
-            <td class="tdartist" v-if="!hideArtistColumn">{{ mediaItem.artists }}</td>
-            <td class="tddate">{{ this.formatDate(mediaItem.date) }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-for="(mediaItem, mediaIndex) in processedTableData" :key="mediaIndex" class="onePiece">
+        <table>
+          <tbody>
+            <template v-if="mediaItem.songs && mediaItem.songs.length">
+              <tr v-if="mediaItem.album" class="album-header">
+                <td colspan="3">
+                  <strong>{{ mediaItem.album }}</strong>
+                </td>
+              </tr>
+              <tr
+                v-for="(song, songIndex) in mediaItem.songs"
+                :key="songIndex"
+                :class="{
+                  'future-date': isDateInFuture(song.date),
+                }">
+                <td class="tdsong">{{ song.name }}</td>
+                <td class="tdartist" v-if="!hideArtistColumn">{{ song.artists }}</td>
+                <td class="tddate">{{ formatDate(song.date) }}</td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr>
+                <td class="tdsong">{{ mediaItem.name }}</td>
+                <td class="tdartist" v-if="!hideArtistColumn">{{ mediaItem.artists }}</td>
+                <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -57,30 +70,30 @@ export default {
   computed: {
     ...mapState(["tableData", "previewVis", "selectedArtist", "isoDates", "sourceTab", "urlExists"]),
     processedTableData() {
-      return this.tableData
-        .map((item) => {
-          if (item.album !== null) {
-            return [
-              {
-                isAlbumHeader: true,
-                name: item.album,
-                date: item.date,
-              },
-              ...item.songs.map((song) => ({
-                isAlbumSong: true,
-                name: song.name,
-              })),
-            ];
-          } else {
-            return {
-              album: false,
-              name: item.name,
-              artists: item.artists,
-              date: item.date,
-            };
-          }
-        })
-        .flat();
+      return this.tableData;
+      // .map((item) => {
+      //   if (item.album !== null) {
+      //     return [
+      //       {
+      //         isAlbumHeader: true,
+      //         name: item.album,
+      //         date: item.date,
+      //       },
+      //       ...item.songs.map((song) => ({
+      //         isAlbumSong: true,
+      //         name: song.name,
+      //       })),
+      //     ];
+      //   } else {
+      //     return {
+      //       album: false,
+      //       name: item.name,
+      //       artists: item.artists,
+      //       date: item.date,
+      //     };
+      //   }
+      // })
+      // .flat();
     },
     hideArtistColumn() {
       return this.sourceTab !== "combview" && this.selectedArtist !== "";
@@ -190,5 +203,11 @@ th {
 }
 .future-date {
   opacity: 40%;
+}
+.onePiece {
+  background-color: rgb(135, 142, 11);
+  margin-bottom: 15px;
+  width: 70%;
+  border-radius: 5px;
 }
 </style>

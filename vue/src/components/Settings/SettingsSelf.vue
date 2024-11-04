@@ -10,9 +10,6 @@
 </template>
 
 <style scoped>
-* {
-  transition: 0.1s;
-}
 .container {
   display: flex;
   justify-content: space-evenly;

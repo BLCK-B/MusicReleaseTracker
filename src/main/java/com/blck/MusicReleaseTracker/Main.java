@@ -67,7 +67,6 @@ public class Main {
 
     @Component
     public class StartupRunner implements CommandLineRunner {
-
         // on startup of springboot server
         @Override
         public void run(String... args) {

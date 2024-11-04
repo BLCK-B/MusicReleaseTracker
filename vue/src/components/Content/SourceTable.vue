@@ -1,40 +1,23 @@
 <template>
   <div class="table-container" v-if="hideTable">
-    <!-- <div class="table-header">
-      <table>
-        <thead>
-          <tr>
-            <th class="song">song</th>
-            <th v-if="!hideArtistColumn" class="artist">artist</th>
-            <th class="date">date</th>
-          </tr>
-        </thead>
-      </table>
-    </div> -->
-
     <div class="table-body">
-      <div v-for="(mediaItem, mediaIndex) in processedTableData" :key="mediaIndex" class="onePiece">
+      <div v-for="(mediaItem, mediaIndex) in this.tableData" :key="mediaIndex" class="aBubble">
         <table>
           <tbody>
             <template v-if="mediaItem.songs && mediaItem.songs.length">
               <tr v-if="mediaItem.album" class="album-header">
-                <td colspan="3">
+                <td colspan="2">
                   <strong>{{ mediaItem.album }}</strong>
                 </td>
+                <td class="tdartist"></td>
+                <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
               </tr>
-              <tr
-                v-for="(song, songIndex) in mediaItem.songs"
-                :key="songIndex"
-                :class="{
-                  'future-date': isDateInFuture(song.date),
-                }">
+              <tr class="album-bubble" v-for="(song, songIndex) in mediaItem.songs" :key="songIndex">
                 <td class="tdsong">{{ song.name }}</td>
-                <td class="tdartist" v-if="!hideArtistColumn">{{ song.artists }}</td>
-                <td class="tddate">{{ formatDate(song.date) }}</td>
               </tr>
             </template>
             <template v-else>
-              <tr>
+              <tr class="single-bubble" :class="{ 'future-date': isDateInFuture(mediaItem.date) }">
                 <td class="tdsong">{{ mediaItem.name }}</td>
                 <td class="tdartist" v-if="!hideArtistColumn">{{ mediaItem.artists }}</td>
                 <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
@@ -69,32 +52,6 @@ export default {
   },
   computed: {
     ...mapState(["tableData", "previewVis", "selectedArtist", "isoDates", "sourceTab", "urlExists"]),
-    processedTableData() {
-      return this.tableData;
-      // .map((item) => {
-      //   if (item.album !== null) {
-      //     return [
-      //       {
-      //         isAlbumHeader: true,
-      //         name: item.album,
-      //         date: item.date,
-      //       },
-      //       ...item.songs.map((song) => ({
-      //         isAlbumSong: true,
-      //         name: song.name,
-      //       })),
-      //     ];
-      //   } else {
-      //     return {
-      //       album: false,
-      //       name: item.name,
-      //       artists: item.artists,
-      //       date: item.date,
-      //     };
-      //   }
-      // })
-      // .flat();
-    },
     hideArtistColumn() {
       return this.sourceTab !== "combview" && this.selectedArtist !== "";
     },
@@ -122,23 +79,22 @@ export default {
 </script>
 
 <style scoped>
-.table-header {
-  flex-shrink: 0;
-  overflow: hidden;
-  z-index: 3;
-  position: fixed;
-  width: calc(100% - 170px);
+.table-container {
+  margin-top: 20px;
 }
 .table-body {
-  flex-grow: 1;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-87px);
   user-select: text;
+  overflow-y: auto;
   margin-bottom: 10vh;
 }
 table {
-  width: 100%;
   min-width: 500px;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 th,
 td {
@@ -150,26 +106,29 @@ th {
   position: sticky;
   top: 0;
 }
-.song,
 .tdsong {
   width: 50%;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: orange;
 }
-.artist,
 .tdartist {
   width: 50%;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: red;
 }
-.date,
 .tddate {
   width: 100px;
   min-width: 100px;
+  background-color: green;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 30px;
 }
 .emptynotice {
   position: fixed;
@@ -189,25 +148,17 @@ th {
 .quickstart .title {
   font-weight: bold;
 }
-.tddate {
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 30px;
-}
-.album-header {
+.aBubble {
   background-color: var(--duller-color);
+  width: 65%;
+  border-radius: 5px;
+  margin-bottom: 3px;
+  min-width: 500px;
 }
-.album-song {
-  border-left: 30px solid var(--primary-color);
-  border-right: 0px solid transparent;
+.single-bubble {
+  background-color: var(--primary-color);
 }
 .future-date {
-  opacity: 40%;
-}
-.onePiece {
-  background-color: rgb(135, 142, 11);
-  margin-bottom: 15px;
-  width: 70%;
-  border-radius: 5px;
+  opacity: 50%;
 }
 </style>

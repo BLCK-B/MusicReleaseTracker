@@ -46,9 +46,6 @@ export default {
 </script>
 
 <style scoped>
-* {
-  transition: 0.1s;
-}
 .title {
   font-weight: bold;
 }
@@ -77,6 +74,7 @@ input[type="checkbox"] {
 }
 
 .colorindicator {
+  transition: 0.3s;
   position: absolute;
   right: 0;
   top: 0;

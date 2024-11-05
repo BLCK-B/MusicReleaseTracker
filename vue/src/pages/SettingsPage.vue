@@ -128,9 +128,6 @@ export default {
 </script>
 
 <style scoped>
-* {
-  transition: 0.1s;
-}
 .settings {
   overflow-y: scroll;
   overflow-x: hidden;

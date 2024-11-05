@@ -1,35 +1,31 @@
 <template>
   <div class="table-container" v-if="hideTable">
-    <div class="table-header">
-      <table>
-        <thead>
-          <tr>
-            <th class="song">song</th>
-            <th v-if="!hideArtistColumn" class="artist">artist</th>
-            <th class="date">date</th>
-          </tr>
-        </thead>
-      </table>
-    </div>
-
     <div class="table-body">
-      <table>
-        <tbody>
-          <br /><br />
-          <tr
-            v-for="(mediaItem, mediaIndex) in processedTableData"
-            :key="mediaIndex"
-            :class="{
-              'album-header': mediaItem.isAlbumHeader,
-              'album-song': mediaItem.isAlbumSong,
-              'future-date': isDateInFuture(mediaItem.date),
-            }">
-            <td class="tdsong">{{ mediaItem.name }}</td>
-            <td class="tdartist" v-if="!hideArtistColumn">{{ mediaItem.artists }}</td>
-            <td class="tddate">{{ this.formatDate(mediaItem.date) }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-for="(mediaItem, mediaIndex) in this.tableData" :key="mediaIndex" class="aBubble">
+        <table>
+          <tbody>
+            <template v-if="mediaItem.songs && mediaItem.songs.length">
+              <tr v-if="mediaItem.album" class="album-header">
+                <td class="tdalbumname">
+                  <strong>{{ mediaItem.album }}</strong>
+                </td>
+                <td class="tdartist"></td>
+                <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
+              </tr>
+              <tr class="album-bubble" v-for="(song, songIndex) in mediaItem.songs" :key="songIndex">
+                <td class="tdsong">{{ song.name }}</td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr class="single-bubble" :class="{ 'future-date': isDateInFuture(mediaItem.date) }">
+                <td class="tdsong">{{ mediaItem.name }}</td>
+                <td class="tdartist" v-if="!hideArtistColumn">{{ mediaItem.artists }}</td>
+                <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -56,32 +52,6 @@ export default {
   },
   computed: {
     ...mapState(["tableData", "previewVis", "selectedArtist", "isoDates", "sourceTab", "urlExists"]),
-    processedTableData() {
-      return this.tableData
-        .map((item) => {
-          if (item.album !== null) {
-            return [
-              {
-                isAlbumHeader: true,
-                name: item.album,
-                date: item.date,
-              },
-              ...item.songs.map((song) => ({
-                isAlbumSong: true,
-                name: song.name,
-              })),
-            ];
-          } else {
-            return {
-              album: false,
-              name: item.name,
-              artists: item.artists,
-              date: item.date,
-            };
-          }
-        })
-        .flat();
-    },
     hideArtistColumn() {
       return this.sourceTab !== "combview" && this.selectedArtist !== "";
     },
@@ -109,23 +79,23 @@ export default {
 </script>
 
 <style scoped>
-.table-header {
-  flex-shrink: 0;
-  overflow: hidden;
-  z-index: 3;
-  position: fixed;
-  width: calc(100% - 170px);
+.table-container {
+  margin-top: 20px;
 }
 .table-body {
-  flex-grow: 1;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-90px);
   user-select: text;
+  overflow-y: auto;
   margin-bottom: 10vh;
 }
 table {
-  width: 100%;
   min-width: 500px;
   border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
 }
 th,
 td {
@@ -137,15 +107,20 @@ th {
   position: sticky;
   top: 0;
 }
-.song,
 .tdsong {
-  width: 50%;
+  width: 80%;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.artist,
+.tdalbumname {
+  width: 50%;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: ellipsis;
+}
 .tdartist {
   width: 50%;
   max-width: 120px;
@@ -153,10 +128,12 @@ th {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.date,
 .tddate {
   width: 100px;
   min-width: 100px;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 10px;
 }
 .emptynotice {
   position: fixed;
@@ -176,19 +153,27 @@ th {
 .quickstart .title {
   font-weight: bold;
 }
-.tddate {
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 30px;
-}
-.album-header {
+.aBubble {
   background-color: var(--duller-color);
+  width: 70%;
+  border-radius: 5px;
+  margin-bottom: 3px;
+  min-width: 500px;
 }
-.album-song {
-  border-left: 30px solid var(--primary-color);
-  border-right: 0px solid transparent;
+.single-bubble {
+  background-color: var(--primary-color);
 }
 .future-date {
-  opacity: 40%;
+  opacity: 50%;
+}
+tr.single-bubble {
+  display: flex;
+  justify-content: space-between;
+}
+.album-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0px;
 }
 </style>

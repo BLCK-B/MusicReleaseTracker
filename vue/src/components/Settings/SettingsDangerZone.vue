@@ -60,9 +60,6 @@ export default {
 </script>
 
 <style scoped>
-* {
-  transition: 0.1s;
-}
 .title {
   font-weight: bold;
 }

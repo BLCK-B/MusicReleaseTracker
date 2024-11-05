@@ -220,7 +220,7 @@ export default {
 
 .scrapenotice {
   position: absolute;
-  right: 65px;
+  right: 62px;
   top: 2px;
   height: 35px;
   z-index: 3;

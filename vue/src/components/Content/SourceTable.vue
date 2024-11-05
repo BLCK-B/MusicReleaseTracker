@@ -6,7 +6,7 @@
           <tbody>
             <template v-if="mediaItem.songs && mediaItem.songs.length">
               <tr v-if="mediaItem.album" class="album-header">
-                <td colspan="2">
+                <td class="tdalbumname">
                   <strong>{{ mediaItem.album }}</strong>
                 </td>
                 <td class="tdartist"></td>
@@ -86,7 +86,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateX(-87px);
+  transform: translateX(-90px);
   user-select: text;
   overflow-y: auto;
   margin-bottom: 10vh;
@@ -95,6 +95,7 @@ table {
   min-width: 500px;
   border-collapse: collapse;
   table-layout: fixed;
+  width: 100%;
 }
 th,
 td {
@@ -107,12 +108,18 @@ th {
   top: 0;
 }
 .tdsong {
-  width: 50%;
+  width: 80%;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background-color: orange;
+}
+.tdalbumname {
+  width: 50%;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: ellipsis;
 }
 .tdartist {
   width: 50%;
@@ -120,15 +127,13 @@ th {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  background-color: red;
 }
 .tddate {
   width: 100px;
   min-width: 100px;
-  background-color: green;
   display: flex;
   justify-content: flex-end;
-  margin-right: 30px;
+  margin-right: 10px;
 }
 .emptynotice {
   position: fixed;
@@ -150,7 +155,7 @@ th {
 }
 .aBubble {
   background-color: var(--duller-color);
-  width: 65%;
+  width: 70%;
   border-radius: 5px;
   margin-bottom: 3px;
   min-width: 500px;
@@ -160,5 +165,15 @@ th {
 }
 .future-date {
   opacity: 50%;
+}
+tr.single-bubble {
+  display: flex;
+  justify-content: space-between;
+}
+.album-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0px;
 }
 </style>

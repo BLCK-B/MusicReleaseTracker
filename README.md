@@ -16,8 +16,10 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 
 ##
 
+<p align="center">
 <img src="https://github.com/user-attachments/assets/45c03cce-bccb-491f-848e-4e1c0d6c7b60" width="500px"/> <br>
 <img src="https://github.com/user-attachments/assets/11ef4c87-c21b-4c7c-bb55-fc76b835f63a" width="500px"/>
+</p>
 
 ##
 
@@ -25,8 +27,16 @@ Latest information is compiled into a simple overview. This is achieved through 
 
 You will no longer have to search social media or streaming services. Never miss a new song again.
 
-Currently available sources: Beatport, Musicbrainz, Junodownload, Youtube.
+Currently available sources: `Beatport`, `Musicbrainz`, `Junodownload`, `Youtube`.
 
+
+##
+
+**Issue reporting and contributing**
+
+If you find a bug, which may well happen, report it at the [issue tracker](https://github.com/BLCK-B/MusicReleaseTracker/issues). An [email](https://github.com/BLCK-B) is acceptable, too.
+
+For compilation and contribution, see [CONTRIBUTING.md](https://github.com/BLCK-B/MusicReleaseTracker/blob/main/CONTRIBUTING.md).
 
 ---
 

@@ -91,7 +91,7 @@ public class ScrapeProcessTest {
         assertEquals(0.25, values.get(0));
         assertEquals(0.5, values.get(1));
         assertEquals(0.75, values.get(2));
-        assertEquals(1, values.get(3));
+        verify(sseController, atLeastOnce()).complete();
     }
 
     @Test

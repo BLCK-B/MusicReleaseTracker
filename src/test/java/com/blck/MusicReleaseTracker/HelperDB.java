@@ -26,11 +26,14 @@ import java.sql.*;
 
 public class HelperDB {
 
+    final static Path testResources = Paths.get("src", "test", "testresources");
     final static String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
     final static Path DBfilePath = Paths.get("src", "test", "testresources", "testdb.db");
 
     public static void redoTestDB() {
         try {
+            if (!Files.exists(testResources))
+                Files.createDirectory(testResources);
             if (Files.exists(DBfilePath))
                 Files.delete(DBfilePath);
         } catch (IOException e) {

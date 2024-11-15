@@ -17,6 +17,7 @@ package com.blck.MusicReleaseTracker.JsonSettings;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -37,6 +39,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class SettingsIOTest {
 
+    final static Path testResources = Paths.get("src", "test", "testresources");
     final static Path testSettingsPath = Paths.get("src", "test", "testresources", "testSettings.json");
     final static File settingsFile = new File(testSettingsPath.toString());
 
@@ -46,6 +49,12 @@ public class SettingsIOTest {
     ErrorLogging log;
     @InjectMocks
     SettingsIO settingsIO;
+
+    @BeforeAll
+    static void init() throws IOException {
+        if (!Files.exists(testResources))
+            Files.createDirectory(testResources);
+    }
 
     @BeforeEach
     void setUp() {

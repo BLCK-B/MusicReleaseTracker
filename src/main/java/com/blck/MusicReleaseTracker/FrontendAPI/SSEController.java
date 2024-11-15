@@ -39,19 +39,21 @@ public class SSEController {
         return emitter;
     }
 
-    public boolean sendProgress(double state) {
+    public void complete() {
+		sendProgress(1.0);
+		emitter.complete();
+    }
+
+    public void sendProgress(double state) {
         try {
             emitter.send(String.valueOf(state));
-            if (state == 1.0)
-                emitter.complete();
         }
         catch (IllegalStateException e) {
-            return true;
+            log.error(e, ErrorLogging.Severity.INFO, "SSE progress controller called while being unopened");
         }
         catch (Exception e) {
-            log.error(e, ErrorLogging.Severity.INFO, "error in progress emitter");
+            log.error(e, ErrorLogging.Severity.WARNING, "error in progress emitter");
         }
-        return false;
     }
 
 }

@@ -54,15 +54,15 @@ public class ScrapeProcess {
 			return;
 		int remaining = 1;
 		double progress = 0.0;
-		while (remaining != 0 && !scrapeCancel) {
+		while (!scrapeCancel) {
 			remaining = scraperManager.scrapeNext();
-
 			progress = ((double) initSize - (double) remaining) / (double) initSize;
-			if (progress != 1.0)
-				if (SSE.sendProgress(progress))
-					scrapeCancel = true;
+			if (progress == 1.0)
+				break;
+			else
+				SSE.sendProgress(progress);
 		}
-		SSE.sendProgress(1.0);
+		SSE.complete();
 		System.gc();
 	}
 

@@ -31,7 +31,8 @@ public class HelperDB {
 
     public static void redoTestDB() {
         try {
-            Files.delete(DBfilePath);
+            if (Files.exists(DBfilePath))
+                Files.delete(DBfilePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

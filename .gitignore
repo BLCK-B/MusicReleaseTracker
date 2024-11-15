@@ -4,7 +4,6 @@ MRT/
 out/
 musicdata.db
 src/test/testresources/*
-!src/test/testresources/.gitkeep
 
 # include (only) graal aot tracing
 build/

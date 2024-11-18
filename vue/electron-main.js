@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { app, BrowserWindow, Menu, shell } from "electron";
+import { app, BrowserWindow, Menu, shell, ipcMain } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
@@ -47,6 +47,10 @@ function createWindow() {
 
   win.loadURL("http://localhost:57782");
 
+  win.webContents.on("did-finish-load", () => {
+    win.webContents.setZoomFactor(1);
+  });
+
   win.once("ready-to-show", () => {
     win.show();
   });
@@ -54,6 +58,13 @@ function createWindow() {
   win.on("closed", () => {
     if (externalEXE) {
       externalEXE.kill();
+    }
+  });
+
+  ipcMain.on("set-zoom-factor", (event, zoomFactor) => {
+    console.log("ass", zoomFactor);
+    if (win) {
+      win.webContents.setZoomFactor(zoomFactor);
     }
   });
 }

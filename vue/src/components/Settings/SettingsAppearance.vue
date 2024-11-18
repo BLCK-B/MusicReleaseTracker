@@ -31,6 +31,15 @@
   <div class="belowAppearance">
     <input type="checkbox" :checked="autoTheme" @change="$emit('set-setting', 'autoTheme', $event.target.checked)" />
     <label>Match system theme</label>
+
+    <div class="scaling">
+      Scale:
+      <select v-model.number="zoomFactor" @change="updateZoomFactor" class="scale-control">
+        <option v-for="level in zoomLevels" :key="level" :value="level">
+          {{ level.toFixed(1) }}
+        </option>
+      </select>
+    </div>
   </div>
 </template>
 
@@ -41,6 +50,21 @@ export default {
     primaryColor: String,
     accentColor: String,
     autoTheme: Boolean,
+    initialZoomFactor: {
+      type: Number,
+      default: 1,
+    },
+  },
+  data() {
+    return {
+      zoomFactor: this.initialZoomFactor,
+      zoomLevels: [0.9, 1, 1.1, 1.2],
+    };
+  },
+  methods: {
+    updateZoomFactor() {
+      window.ipcRenderer.send("set-zoom-factor", this.zoomFactor);
+    },
   },
 };
 </script>
@@ -72,7 +96,6 @@ export default {
 input[type="checkbox"] {
   margin-right: 6px;
 }
-
 .colorindicator {
   transition: 0.3s;
   position: absolute;
@@ -86,5 +109,13 @@ input[type="checkbox"] {
 }
 .disabled {
   opacity: 0.3;
+}
+.scaling {
+  padding: 4px;
+}
+.scale-control {
+  background-color: white;
+  border: none;
+  border-radius: 4px;
 }
 </style>

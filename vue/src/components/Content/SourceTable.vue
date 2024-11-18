@@ -88,11 +88,9 @@ export default {
   align-items: center;
   transform: translateX(-90px);
   user-select: text;
-  overflow-y: auto;
   margin-bottom: 10vh;
 }
 table {
-  min-width: 500px;
   border-collapse: collapse;
   table-layout: fixed;
   width: 100%;
@@ -109,21 +107,18 @@ th {
 }
 .tdsong {
   width: 80%;
-  max-width: 120px;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
 }
 .tdalbumname {
   width: 50%;
-  max-width: 120px;
   white-space: nowrap;
   overflow: visible;
   text-overflow: ellipsis;
 }
 .tdartist {
-  width: 50%;
-  max-width: 120px;
+  width: 60%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -158,7 +153,6 @@ th {
   width: 70%;
   border-radius: 5px;
   margin-bottom: 3px;
-  min-width: 500px;
 }
 .single-bubble {
   background-color: var(--primary-color);
@@ -175,5 +169,22 @@ tr.single-bubble {
   justify-content: space-between;
   align-items: center;
   padding: 3px 0px;
+}
+@media (max-width: 1100px) {
+  .aBubble {
+    width: 85%;
+  }
+  .table-body {
+    transform: translateX(-30px);
+  }
+}
+@media (max-width: 950px) {
+  .aBubble {
+    margin-left: 150px;
+    width: 95%;
+  }
+  .table-body {
+    transform: translateX(-80px);
+  }
 }
 </style>

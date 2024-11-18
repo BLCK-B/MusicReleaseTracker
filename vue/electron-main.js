@@ -29,7 +29,7 @@ function createWindow() {
     backgroundColor: "#000000",
     width: mainWindowState.width,
     height: mainWindowState.height,
-    minHeight: 450,
+    minHeight: 500,
     minWidth: 720,
     x: mainWindowState.x,
     y: mainWindowState.y,

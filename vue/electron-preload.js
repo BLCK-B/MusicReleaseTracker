@@ -1,6 +1,4 @@
 /* eslint-disable no-undef */
-const { contextBridge, ipcRenderer } = require("electron");
-
 window.addEventListener("DOMContentLoaded", () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector);
@@ -10,13 +8,4 @@ window.addEventListener("DOMContentLoaded", () => {
   for (const type of ["chrome", "node", "electron"]) {
     replaceText(`${type}-version`, process.versions[type]);
   }
-});
-
-contextBridge.exposeInMainWorld("ipcRenderer", {
-  send: (channel, data) => {
-    const validChannels = ["set-zoom-factor"];
-    if (validChannels.includes(channel)) {
-      ipcRenderer.send(channel, data);
-    }
-  },
 });

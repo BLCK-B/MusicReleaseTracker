@@ -29,6 +29,9 @@ public class HelperDB {
     public final static String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
     public final static Path DBfilePath = Paths.get("src", "test", "testresources", "testdb.db");
 
+    public final static String legacyTestDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "musicdata.db");
+    public final static String testTemplateDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "DBTemplate.db");
+
     public static void deleteDB() {
         try {
             if (Files.exists(DBfilePath))
@@ -116,5 +119,87 @@ public class HelperDB {
             throw new RuntimeException(e);
         }
     }
+
+    public static void createDBv1(String path) {
+        try (Connection conn = DriverManager.getConnection(path)) {
+            Statement stmt = conn.createStatement();
+            stmt.addBatch("""
+                CREATE TABLE IF NOT EXISTS artists (
+                artist text PRIMARY KEY,
+                urlbeatport text
+                );
+                """);
+            stmt.addBatch("""
+                CREATE TABLE IF NOT EXISTS combview (
+                song text NOT NULL,
+                artist text NOT NULL,
+                date text NOT NULL
+                );
+                """);
+            conn.setAutoCommit(false);
+            stmt.executeBatch();
+            conn.setAutoCommit(true);
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void createDBv2(String path) {
+        try (Connection conn = DriverManager.getConnection(path)) {
+            Statement stmt = conn.createStatement();
+            stmt.addBatch("""
+                CREATE TABLE IF NOT EXISTS artists (
+                artist text PRIMARY KEY,
+                urlbeatport text
+                );
+                """);
+            stmt.addBatch("""
+                CREATE TABLE IF NOT EXISTS combview (
+                song text NOT NULL,
+                artist text NOT NULL,
+                date text NOT NULL,
+                album text
+                );
+                """);
+            conn.setAutoCommit(false);
+            stmt.executeBatch();
+            conn.setAutoCommit(true);
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void createDBv3(String path) {
+        try (Connection conn = DriverManager.getConnection(path)) {
+            Statement stmt = conn.createStatement();
+            stmt.addBatch("""
+                CREATE TABLE IF NOT EXISTS artists (
+                artist text PRIMARY KEY,
+                urlbeatport text
+                );
+                """);
+            conn.setAutoCommit(false);
+            stmt.executeBatch();
+            conn.setAutoCommit(true);
+            stmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void deleteLegacyFiles(){
+        Path s1 = Paths.get("src", "test", "testresources", "musicdata.db");
+        Path s2 = Paths.get("src", "test", "testresources", "DBTemplate.db");
+			try {
+                if (Files.exists(s1))
+				    Files.delete(s1);
+                if (Files.exists(s2))
+                    Files.delete(s2);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
 }

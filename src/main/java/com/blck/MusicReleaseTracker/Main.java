@@ -80,7 +80,7 @@ public class Main {
             """);
             store.setAppVersion(appConfig.version());
             startSetup.createPathsAndDirs();
-            manageDB.migrateDB();
+//            manageDB.migrateDB();
             settingsIO.updateSettings();
             store.setBackendReady();
         }

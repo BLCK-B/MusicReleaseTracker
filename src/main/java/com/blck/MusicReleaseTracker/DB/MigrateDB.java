@@ -20,9 +20,14 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MigrateDB {
@@ -102,62 +107,53 @@ public class MigrateDB {
         }
     }
 
-    public void migrateDB() {
-        // on start: create DB if not exist, check DB structure, if different -> create new from template and refill with all data possible
-        final String templateFilePath = store.getAppDataPath() + "DBTemplate.db";
-        final String DBtemplatePath = "jdbc:sqlite:" + templateFilePath;
-        final String DBfilePath = store.getAppDataPath() + "musicdata.db";
-
-        File templateFile = new File(templateFilePath);
-        templateFile.delete();
-        createDBandSourceTables(store.getDBpathString());
+    public void migrateDB(Path DBfilePath, Path templateDBfilePath) {
+        if (Files.exists(DBfilePath)) {
+			try {
+				Files.delete(templateDBfilePath);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+        final String DBpath = "jdbc:sqlite:" + DBfilePath;
+        final String DBtemplatePath = "jdbc:sqlite:" + templateDBfilePath;
+        createDBandSourceTables(DBpath);
         createDBandSourceTables(DBtemplatePath);
 
-        // if different structure, fill template artist table data from musicdata and then rename/delete, make new template
-        // this only preserves "artists" data and assumes that the insertion logic will be adjusted after any changes
-        // made to the "artists" table: change in order of columns, adding/removing a column or changing a column's name
-        Map<String, ArrayList<String>> DBMap = getDBStructure(store.getDBpathString());
-        Map<String, ArrayList<String>> DBtemplateMap = getDBStructure(DBtemplatePath);
-        if (!DBMap.equals(DBtemplateMap)) {
-            try (
-                    Connection connDB = DriverManager.getConnection(store.getDBpathString());
-                    Connection connDBtemplate = DriverManager.getConnection(DBtemplatePath)
-            ) {
-                // insert data from musicdata column to template column
-                String sql = "SELECT * FROM artists LIMIT 1000";
-                Statement stmt = connDB.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);
-
-                sql = "insert into artists(artist, urlmusicbrainz, urlbeatport, urljunodownload, urlyoutube) values(?, ?, ?, ?, ?)";
-                PreparedStatement pstmt = connDBtemplate.prepareStatement(sql);
-                ArrayList<String> columnList = DBMap.get("artists");
-                // cycling table rows
-                while (rs.next()) {
-                    // construct sql query for every column, add to batch
-                    for (int i = 0; i < columnList.size(); i++) {
-                        String column = columnList.get(i);
-                        pstmt.setString(i + 1, rs.getString(column));
-                    }
-                    pstmt.addBatch();
-                }
-                connDBtemplate.setAutoCommit(false);
-                pstmt.executeBatch();
-                connDBtemplate.commit();
-                connDBtemplate.setAutoCommit(true);
-                pstmt.close();
-            } catch (Exception e) {
-                log.error(e, ErrorLogging.Severity.SEVERE, "error updating DB file");
-            }
+        var DBstructure = getDBStructure(DBpath);
+        if (!DBstructure.equals(getDBStructure(DBtemplatePath))) {
+            copyArtistsData(DBpath, DBtemplatePath);
             try {
-                File oldFile = new File(DBfilePath);
-                File newFile = new File(templateFilePath);
-                // delete old musicdata
-                oldFile.delete();
-                // rename template to musicdata
-                newFile.renameTo(oldFile);
+                Files.delete(DBfilePath);
+                File newFile = new File(String.valueOf(templateDBfilePath));
+                newFile.renameTo(DBfilePath.toFile());
             } catch (Exception e) {
                 log.error(e, ErrorLogging.Severity.SEVERE, "error renaming/deleting DB files");
             }
+        }
+    }
+
+    public void copyArtistsData(String sourceDBPath, String targetDBpath) {
+        if (targetDBpath.contains("jdbc:sqlite:"))
+            throw new RuntimeException("targetDBpath cannot have sqlite prefix");
+
+        String testTemplateDBpath = String.valueOf(Paths.get("src", "test", "testresources", "DBTemplate.db"));
+
+        var DBcolumns = getDBStructure(sourceDBPath).get("artists");
+        var templateColumns = getDBStructure(targetDBpath).get("artists");
+
+//        if (!DBcolumns.equals(templateColumns))
+
+        List<String> sharedColumns = new ArrayList<>(DBcolumns);
+        sharedColumns.retainAll(templateColumns);
+        String shared = String.join(", ", sharedColumns);
+
+        try (Connection conn = DriverManager.getConnection(sourceDBPath)) {
+            Statement stmt = conn.createStatement();
+            stmt.execute("ATTACH DATABASE '" + testTemplateDBpath + "' AS target_db");
+            stmt.executeUpdate("INSERT INTO target_db.artists (" + shared + ") SELECT " + shared + " FROM artists");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

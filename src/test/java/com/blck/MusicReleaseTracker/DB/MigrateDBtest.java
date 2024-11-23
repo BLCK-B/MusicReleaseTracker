@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Files;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MigrateDBtest {
@@ -38,12 +38,43 @@ public class MigrateDBtest {
 	MigrateDB migrateDB;
 
 	@Test
-	void createsDB() {
+	void createsDBfile() {
 		HelperDB.deleteDB();
 
 		migrateDB.createDBandSourceTables(HelperDB.testDBpath);
 
 		assertTrue(Files.exists(HelperDB.DBfilePath));
+	}
+
+	@Test
+	void createsTables() {
+		migrateDB.createDBandSourceTables(HelperDB.testDBpath);
+
+		var structure = migrateDB.getDBStructure(HelperDB.testDBpath);
+
+		assertAll(
+			() -> assertTrue(structure.containsKey("artists")),
+			() -> assertTrue(structure.containsKey("combview")),
+			() -> assertTrue(structure.containsKey("beatport"))
+		);
+	}
+
+	@Test
+	void structureContainsColumns() {
+		migrateDB.createDBandSourceTables(HelperDB.testDBpath);
+
+		var structure = migrateDB.getDBStructure(HelperDB.testDBpath);
+
+		assertFalse(structure.get("artists").isEmpty());
+	}
+
+	@Test
+	void testStuff() {
+//		HelperDB.deleteLegacyFiles();
+//		HelperDB.createDBv1(HelperDB.legacyTestDBpath);
+//		HelperDB.createDBv1(HelperDB.testTemplateDBpath);
+
+		migrateDB.copyArtistsData(HelperDB.legacyTestDBpath, HelperDB.testTemplateDBpath);
 	}
 
 }

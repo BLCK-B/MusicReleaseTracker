@@ -13,13 +13,11 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DB.DBqueries;
-import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.Album;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
@@ -33,7 +31,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,8 +40,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DBqueriesTest {
-
-    final static String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
 
     @Mock
     ValueStore store;
@@ -72,7 +67,7 @@ public class DBqueriesTest {
     @BeforeEach
     void setUp() {
         HelperDB.redoTestData();
-        lenient().when(store.getDBpathString()).thenReturn(testDBpath);
+        lenient().when(store.getDBpathString()).thenReturn(HelperDB.testDBpath);
         dBqueriesClass = new DBqueries(store, log, settingsIO, migrateDB);
         songList = List.of(
             new Song("song1", "artist1", "2022-01-01", "remix"),
@@ -151,7 +146,7 @@ public class DBqueriesTest {
 
     @Test
     void mixedSinglesAndAlbumsReadSingles() {
-        songList.get(0).setAlbumID("album");
+        songList.getFirst().setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
 
         assertEquals(2,dBqueriesClass.readCombviewSingles().size());
@@ -159,7 +154,7 @@ public class DBqueriesTest {
 
     @Test
     void mixedSinglesAndAlbumsReadAlbums() {
-        songList.get(0).setAlbumID("album");
+        songList.getFirst().setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
 
         assertEquals(1,dBqueriesClass.readCombviewAlbums().size());
@@ -167,7 +162,7 @@ public class DBqueriesTest {
 
     @Test
     void getMediaItemsFromCombview() {
-        songList.get(0).setAlbumID("album");
+        songList.getFirst().setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
 
         List<MediaItem> mediaItems = dBqueriesClass.loadCombviewTable();

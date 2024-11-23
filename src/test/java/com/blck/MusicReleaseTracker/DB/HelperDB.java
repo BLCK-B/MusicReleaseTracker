@@ -13,10 +13,9 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker;
+package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
-import com.blck.MusicReleaseTracker.DB.MigrateDB;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,9 +25,18 @@ import java.sql.*;
 
 public class HelperDB {
 
-    final static Path testResources = Paths.get("src", "test", "testresources");
-    final static String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
-    final static Path DBfilePath = Paths.get("src", "test", "testresources", "testdb.db");
+    public final static Path testResources = Paths.get("src", "test", "testresources");
+    public final static String testDBpath = "jdbc:sqlite:" + Paths.get("src", "test", "testresources", "testdb.db");
+    public final static Path DBfilePath = Paths.get("src", "test", "testresources", "testdb.db");
+
+    public static void deleteDB() {
+        try {
+            if (Files.exists(DBfilePath))
+                Files.delete(DBfilePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void redoTestDB() {
         try {

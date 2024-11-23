@@ -40,44 +40,41 @@ public class MigrateDB {
         // note: generate by string templates after preview
         try (Connection conn = DriverManager.getConnection(path)) {
             Statement stmt = conn.createStatement();
-            String sql = """
+
+            stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS musicbrainz (
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL
                     );
-                    """;
-            stmt.addBatch(sql);
+                    """);
 
-            sql = """
+            stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS beatport (
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL,
                     type text NOT NULL
                     );
-                    """;
-            stmt.addBatch(sql);
+                    """);
 
-            sql = """
+            stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS junodownload (
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL
                     );
-                    """;
-            stmt.addBatch(sql);
+                    """);
 
-            sql = """
+            stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS youtube (
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL
                     );
-                    """;
-            stmt.addBatch(sql);
+                    """);
 
-            sql = """
+            stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS artists (
                     artist text PRIMARY KEY,
                     urlmusicbrainz text,
@@ -85,18 +82,16 @@ public class MigrateDB {
                     urljunodownload text,
                     urlyoutube text
                     );
-                    """;
-            stmt.addBatch(sql);
+                    """);
 
-            sql = """
+            stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS combview (
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL,
                     album text
                     );
-                    """;
-            stmt.addBatch(sql);
+                    """);
 
             conn.setAutoCommit(false);
             stmt.executeBatch();

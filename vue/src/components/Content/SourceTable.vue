@@ -1,5 +1,20 @@
+<!--
+  -         MusicReleaseTracker
+  -         Copyright (C) 2023 - 2024 BLCK
+  -         This program is free software: you can redistribute it and/or modify
+  -         it under the terms of the GNU General Public License as published by
+  -         the Free Software Foundation, either version 3 of the License, or
+  -         (at your option) any later version.
+  -         This program is distributed in the hope that it will be useful,
+  -         but WITHOUT ANY WARRANTY; without even the implied warranty of
+  -         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  -         GNU General Public License for more details.
+  -         You should have received a copy of the GNU General Public License
+  -         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
-  <div class="table-container" v-if="hideTable">
+  <div v-if="hideTable" class="table-container">
     <div class="table-body">
       <div v-for="(mediaItem, mediaIndex) in this.tableData" :key="mediaIndex" class="aBubble">
         <table>
@@ -12,14 +27,14 @@
                 <td class="tdartist"></td>
                 <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
               </tr>
-              <tr class="album-bubble" v-for="(song, songIndex) in mediaItem.songs" :key="songIndex">
+              <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" class="album-bubble">
                 <td class="tdsong">{{ song.name }}</td>
               </tr>
             </template>
             <template v-else>
-              <tr class="single-bubble" :class="{ 'future-date': isDateInFuture(mediaItem.date) }">
+              <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" class="single-bubble">
                 <td class="tdsong">{{ mediaItem.name }}</td>
-                <td class="tdartist" v-if="!hideArtistColumn">{{ mediaItem.artists }}</td>
+                <td v-if="!hideArtistColumn" class="tdartist">{{ mediaItem.artists }}</td>
                 <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
               </tr>
             </template>
@@ -29,10 +44,10 @@
     </div>
   </div>
 
-  <div class="emptynotice" v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'">
+  <div v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'" class="emptynotice">
     <p>table empty</p>
   </div>
-  <div class="quickstart" v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'">
+  <div v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'" class="quickstart">
     <p>
       <span class="title">Quickstart guide</span> <br />
       1. click "add artist" to insert an artist <br />
@@ -44,7 +59,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import {mapState} from "vuex";
 
 export default {
   mounted() {

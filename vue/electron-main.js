@@ -29,7 +29,7 @@ function createWindow() {
     backgroundColor: "#000000",
     width: mainWindowState.width,
     height: mainWindowState.height,
-    minHeight: 450,
+    minHeight: 500,
     minWidth: 720,
     x: mainWindowState.x,
     y: mainWindowState.y,
@@ -45,7 +45,8 @@ function createWindow() {
     return { action: "deny" };
   });
 
-  win.loadURL("http://localhost:57782");
+  if (process.env.NODE_ENV !== "development") win.loadURL("http://localhost:57782");
+  else win.loadURL("http://localhost:57782", { extraHeaders: "Cache-Control: no-cache" });
 
   win.once("ready-to-show", () => {
     win.show();

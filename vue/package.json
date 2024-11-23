@@ -72,7 +72,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "buildVue": "vite build",
+    "buildVue": "vite build --emptyOutDir",
     "preview": "vite preview",
     "electron": "cross-env NODE_ENV=development electron .",
     "distExe": "electron-builder --dir",

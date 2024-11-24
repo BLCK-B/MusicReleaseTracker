@@ -61,13 +61,13 @@ public class DBqueriesTest {
 
     @AfterAll
     static void cleanUp() {
-        HelperDB.redoTestData();
+        HelperDB.redoTestData(HelperDB.testDBpath);
     }
 
     @BeforeEach
     void setUp() {
-        HelperDB.redoTestData();
-        lenient().when(store.getDBpathString()).thenReturn(HelperDB.testDBpath);
+        HelperDB.redoTestData(HelperDB.testDBpath);
+        lenient().when(store.getDBpath()).thenReturn(HelperDB.testDBpath);
         dBqueriesClass = new DBqueries(store, log, settingsIO, migrateDB);
         songList = List.of(
             new Song("song1", "artist1", "2022-01-01", "remix"),
@@ -79,21 +79,21 @@ public class DBqueriesTest {
     void batchInsertIntoSource() {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
 
-        assertEquals(3, HelperDB.getNumEntries("beatport"));
+        assertEquals(3, HelperDB.getNumEntries(HelperDB.testDBpath, "beatport"));
     }
 
     @Test
     void batchInsertIntoCombview() {
         dBqueriesClass.batchInsertCombview(songList);
 
-        assertEquals(3, HelperDB.getNumEntries("combview"));
+        assertEquals(3, HelperDB.getNumEntries(HelperDB.testDBpath, "combview"));
     }
 
     @Test
     void batchInsertOverLimit() {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 1);
 
-        assertEquals(1, HelperDB.getNumEntries("beatport"));
+        assertEquals(1, HelperDB.getNumEntries(HelperDB.testDBpath, "beatport"));
     }
 
     @Test
@@ -295,12 +295,12 @@ public class DBqueriesTest {
     @Test
     void truncateCombviewTable() {
         dBqueriesClass.batchInsertCombview(songList);
-        int entries = HelperDB.getNumEntries("combview", "beatport");
+        int entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "beatport");
         assertEquals(3, entries);
 
         dBqueriesClass.truncateCombview();
 
-        entries = HelperDB.getNumEntries("combview", "beatport");
+        entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "beatport");
         assertEquals(0, entries);
     }
 
@@ -312,12 +312,12 @@ public class DBqueriesTest {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
         dBqueriesClass.batchInsertCombview(songList);
-        int entries = HelperDB.getNumEntries("combview", "musicbrainz", "junodownload");
+        int entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "musicbrainz", "junodownload");
         assertEquals(6, entries);
 
         dBqueriesClass.truncateAllTables();
 
-        entries = HelperDB.getNumEntries("combview", "musicbrainz", "junodownload");
+        entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "musicbrainz", "junodownload");
         assertEquals(0, entries);
     }
 
@@ -329,27 +329,27 @@ public class DBqueriesTest {
     @Test
     void clearArtistDataFrom() {;
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
-        assertEquals(2, HelperDB.getCountOf("beatport", "artist", "artist1"));
+        assertEquals(2, HelperDB.getCountOf(HelperDB.testDBpath, "beatport", "artist", "artist1"));
 
         dBqueriesClass.clearArtistDataFrom("artist1", TablesEnum.beatport);
 
-        assertEquals(0, HelperDB.getCountOf("beatport", "artist", "artist1"));
-        assertEquals(1, HelperDB.getCountOf("beatport", "artist", "artist2"));
+        assertEquals(0, HelperDB.getCountOf(HelperDB.testDBpath, "beatport", "artist", "artist1"));
+        assertEquals(1, HelperDB.getCountOf(HelperDB.testDBpath, "beatport", "artist", "artist2"));
     }
 
     @Test
     void deleteArtistFromAllTables() {
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         dBqueriesClass.batchInsertCombview(songList);
-        assertEquals(1, HelperDB.getCountOf("artists", "artist", "artist1"));
-        assertEquals(2, HelperDB.getCountOf("beatport", "artist", "artist1"));
-        assertEquals(2, HelperDB.getCountOf("combview", "artist", "artist1"));
+        assertEquals(1, HelperDB.getCountOf(HelperDB.testDBpath, "artists", "artist", "artist1"));
+        assertEquals(2, HelperDB.getCountOf(HelperDB.testDBpath, "beatport", "artist", "artist1"));
+        assertEquals(2, HelperDB.getCountOf(HelperDB.testDBpath, "combview", "artist", "artist1"));
 
         dBqueriesClass.removeArtistFromAllTables("artist1");
 
-        assertEquals(0, HelperDB.getCountOf("artists", "artist", "artist1"));
-        assertEquals(0, HelperDB.getCountOf("beatport", "artist", "artist1"));
-        assertEquals(0, HelperDB.getCountOf("combview", "artist", "artist1"));
+        assertEquals(0, HelperDB.getCountOf(HelperDB.testDBpath, "artists", "artist", "artist1"));
+        assertEquals(0, HelperDB.getCountOf(HelperDB.testDBpath, "beatport", "artist", "artist1"));
+        assertEquals(0, HelperDB.getCountOf(HelperDB.testDBpath, "combview", "artist", "artist1"));
     }
 
 

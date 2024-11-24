@@ -70,7 +70,6 @@ public class Main {
         // on startup of springboot server
         @Override
         public void run(String... args) {
-            System.out.println("----------LOCAL SERVER STARTED----------");
             System.out.println("""
                  __  __ ____ _____
                 |  \\/  |  _ \\_   _|
@@ -80,7 +79,7 @@ public class Main {
             """);
             store.setAppVersion(appConfig.version());
             startSetup.createPathsAndDirs();
-//            manageDB.migrateDB();
+            manageDB.migrateDB(store.getDBpath(), store.getDBpathTemplate());
             settingsIO.updateSettings();
             store.setBackendReady();
         }

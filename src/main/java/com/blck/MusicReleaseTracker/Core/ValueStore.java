@@ -24,7 +24,8 @@ import java.nio.file.Path;
 public class ValueStore {
 
     private String appDataPath;
-    private String DBpath;
+    private Path DBpath;
+    private Path DBpathTemplate;
     private Path configPath;
     private Path errorLogsPath;
     private String scrapeDate;
@@ -55,11 +56,20 @@ public class ValueStore {
         this.appDataPath = appDataPath;
     }
 
-    public void setDBpath(String DBpath) {
+    public Path getDBpath() {
+        return DBpath;
+    }
+
+    public void setDBpath(Path DBpath) {
         this.DBpath = DBpath;
     }
-    public String getDBpathString() {
-        return DBpath.toString();
+
+    public Path getDBpathTemplate() {
+        return DBpathTemplate;
+    }
+
+    public void setDBpathTemplate(Path DBpathTemplate) {
+        this.DBpathTemplate = DBpathTemplate;
     }
 
     public Path getConfigPath() {

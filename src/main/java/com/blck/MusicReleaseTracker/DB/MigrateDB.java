@@ -20,10 +20,8 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,10 +39,29 @@ public class MigrateDB {
         this.log = errorLogging;
     }
 
-    public void createDBandSourceTables(String path) {
+    public void createDBandTables(Path path) {
         // note: generate by string templates after preview
-        try (Connection conn = DriverManager.getConnection(path)) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + path)) {
             Statement stmt = conn.createStatement();
+
+            stmt.addBatch("""
+                    CREATE TABLE IF NOT EXISTS artists (
+                    artist text PRIMARY KEY,
+                    urlmusicbrainz text,
+                    urlbeatport text,
+                    urljunodownload text,
+                    urlyoutube text
+                    );
+                    """);
+
+            stmt.addBatch("""
+                    CREATE TABLE IF NOT EXISTS combview (
+                    song text NOT NULL,
+                    artist text NOT NULL,
+                    date text NOT NULL,
+                    album text
+                    );
+                    """);
 
             stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS musicbrainz (
@@ -79,25 +96,6 @@ public class MigrateDB {
                     );
                     """);
 
-            stmt.addBatch("""
-                    CREATE TABLE IF NOT EXISTS artists (
-                    artist text PRIMARY KEY,
-                    urlmusicbrainz text,
-                    urlbeatport text,
-                    urljunodownload text,
-                    urlyoutube text
-                    );
-                    """);
-
-            stmt.addBatch("""
-                    CREATE TABLE IF NOT EXISTS combview (
-                    song text NOT NULL,
-                    artist text NOT NULL,
-                    date text NOT NULL,
-                    album text
-                    );
-                    """);
-
             conn.setAutoCommit(false);
             stmt.executeBatch();
             conn.setAutoCommit(true);
@@ -107,61 +105,46 @@ public class MigrateDB {
         }
     }
 
-    public void migrateDB(Path DBfilePath, Path templateDBfilePath) {
-        if (Files.exists(DBfilePath)) {
-			try {
-				Files.delete(templateDBfilePath);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-        final String DBpath = "jdbc:sqlite:" + DBfilePath;
-        final String DBtemplatePath = "jdbc:sqlite:" + templateDBfilePath;
-        createDBandSourceTables(DBpath);
-        createDBandSourceTables(DBtemplatePath);
+    public void migrateDB(Path DB, Path DBtemplate) {
+        try {
+            Files.deleteIfExists(DBtemplate);
+            createDBandTables(DB);
+            createDBandTables(DBtemplate);
 
-        var DBstructure = getDBStructure(DBpath);
-        if (!DBstructure.equals(getDBStructure(DBtemplatePath))) {
-            copyArtistsData(DBpath, DBtemplatePath);
-            try {
-                Files.delete(DBfilePath);
-                File newFile = new File(String.valueOf(templateDBfilePath));
-                newFile.renameTo(DBfilePath.toFile());
-            } catch (Exception e) {
-                log.error(e, ErrorLogging.Severity.SEVERE, "error renaming/deleting DB files");
+            var DBstructure = getDBStructure(DB);
+            if (!DBstructure.equals(getDBStructure(DBtemplate))) {
+                copyArtistsData(DB, DBtemplate);
+                Files.delete(DB);
+                new File(String.valueOf(DBtemplate))
+                        .renameTo(DB.toFile());
             }
+        } catch (Exception e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "failed to migrate DB");
         }
     }
 
-    public void copyArtistsData(String sourceDBPath, String targetDBpath) {
-        if (targetDBpath.contains("jdbc:sqlite:"))
-            throw new RuntimeException("targetDBpath cannot have sqlite prefix");
-
-        String testTemplateDBpath = String.valueOf(Paths.get("src", "test", "testresources", "DBTemplate.db"));
-
-        var DBcolumns = getDBStructure(sourceDBPath).get("artists");
-        var templateColumns = getDBStructure(targetDBpath).get("artists");
-
-//        if (!DBcolumns.equals(templateColumns))
-
+    public void copyArtistsData(Path sourceDB, Path targetDB) {
+        var DBcolumns = getDBStructure(sourceDB).get("artists");
+        var templateColumns = getDBStructure(targetDB).get("artists");
         List<String> sharedColumns = new ArrayList<>(DBcolumns);
         sharedColumns.retainAll(templateColumns);
         String shared = String.join(", ", sharedColumns);
 
-        try (Connection conn = DriverManager.getConnection(sourceDBPath)) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + sourceDB)) {
             Statement stmt = conn.createStatement();
-            stmt.execute("ATTACH DATABASE '" + testTemplateDBpath + "' AS target_db");
+            stmt.execute("ATTACH DATABASE '" + targetDB + "' AS target_db");
             stmt.executeUpdate("INSERT INTO target_db.artists (" + shared + ") SELECT " + shared + " FROM artists");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Map<String, ArrayList<String>> getDBStructure(String path) {
-        // returns a structure of tables and their columns
-        HashMap<String, ArrayList<String>> tableMap = new HashMap<>();
+    public Map<String, ArrayList<String>> getDBStructure(Path path) {
+        if (Files.notExists(path))
+            throw new RuntimeException("file " + path +  " does not exist");
 
-        try (Connection conn = DriverManager.getConnection(path)) {
+        HashMap<String, ArrayList<String>> tableMap = new HashMap<>();
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + path)) {
             String sql = "SELECT name FROM sqlite_master WHERE type='table'";
             Statement stmt = conn.createStatement();
             ResultSet rsTables = stmt.executeQuery(sql);
@@ -189,7 +172,7 @@ public class MigrateDB {
     public void resetDB() {
         File musicdata = new File(store.getAppDataPath() + "musicdata.db");
         musicdata.delete();
-        createDBandSourceTables(store.getDBpathString());
+        createDBandTables(store.getDBpath());
     }
 
 }

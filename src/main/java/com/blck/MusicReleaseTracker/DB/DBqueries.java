@@ -48,7 +48,7 @@ public class DBqueries {
 
     public List<String> getArtistList() {
         List<String> dataList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT artist FROM artists ORDER BY artist LIMIT 500");
             while (rs.next())
@@ -63,7 +63,7 @@ public class DBqueries {
 
     public List<MediaItem> loadTable(TablesEnum source, String name) {
         List<MediaItem> tableContent = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC, song LIMIT 50");
             pstmt.setString(1, name);
@@ -92,7 +92,7 @@ public class DBqueries {
 
     public List<Song> readCombviewSingles() {
         List<Song> singles = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(
                     "SELECT song, artist, date FROM combview WHERE album IS NULL ORDER BY date DESC, song LIMIT 1000"
@@ -110,7 +110,7 @@ public class DBqueries {
 
     public List<Album> readCombviewAlbums() {
         List<Album> albums = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
             ResultSet rs1 = stmt.executeQuery(
                     "SELECT DISTINCT album FROM combview WHERE album IS NOT NULL ORDER BY date LIMIT 300"
@@ -137,7 +137,7 @@ public class DBqueries {
     }
 
     public void insertIntoArtistList(String name) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "INSERT INTO artists (artist) values(?)");
             pstmt.setString(1, name);
@@ -154,7 +154,7 @@ public class DBqueries {
             sql = "UPDATE artists SET url" + source + " = NULL WHERE artist = ?";
         else
             sql = "UPDATE artists SET url" + source + " = ? WHERE artist = ?";
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             if (newID == null) {
                 pstmt.setString(1, name);
@@ -170,7 +170,7 @@ public class DBqueries {
     }
 
     public Optional<String> getArtistSourceID(String name, TablesEnum source) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT url" + source + " FROM artists WHERE artist = ?");
             pstmt.setString(1, name);
@@ -182,7 +182,7 @@ public class DBqueries {
     }
 
     public void clearArtistDataFrom(String name, TablesEnum table) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "DELETE FROM " + table + " WHERE artist = ?");
             pstmt.setString(1, name);
@@ -195,7 +195,7 @@ public class DBqueries {
     public void removeArtistFromAllTables(String name) {
         for (TablesEnum table : TablesEnum.values())
             clearArtistDataFrom(name, table);
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM artists WHERE artist = ?");
             pstmt.setString(1, name);
             pstmt.executeUpdate();
@@ -205,7 +205,7 @@ public class DBqueries {
     }
 
     public void truncateAllTables() {
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
             for (TablesEnum table : TablesEnum.values())
                 stmt.addBatch("DELETE FROM " + table);
@@ -219,7 +219,7 @@ public class DBqueries {
     }
 
     public void truncateCombview() {
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("DELETE FROM combview");
             stmt.close();
@@ -231,7 +231,7 @@ public class DBqueries {
     public ArrayList<Song> getSourceTablesDataForCombview() {
         var filterWords = settingsIO.getFilterValues();
         ArrayList<Song> songObjectList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             for (TablesEnum table : TablesEnum.values()) {
                 if (table == TablesEnum.combview)
                     continue;
@@ -280,7 +280,7 @@ public class DBqueries {
     public LinkedList<Scraper> getAllScrapers() {
         // creating a list of scraper objects: one scraper holds one URL
         LinkedList<Scraper> scrapers = new LinkedList<>();
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT artist FROM artists LIMIT 500");
             ResultSet artistResults = pstmt.executeQuery();
@@ -318,7 +318,7 @@ public class DBqueries {
             throw new NullPointerException("null table");
         if (source == TablesEnum.combview)
             throw new RuntimeException("use dedicated combview insert method");
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             String sql;
             if (songList.getFirst().getType().isPresent())
                 sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
@@ -347,7 +347,7 @@ public class DBqueries {
     }
 
     public void batchInsertCombview(List<Song> songList) {
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
                     "insert into combview (song, artist, date, album) values(?, ?, ?, ?)"
             );
@@ -372,7 +372,7 @@ public class DBqueries {
     }
 
     public void vacuum() {
-        try (Connection conn = DriverManager.getConnection(store.getDBpathString())) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement("VACUUM;");
             pstmt.execute();
             pstmt.close();

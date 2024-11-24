@@ -20,7 +20,6 @@ import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -51,14 +50,20 @@ public class StartSetup {
             throw new UnsupportedOperationException("unsupported OS");
 
         String appDataPath = appData + slash + "MusicReleaseTracker" + slash;
-        String DBpath = "jdbc:sqlite:" + Paths.get(appDataPath,  "musicdata.db");
-        Path configPath = Paths.get(appDataPath, "MRTsettings.json");
-        Path errorLogsPath = Paths.get(appDataPath, "errorlogs.txt");
 
         store.setAppDataPath(appDataPath);
-        store.setConfigPath(configPath);
-        store.setDBpath(DBpath);
-        store.setErrorLogsPath(errorLogsPath);
+        store.setConfigPath(
+            Paths.get(appDataPath, "MRTsettings.json")
+        );
+        store.setDBpath(
+            Paths.get(appDataPath,  "musicdata.db")
+        );
+        store.setDBpathTemplate(
+            Paths.get(appDataPath, "DBTemplate.db")
+        );
+        store.setErrorLogsPath(
+            Paths.get(appDataPath, "errorlogs.txt")
+        );
     }
 
     public void createDirs() {

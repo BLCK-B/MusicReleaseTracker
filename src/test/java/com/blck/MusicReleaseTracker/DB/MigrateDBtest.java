@@ -41,14 +41,14 @@ public class MigrateDBtest {
 	void createsDBfile() {
 		HelperDB.deleteDB();
 
-		migrateDB.createDBandSourceTables(HelperDB.testDBpath);
+		migrateDB.createDBandTables(HelperDB.testDBpath);
 
-		assertTrue(Files.exists(HelperDB.DBfilePath));
+		assertTrue(Files.exists(HelperDB.testDBpath));
 	}
 
 	@Test
 	void createsTables() {
-		migrateDB.createDBandSourceTables(HelperDB.testDBpath);
+		migrateDB.createDBandTables(HelperDB.testDBpath);
 
 		var structure = migrateDB.getDBStructure(HelperDB.testDBpath);
 
@@ -61,7 +61,7 @@ public class MigrateDBtest {
 
 	@Test
 	void structureContainsColumns() {
-		migrateDB.createDBandSourceTables(HelperDB.testDBpath);
+		migrateDB.createDBandTables(HelperDB.testDBpath);
 
 		var structure = migrateDB.getDBStructure(HelperDB.testDBpath);
 
@@ -69,12 +69,45 @@ public class MigrateDBtest {
 	}
 
 	@Test
-	void testStuff() {
-//		HelperDB.deleteLegacyFiles();
-//		HelperDB.createDBv1(HelperDB.legacyTestDBpath);
-//		HelperDB.createDBv1(HelperDB.testTemplateDBpath);
+	void copyArtistsDataNoChange() {
+		HelperDB.deleteTestDBs();
+		HelperDB.createArtistsTestDB("jdbc:sqlite:" + HelperDB.testDBpath, 2);
+		HelperDB.fillArtistsTable(HelperDB.testDBpath, 2);
+		HelperDB.createArtistsTestDB("jdbc:sqlite:" + HelperDB.testTemplateDBpath, 2);
 
-		migrateDB.copyArtistsData(HelperDB.legacyTestDBpath, HelperDB.testTemplateDBpath);
+		migrateDB.copyArtistsData(HelperDB.testDBpath, HelperDB.testTemplateDBpath);
+
+		assertAll(
+			() -> assertTrue(HelperDB.isArtistsColumnNotEmpty(HelperDB.testTemplateDBpath, "artist")),
+			() -> assertTrue(HelperDB.isArtistsColumnNotEmpty(HelperDB.testTemplateDBpath, "urlbeatport"))
+		);
+	}
+
+	@Test
+	void copyArtistsDataRemovedColumns() {
+		HelperDB.deleteTestDBs();
+		HelperDB.createArtistsTestDB("jdbc:sqlite:" + HelperDB.testDBpath, 3);
+		HelperDB.fillArtistsTable(HelperDB.testDBpath, 3);
+		HelperDB.createArtistsTestDB("jdbc:sqlite:" + HelperDB.testTemplateDBpath, 1);
+
+		migrateDB.copyArtistsData(HelperDB.testDBpath, HelperDB.testTemplateDBpath);
+
+		assertTrue(HelperDB.isArtistsColumnNotEmpty(HelperDB.testTemplateDBpath, "artist"));
+	}
+
+	@Test
+	void copyArtistsDataAddedColumns() {
+		HelperDB.deleteTestDBs();
+		HelperDB.createArtistsTestDB("jdbc:sqlite:" + HelperDB.testDBpath, 1);
+		HelperDB.fillArtistsTable(HelperDB.testDBpath, 1);
+		HelperDB.createArtistsTestDB("jdbc:sqlite:" + HelperDB.testTemplateDBpath, 3);
+
+		migrateDB.copyArtistsData(HelperDB.testDBpath, HelperDB.testTemplateDBpath);
+
+		assertAll(
+			() -> assertTrue(HelperDB.isArtistsColumnNotEmpty(HelperDB.testTemplateDBpath, "artist")),
+			() -> assertFalse(HelperDB.isArtistsColumnNotEmpty(HelperDB.testTemplateDBpath, "urlbeatport"))
+		);
 	}
 
 }

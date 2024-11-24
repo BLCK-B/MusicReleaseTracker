@@ -43,8 +43,6 @@ public class StartSetupTest {
     StartSetup startSetup;
 
     @Captor
-    ArgumentCaptor<String> stringCaptor;
-    @Captor
     ArgumentCaptor<Path> pathCaptor;
 
     @Test
@@ -53,9 +51,8 @@ public class StartSetupTest {
 
         startSetup.createPaths();
 
-        verify(store).setDBpath(stringCaptor.capture());
-        assertTrue(stringCaptor.getValue().contains(DBpath));
-        assertTrue(stringCaptor.getValue().contains("jdbc:sqlite:"));
+        verify(store).setDBpath(pathCaptor.capture());
+        assertTrue(pathCaptor.getValue().toString().contains(DBpath));
     }
 
     @Test

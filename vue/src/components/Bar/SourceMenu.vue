@@ -113,7 +113,7 @@ export default {
           const currentTime = new Date();
           let time = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)
             .toString()
-            .padStart(2, "0")}.${currentTime.getHours().toString().padStart(2, "0")}:${currentTime
+            .padStart(2, "0")} ${currentTime.getHours().toString().padStart(2, "0")}:${currentTime
             .getMinutes()
             .toString()
             .padStart(2, "0")}`;

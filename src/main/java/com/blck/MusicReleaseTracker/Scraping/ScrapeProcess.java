@@ -192,7 +192,7 @@ public class ScrapeProcess {
 				));
 		for (List<Song> group : artistSameDayCounts.values()) {
 			if (group.size() >= atLeast)
-				group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.get(0).getArtists()));
+				group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.getFirst().getArtists()));
 		}
 		return artistSameDayCounts.values().stream()
 				.flatMap(Collection::stream)
@@ -218,8 +218,6 @@ public class ScrapeProcess {
 
 	/**
 	 *
-	 * @param song1
-	 * @param song2
 	 * @return older song
 	 */
 	private Song getOlderDateSong(Song song1, Song song2) {
@@ -236,8 +234,6 @@ public class ScrapeProcess {
 
 	/**
 	 *
-	 * @param song1
-	 * @param song2
 	 * @return newer song
 	 */
 	private Song getNewerDateSong(Song song1, Song song2) {
@@ -254,8 +250,6 @@ public class ScrapeProcess {
 
 	/**
 	 *
-	 * @param song1
-	 * @param song2
 	 * @return absolute floored difference in days between song dates
 	 */
 	public int getDayDifference(Song song1, Song song2) {

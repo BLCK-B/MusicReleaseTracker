@@ -43,14 +43,32 @@ public class Scraper {
         this.store = store;
     }
 
+    /**
+     * Scraper data from given source and inserts them into the respective source table.
+     *
+     * @param timeout Jsoup timeout
+	 */
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         System.out.println("The method scrape() is to be overriden.");
     }
 
+    /**
+     *
+     * @return base artist identifier for a given source
+     */
     public String getID() {
         return "The method getID() is to be overriden.";
     }
 
+    /**
+     * Creates a {@code List<Song>} from song names, dates, types of one artist.
+     *
+     * @param names
+     * @param artist
+     * @param dates
+     * @param types may be null
+     * @return {@code List<Song>}
+     */
     public List<Song> artistToSongList(List<String> names, String artist, List<String> dates, List<String> types) {
         return IntStream.range(0, Math.min(names.size(), dates.size()))
                 .filter(i -> names.get(i) != null && artist != null && dates.get(i) != null)
@@ -62,6 +80,12 @@ public class Scraper {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Ensures valid date format, unifies symbols in names, removes song name duplicates, sorts by date newest->oldest.
+     *
+     * @param songList list of songs
+     * @return a better formatted list of songs
+     */
     public List<Song> processInfo(List<Song> songList) {
         if (songList.isEmpty()) {
             log.error(new Exception(), ErrorLogging.Severity.WARNING, "song list produced by scraper is empty");
@@ -83,6 +107,12 @@ public class Scraper {
                 .replace("´", "'");
     }
 
+    /**
+     *
+     * @param date a date to check
+     * @param formatter formatter object with specified date format
+     * @return if the date is valid in the requested format
+     */
     public boolean isValidDate(String date, DateTimeFormatter formatter) {
         try {
             LocalDate.parse(date, formatter);

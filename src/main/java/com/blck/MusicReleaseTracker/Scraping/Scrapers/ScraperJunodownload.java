@@ -104,7 +104,7 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
                         artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
-    private void reduceToID() {
+    public void reduceToID() {
         if (isIDnull)
             return;
         int idStartIndex;

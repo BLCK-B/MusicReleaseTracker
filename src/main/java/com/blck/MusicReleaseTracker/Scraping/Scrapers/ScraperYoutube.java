@@ -75,7 +75,7 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
                         artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
-    private void reduceToID() {
+    public void reduceToID() {
         if (isIDnull)
             return;
         int idStartIndex;

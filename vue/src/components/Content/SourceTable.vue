@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
+import { mapState } from "vuex";
 
 export default {
   mounted() {
@@ -113,6 +113,7 @@ table {
 th,
 td {
   padding: 4px;
+  text-overflow: ellipsis;
 }
 th {
   background-color: var(--primary-color);
@@ -123,20 +124,17 @@ th {
 .tdsong {
   width: 80%;
   white-space: nowrap;
-  overflow: visible;
-  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .tdalbumname {
   width: 50%;
   white-space: nowrap;
   overflow: visible;
-  text-overflow: ellipsis;
 }
 .tdartist {
   width: 60%;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .tddate {
   width: 100px;
@@ -165,7 +163,7 @@ th {
 }
 .aBubble {
   background-color: var(--duller-color);
-  width: 70%;
+  width: 60%;
   border-radius: 5px;
   margin-bottom: 3px;
 }
@@ -187,13 +185,13 @@ tr.single-bubble {
 }
 @media (max-width: 1100px) {
   .aBubble {
-    width: 85%;
+    width: 80%;
   }
   .table-body {
-    transform: translateX(-30px);
+    transform: translateX(-40px);
   }
 }
-@media (max-width: 950px) {
+@media (max-width: 920px) {
   .aBubble {
     margin-left: 150px;
     width: 95%;

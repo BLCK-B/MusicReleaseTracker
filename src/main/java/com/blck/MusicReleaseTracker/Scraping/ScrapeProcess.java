@@ -139,7 +139,8 @@ public class ScrapeProcess {
 	}
 
 	/**
-	 * Merges all songs with the same song name if they are {@code maxDays} or less apart by date. Retains older by date.
+	 * Merges all songs with the same song name if they are {@code maxDays} or less apart by date. Retains older by
+	 * date. <STRONG>Does not merge same-date songs.</STRONG>
 	 * <pre>
 	 * input:
 	 *   songName Joe 2020-01-05

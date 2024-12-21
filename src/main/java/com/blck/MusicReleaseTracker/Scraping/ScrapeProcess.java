@@ -46,6 +46,11 @@ public class ScrapeProcess {
 		this.SSE = sseController;
 	}
 
+	/**
+	 * Clears tables, loads scraperManager and calls scraping until done or cancelled.
+	 *
+	 * @param scraperManager new instance - no setup necessary
+	 */
 	public void scrapeData(ScraperManager scraperManager) {
 		scrapeCancel = false;
 		DB.truncateAllTables();
@@ -66,6 +71,9 @@ public class ScrapeProcess {
 		System.gc();
 	}
 
+	/**
+	 * Clears and fills combview with data from source tables using the processing chain.
+	 */
 	public void fillCombviewTable() {
 		DB.truncateCombview();
 		List<Song> songList = DB.getSourceTablesDataForCombview();
@@ -81,6 +89,19 @@ public class ScrapeProcess {
 		DB.batchInsertCombview(songList);
 	}
 
+	/**
+	 * Merges songs with the same artist and song name (retains older by date):
+	 * <pre>
+	 * input:
+	 *   songName Joe 2024-10-10
+	 *   songName Joe 2024-10-15
+	 * output:
+	 *   songName Joe 2024-10-10
+	 * </pre>
+	 *
+	 * @param songList list of songs
+	 * @return list of songs with merged duplicates
+	 */
 	public List<Song> mergeNameArtistDuplicates(List<Song> songList) {
 		Map<String, Song> nameArtistMap =
 			songList.stream()
@@ -91,6 +112,19 @@ public class ScrapeProcess {
 		return new ArrayList<>(nameArtistMap.values());
 	}
 
+	/**
+	 * Merges songs with the same song name and date (appends artists):
+	 * <pre>
+	 * input:
+	 *   songName Joe 2024-10-10
+	 *   songName Bob 2024-10-10
+	 * output:
+	 *   songName Bob, Joe 2024-10-10
+	 * </pre>
+	 *
+	 * @param songList list of songs
+	 * @return list of songs with merged duplicates
+	 */
 	public List<Song> mergeNameDateDuplicates(List<Song> songList) {
 		Map<String, Song> nameDateMap =
 			songList.stream()
@@ -104,6 +138,22 @@ public class ScrapeProcess {
 		return new ArrayList<>(nameDateMap.values());
 	}
 
+	/**
+	 * Merges all songs with the same song name if they are {@code maxDays} or less apart by date. Retains older by
+	 * date. <STRONG>Does not merge same-date songs.</STRONG>
+	 * <pre>
+	 * input:
+	 *   songName Joe 2020-01-05
+	 *   songName Bob 2020-01-03
+	 *   songName Zilch 2020-01-04
+	 * output:
+	 *   songName Bob, Joe, Zilch 2020-01-03
+	 * </pre>
+	 *
+	 * @param songList list of songs
+	 * @param maxDays max days apart
+	 * @return list of songs with merged duplicates
+	 */
 	public List<Song> mergeSongsWithinDaysApart(List<Song> songList, int maxDays) {
 		List<Song> tempList = new ArrayList<>();
 		Map<String, Song> nameArtistMap =
@@ -128,6 +178,13 @@ public class ScrapeProcess {
 				.toList();
 	}
 
+	/**
+	 * Groups songs of the same artist released on the same day using an album identifier.
+	 *
+	 * @param songList list of songs
+	 * @param atLeast minimum number of songs of album
+	 * @return list of songs with and without album identifiers
+	 */
 	public List<Song> groupSameDateArtistSongs(List<Song> songList, int atLeast) {
 		Map<String, List<Song>> artistSameDayCounts =
 				songList.stream()
@@ -136,13 +193,19 @@ public class ScrapeProcess {
 				));
 		for (List<Song> group : artistSameDayCounts.values()) {
 			if (group.size() >= atLeast)
-				group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.get(0).getArtists()));
+				group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.getFirst().getArtists()));
 		}
 		return artistSameDayCounts.values().stream()
 				.flatMap(Collection::stream)
 				.toList();
 	}
 
+	/**
+	 * Sorts a list of songs by date (newest -> oldest) then by song name (A -> Z).
+	 *
+	 * @param songObjectList list of songs
+	 * @return sorted list of songs
+	 */
 	public List<Song> sortByNewestAndByName(List<Song> songObjectList) {
 		return songObjectList.stream()
 				.sorted(Comparator.comparing(Song::getDate).reversed()
@@ -154,6 +217,10 @@ public class ScrapeProcess {
 		return s.replaceAll("\\s+", "").toLowerCase();
 	}
 
+	/**
+	 *
+	 * @return older song
+	 */
 	private Song getOlderDateSong(Song song1, Song song2) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		try {
@@ -166,6 +233,10 @@ public class ScrapeProcess {
 		return song1;
 	}
 
+	/**
+	 *
+	 * @return newer song
+	 */
 	private Song getNewerDateSong(Song song1, Song song2) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		try {
@@ -178,11 +249,15 @@ public class ScrapeProcess {
 		return song1;
 	}
 
-	public int getDayDifference(Song s1, Song s2) {
+	/**
+	 *
+	 * @return absolute floored difference in days between song dates
+	 */
+	public int getDayDifference(Song song1, Song song2) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		try {
-			Date date1 = dateFormat.parse(s1.getDate());
-			Date date2 = dateFormat.parse(s2.getDate());
+			Date date1 = dateFormat.parse(song1.getDate());
+			Date date2 = dateFormat.parse(song2.getDate());
 			long diffMillisec = date2.getTime() - date1.getTime();
 			long diffDays = diffMillisec / (1000 * 3600 * 24);
 			return (int) Math.abs(Math.floor(diffDays));

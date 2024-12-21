@@ -32,6 +32,11 @@ public class ScraperManager {
     private LinkedList<Scraper> scrapers;
     private int minDelay = 2800; // ms
 
+    /**
+     *
+     * @param log error logging
+     * @param DB database
+     */
     public ScraperManager(ErrorLogging log, DBqueries DB) {
         this.log = log;
         this.DB = DB;
@@ -41,6 +46,14 @@ public class ScraperManager {
             sourceTimes.put(source.toString(), 0.0);
         }
     }
+
+    /**
+     * Custom minimum delay time for testing purposes.
+     *
+     * @param log error logging
+     * @param DB database
+     * @param customSleepTime ms
+     */
     public ScraperManager(ErrorLogging log, DBqueries DB, int customSleepTime) {
         this.log = log;
         this.DB = DB;
@@ -52,11 +65,21 @@ public class ScraperManager {
         }
     }
 
+    /**
+     * Loads a new list of scrapers from DB.
+     *
+     * @return number of loaded scrapers
+     */
     public int loadWithScrapers() {
         scrapers = DB.getAllScrapers();
         return scrapers.size();
     }
 
+    /**
+     * Initiate one scraping, jump to the next scraper. Applies dynamic blocking delay based on {@code minDelay}.
+     *
+     * @return scrapers remaining
+     */
     public int scrapeNext() {
         double startTime = System.currentTimeMillis();
         Scraper scraper = scrapers.getFirst();
@@ -84,6 +107,13 @@ public class ScraperManager {
         return scrapers.size();
     }
 
+    /**
+     * Handling of scraper fail cases.
+     *
+     * @param i retry attempt, {@code i == 2} removes all scrapers of this source from queue
+     * @param scraper failing Scraper object
+     * @param e exception thrown by {@code scraper}
+     */
     private void scrapeErrorLaunder(int i, Scraper scraper, Exception e) {
         if (e instanceof ScraperTimeoutException)
             log.error(e, ErrorLogging.Severity.INFO, scraper + " scraper threw " + e + " " + i + " times");
@@ -99,6 +129,12 @@ public class ScraperManager {
         }
     }
 
+    /**
+     * Calculates dynamic delay length based on last invocation and {@code minDelay}.
+     *
+     * @param source {@code scraper.toString()}
+     * @return delay length, can be 0 if last invocation > {@code minDelay}
+     */
     public long delays(String source) {
         long waitTime = (long) (minDelay - sourceTimes.get(source));
         if (waitTime > 0) {

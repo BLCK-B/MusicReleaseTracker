@@ -69,7 +69,7 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
                         artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
     }
 
-    private void reduceToID() {
+    public void reduceToID() {
         if (isIDnull)
             return;
         int idStartIndex;

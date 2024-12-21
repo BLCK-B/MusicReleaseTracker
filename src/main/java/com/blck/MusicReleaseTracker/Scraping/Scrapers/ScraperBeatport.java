@@ -91,7 +91,7 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
                         artistToSongList(songsArrayList, songArtist, datesArrayList, typesArrayList)));
     }
 
-    private void reduceToID() {
+    public void reduceToID() {
         if (isIDnull)
             return;
         int idStartIndex;

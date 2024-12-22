@@ -52,7 +52,7 @@ java {
 }
 
 dependencies {
-    implementation 'org.xerial:sqlite-jdbc:3.47.1.0'
+    implementation 'org.xerial:sqlite-jdbc:3.47.0.0'
     implementation 'org.jsoup:jsoup:1.18.3'
 
     testImplementation(platform('org.junit:junit-bom:5.11.3'))
@@ -73,6 +73,7 @@ bootJar {
     archiveFileName = "MRT-${version}.jar"
 }
 
+// generate aot tracing - rather see contributing.md
 //bootRun {
 //    jvmArgs("-agentlib:native-image-agent=config-output-dir=tracing")
 //}

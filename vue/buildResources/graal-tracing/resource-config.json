@@ -17,8 +17,6 @@
   }, {
     "pattern":"\\QMETA-INF/resources/accent-warm.css\\E"
   }, {
-    "pattern":"\\QMETA-INF/resources/assets/MRTicon-BABpuI07.ico\\E"
-  }, {
     "pattern":"\\QMETA-INF/resources/assets/MRTlogo-BpL2l-3G.png\\E"
   }, {
     "pattern":"\\QMETA-INF/resources/assets/blcktext-QjjfTEs8.png\\E"
@@ -29,13 +27,9 @@
   }, {
 	"pattern":"\\QMETA-INF/resources/assets/index-.*\\.js\\E"
   }, {
-    "pattern":"\\QMETA-INF/resources/assets/index-.*\\.css\\E"
+	"pattern":"\\QMETA-INF/resources/assets/index-.*\\.css\\E"
   }, {
     "pattern":"\\QMETA-INF/resources/assets/optionsblack-vjTCXWXl.png\\E"
-  }, {
-    "pattern":"\\QMETA-INF/resources/assets/optionsdark-ymr6Vwzk.png\\E"
-  }, {
-    "pattern":"\\QMETA-INF/resources/assets/optionslight-B8QchSUy.png\\E"
   }, {
     "pattern":"\\QMETA-INF/resources/assets/refreshuniversal-3TIkIW2C.png\\E"
   }, {
@@ -78,6 +72,8 @@
     "pattern":"\\QMETA-INF/spring.integration.properties\\E"
   }, {
     "pattern":"\\QMETA-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports\\E"
+  }, {
+    "pattern":"\\QMETA-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.replacements\\E"
   }, {
     "pattern":"\\Qapplication-default.properties\\E"
   }, {
@@ -453,6 +449,12 @@
   }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/http/JsonbHttpMessageConvertersConfiguration.class\\E"
   }, {
+    "pattern":"\\Qorg/springframework/boot/autoconfigure/http/client/HttpClientAutoConfiguration.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/boot/autoconfigure/http/client/NotReactiveWebApplicationCondition$ReactiveWebApplication.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/boot/autoconfigure/http/client/NotReactiveWebApplicationCondition.class\\E"
+  }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/info/ProjectInfoAutoConfiguration$GitResourceAvailableCondition.class\\E"
   }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/info/ProjectInfoAutoConfiguration.class\\E"
@@ -493,8 +495,6 @@
   }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskExecutorConfigurations$SimpleAsyncTaskExecutorBuilderConfiguration.class\\E"
   }, {
-    "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskExecutorConfigurations$TaskExecutorBuilderConfiguration.class\\E"
-  }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskExecutorConfigurations$TaskExecutorConfiguration.class\\E"
   }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskExecutorConfigurations$ThreadPoolTaskExecutorBuilderConfiguration.class\\E"
@@ -502,8 +502,6 @@
     "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskSchedulingAutoConfiguration.class\\E"
   }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskSchedulingConfigurations$SimpleAsyncTaskSchedulerBuilderConfiguration.class\\E"
-  }, {
-    "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskSchedulingConfigurations$TaskSchedulerBuilderConfiguration.class\\E"
   }, {
     "pattern":"\\Qorg/springframework/boot/autoconfigure/task/TaskSchedulingConfigurations$TaskSchedulerConfiguration.class\\E"
   }, {
@@ -603,8 +601,6 @@
   }, {
     "pattern":"\\Qorg/springframework/boot/sql/init/dependency/DatabaseInitializationDependencyConfigurer.class\\E"
   }, {
-    "pattern":"\\Qorg/springframework/boot/web/server/mime-mappings.properties\\E"
-  }, {
     "pattern":"\\Qorg/springframework/context/ApplicationContextAware.class\\E"
   }, {
     "pattern":"\\Qorg/springframework/context/ResourceLoaderAware.class\\E"
@@ -655,8 +651,6 @@
   }, {
     "pattern":"\\Qresources/accent-warm.css\\E"
   }, {
-    "pattern":"\\Qresources/assets/MRTicon-BABpuI07.ico\\E"
-  }, {
     "pattern":"\\Qresources/assets/MRTlogo-BpL2l-3G.png\\E"
   }, {
     "pattern":"\\Qresources/assets/blcktext-QjjfTEs8.png\\E"
@@ -665,15 +659,11 @@
   }, {
     "pattern":"\\Qresources/assets/crosslight-CRspF710.png\\E"
   }, {
-    "pattern":"\\Qresources/assets/index-CkTRZNgD.js\\E"
+    "pattern":"\\Qresources/assets/index-4AKdfNH0.js\\E"
   }, {
-    "pattern":"\\Qresources/assets/index-DZnS3iZB.css\\E"
+    "pattern":"\\Qresources/assets/index-CjUsfCBT.css\\E"
   }, {
     "pattern":"\\Qresources/assets/optionsblack-vjTCXWXl.png\\E"
-  }, {
-    "pattern":"\\Qresources/assets/optionsdark-ymr6Vwzk.png\\E"
-  }, {
-    "pattern":"\\Qresources/assets/optionslight-B8QchSUy.png\\E"
   }, {
     "pattern":"\\Qresources/assets/refreshuniversal-3TIkIW2C.png\\E"
   }, {
@@ -699,8 +689,6 @@
   }, {
     "pattern":"\\Qstatic/accent-warm.css\\E"
   }, {
-    "pattern":"\\Qstatic/assets/MRTicon-BABpuI07.ico\\E"
-  }, {
     "pattern":"\\Qstatic/assets/MRTlogo-BpL2l-3G.png\\E"
   }, {
     "pattern":"\\Qstatic/assets/blcktext-QjjfTEs8.png\\E"
@@ -709,15 +697,11 @@
   }, {
     "pattern":"\\Qstatic/assets/crosslight-CRspF710.png\\E"
   }, {
-    "pattern":"\\Qstatic/assets/index-CkTRZNgD.js\\E"
+    "pattern":"\\Qstatic/assets/index-4AKdfNH0.js\\E"
   }, {
-    "pattern":"\\Qstatic/assets/index-DZnS3iZB.css\\E"
+    "pattern":"\\Qstatic/assets/index-CjUsfCBT.css\\E"
   }, {
     "pattern":"\\Qstatic/assets/optionsblack-vjTCXWXl.png\\E"
-  }, {
-    "pattern":"\\Qstatic/assets/optionsdark-ymr6Vwzk.png\\E"
-  }, {
-    "pattern":"\\Qstatic/assets/optionslight-B8QchSUy.png\\E"
   }, {
     "pattern":"\\Qstatic/assets/refreshuniversal-3TIkIW2C.png\\E"
   }, {
@@ -734,6 +718,10 @@
     "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt74b/uprops.icu\\E"
   }, {
     "pattern":"java.base:\\Qsun/net/idn/uidna.spp\\E"
+  }, {
+    "pattern":"java.logging:\\Qsun/util/logging/resources/logging_cs.properties\\E"
+  }, {
+    "pattern":"java.logging:\\Qsun/util/logging/resources/logging_cs_CZ.properties\\E"
   }, {
     "pattern":"jdk.internal.le:\\Qjdk/internal/org/jline/utils/capabilities.txt\\E"
   }, {

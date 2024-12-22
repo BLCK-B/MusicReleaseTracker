@@ -41,3 +41,7 @@ If you *need* distribution details, please refer to [blog (2024)](https://blck-b
 `./gradlew nativeCompile` - (needs GraalVM) native backend compilation to `build/native/nativeCompile`
 
 scripts in `vue/package.json` - use these to export electron
+
+### Tracing
+Generating graal aot `tracing` works for me only by running the generated bootJar as `java -jar 
+-agentlib:native-image-agent=config-output-dir=tracing MRT-X.jar`

@@ -24,6 +24,9 @@
   "name":"[Ljava.lang.Class;"
 },
 {
+  "name":"[Ljava.lang.Object;"
+},
+{
   "name":"[Ljava.lang.String;"
 },
 {
@@ -155,6 +158,7 @@
   "name":"com.blck.MusicReleaseTracker.DataObjects.Album",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
   "methods":[{"name":"getAlbum","parameterTypes":[] }, {"name":"getAlbumSongs","parameterTypes":[] }, {"name":"getDate","parameterTypes":[] }, {"name":"getName","parameterTypes":[] }, {"name":"songs","parameterTypes":[] }]
 },
 {
@@ -173,7 +177,7 @@
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":["com.blck.MusicReleaseTracker.GUIController"] }, {"name":"checkExistURL","parameterTypes":["java.util.Map"] }, {"name":"clickAddURL","parameterTypes":["java.util.Map"] }, {"name":"clickArtistAdd","parameterTypes":["java.lang.String"] }, {"name":"clickScrape","parameterTypes":[] }, {"name":"deleteArtist","parameterTypes":["java.lang.String"] }, {"name":"deleteUrl","parameterTypes":["java.util.Map"] }, {"name":"fillCombview","parameterTypes":[] }, {"name":"getAppVersion","parameterTypes":[] }, {"name":"getScrapeDate","parameterTypes":[] }, {"name":"getTableData","parameterTypes":["java.util.Map"] }, {"name":"getThemeConfig","parameterTypes":[] }, {"name":"loadList","parameterTypes":[] }, {"name":"saveUrl","parameterTypes":["java.util.Map"] }, {"name":"setSetting","parameterTypes":["java.util.Map"] }, {"name":"settingsOpened","parameterTypes":[] }]
+  "methods":[{"name":"<init>","parameterTypes":["com.blck.MusicReleaseTracker.GUIController"] }, {"name":"cancelScrape","parameterTypes":[] }, {"name":"checkExistURL","parameterTypes":["java.util.Map"] }, {"name":"cleanArtistSource","parameterTypes":["java.util.Map"] }, {"name":"clickAddURL","parameterTypes":["java.util.Map"] }, {"name":"clickArtistAdd","parameterTypes":["java.lang.String"] }, {"name":"clickScrape","parameterTypes":[] }, {"name":"deleteArtist","parameterTypes":["java.lang.String"] }, {"name":"fillCombview","parameterTypes":[] }, {"name":"getAppVersion","parameterTypes":[] }, {"name":"getScrapeDate","parameterTypes":[] }, {"name":"getTableData","parameterTypes":["java.util.Map"] }, {"name":"getThemeConfig","parameterTypes":[] }, {"name":"loadList","parameterTypes":[] }, {"name":"setSetting","parameterTypes":["java.util.Map"] }, {"name":"settingsOpened","parameterTypes":[] }]
 },
 {
   "name":"com.blck.MusicReleaseTracker.FrontendAPI.SSEController",
@@ -200,7 +204,7 @@
   "allDeclaredClasses":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":["com.blck.MusicReleaseTracker.Core.AppConfig","com.blck.MusicReleaseTracker.Core.ValueStore","com.blck.MusicReleaseTracker.JsonSettings.SettingsIO","com.blck.MusicReleaseTracker.Core.ErrorLogging","com.blck.MusicReleaseTracker.StartSetup","com.blck.MusicReleaseTracker.DB.MigrateDB"] }, {"name":"main","parameterTypes":["java.lang.String[]"] }, {"name":"setBeanFactory","parameterTypes":["org.springframework.beans.factory.BeanFactory"] }]
+  "methods":[{"name":"<init>","parameterTypes":["com.blck.MusicReleaseTracker.Core.AppConfig","com.blck.MusicReleaseTracker.Core.ValueStore","com.blck.MusicReleaseTracker.JsonSettings.SettingsIO","com.blck.MusicReleaseTracker.Core.ErrorLogging","com.blck.MusicReleaseTracker.StartSetup","com.blck.MusicReleaseTracker.DB.MigrateDB"] }, {"name":"corsConfigurer","parameterTypes":[] }, {"name":"main","parameterTypes":["java.lang.String[]"] }, {"name":"setBeanFactory","parameterTypes":["org.springframework.beans.factory.BeanFactory"] }]
 },
 {
   "name":"com.blck.MusicReleaseTracker.Main$$SpringCGLIB$$0",
@@ -209,6 +213,20 @@
   "queryAllDeclaredConstructors":true,
   "fields":[{"name":"CGLIB$FACTORY_DATA"}],
   "methods":[{"name":"<init>","parameterTypes":["com.blck.MusicReleaseTracker.Core.AppConfig","com.blck.MusicReleaseTracker.Core.ValueStore","com.blck.MusicReleaseTracker.JsonSettings.SettingsIO","com.blck.MusicReleaseTracker.Core.ErrorLogging","com.blck.MusicReleaseTracker.StartSetup","com.blck.MusicReleaseTracker.DB.MigrateDB"] }, {"name":"CGLIB$SET_STATIC_CALLBACKS","parameterTypes":["org.springframework.cglib.proxy.Callback[]"] }, {"name":"CGLIB$SET_THREAD_CALLBACKS","parameterTypes":["org.springframework.cglib.proxy.Callback[]"] }]
+},
+{
+  "name":"com.blck.MusicReleaseTracker.Main$$SpringCGLIB$$FastClass$$0",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Class"] }]
+},
+{
+  "name":"com.blck.MusicReleaseTracker.Main$$SpringCGLIB$$FastClass$$1",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Class"] }]
+},
+{
+  "name":"com.blck.MusicReleaseTracker.Main$1",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"addCorsMappings","parameterTypes":["org.springframework.web.servlet.config.annotation.CorsRegistry"] }, {"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
 },
 {
   "name":"com.blck.MusicReleaseTracker.Main$StartupRunner",
@@ -223,6 +241,9 @@
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
+},
+{
+  "name":"com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz"
 },
 {
   "name":"com.blck.MusicReleaseTracker.StartSetup",
@@ -246,7 +267,7 @@
   "name":"com.fasterxml.jackson.core.ObjectCodec",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"getJsonFactory","parameterTypes":[] }, {"name":"readValues","parameterTypes":["com.fasterxml.jackson.core.JsonParser","com.fasterxml.jackson.core.type.ResolvedType"] }, {"name":"readValues","parameterTypes":["com.fasterxml.jackson.core.JsonParser","com.fasterxml.jackson.core.type.TypeReference"] }]
+  "methods":[{"name":"getJsonFactory","parameterTypes":[] }, {"name":"readValues","parameterTypes":["com.fasterxml.jackson.core.JsonParser","com.fasterxml.jackson.core.type.ResolvedType"] }, {"name":"readValues","parameterTypes":["com.fasterxml.jackson.core.JsonParser","com.fasterxml.jackson.core.type.TypeReference"] }, {"name":"readValues","parameterTypes":["com.fasterxml.jackson.core.JsonParser","java.lang.Class"] }]
 },
 {
   "name":"com.fasterxml.jackson.core.TreeCodec",
@@ -288,6 +309,9 @@
 },
 {
   "name":"com.fasterxml.jackson.dataformat.xml.XmlMapper"
+},
+{
+  "name":"com.fasterxml.jackson.dataformat.yaml.YAMLFactory"
 },
 {
   "name":"com.fasterxml.jackson.datatype.jdk8.Jdk8Module",
@@ -406,6 +430,9 @@
 },
 {
   "name":"io.netty.util.NettyRuntime"
+},
+{
+  "name":"io.r2dbc.proxy.ProxyConnectionFactory"
 },
 {
   "name":"io.r2dbc.spi.ConnectionFactory"
@@ -558,6 +585,10 @@
   "name":"java.io.FilePermission"
 },
 {
+  "name":"java.io.IOException",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String"] }]
+},
+{
   "name":"java.io.Serializable",
   "queryAllDeclaredMethods":true,
   "queryAllPublicMethods":true
@@ -575,10 +606,6 @@
   "name":"java.lang.ClassLoader",
   "fields":[{"name":"classLoaderValueMap"}],
   "methods":[{"name":"defineClass","parameterTypes":["java.lang.String","byte[]","int","int","java.security.ProtectionDomain"] }]
-},
-{
-  "name":"java.lang.Cloneable",
-  "queryAllDeclaredMethods":true
 },
 {
   "name":"java.lang.Comparable",
@@ -694,6 +721,9 @@
   "methods":[{"name":"of","parameterTypes":["java.lang.String"] }]
 },
 {
+  "name":"java.net.http.HttpClient"
+},
+{
   "name":"java.nio.channels.ServerSocketChannel",
   "methods":[{"name":"open","parameterTypes":["java.net.ProtocolFamily"] }]
 },
@@ -742,10 +772,7 @@
   "name":"java.util.ArrayList"
 },
 {
-  "name":"java.util.Date",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true
+  "name":"java.util.Date"
 },
 {
   "name":"java.util.Enumeration"
@@ -754,10 +781,26 @@
   "name":"java.util.HashSet"
 },
 {
-  "name":"java.util.List"
+  "name":"java.util.List",
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"java.util.PropertyPermission"
+},
+{
+  "name":"java.util.RandomAccess",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.util.ReverseOrderListView",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.util.ReverseOrderListView$Rand",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true
 },
 {
   "name":"java.util.Set"
@@ -784,10 +827,6 @@
 {
   "name":"java.util.concurrent.atomic.Striped64",
   "fields":[{"name":"base"}, {"name":"cellsBusy"}]
-},
-{
-  "name":"java.util.concurrent.atomic.Striped64$Cell",
-  "fields":[{"name":"value"}]
 },
 {
   "name":"java.util.logging.LogManager"
@@ -818,6 +857,9 @@
   "name":"javax.inject.Named"
 },
 {
+  "name":"javax.inject.Qualifier"
+},
+{
   "name":"javax.money.MonetaryAmount"
 },
 {
@@ -825,6 +867,10 @@
 },
 {
   "name":"javax.naming.ldap.LdapContext"
+},
+{
+  "name":"javax.security.auth.Subject",
+  "methods":[{"name":"callAs","parameterTypes":["javax.security.auth.Subject","java.util.concurrent.Callable"] }]
 },
 {
   "name":"javax.security.auth.x500.X500Principal",
@@ -937,6 +983,9 @@
   "name":"org.apache.coyote.http11.Http11Processor"
 },
 {
+  "name":"org.apache.hc.client5.http.impl.classic.HttpClients"
+},
+{
   "name":"org.apache.jasper.compiler.JspConfig"
 },
 {
@@ -997,6 +1046,9 @@
   "name":"org.eclipse.core.runtime.FileLocator"
 },
 {
+  "name":"org.eclipse.jetty.client.HttpClient"
+},
+{
   "name":"org.eclipse.jetty.ee10.webapp.WebAppContext"
 },
 {
@@ -1026,9 +1078,6 @@
 },
 {
   "name":"org.infinispan.spring.embedded.provider.SpringEmbeddedCacheManager"
-},
-{
-  "name":"org.influxdb.InfluxDB"
 },
 {
   "name":"org.jboss.logging.Logger"
@@ -1175,6 +1224,12 @@
   "queryAllDeclaredMethods":true
 },
 {
+  "name":"org.springframework.boot.ApplicationProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"org.springframework.boot.ClearCachesApplicationListener",
   "queryAllDeclaredConstructors":true,
   "queryAllPublicConstructors":true,
@@ -1189,10 +1244,6 @@
   "name":"org.springframework.boot.Runner",
   "queryAllDeclaredMethods":true,
   "queryAllPublicMethods":true
-},
-{
-  "name":"org.springframework.boot.SpringApplication",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.springframework.boot.SpringBootConfiguration",
@@ -1487,6 +1538,24 @@
   "name":"org.springframework.boot.autoconfigure.http.JsonbHttpMessageConvertersConfiguration"
 },
 {
+  "name":"org.springframework.boot.autoconfigure.http.client.HttpClientAutoConfiguration",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"clientHttpRequestFactoryBuilder","parameterTypes":["org.springframework.boot.autoconfigure.http.client.HttpClientProperties"] }, {"name":"clientHttpRequestFactorySettings","parameterTypes":["org.springframework.boot.autoconfigure.http.client.HttpClientProperties","org.springframework.beans.factory.ObjectProvider"] }]
+},
+{
+  "name":"org.springframework.boot.autoconfigure.http.client.HttpClientProperties",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.springframework.boot.autoconfigure.http.client.NotReactiveWebApplicationCondition",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -1616,7 +1685,7 @@
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.ssl.SslProperties"] }, {"name":"fileWatcher","parameterTypes":[] }, {"name":"sslBundleRegistry","parameterTypes":["org.springframework.beans.factory.ObjectProvider"] }, {"name":"sslPropertiesSslBundleRegistrar","parameterTypes":["org.springframework.boot.autoconfigure.ssl.FileWatcher"] }]
+  "methods":[{"name":"<init>","parameterTypes":["org.springframework.core.io.ResourceLoader","org.springframework.boot.autoconfigure.ssl.SslProperties"] }, {"name":"fileWatcher","parameterTypes":[] }, {"name":"sslBundleRegistry","parameterTypes":["org.springframework.beans.factory.ObjectProvider"] }, {"name":"sslPropertiesSslBundleRegistrar","parameterTypes":["org.springframework.boot.autoconfigure.ssl.FileWatcher"] }]
 },
 {
   "name":"org.springframework.boot.autoconfigure.ssl.SslBundleRegistrar",
@@ -1657,25 +1726,18 @@
   "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskExecutionProperties","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider"] }, {"name":"simpleAsyncTaskExecutorBuilder","parameterTypes":[] }]
 },
 {
-  "name":"org.springframework.boot.autoconfigure.task.TaskExecutorConfigurations$TaskExecutorBuilderConfiguration",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"taskExecutorBuilder","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskExecutionProperties","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider"] }]
-},
-{
   "name":"org.springframework.boot.autoconfigure.task.TaskExecutorConfigurations$TaskExecutorConfiguration",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"applicationTaskExecutor","parameterTypes":["org.springframework.boot.task.TaskExecutorBuilder","org.springframework.beans.factory.ObjectProvider"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"applicationTaskExecutor","parameterTypes":["org.springframework.boot.task.ThreadPoolTaskExecutorBuilder"] }]
 },
 {
   "name":"org.springframework.boot.autoconfigure.task.TaskExecutorConfigurations$ThreadPoolTaskExecutorBuilderConfiguration",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"threadPoolTaskExecutorBuilder","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskExecutionProperties","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"threadPoolTaskExecutorBuilder","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskExecutionProperties","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider"] }]
 },
 {
   "name":"org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration",
@@ -1692,13 +1754,6 @@
   "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskSchedulingProperties","org.springframework.beans.factory.ObjectProvider"] }, {"name":"simpleAsyncTaskSchedulerBuilder","parameterTypes":[] }]
 },
 {
-  "name":"org.springframework.boot.autoconfigure.task.TaskSchedulingConfigurations$TaskSchedulerBuilderConfiguration",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"taskSchedulerBuilder","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskSchedulingProperties","org.springframework.beans.factory.ObjectProvider"] }]
-},
-{
   "name":"org.springframework.boot.autoconfigure.task.TaskSchedulingConfigurations$TaskSchedulerConfiguration"
 },
 {
@@ -1706,7 +1761,7 @@
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"threadPoolTaskSchedulerBuilder","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskSchedulingProperties","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"threadPoolTaskSchedulerBuilder","parameterTypes":["org.springframework.boot.autoconfigure.task.TaskSchedulingProperties","org.springframework.beans.factory.ObjectProvider"] }]
 },
 {
   "name":"org.springframework.boot.autoconfigure.task.TaskSchedulingProperties",
@@ -1772,7 +1827,7 @@
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"httpMessageConvertersRestClientCustomizer","parameterTypes":["org.springframework.beans.factory.ObjectProvider"] }, {"name":"restClientBuilderConfigurer","parameterTypes":["org.springframework.beans.factory.ObjectProvider"] }, {"name":"restClientSsl","parameterTypes":["org.springframework.boot.ssl.SslBundles"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"httpMessageConvertersRestClientCustomizer","parameterTypes":["org.springframework.beans.factory.ObjectProvider"] }, {"name":"restClientBuilderConfigurer","parameterTypes":["org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider"] }, {"name":"restClientSsl","parameterTypes":["org.springframework.beans.factory.ObjectProvider","org.springframework.boot.ssl.SslBundles"] }]
 },
 {
   "name":"org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer",
@@ -1942,7 +1997,7 @@
   "queryAllDeclaredMethods":true,
   "queryAllPublicMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties","org.springframework.boot.autoconfigure.web.WebProperties","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ListableBeanFactory"] }, {"name":"flashMapManager","parameterTypes":[] }, {"name":"localeResolver","parameterTypes":[] }, {"name":"mvcContentNegotiationManager","parameterTypes":[] }, {"name":"mvcConversionService","parameterTypes":[] }, {"name":"mvcValidator","parameterTypes":[] }, {"name":"setResourceLoader","parameterTypes":["org.springframework.core.io.ResourceLoader"] }, {"name":"themeResolver","parameterTypes":[] }, {"name":"welcomePageHandlerMapping","parameterTypes":["org.springframework.context.ApplicationContext","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"welcomePageNotAcceptableHandlerMapping","parameterTypes":["org.springframework.context.ApplicationContext","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }]
+  "methods":[{"name":"<init>","parameterTypes":["org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties","org.springframework.boot.autoconfigure.web.WebProperties","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ObjectProvider","org.springframework.beans.factory.ListableBeanFactory"] }, {"name":"flashMapManager","parameterTypes":[] }, {"name":"localeResolver","parameterTypes":[] }, {"name":"mvcContentNegotiationManager","parameterTypes":[] }, {"name":"mvcConversionService","parameterTypes":[] }, {"name":"mvcValidator","parameterTypes":[] }, {"name":"setResourceLoader","parameterTypes":["org.springframework.core.io.ResourceLoader"] }, {"name":"themeResolver","parameterTypes":[] }, {"name":"viewNameTranslator","parameterTypes":[] }, {"name":"welcomePageHandlerMapping","parameterTypes":["org.springframework.context.ApplicationContext","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"welcomePageNotAcceptableHandlerMapping","parameterTypes":["org.springframework.context.ApplicationContext","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }]
 },
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration$WebMvcAutoConfigurationAdapter",
@@ -1973,14 +2028,13 @@
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController",
   "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "queryAllPublicMethods":true
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"close","parameterTypes":[] }, {"name":"error","parameterTypes":["jakarta.servlet.http.HttpServletRequest"] }, {"name":"shutdown","parameterTypes":[] }]
+  "methods":[{"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
 },
 {
   "name":"org.springframework.boot.autoconfigure.web.servlet.error.DefaultErrorViewResolver",
@@ -2124,16 +2178,6 @@
   "methods":[{"name":"<init>","parameterTypes":["org.springframework.core.io.ResourceLoader"] }]
 },
 {
-  "name":"org.springframework.boot.context.config.DelegatingApplicationContextInitializer",
-  "queryAllPublicConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.springframework.boot.context.config.DelegatingApplicationListener",
-  "queryAllPublicConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"org.springframework.boot.context.config.StandardConfigDataLoader",
   "queryAllPublicConstructors":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
@@ -2173,10 +2217,6 @@
 {
   "name":"org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor",
   "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.springframework.boot.context.properties.DeprecatedConfigurationProperty",
-  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.springframework.boot.context.properties.EnableConfigurationProperties",
@@ -2236,6 +2276,39 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"org.springframework.boot.http.client.AbstractClientHttpRequestFactoryBuilder",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder",
+  "queryAllPublicMethods":true
+},
+{
+  "name":"org.springframework.boot.http.client.ClientHttpRequestFactorySettings",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
+},
+{
+  "name":"org.springframework.boot.http.client.JdkClientHttpRequestFactoryBuilder",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
+},
+{
+  "name":"org.springframework.boot.io.Base64ProtocolResolver",
+  "queryAllDeclaredConstructors":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.springframework.boot.io.ProtocolResolverApplicationContextInitializer",
+  "queryAllDeclaredConstructors":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"org.springframework.boot.jackson.JsonComponentModule",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -2286,11 +2359,11 @@
   "name":"org.springframework.boot.logging.log4j2.Log4J2LoggingSystem.Factory"
 },
 {
-  "name":"org.springframework.boot.logging.logback.ApplicationNameConverter",
+  "name":"org.springframework.boot.logging.logback.ColorConverter",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"org.springframework.boot.logging.logback.ColorConverter",
+  "name":"org.springframework.boot.logging.logback.EnclosedInSquareBracketsConverter",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
@@ -2361,18 +2434,6 @@
 },
 {
   "name":"org.springframework.boot.task.SimpleAsyncTaskSchedulerBuilder",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
-},
-{
-  "name":"org.springframework.boot.task.TaskExecutorBuilder",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
-},
-{
-  "name":"org.springframework.boot.task.TaskSchedulerBuilder",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"close","parameterTypes":[] }, {"name":"shutdown","parameterTypes":[] }]
@@ -2713,9 +2774,6 @@
   "name":"org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate"
 },
 {
-  "name":"org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient"
-},
-{
   "name":"org.springframework.data.elasticsearch.repository.ElasticsearchRepository"
 },
 {
@@ -2770,6 +2828,9 @@
 },
 {
   "name":"org.springframework.http.ReactiveHttpInputMessage"
+},
+{
+  "name":"org.springframework.http.client.ClientHttpRequestFactory"
 },
 {
   "name":"org.springframework.http.codec.CodecConfigurer"
@@ -3055,10 +3116,6 @@
   "queryAllDeclaredMethods":true
 },
 {
-  "name":"org.springframework.web.method.annotation.ExceptionHandlerMethodResolver",
-  "methods":[{"name":"noMatchingExceptionHandler","parameterTypes":[] }]
-},
-{
   "name":"org.springframework.web.method.support.CompositeUriComponentsContributor",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -3155,7 +3212,7 @@
   "name":"org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"beanNameHandlerMapping","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"defaultServletHandlerMapping","parameterTypes":[] }, {"name":"handlerExceptionResolver","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager"] }, {"name":"handlerFunctionAdapter","parameterTypes":[] }, {"name":"httpRequestHandlerAdapter","parameterTypes":[] }, {"name":"mvcHandlerMappingIntrospector","parameterTypes":[] }, {"name":"mvcPathMatcher","parameterTypes":[] }, {"name":"mvcPatternParser","parameterTypes":[] }, {"name":"mvcResourceUrlProvider","parameterTypes":[] }, {"name":"mvcUriComponentsContributor","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"] }, {"name":"mvcUrlPathHelper","parameterTypes":[] }, {"name":"mvcViewResolver","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager"] }, {"name":"requestMappingHandlerAdapter","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager","org.springframework.format.support.FormattingConversionService","org.springframework.validation.Validator"] }, {"name":"requestMappingHandlerMapping","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"resourceHandlerMapping","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"routerFunctionMapping","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"setApplicationContext","parameterTypes":["org.springframework.context.ApplicationContext"] }, {"name":"setServletContext","parameterTypes":["jakarta.servlet.ServletContext"] }, {"name":"simpleControllerHandlerAdapter","parameterTypes":[] }, {"name":"viewControllerHandlerMapping","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"viewNameTranslator","parameterTypes":[] }]
+  "methods":[{"name":"beanNameHandlerMapping","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"defaultServletHandlerMapping","parameterTypes":[] }, {"name":"handlerExceptionResolver","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager"] }, {"name":"handlerFunctionAdapter","parameterTypes":[] }, {"name":"httpRequestHandlerAdapter","parameterTypes":[] }, {"name":"mvcHandlerMappingIntrospector","parameterTypes":[] }, {"name":"mvcPathMatcher","parameterTypes":[] }, {"name":"mvcPatternParser","parameterTypes":[] }, {"name":"mvcResourceUrlProvider","parameterTypes":[] }, {"name":"mvcUriComponentsContributor","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"] }, {"name":"mvcUrlPathHelper","parameterTypes":[] }, {"name":"mvcViewResolver","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager"] }, {"name":"requestMappingHandlerAdapter","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager","org.springframework.format.support.FormattingConversionService","org.springframework.validation.Validator"] }, {"name":"requestMappingHandlerMapping","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"resourceHandlerMapping","parameterTypes":["org.springframework.web.accept.ContentNegotiationManager","org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"routerFunctionMapping","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }, {"name":"setApplicationContext","parameterTypes":["org.springframework.context.ApplicationContext"] }, {"name":"setServletContext","parameterTypes":["jakarta.servlet.ServletContext"] }, {"name":"simpleControllerHandlerAdapter","parameterTypes":[] }, {"name":"viewControllerHandlerMapping","parameterTypes":["org.springframework.format.support.FormattingConversionService","org.springframework.web.servlet.resource.ResourceUrlProvider"] }]
 },
 {
   "name":"org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport$NoOpValidator",
@@ -3167,7 +3224,7 @@
   "name":"org.springframework.web.servlet.config.annotation.WebMvcConfigurer",
   "queryAllDeclaredMethods":true,
   "queryAllPublicMethods":true,
-  "methods":[{"name":"addArgumentResolvers","parameterTypes":["java.util.List"] }, {"name":"addCorsMappings","parameterTypes":["org.springframework.web.servlet.config.annotation.CorsRegistry"] }, {"name":"addInterceptors","parameterTypes":["org.springframework.web.servlet.config.annotation.InterceptorRegistry"] }, {"name":"addReturnValueHandlers","parameterTypes":["java.util.List"] }, {"name":"addViewControllers","parameterTypes":["org.springframework.web.servlet.config.annotation.ViewControllerRegistry"] }, {"name":"configureDefaultServletHandling","parameterTypes":["org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer"] }, {"name":"configureHandlerExceptionResolvers","parameterTypes":["java.util.List"] }, {"name":"configureViewResolvers","parameterTypes":["org.springframework.web.servlet.config.annotation.ViewResolverRegistry"] }, {"name":"extendHandlerExceptionResolvers","parameterTypes":["java.util.List"] }, {"name":"extendMessageConverters","parameterTypes":["java.util.List"] }, {"name":"getValidator","parameterTypes":[] }]
+  "methods":[{"name":"addArgumentResolvers","parameterTypes":["java.util.List"] }, {"name":"addCorsMappings","parameterTypes":["org.springframework.web.servlet.config.annotation.CorsRegistry"] }, {"name":"addErrorResponseInterceptors","parameterTypes":["java.util.List"] }, {"name":"addFormatters","parameterTypes":["org.springframework.format.FormatterRegistry"] }, {"name":"addInterceptors","parameterTypes":["org.springframework.web.servlet.config.annotation.InterceptorRegistry"] }, {"name":"addResourceHandlers","parameterTypes":["org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry"] }, {"name":"addReturnValueHandlers","parameterTypes":["java.util.List"] }, {"name":"addViewControllers","parameterTypes":["org.springframework.web.servlet.config.annotation.ViewControllerRegistry"] }, {"name":"configureAsyncSupport","parameterTypes":["org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer"] }, {"name":"configureContentNegotiation","parameterTypes":["org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer"] }, {"name":"configureDefaultServletHandling","parameterTypes":["org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer"] }, {"name":"configureHandlerExceptionResolvers","parameterTypes":["java.util.List"] }, {"name":"configureMessageConverters","parameterTypes":["java.util.List"] }, {"name":"configurePathMatch","parameterTypes":["org.springframework.web.servlet.config.annotation.PathMatchConfigurer"] }, {"name":"configureViewResolvers","parameterTypes":["org.springframework.web.servlet.config.annotation.ViewResolverRegistry"] }, {"name":"extendHandlerExceptionResolvers","parameterTypes":["java.util.List"] }, {"name":"extendMessageConverters","parameterTypes":["java.util.List"] }, {"name":"getMessageCodesResolver","parameterTypes":[] }, {"name":"getValidator","parameterTypes":[] }]
 },
 {
   "name":"org.springframework.web.servlet.function.support.HandlerFunctionAdapter",
@@ -3394,6 +3451,9 @@
   "name":"org.webjars.WebJarAssetLocator"
 },
 {
+  "name":"org.webjars.WebJarVersionLocator"
+},
+{
   "name":"org.xnio.SslClientAuthMode"
 },
 {
@@ -3404,6 +3464,9 @@
 },
 {
   "name":"reactor.core.publisher.Mono"
+},
+{
+  "name":"reactor.netty.http.client.HttpClient"
 },
 {
   "name":"reactor.netty.http.server.HttpServer"

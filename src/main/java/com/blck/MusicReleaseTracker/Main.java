@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -40,6 +40,7 @@ public class Main {
     private final StartSetup startSetup;
     private final ValueStore store;
     private final AppConfig appConfig;
+
     @Autowired
     public Main(AppConfig appConfig, ValueStore store, SettingsIO settingsIO,
                 ErrorLogging errorLogging, StartSetup startSetup, MigrateDB manageDB) {
@@ -55,6 +56,9 @@ public class Main {
         SpringApplication.run(Main.class, args);
     }
 
+    /**
+     *  CORS redirect mapping for dev cross-origin permission
+     */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -65,9 +69,12 @@ public class Main {
         };
     }
 
+
     @Component
     public class StartupRunner implements CommandLineRunner {
-        // on startup of springboot server
+        /**
+         *  entry method: load config, paths, create file structure, update DB and settings
+         */
         @Override
         public void run(String... args) {
             System.out.println("""
@@ -78,7 +85,8 @@ public class Main {
                 |_|  |_|_| \\_\\|_|
             """);
             store.setAppVersion(appConfig.version());
-            startSetup.createPathsAndDirs();
+            startSetup.createPaths();
+            startSetup.createDirs();
             manageDB.migrateDB(store.getDBpath(), store.getDBpathTemplate());
             settingsIO.updateSettings();
             store.setBackendReady();

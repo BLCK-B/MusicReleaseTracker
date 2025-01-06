@@ -52,15 +52,15 @@ java {
 }
 
 dependencies {
-    implementation 'org.xerial:sqlite-jdbc:3.47.1.0'
+    implementation 'org.xerial:sqlite-jdbc:3.47.2.0'
     implementation 'org.jsoup:jsoup:1.18.3'
 
     testImplementation(platform('org.junit:junit-bom:5.11.4'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine'
 
-    testImplementation 'org.mockito:mockito-core:5.14.2'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2'
+    testImplementation 'org.mockito:mockito-core:5.15.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.15.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

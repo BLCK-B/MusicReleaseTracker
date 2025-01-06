@@ -35,7 +35,7 @@ public class StartSetup {
     }
 
     /**
-     *  prepare system file paths:
+     *  Prepare system file paths:
      *  <ul>
      *     <li>AppData / user.home</li>
      *     <li>DB</li>
@@ -71,7 +71,7 @@ public class StartSetup {
     }
 
     /**
-     *  create AppData dir, handle sqlite temporary files
+     *  Create AppData dir, handle sqlite temporary files.
      */
     public void createDirs() {
         String appDataPath = store.getAppDataPath();

@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -39,11 +39,18 @@ public class SSEController {
         return emitter;
     }
 
+    /**
+     * Close emitter and conclude progress bar
+     */
     public void complete() {
 		sendProgress(1.0);
 		emitter.complete();
     }
 
+    /**
+     * Set frontend progress bar value
+     * @param state 0.0 - 1.0
+     */
     public void sendProgress(double state) {
         try {
             emitter.send(String.valueOf(state));

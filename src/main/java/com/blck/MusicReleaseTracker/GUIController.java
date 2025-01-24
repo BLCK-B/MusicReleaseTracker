@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * class with methods called from ApiController
+ *  Class with methods called from ApiController
  */
 public class GUIController {
 
@@ -145,7 +145,6 @@ public class GUIController {
     }
 
     public void setSetting(String name, String value) {
-        // write any setting in config, note: "name" = config name
         settingsIO.writeSetting(name, value);
     }
 

@@ -29,6 +29,13 @@ public class Song implements Comparable<Song>, MediaItem {
     private final Optional<String> songType;
     private String album;
 
+    /**
+     *
+     * @param songName name of the song
+     * @param songArtists best created with just one artist
+     * @param songDate yyyy-MM-dd
+     * @param songType type of song for filtering purposes like remix, instrumental
+     */
     public Song(String songName, String songArtists, String songDate, String songType) {
         this.songName = songName;
         this.songArtists = new TreeSet<>();
@@ -42,6 +49,12 @@ public class Song implements Comparable<Song>, MediaItem {
             this.songType = Optional.of(songType);
     }
 
+    /**
+     *  Constructor for song with unspecified type.
+     * @param songName name of the song
+     * @param songArtists best created with just one artist
+     * @param songDate yyyy-MM-dd
+     */
     public Song(String songName, String songArtists, String songDate) {
         this.songName = songName;
         this.songArtists = new TreeSet<>();

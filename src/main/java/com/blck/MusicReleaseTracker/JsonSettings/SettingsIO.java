@@ -163,9 +163,10 @@ public class SettingsIO {
     }
 
     /**
+     *  Write any setting in config, {@code setting} must match the defined name
      *
-     * @param setting exact key in the json file
-     * @param value of the entry as String
+     *  @param setting exact key in the json file
+     *  @param value of the entry as String
      */
     public void writeSetting(String setting, String value) {
         File jsonFile = new File(String.valueOf(store.getConfigPath()));
@@ -178,7 +179,7 @@ public class SettingsIO {
 
     /**
      *
-     * @return map of all settings in the json file and their values
+     *  @return map of all settings in the json file and their values
      */
     public Map<String, String> readAllSettings() {
         File jsonFile = new File(String.valueOf(store.getConfigPath()));
@@ -188,6 +189,5 @@ public class SettingsIO {
                         Enum::name, setting -> allSettings.get(setting.name()).asText()
                 ));
     }
-
 
 }

@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -46,6 +46,10 @@ public class DBqueries {
         this.settingsIO = settingsIO;
     }
 
+    /**
+     *
+     * @return list of artist names
+     */
     public List<String> getArtistList() {
         List<String> dataList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
@@ -61,6 +65,13 @@ public class DBqueries {
         return dataList;
     }
 
+    /**
+     *
+     * @param source web source
+     * @param name artist name
+     * @return list of {@code MediaItem}, in case of source table only songs are returned
+     * @see MediaItem
+     */
     public List<MediaItem> loadTable(TablesEnum source, String name) {
         List<MediaItem> tableContent = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
@@ -79,6 +90,11 @@ public class DBqueries {
         return tableContent;
     }
 
+    /**
+     *
+     * @return songs and albums as {@code MediaItem}
+     * @see MediaItem
+     */
     public List<MediaItem> loadCombviewTable() {
         if (disableR() != null) return disableR();
         ArrayList<MediaItem> tableContent = new ArrayList<>();
@@ -90,6 +106,10 @@ public class DBqueries {
                 .toList().reversed();
     }
 
+    /**
+     *
+     * @return {@code Song} list from combview table
+     */
     public List<Song> readCombviewSingles() {
         List<Song> singles = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
@@ -108,6 +128,10 @@ public class DBqueries {
         return singles;
     }
 
+    /**
+     *
+     * @return {@code Album} list from combview table
+     */
     public List<Album> readCombviewAlbums() {
         List<Album> albums = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
@@ -136,6 +160,10 @@ public class DBqueries {
         return albums;
     }
 
+    /**
+     *
+     * @param name artist name
+     */
     public void insertIntoArtistList(String name) {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
@@ -148,6 +176,13 @@ public class DBqueries {
         }
     }
 
+    /**
+     * Sets an artist's ID for a specific source in {@code artists} table.
+     *
+     * @param name artist name
+     * @param source web source
+     * @param newID new ID for building the URL
+     */
     public void updateArtistSourceID(String name, TablesEnum source, String newID) {
         String sql;
         if (newID == null)
@@ -169,6 +204,12 @@ public class DBqueries {
         }
     }
 
+    /**
+     *
+     * @param name artist name
+     * @param source web source
+     * @return artist source ID
+     */
     public Optional<String> getArtistSourceID(String name, TablesEnum source) {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
@@ -181,6 +222,11 @@ public class DBqueries {
         return Optional.empty();
     }
 
+    /**
+     * Clears artist-related entries from a source table (best effort: appended artists). </br>
+     * @param name artist name
+     * @param table any table
+     */
     public void clearArtistDataFrom(String name, TablesEnum table) {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
@@ -192,6 +238,10 @@ public class DBqueries {
         }
     }
 
+    /**
+     *
+     * @param name artist name
+     */
     public void removeArtistFromAllTables(String name) {
         for (TablesEnum table : TablesEnum.values())
             clearArtistDataFrom(name, table);
@@ -204,6 +254,10 @@ public class DBqueries {
         }
     }
 
+    /**
+     * Truncate all source tables, including {@code combview}. <br/>
+     * {@code artists} table is unaffected.
+     */
     public void truncateAllTables() {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
@@ -218,6 +272,9 @@ public class DBqueries {
         }
     }
 
+    /**
+     * Truncate combview only.
+     */
     public void truncateCombview() {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();

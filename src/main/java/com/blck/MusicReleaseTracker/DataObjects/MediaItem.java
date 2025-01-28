@@ -16,7 +16,8 @@
 package com.blck.MusicReleaseTracker.DataObjects;
 
 /**
- * MediaItem may represent a {@code Song} or an {@code Album}
+ * MediaItem may represent a {@code Song} or an {@code Album}. </br>
+ * The shared parameters of a song and album are are date and name.
  */
 public interface MediaItem {
 	String getDate();

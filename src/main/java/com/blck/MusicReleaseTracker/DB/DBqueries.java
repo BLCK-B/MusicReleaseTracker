@@ -285,6 +285,10 @@ public class DBqueries {
         }
     }
 
+    /**
+     *
+     *  @return list of {@code Song} since this gathers data only from source tables
+     */
     public ArrayList<Song> getSourceTablesDataForCombview() {
         var filterWords = settingsIO.getFilterValues();
         ArrayList<Song> songObjectList = new ArrayList<>();
@@ -313,6 +317,13 @@ public class DBqueries {
         return songObjectList;
     }
 
+    /**
+     *  Checks if the song name of type contains anyn of the enabled filters.
+     *
+     * @param song object
+     * @param filterWords may contain both true and false filters
+     * @return true if no matches found
+     */
     public boolean songPassesFilterCheck(Song song, HashMap<String, String> filterWords) {
         Set<String> disabledWords = filterWords.entrySet().stream()
                 .filter(entry -> Boolean.parseBoolean(entry.getValue()))
@@ -334,8 +345,13 @@ public class DBqueries {
         return settingName.replace("filter", "").trim();
     }
 
+    /**
+     * Creates a list of scraper objects from {@code artists} table where one scraper holds one UR.
+     *
+     * @return list of scraper objects
+     * @see Scraper
+     */
     public LinkedList<Scraper> getAllScrapers() {
-        // creating a list of scraper objects: one scraper holds one URL
         LinkedList<Scraper> scrapers = new LinkedList<>();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
@@ -370,6 +386,13 @@ public class DBqueries {
         return scrapers;
     }
 
+    /**
+     * Batch inserts songs to a source table from a list depending on the song dates - prefers newer.
+     *
+     * @param songList songs
+     * @param source source table
+     * @param limit max number of songs from {@code songList}
+     */
     public void batchInsertSongs(List<Song> songList, TablesEnum source, int limit) {
         if (source == null)
             throw new NullPointerException("null table");
@@ -403,6 +426,10 @@ public class DBqueries {
         }
     }
 
+    /**
+     *
+     * @param songList songs
+     */
     public void batchInsertCombview(List<Song> songList) {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
@@ -428,6 +455,9 @@ public class DBqueries {
         }
     }
 
+    /**
+     * SQLite DB command for optimisation.
+     */
     public void vacuum() {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement("VACUUM;");

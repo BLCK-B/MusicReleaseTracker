@@ -19,7 +19,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.graalvm.buildtools.native' version '0.10.4'
+    id 'org.graalvm.buildtools.native' version '0.10.5'
 }
 
 group 'com.blck'
@@ -52,7 +52,7 @@ java {
 }
 
 dependencies {
-    implementation 'org.xerial:sqlite-jdbc:3.48.0.0'
+    implementation 'org.xerial:sqlite-jdbc:3.49.0.0'
     implementation 'org.jsoup:jsoup:1.18.3'
 
     testImplementation(platform('org.junit:junit-bom:5.11.4'))

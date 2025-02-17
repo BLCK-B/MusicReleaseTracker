@@ -79,29 +79,17 @@ app.whenReady().then(async () => {
     // externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
     const EXEPath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
 
-    console.log(execPath);
+    console.log("exe path: " + execPath);
 
-    externalEXE = spawn(EXEPath, { detached: true, stdio: "ignore" });
+    // externalEXE = spawn(EXEPath, { detached: true, stdio: "ignore" });
 
-    externalEXE.stdout.on("data", (data) => {
-      console.error(data.toString());
-    });
-
-    externalEXE.stderr.on("data", (data) => {
-      console.error(data.toString());
-    });
-
-    externalEXE.on("error", (err) => {
-      console.error("Error spawning process:", err);
-
-      execFile(EXEPath, (error, stdout, stderr) => {
-        if (error) {
-          console.log("execfile error");
-          return;
-        }
-        console.log(stdout);
-        console.error(stderr);
-      });
+    execFile(EXEPath, (error, stdout, stderr) => {
+      if (error) {
+        console.log("execfile error");
+        return;
+      }
+      console.log(stdout);
+      console.error(stderr);
     });
   }
 

@@ -75,12 +75,9 @@ async function checkBackendReady() {
 app.whenReady().then(async () => {
   // needs open backend in dev to run
   if (process.env.NODE_ENV !== "development") {
-    const path = require("path");
-    const exePath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
-    externalEXE = spawn(exePath, { detached: true, stdio: "ignore" });
-
     // externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
-
+    const EXEPath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
+    externalEXE = spawn(EXEPath, { detached: true, stdio: "ignore" });
     externalEXE.on("error", (err) => {
       console.error("Error spawning process:", err);
     });

@@ -2,9 +2,10 @@
 import { app, BrowserWindow, Menu, shell } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
-import { spawn } from "child_process";
+import { spawn, execFile } from "child_process";
 import axios from "axios";
 import windowStateKeeper from "electron-window-state";
+import { execPath } from "process";
 
 axios.defaults.baseURL = "http://localhost:57782";
 
@@ -77,9 +78,30 @@ app.whenReady().then(async () => {
   if (process.env.NODE_ENV !== "development") {
     // externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
     const EXEPath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
+
+    console.log(execPath);
+
     externalEXE = spawn(EXEPath, { detached: true, stdio: "ignore" });
+
+    externalEXE.stdout.on("data", (data) => {
+      console.error(data.toString());
+    });
+
+    externalEXE.stderr.on("data", (data) => {
+      console.error(data.toString());
+    });
+
     externalEXE.on("error", (err) => {
       console.error("Error spawning process:", err);
+
+      execFile(EXEPath, (error, stdout, stderr) => {
+        if (error) {
+          console.log("execfile error");
+          return;
+        }
+        console.log(stdout);
+        console.error(stderr);
+      });
     });
   }
 

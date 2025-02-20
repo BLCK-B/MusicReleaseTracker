@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -39,6 +39,11 @@ public class MigrateDB {
         this.log = errorLogging;
     }
 
+    /**
+     * Creates a DB file (if doesnt exist) with all tables.
+     *
+     * @param path DB file path
+     */
     public void createDBandTables(Path path) {
         // note: generate by string templates after preview
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + path)) {
@@ -105,6 +110,13 @@ public class MigrateDB {
         }
     }
 
+    /**
+     * Create a new DB file to replace {@code DB} if there is a structure difference. <br/>
+     * Copies over some data: see {@code copyArtistsData}.
+     *
+     * @param DB current DB path
+     * @param DBtemplate temporary template DB path
+     */
     public void migrateDB(Path DB, Path DBtemplate) {
         try {
             Files.deleteIfExists(DBtemplate);
@@ -123,6 +135,13 @@ public class MigrateDB {
         }
     }
 
+    /**
+     * Retains only {@code artists} data. Source tables are cleared. <br/>
+     * New columns are empty while dropped columns' data is lost.
+     *
+     * @param sourceDB previous DB with data
+     * @param targetDB new DB where data is transferred
+     */
     public void copyArtistsData(Path sourceDB, Path targetDB) {
         var DBcolumns = getDBStructure(sourceDB).get("artists");
         var templateColumns = getDBStructure(targetDB).get("artists");
@@ -139,6 +158,11 @@ public class MigrateDB {
         }
     }
 
+    /**
+     *
+     * @param path DB file path
+     * @return map with table names as key and their columns list as value
+     */
     public Map<String, ArrayList<String>> getDBStructure(Path path) {
         if (Files.notExists(path))
             throw new RuntimeException("file " + path +  " does not exist");
@@ -169,6 +193,9 @@ public class MigrateDB {
         return tableMap;
     }
 
+    /**
+     * Deletes DB file and creates an empty file.
+     */
     public void resetDB() {
         File musicdata = new File(store.getAppDataPath() + "musicdata.db");
         musicdata.delete();

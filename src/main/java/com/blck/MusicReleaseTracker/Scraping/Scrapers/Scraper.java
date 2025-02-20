@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -30,6 +30,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * The common denominator of specific web source scrapers with super methods and other to be overriden. </br>
+ * It is not abstract because we need instantiation.
+ */
 public class Scraper {
 
     protected final ErrorLogging log;

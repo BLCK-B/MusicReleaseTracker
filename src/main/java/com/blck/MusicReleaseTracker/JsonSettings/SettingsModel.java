@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -18,7 +18,9 @@ package com.blck.MusicReleaseTracker.JsonSettings;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/** the default settings file definition */
+/**
+ *  The default settings file definition. The enum specifies options which are then converted to JSON representation.
+ */
 public enum SettingsModel {
     theme("black"),
     accent("cactus"),
@@ -34,6 +36,7 @@ public enum SettingsModel {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final Object value;
+
     SettingsModel(Object value) {
         this.value = value;
     }

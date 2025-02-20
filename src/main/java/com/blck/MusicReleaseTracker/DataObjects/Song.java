@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -29,6 +29,13 @@ public class Song implements Comparable<Song>, MediaItem {
     private final Optional<String> songType;
     private String album;
 
+    /**
+     *
+     * @param songName name of the song
+     * @param songArtists best created with just one artist
+     * @param songDate yyyy-MM-dd
+     * @param songType type of song for filtering purposes like remix, instrumental
+     */
     public Song(String songName, String songArtists, String songDate, String songType) {
         this.songName = songName;
         this.songArtists = new TreeSet<>();
@@ -42,6 +49,12 @@ public class Song implements Comparable<Song>, MediaItem {
             this.songType = Optional.of(songType);
     }
 
+    /**
+     *  Constructor for song with unspecified type.
+     * @param songName name of the song
+     * @param songArtists best created with just one artist
+     * @param songDate yyyy-MM-dd
+     */
     public Song(String songName, String songArtists, String songDate) {
         this.songName = songName;
         this.songArtists = new TreeSet<>();
@@ -74,6 +87,11 @@ public class Song implements Comparable<Song>, MediaItem {
         return songType;
     }
 
+    /**
+     * Appends new artist to the song's artist list and sorts alphabetically.
+     *
+     * @param artist artist to add
+     */
     public void appendArtist(String artist) {
         this.songArtists.add(artist);
     }
@@ -84,16 +102,29 @@ public class Song implements Comparable<Song>, MediaItem {
                 (songType.map(type -> " " + type).orElse(""));
     }
 
+    /**
+     *
+     * @param formatter date formatter (yyyy-MM-dd)
+     * @return compare release dates
+     */
     public int compareDates(Song s, DateTimeFormatter formatter) {
         return LocalDate.parse(getDate(), formatter)
                 .compareTo(LocalDate.parse(s.getDate(), formatter));
     }
 
+    /**
+     *
+     * @return compare song names
+     */
     @Override
     public int compareTo(Song s) {
         return getName().toLowerCase().compareTo(s.getName().toLowerCase());
     }
 
+    /**
+     *
+     * @return true if the song names match
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null)

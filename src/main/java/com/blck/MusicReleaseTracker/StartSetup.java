@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -34,11 +34,15 @@ public class StartSetup {
         this.log = errorLogging;
     }
 
-    public void createPathsAndDirs() {
-        createPaths();
-        createDirs();
-    }
-
+    /**
+     *  Prepare system file paths:
+     *  <ul>
+     *     <li>AppData / user.home</li>
+     *     <li>DB</li>
+     *     <li>settings</li>
+     *     <li>logs</li>
+     * </ul>
+     */
     public void createPaths() {
         String appData = null;
         final String os = System.getProperty("os.name").toLowerCase();
@@ -66,6 +70,9 @@ public class StartSetup {
         );
     }
 
+    /**
+     *  Create AppData dir, handle sqlite temporary files.
+     */
     public void createDirs() {
         String appDataPath = store.getAppDataPath();
         try {

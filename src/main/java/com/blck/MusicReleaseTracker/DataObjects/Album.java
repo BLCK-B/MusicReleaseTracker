@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -17,6 +17,11 @@ package com.blck.MusicReleaseTracker.DataObjects;
 
 import java.util.List;
 
+/**
+ *
+ * @param album album identifier, ideally unique
+ * @param songs list of songs that the album consists of
+ */
 public record Album(String album, List<Song> songs) implements MediaItem {
 	public List<Song> getAlbumSongs() {
 		return songs;

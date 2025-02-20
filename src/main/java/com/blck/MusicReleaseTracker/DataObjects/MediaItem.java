@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -15,7 +15,10 @@
 
 package com.blck.MusicReleaseTracker.DataObjects;
 
-/** container for songs and albums intended for frontend */
+/**
+ * MediaItem may represent a {@code Song} or an {@code Album}. </br>
+ * The shared parameters of a song and album are are date and name.
+ */
 public interface MediaItem {
 	String getDate();
 	String getName();

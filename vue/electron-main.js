@@ -101,13 +101,11 @@ function logFilesInDirectory(dir) {
 app.whenReady().then(async () => {
   // needs open backend in dev to run
   if (process.env.NODE_ENV !== "development") {
-    // externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
     const EXEPath = "../buildResources/MusicReleaseTracker";
-    // const EXEPath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
 
     console.log("exe path: " + execPath);
     console.log("all files:");
-    logFilesInDirectory(__dirname);
+    logFilesInDirectory(path.join(__dirname, "../"));
 
     externalEXE = spawn(EXEPath, { detached: true, stdio: "ignore" });
   }

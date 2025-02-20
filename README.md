@@ -17,18 +17,17 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 ##
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/45c03cce-bccb-491f-848e-4e1c0d6c7b60" width="500px"/> <br>
-<img src="https://github.com/user-attachments/assets/11ef4c87-c21b-4c7c-bb55-fc76b835f63a" width="500px"/>
+<img src="https://github.com/user-attachments/assets/c2e15386-6810-4790-8998-4f6954e6d7b8" width="500px"/> <br>
+<img src="https://github.com/user-attachments/assets/faa07769-18e9-484d-afe9-a1bed36771f7" width="500px"/>
 </p>
 
 ##
 
 Latest information is compiled into a simple overview. This is achieved through custom processing.
 
-You will no longer have to search social media or streaming services. Never miss a new song again.
+You will no longer have to search social media or streaming services. Never miss a new song or album again.
 
 Currently available sources: `Beatport`, `Musicbrainz`, `Junodownload`, `Youtube`.
-
 
 ##
 

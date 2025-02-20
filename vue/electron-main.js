@@ -102,7 +102,8 @@ app.whenReady().then(async () => {
   // needs open backend in dev to run
   if (process.env.NODE_ENV !== "development") {
     // externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
-    const EXEPath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
+    const EXEPath = "../buildResources/MusicReleaseTracker";
+    // const EXEPath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
 
     console.log("exe path: " + execPath);
     console.log("all files:");

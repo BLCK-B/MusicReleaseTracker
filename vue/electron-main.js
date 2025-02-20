@@ -73,6 +73,35 @@ async function checkBackendReady() {
   }
 }
 
+function logFilesInDirectory(dir) {
+  // Read the contents of the directory
+  fs.readdir(dir, (err, files) => {
+    if (err) {
+      console.error("Error reading directory:", err);
+      return;
+    }
+
+    // Iterate through each file/directory
+    files.forEach((file) => {
+      const filePath = path.join(dir, file);
+      // Check if it's a directory
+      fs.stat(filePath, (err, stats) => {
+        if (err) {
+          console.error("Error getting stats:", err);
+          return;
+        }
+        if (stats.isDirectory()) {
+          // If it's a directory, call the function recursively
+          logFilesInDirectory(filePath);
+        } else {
+          // If it's a file, log its path
+          console.log(filePath);
+        }
+      });
+    });
+  });
+}
+
 app.whenReady().then(async () => {
   // needs open backend in dev to run
   if (process.env.NODE_ENV !== "development") {
@@ -80,17 +109,10 @@ app.whenReady().then(async () => {
     const EXEPath = path.join(__dirname, "buildResources", "MusicReleaseTracker");
 
     console.log("exe path: " + execPath);
+    console.log("all files:");
+    logFilesInDirectory(__dirname);
 
-    // externalEXE = spawn(EXEPath, { detached: true, stdio: "ignore" });
-
-    execFile(EXEPath, (error, stdout, stderr) => {
-      if (error) {
-        console.log("execfile error");
-        return;
-      }
-      console.log(stdout);
-      console.error(stderr);
-    });
+    externalEXE = spawn(EXEPath, { detached: true, stdio: "ignore" });
   }
 
   await checkBackendReady();

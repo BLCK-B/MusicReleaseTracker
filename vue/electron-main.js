@@ -6,6 +6,7 @@ import { spawn, execFile } from "child_process";
 import axios from "axios";
 import windowStateKeeper from "electron-window-state";
 import { execPath } from "process";
+import * as fs from "fs/promises";
 
 axios.defaults.baseURL = "http://localhost:57782";
 
@@ -75,31 +76,26 @@ async function checkBackendReady() {
 
 function logFilesInDirectory(dir) {
   // Read the contents of the directory
-  fs.readdir(dir, (err, files) => {
-    if (err) {
-      console.error("Error reading directory:", err);
-      return;
-    }
+  fs.readdir(dir)
+    .then((files) => {
+      // Iterate through each file/directory
+      files.forEach((file) => {
+        const filePath = path.join(dir, file);
 
-    // Iterate through each file/directory
-    files.forEach((file) => {
-      const filePath = path.join(dir, file);
-      // Check if it's a directory
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          console.error("Error getting stats:", err);
-          return;
-        }
-        if (stats.isDirectory()) {
-          // If it's a directory, call the function recursively
-          logFilesInDirectory(filePath);
-        } else {
-          // If it's a file, log its path
-          console.log(filePath);
-        }
+        fs.stat(filePath)
+          .then((stats) => {
+            if (stats.isDirectory()) {
+              // If it's a directory, call the function recursively
+              logFilesInDirectory(filePath);
+            } else {
+              // If it's a file, log its path
+              console.log(filePath);
+            }
+          })
+          .catch((err) => console.error("Error getting stats:", err));
       });
-    });
-  });
+    })
+    .catch((err) => console.error("Error reading directory:", err));
 }
 
 app.whenReady().then(async () => {

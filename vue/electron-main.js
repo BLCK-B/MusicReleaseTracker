@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { spawn } from "child_process";
 import axios from "axios";
 import windowStateKeeper from "electron-window-state";
+import fs from "fs";
 
 axios.defaults.baseURL = "http://localhost:57782";
 
@@ -72,9 +73,30 @@ async function checkBackendReady() {
   }
 }
 
+function printFilesRecursively(dir) {
+  console.log("contents: ");
+  fs.readdir(dir, { withFileTypes: true }, (err, files) => {
+    if (err) {
+      console.error(`Error reading directory ${dir}:`, err);
+      return;
+    }
+    files.forEach((file) => {
+      const fullPath = path.join(dir, file.name);
+      console.log(fullPath);
+      if (file.isDirectory()) {
+        printFilesRecursively(fullPath);
+      }
+    });
+  });
+}
+
 app.whenReady().then(async () => {
   // needs open backend in dev to run
   if (process.env.NODE_ENV !== "development") {
+    console.log("root: ", __dirname);
+    const rootDir = path.join(__dirname, "..");
+    printFilesRecursively(rootDir);
+
     externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
   }
 

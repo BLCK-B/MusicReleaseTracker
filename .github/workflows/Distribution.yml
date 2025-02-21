@@ -8,9 +8,9 @@ on:
         required: true
         default: "yes"
       platforms:
-        description: "OSes to compile for, comma separated."
+        description: "PLatforms to compile for."
         required: true
-        default: "ubuntu-latest,windows-latest,macos-latest"
+        default: "[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]"
       make-draft:
         description: "Make draft release?"
         required: true
@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [${{ inputs.platforms }}]
+        os: ${{fromJson(inputs.platforms)}}
         make-native: [yes]
     steps:
       - uses: actions/checkout@v4

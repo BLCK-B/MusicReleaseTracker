@@ -96,7 +96,7 @@ app.whenReady().then(async () => {
     console.log("root: ", __dirname);
     const basePath = process.cwd();
     const exePath = path.join(basePath, "buildResources", "MusicReleaseTracker");
-    printFilesRecursively(exePath);
+    // printFilesRecursively(exePath);
 
     externalEXE = spawn(exePath, { detached: true, stdio: "ignore" });
   }

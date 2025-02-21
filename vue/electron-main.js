@@ -94,12 +94,11 @@ app.whenReady().then(async () => {
   // needs open backend in dev to run
   if (process.env.NODE_ENV !== "development") {
     console.log("root: ", __dirname);
-    const rootDir = path.resolve(__dirname, "..");
-    const anotherWay = app.getAppPath();
-    printFilesRecursively(rootDir);
-    printFilesRecursively(anotherWay);
+    const basePath = process.cwd();
+    const exePath = path.join(basePath, "buildResources", "MusicReleaseTracker");
+    printFilesRecursively(exePath);
 
-    externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
+    externalEXE = spawn(exePath, { detached: true, stdio: "ignore" });
   }
 
   await checkBackendReady();

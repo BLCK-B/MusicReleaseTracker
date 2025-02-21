@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { spawn } from "child_process";
 import axios from "axios";
 import windowStateKeeper from "electron-window-state";
+import fs from "fs";
 
 axios.defaults.baseURL = "http://localhost:57782";
 
@@ -75,7 +76,25 @@ async function checkBackendReady() {
 app.whenReady().then(async () => {
   // needs open backend in dev to run
   if (process.env.NODE_ENV !== "development") {
-    externalEXE = spawn("buildResources/MusicReleaseTracker", { detached: true, stdio: "ignore" });
+    let currentDir = __dirname;
+    // climb up until buildResources is present - necessary for portables
+    for (let i = 0; i <= 2; ++i) {
+      currentDir = path.dirname(currentDir);
+      try {
+        const contents = fs.readdirSync(currentDir);
+        console.log(`Contents at Level ${i}: ${currentDir} - ${contents}`);
+        if (contents.includes("buildResources")) {
+          console.log("buildResources is present");
+        }
+        if (i == 1) {
+          const truePath = path.join(currentDir, "buildResources", "MusicReleaseTracker");
+          externalEXE = spawn(truePath, { detached: true, stdio: "ignore" });
+          break;
+        }
+      } catch (e) {
+        console.error(`Error reading directory ${e}`);
+      }
+    }
   }
 
   await checkBackendReady();

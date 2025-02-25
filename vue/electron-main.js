@@ -11,6 +11,8 @@ axios.defaults.baseURL = "http://localhost:57782";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const appDataPath = app.getPath("appData");
+const logFilePath = path.join(appDataPath, "MusicReleaseTracker", "errorlogs.txt");
 
 app.disableHardwareAcceleration();
 
@@ -67,14 +69,23 @@ async function checkBackendReady() {
       const response = await axios.get("/api/isBackendReady");
       if (response.data === true) break;
     } catch (error) {
-      console.error();
+      writeLog(error);
     }
     await new Promise((resolve) => setTimeout(resolve, 5));
   }
 }
 
+function writeLog(message) {
+  const timestamp = new Date().toISOString();
+  const logMessage = `${timestamp} - Electron log: ${message}\n`;
+  console.log(logMessage);
+  fs.appendFile(logFilePath, logMessage, (err) => {
+    if (err) console.error("Error writing to log", err);
+  });
+}
+
 app.whenReady().then(async () => {
-  // needs open backend in dev to run
+  // needs an open backend in dev to connect to
   if (process.env.NODE_ENV !== "development") {
     let currentDir = __dirname;
     // climb up until buildResources is present - necessary for portables
@@ -82,17 +93,15 @@ app.whenReady().then(async () => {
       currentDir = path.dirname(currentDir);
       try {
         const contents = fs.readdirSync(currentDir);
-        console.log(`Contents at Level ${i}: ${currentDir} - ${contents}`);
+        writeLog(`Contents at Level ${i}: ${currentDir} - ${contents}`);
         if (contents.includes("buildResources")) {
-          console.log("buildResources is present");
-        }
-        if (i == 1) {
+          writeLog("buildResources is present");
           const truePath = path.join(currentDir, "buildResources", "MusicReleaseTracker");
           externalEXE = spawn(truePath, { detached: true, stdio: "ignore" });
           break;
         }
       } catch (e) {
-        console.error(`Error reading directory ${e}`);
+        writeLog(`Error reading directory ${e}`);
       }
     }
   }

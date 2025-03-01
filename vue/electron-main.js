@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { app, BrowserWindow, Menu, shell } from "electron";
+import { app, BrowserWindow, Menu, shell, dialog } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
@@ -11,8 +11,23 @@ axios.defaults.baseURL = "http://localhost:57782";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const appDataPath = app.getPath("appData");
-const logFilePath = path.join(appDataPath, "MusicReleaseTracker", "errorlogs.txt");
+const logFilePath = getLogPath();
+
+function getLogPath() {
+  let appDataPath;
+  switch (process.platform) {
+    case "win32":
+      appDataPath = app.getPath("appData");
+      break;
+    case "darwin":
+    case "linux":
+      appDataPath = os.homedir();
+      break;
+    default:
+      throw new Error("Unsupported OS");
+  }
+  return path.join(appDataPath, "MusicReleaseTracker", "errorlogs.txt");
+}
 
 app.disableHardwareAcceleration();
 
@@ -84,6 +99,14 @@ function writeLog(message) {
   });
 }
 
+function electronStartErrorDialog(error) {
+  dialog.showErrorBox(
+    `Error: ${error.message}`,
+    `Please report this at the issue tracker.\n\nThe error logs file is located in: ${logFilePath}`
+  );
+  app.quit();
+}
+
 app.whenReady().then(async () => {
   // needs an open backend in dev to connect to
   if (process.env.NODE_ENV !== "development") {
@@ -97,11 +120,18 @@ app.whenReady().then(async () => {
         if (contents.includes("buildResources")) {
           writeLog("buildResources is present");
           const truePath = path.join(currentDir, "buildResources", "MusicReleaseTracker");
+          // intentional
+          electronStartErrorDialog({ message: "This works as expected." });
           externalEXE = spawn(truePath, { detached: true, stdio: "ignore" });
           break;
         }
       } catch (e) {
         writeLog(`Error reading directory ${e}`);
+        electronStartErrorDialog(e);
+      }
+      if (i == 2) {
+        writeLog("Backend executable not found.");
+        electronStartErrorDialog({ message: "Backend executable not found." });
       }
     }
   }

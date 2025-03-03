@@ -6,6 +6,7 @@ import { spawn } from "child_process";
 import axios from "axios";
 import windowStateKeeper from "electron-window-state";
 import fs from "fs";
+import os from "os";
 
 axios.defaults.baseURL = "http://localhost:57782";
 

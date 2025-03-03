@@ -12,9 +12,9 @@ updates:
         update-types:
           - "patch"
           - "minor"
-    allow:
+    ignore:
       - dependency-name: "org.jsoup:jsoup"
-        versions: ["1.18.3"] # IDE compiler issue: https://youtrack.jetbrains.com/issue/IDEA-365356/
+        versions: [ ">=1.18.3" ]
   - package-ecosystem: "npm"
     directory: "/vue" 
     schedule:

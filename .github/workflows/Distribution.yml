@@ -7,10 +7,15 @@ on:
         description: "Build native executables and package with electron-builder? yes/no"
         required: true
         default: "yes"
-      make-draft:
-        description: "Make draft release? yes/no"
+      platforms:
+        description: "PLatforms to compile for."
         required: true
-        default: "yes"
+        default: "[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]"
+      make-draft:
+        description: "Make draft release?"
+        required: true
+        type: boolean
+        default: false
 
 env:
   JAVA_VERSION: "23"
@@ -44,7 +49,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: ${{fromJson(inputs.platforms)}}
         make-native: [yes]
     steps:
       - uses: actions/checkout@v4
@@ -89,7 +94,7 @@ jobs:
   draft-release:
     needs: native-and-electron
     runs-on: ubuntu-latest
-    if: ${{ inputs.make-draft == 'yes' }}
+    if: ${{ inputs.make-draft }}
     steps:
       - uses: actions/checkout@v4
       - name: Download candidate artifacts

@@ -37,6 +37,9 @@ let externalEXE;
 function createWindow() {
   if (process.env.NODE_ENV !== "development") Menu.setApplicationMenu(null);
 
+  // single instance allowed
+  if (!app.requestSingleInstanceLock()) app.quit();
+
   const mainWindowState = windowStateKeeper({
     defaultWidth: 900,
     defaultHeight: 650,
@@ -80,14 +83,20 @@ function createWindow() {
 
 // could be better than this polling
 async function checkBackendReady() {
+  let attempts = 0;
   while (true) {
     try {
       const response = await axios.get("/api/isBackendReady");
       if (response.data === true) break;
     } catch (error) {
-      writeLog(error);
+      console.log("Waiting for backend ready.");
     }
     await new Promise((resolve) => setTimeout(resolve, 5));
+    attempts++;
+    if (attempts === 150) {
+      writeLog(`Backend connection timeout.`);
+      electronStartErrorDialog({ message: "Backend connection timeout." });
+    }
   }
 }
 
@@ -121,9 +130,7 @@ app.whenReady().then(async () => {
         if (contents.includes("buildResources")) {
           writeLog("buildResources is present");
           const truePath = path.join(currentDir, "buildResources", "MusicReleaseTracker");
-          // intentional
-          electronStartErrorDialog({ message: "This works as expected." });
-          externalEXE = spawn(truePath, { detached: true, stdio: "ignore" });
+          externalEXE = spawn(truePath, { detached: false, stdio: "ignore" });
           break;
         }
       } catch (e) {

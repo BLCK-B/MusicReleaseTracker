@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class SettingsIO {
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final ValueStore store;
     private final ErrorLogging log;
 

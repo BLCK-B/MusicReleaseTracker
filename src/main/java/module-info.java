@@ -13,17 +13,19 @@ module com.blck.MusicReleaseTracker {
 	requires java.desktop;
 
 	opens com.blck.MusicReleaseTracker;
+    opens com.blck.MusicReleaseTracker.Core;
+    opens com.blck.MusicReleaseTracker.DataObjects;
+    opens com.blck.MusicReleaseTracker.DB;
+    opens com.blck.MusicReleaseTracker.FrontendAPI;
+    opens com.blck.MusicReleaseTracker.JsonSettings;
+    opens com.blck.MusicReleaseTracker.Scraping;
 
     exports com.blck.MusicReleaseTracker;
     exports com.blck.MusicReleaseTracker.Core;
-    opens com.blck.MusicReleaseTracker.Core;
-    opens com.blck.MusicReleaseTracker.Scraping;
-    exports com.blck.MusicReleaseTracker.Scraping;
-    exports com.blck.MusicReleaseTracker.FrontendAPI;
-    opens com.blck.MusicReleaseTracker.FrontendAPI;
     exports com.blck.MusicReleaseTracker.DataObjects;
-    opens com.blck.MusicReleaseTracker.DataObjects;
     exports com.blck.MusicReleaseTracker.DB;
-    opens com.blck.MusicReleaseTracker.DB;
+    exports com.blck.MusicReleaseTracker.FrontendAPI;
+    exports com.blck.MusicReleaseTracker.JsonSettings;
+    exports com.blck.MusicReleaseTracker.Scraping;
 }
 

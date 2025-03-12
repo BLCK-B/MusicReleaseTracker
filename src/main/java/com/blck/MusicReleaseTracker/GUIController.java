@@ -26,6 +26,7 @@ import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Map;
 /**
  *  Class with methods called from ApiController
  */
+@Component
 public class GUIController {
 
     private final ValueStore store;
@@ -64,7 +66,7 @@ public class GUIController {
     }
 
     public void addNewArtist(String name) {
-        if (name.isEmpty() || name.isBlank())
+        if (name.isBlank())
             return;
         DB.insertIntoArtistList(name);
     }

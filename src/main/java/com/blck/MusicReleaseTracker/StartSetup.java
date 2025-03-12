@@ -18,11 +18,13 @@ package com.blck.MusicReleaseTracker;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+@Component
 public class StartSetup {
     final String slash = File.separator;
     private final ValueStore store;

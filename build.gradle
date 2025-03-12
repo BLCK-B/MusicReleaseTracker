@@ -52,7 +52,7 @@ java {
 }
 
 dependencies {
-    implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+    implementation 'org.xerial:sqlite-jdbc:3.47.0.0'
     implementation 'org.jsoup:jsoup:1.18.3'
 
     testImplementation(platform('org.junit:junit-bom:5.12.0'))

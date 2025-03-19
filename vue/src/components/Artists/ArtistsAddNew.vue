@@ -18,47 +18,43 @@
 </template>
 
 <script>
+import { defineComponent, ref, computed } from "vue";
+import { useStore } from "vuex";
 import axios from "axios";
-import { mapState } from "vuex";
 
-export default {
+export default defineComponent({
   props: {
     addVisibility: Boolean,
   },
-  data: () => ({
-    input: "",
-    rules: [
-      //if isn't empty
-      (value) => !!value.trim(),
-      (value) => (value || "").length <= 25,
-    ],
-  }),
-  computed: {
-    ...mapState(["primaryColor"]),
-    // if no rules in data broken, enable add button
-    isValid() {
-      return this.rules.every((rule) => rule(this.input) === true);
-    },
+  setup(props, { emit }) {
+    const input = ref("");
+    const store = useStore();
+    // empty input forbidden
+    const rules = [(value) => !!value.trim(), (value) => (value || "").length <= 25];
+    const isValid = computed(() => rules.every((rule) => rule(input.value)));
+    const primaryColor = computed(() => store.state.primaryColor);
+
+    const clickAdd = async () => {
+      try {
+        const artistname = encodeURIComponent(input.value.trim());
+        await axios.post("/api/clickArtistAdd", artistname);
+        input.value = "";
+        store.commit("SET_SELECTED_ARTIST", artistname);
+        emit("close-add-new");
+        store.commit("SET_LOAD_REQUEST", true);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    return {
+      input,
+      isValid,
+      primaryColor,
+      clickAdd,
+    };
   },
-  methods: {
-    // add artist to db
-    clickAdd() {
-      // it needs be encoded decoded trimmed ... because axios is changing symbols
-      const artistname = encodeURIComponent(this.input);
-      axios
-        .post("/api/clickArtistAdd", artistname)
-        .then(() => {
-          this.input = "";
-          this.$store.commit("SET_SELECTED_ARTIST", artistname);
-          this.$emit("close-add-new");
-          this.$store.commit("SET_LOAD_REQUEST", true);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-  },
-};
+});
 </script>
 
 <style scoped>

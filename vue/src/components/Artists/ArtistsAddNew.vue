@@ -17,44 +17,36 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref, computed } from "vue";
+<script setup>
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";
 
-export default defineComponent({
-  props: {
-    addVisibility: Boolean,
-  },
-  setup(props, { emit }) {
-    const input = ref("");
-    const store = useStore();
-    // empty input forbidden
-    const rules = [(value) => !!value.trim(), (value) => (value || "").length <= 25];
-    const isValid = computed(() => rules.every((rule) => rule(input.value)));
-    const primaryColor = computed(() => store.state.primaryColor);
-
-    const clickAdd = async () => {
-      try {
-        const artistname = encodeURIComponent(input.value.trim());
-        await axios.post("/api/clickArtistAdd", artistname);
-        input.value = "";
-        store.commit("SET_SELECTED_ARTIST", artistname);
-        emit("close-add-new");
-        store.commit("SET_LOAD_REQUEST", true);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    return {
-      input,
-      isValid,
-      primaryColor,
-      clickAdd,
-    };
-  },
+defineProps({
+  addVisibility: Boolean,
 });
+const emit = defineEmits(["close-add-new"]);
+
+const input = ref("");
+const store = useStore();
+// empty input forbidden
+const rules = [(value) => !!value.trim(), (value) => (value || "").length <= 25];
+const isValid = computed(() => rules.every((rule) => rule(input.value)));
+
+const primaryColor = computed(() => store.state.primaryColor);
+
+function clickAdd() {
+  try {
+    const artistname = encodeURIComponent(input.value.trim());
+    axios.post("/api/clickArtistAdd", artistname);
+    input.value = "";
+    store.commit("SET_SELECTED_ARTIST", artistname);
+    emit("close-add-new");
+    store.commit("SET_LOAD_REQUEST", true);
+  } catch (error) {
+    console.error(error);
+  }
+}
 </script>
 
 <style scoped>

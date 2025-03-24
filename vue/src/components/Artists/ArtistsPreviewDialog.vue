@@ -14,34 +14,32 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
+import { useStore } from "vuex";
 import axios from "axios";
-import { mapState } from "vuex";
 
-export default {
-  computed: {
-    ...mapState(["tableData", "primaryColor", "sourceTab", "selectedArtist"]),
-    hideTable() {
-      return this.tableData.length == 0;
-    },
-  },
-  methods: {
-    // close dialog, delete scraped preview from db
-    clickCancel() {
-      axios.post("/api/cleanArtistSource", { source: this.sourceTab, artist: this.selectedArtist }).catch((error) => {
-        console.error(error);
-      });
-      this.$store.commit("SET_PREVIEW_VIS", false);
-    },
-    // close dialog, save url used for preview
-    clickConfirm() {
-      axios.post("/api/saveUrl", { source: this.sourceTab, artist: this.selectedArtist }).catch((error) => {
-        console.error(error);
-      });
-      this.$store.commit("SET_PREVIEW_VIS", false);
-    },
-  },
-};
+const store = useStore();
+const tableData = computed(() => store.state.tableData);
+const primaryColor = computed(() => store.state.primaryColor);
+const sourceTab = computed(() => store.state.sourceTab);
+const selectedArtist = computed(() => store.state.selectedArtist);
+
+const hideTable = computed(() => tableData.value.length === 0);
+
+function clickCancel() {
+  axios.post("/api/cleanArtistSource", { source: sourceTab, artist: selectedArtist }).catch((error) => {
+    console.error(error);
+  });
+  store.commit("SET_PREVIEW_VIS", false);
+}
+// TODO: not calling axios
+function clickConfirm() {
+  axios.post("/api/saveUrl", { source: sourceTab, artist: selectedArtist }).catch((error) => {
+    console.error(error);
+  });
+  store.commit("SET_PREVIEW_VIS", false);
+}
 </script>
 
 <style scoped>

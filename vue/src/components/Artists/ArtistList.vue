@@ -39,98 +39,87 @@
   <ArtistsPreviewDialog v-if="previewVis" class="preview" />
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, watch } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
 import ArtistsAddNew from "@/components/Artists/ArtistsAddNew.vue";
 import ArtistsPreviewDialog from "@/components/Artists/ArtistsPreviewDialog.vue";
-import axios from "axios";
-import { mapState } from "vuex";
 
-export default {
-  components: {
-    ArtistsAddNew,
-    ArtistsPreviewDialog,
-  },
-  data() {
-    return {
-      addVisibility: false,
-      artistsArrayList: [],
-      showDropdown: false,
-    };
-  },
-  computed: {
-    ...mapState(["allowButtons", "sourceTab", "selectedArtist", "previewVis"]),
-  },
-  created() {
-    // load artist list, last clicked artist if not null
-    this.loadList();
-    // if (response.data !== "") this.lastClickedItem = response.data;
-  },
-  watch: {
-    "$store.state.loadListRequest"(loadListRequest) {
-      if (loadListRequest) {
-        this.$store.commit("SET_LOAD_REQUEST", false);
-        this.loadList();
-      }
-    },
-  },
-  methods: {
-    // populate list from backend
-    loadList() {
-      axios
-        .get("/api/loadList")
-        .then((response) => {
-          this.artistsArrayList = response.data;
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    // load respective table when artist selected
-    handleItemClick(artist) {
-      if (artist === this.selectedArtist) return;
-      axios
-        .post("/api/getTableData", { source: this.sourceTab, artist: artist })
-        .then((response) => {
-          this.$store.commit("SET_SELECTED_ARTIST", artist);
-          this.$store.commit("SET_TABLE_CONTENT", response.data);
-          this.$forceUpdate();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    // show AddArtistDialog
-    clickAddArtist() {
-      this.addVisibility = true;
-    },
-    closeAddNew() {
-      this.addVisibility = false;
-    },
-    // delete all (last selected) artist entries from db, rebuild combview
-    clickDeleteArtist() {
-      if (this.lastClickedItem !== "") {
-        axios
-          .post("/api/deleteArtist", this.selectedArtist)
-          .then(() => {
-            this.$store.commit("SET_SELECTED_ARTIST", "");
-            this.$store.commit("SET_SOURCE_TAB", "combview");
-            this.loadList();
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
-    },
-    showMore() {
-      this.showDropdown = !this.showDropdown;
-    },
-    deleteUrl() {
-      // set null specific URL, trigger table reload
-      axios.post("/api/deleteUrl", { source: this.sourceTab, artist: this.selectedArtist }).then(() => {
-        this.handleItemClick(this.lastClickedItem);
+const store = useStore();
+const addVisibility = ref(false);
+const artistsArrayList = ref([]);
+const showDropdown = ref(false);
+
+const allowButtons = computed(() => store.state.allowButtons);
+const sourceTab = computed(() => store.state.sourceTab);
+const selectedArtist = computed(() => store.state.selectedArtist);
+const previewVis = computed(() => store.state.previewVis);
+
+watch(
+  () => store.state.loadListRequest,
+  (newValue) => {
+    if (newValue) {
+      store.commit("SET_LOAD_REQUEST", false);
+      loadList();
+    }
+  }
+);
+
+onMounted(() => {
+  loadList();
+});
+
+const loadList = () => {
+  axios
+    .get("/api/loadList")
+    .then((response) => {
+      artistsArrayList.value = response.data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+const handleItemClick = (artist) => {
+  if (artist === selectedArtist.value) return;
+  axios
+    .post("/api/getTableData", { source: sourceTab.value, artist: artist })
+    .then((response) => {
+      store.commit("SET_SELECTED_ARTIST", artist);
+      store.commit("SET_TABLE_CONTENT", response.data);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+const clickAddArtist = () => (addVisibility.value = true);
+const closeAddNew = () => (addVisibility.value = false);
+
+// delete all (last selected) artist entries from db, rebuild combview
+const clickDeleteArtist = () => {
+  if (selectedArtist.value !== "") {
+    axios
+      .post("/api/deleteArtist", selectedArtist.value)
+      .then(() => {
+        store.commit("SET_SELECTED_ARTIST", "");
+        store.commit("SET_SOURCE_TAB", "combview");
+        loadList();
+      })
+      .catch((error) => {
+        console.error(error);
       });
-    },
-  },
+  }
+};
+
+const showMore = () => (showDropdown.value = !showDropdown.value);
+
+const deleteUrl = () => {
+  // set null specific URL, trigger table reload
+  axios.post("/api/deleteUrl", { source: sourceTab.value, artist: selectedArtist.value }).then(() => {
+    handleItemClick(selectedArtist.value);
+  });
 };
 </script>
 

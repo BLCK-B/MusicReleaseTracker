@@ -27,27 +27,18 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import ArtistList from "@/components/Artists/ArtistList.vue";
 import SourceMenu from "@/components/Bar/SourceMenu.vue";
 import SourceTable from "@/components/Content/SourceTable.vue";
 import DialogsURL from "@/components/Content/DialogsURL.vue";
 import ProgressBar from "@/components/Content/ProgressBar.vue";
-import { mapState } from "vuex";
+import { computed } from "vue";
+import { useStore } from "vuex";
 
-export default {
-  components: {
-    ArtistList,
-    SourceMenu,
-    SourceTable,
-    DialogsURL,
-    ProgressBar,
-  },
-  computed: {
-    ...mapState(["settingsOpen", "primaryColor", "accentColor", "previewVis"]),
-  },
-  methods: {},
-};
+const store = useStore();
+
+const previewVis = computed(() => store.state.previewVis);
 </script>
 
 <style scoped>

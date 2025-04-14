@@ -9,7 +9,7 @@
         Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
       <input v-model="input" placeholder="https://musicbrainz.org/artist/id/..." />
-      <button @click="clickURL" class="imgbutton">
+      <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
       </button>
@@ -24,7 +24,7 @@
         Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
       <input v-model="input" placeholder="https://beatport.com/artist/artistname/id/..." />
-      <button @click="clickURL" class="imgbutton">
+      <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
       </button>
@@ -39,7 +39,7 @@
         Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
       <input v-model="input" placeholder="https://junodownload.com/artists/artistname/..." />
-      <button @click="clickURL" class="imgbutton">
+      <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
       </button>
@@ -55,7 +55,7 @@
         >. Either a channel ID or URL is accepted. <br />Channel handles will not work.
       </p>
       <input v-model="input" placeholder="https://youtube.com/channel/UCwZEU0wAwIyZb..." />
-      <button @click="clickURL" class="imgbutton">
+      <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
       </button>
@@ -63,57 +63,55 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from "axios";
-import { mapState } from "vuex";
+import { useStore } from "vuex";
+import { ref, computed, watch } from "vue";
 
-export default {
-  data: () => ({
-    input: "",
-  }),
-  computed: {
-    ...mapState(["tableData", "sourceTab", "allowButtons", "selectedArtist", "primaryColor", "urlExists"]),
-  },
-  watch: {
-    // trigger url check on every tableData change
-    tableData() {
-      this.determineDiagShow();
-    },
-  },
-  methods: {
-    // send input to be processed, displays preview dialog with scraped source table
-    clickURL() {
-      // it needs be encoded decoded trimmed ... because axios is changing symbols
-      const url = encodeURIComponent(this.input);
-      this.input = "";
-      if (url) {
-        axios
-          .post("/api/clickAddURL", { source: this.sourceTab, artist: this.selectedArtist, url: url })
-          .then(() => {
-            axios.post("/api/getTableData", { source: this.sourceTab, artist: this.selectedArtist }).then((response) => {
-              this.$store.commit("SET_TABLE_CONTENT", response.data);
-              this.$store.commit("SET_PREVIEW_VIS", true);
-            });
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
-    },
-    // only show dialog when table is null, and if URL does not exist
-    determineDiagShow() {
-      if (this.tableData.length === 0) {
-        axios
-          .post("/api/checkExistURL", { source: this.sourceTab, artist: this.selectedArtist })
-          .then((response) => {
-            this.$store.commit("SET_URL_EXISTS", response.data);
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      } else this.$store.commit("SET_URL_EXISTS", true);
-    },
-  },
+const store = useStore();
+const userInput = ref("");
+const tableData = computed(() => store.state.tableData);
+const sourceTab = computed(() => store.state.sourceTab);
+const allowButtons = computed(() => store.state.allowButtons);
+const selectedArtist = computed(() => store.state.selectedArtist);
+const primaryColor = computed(() => store.state.primaryColor);
+const urlExists = computed(() => store.state.urlExists);
+
+watch(tableData, () => {
+  determineDiagShow();
+});
+
+// send input to be processed, displays preview dialog with scraped source table
+const clickConfirmURL = () => {
+  // it needs to be encoded decoded trimmed ... because axios is changing symbols
+  const url = encodeURIComponent(userInput.value);
+  userInput.value = "";
+  if (url) {
+    axios
+      .post("/api/clickAddURL", { source: sourceTab.value, artist: selectedArtist.value, url: url })
+      .then(() => {
+        axios.post("/api/getTableData", { source: sourceTab.value, artist: selectedArtist.value }).then((response) => {
+          store.commit("SET_TABLE_CONTENT", response.data);
+          store.commit("SET_PREVIEW_VIS", true);
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+};
+
+const determineDiagShow = () => {
+  if (tableData.value.length === 0) {
+    axios
+      .post("/api/checkExistURL", { source: sourceTab.value, artist: selectedArtist.value })
+      .then((response) => {
+        store.commit("SET_URL_EXISTS", response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else store.commit("SET_URL_EXISTS", true);
 };
 </script>
 

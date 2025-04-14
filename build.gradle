@@ -55,7 +55,7 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.47.0.0'
     implementation 'org.jsoup:jsoup:1.19.1'
 
-    testImplementation(platform('org.junit:junit-bom:5.12.1'))
+    testImplementation(platform('org.junit:junit-bom:5.12.2'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine'
 

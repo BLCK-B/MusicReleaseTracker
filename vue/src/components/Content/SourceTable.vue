@@ -90,41 +90,6 @@ const formatDate = (dateString) => {
 };
 </script>
 
-<!-- <script>
-import { mapState } from "vuex";
-
-export default {
-  mounted() {
-    this.isDateInFuture;
-  },
-  computed: {
-    ...mapState(["tableData", "previewVis", "selectedArtist", "isoDates", "sourceTab", "urlExists"]),
-    hideArtistColumn() {
-      return this.sourceTab !== "combview" && this.selectedArtist !== "";
-    },
-    hideTable() {
-      return this.tableData.some((item) => item.song !== null);
-    },
-  },
-  methods: {
-    isDateInFuture(dateString) {
-      const date = new Date(dateString);
-      return date > new Date();
-    },
-    formatDate(dateString) {
-      if (!this.isoDates) {
-        if (dateString === undefined) return dateString;
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        return `${day}. ${month}. ${year}`;
-      } else return dateString;
-    },
-  },
-};
-</script> -->
-
 <style scoped>
 .table-container {
   margin-top: 20px;

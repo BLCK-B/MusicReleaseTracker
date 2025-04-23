@@ -1,28 +1,14 @@
-<!--
-  -         MusicReleaseTracker
-  -         Copyright (C) 2023 - 2024 BLCK
-  -         This program is free software: you can redistribute it and/or modify
-  -         it under the terms of the GNU General Public License as published by
-  -         the Free Software Foundation, either version 3 of the License, or
-  -         (at your option) any later version.
-  -         This program is distributed in the hope that it will be useful,
-  -         but WITHOUT ANY WARRANTY; without even the implied warranty of
-  -         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  -         GNU General Public License for more details.
-  -         You should have received a copy of the GNU General Public License
-  -         along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
 <template>
-  <div v-if="hideTable" class="table-container">
+  <div v-if="tableVisible" class="table-container">
     <div class="table-body">
-      <div v-for="(mediaItem, mediaIndex) in this.tableData" :key="mediaIndex" class="aBubble">
+      <div v-for="(mediaItem, mediaIndex) in tableData" :key="mediaIndex" class="aBubble">
         <table>
           <tbody>
-            <template v-if="mediaItem.songs && mediaItem.songs.length">
-              <tr v-if="mediaItem.album" class="album-header">
+            <!-- album -->
+            <template v-if="isAlbum(mediaItem)">
+              <tr class="album-header">
                 <td class="tdalbumname">
-                  <strong>{{ mediaItem.album }}</strong>
+                  {{ mediaItem.album }}
                 </td>
                 <td class="tdartist"></td>
                 <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
@@ -31,10 +17,11 @@
                 <td class="tdsong">{{ song.name }}</td>
               </tr>
             </template>
+            <!-- separate songs -->
             <template v-else>
               <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" class="single-bubble">
                 <td class="tdsong">{{ mediaItem.name }}</td>
-                <td v-if="!hideArtistColumn" class="tdartist">{{ mediaItem.artists }}</td>
+                <td v-if="artistColumnVisible" class="tdartist">{{ mediaItem.artists }}</td>
                 <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
               </tr>
             </template>
@@ -44,10 +31,10 @@
     </div>
   </div>
 
-  <div v-if="urlExists && !hideTable && !previewVis && sourceTab !== 'combview'" class="emptynotice">
+  <div v-if="urlExists && !tableVisible && !previewVis && sourceTab !== 'combview'" class="emptynotice">
     <p>table empty</p>
   </div>
-  <div v-if="!urlExists && !hideTable && !previewVis && sourceTab === 'combview'" class="quickstart">
+  <div v-if="!urlExists && !tableVisible && !previewVis && sourceTab === 'combview'" class="quickstart">
     <p>
       <span class="title">Quickstart guide</span> <br />
       1. click "add artist" to insert an artist <br />
@@ -58,7 +45,52 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { useStore } from "vuex";
+import { onMounted, computed } from "vue";
+
+const store = useStore();
+
+const tableData = computed(() => store.state.tableData);
+const selectedArtist = computed(() => store.state.selectedArtist);
+const previewVis = computed(() => store.state.previewVis);
+const isoDates = computed(() => store.state.isoDates);
+const sourceTab = computed(() => store.state.sourceTab);
+const urlExists = computed(() => store.state.urlExists);
+
+onMounted(() => {
+  isDateInFuture();
+});
+
+const artistColumnVisible = computed(() => {
+  return !(sourceTab.value !== "combview" && selectedArtist.value !== "");
+});
+
+const tableVisible = computed(() => {
+  return tableData.value.some((item) => item.song !== null);
+});
+
+const isAlbum = (mediaItem) => {
+  return mediaItem.songs && mediaItem.songs.length;
+};
+
+const isDateInFuture = (dateString) => {
+  return new Date(dateString) > new Date();
+};
+
+const formatDate = (dateString) => {
+  if (!isoDates.value) {
+    if (dateString === undefined) return dateString;
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}. ${month}. ${year}`;
+  } else return dateString;
+};
+</script>
+
+<!-- <script>
 import { mapState } from "vuex";
 
 export default {
@@ -91,7 +123,7 @@ export default {
     },
   },
 };
-</script>
+</script> -->
 
 <style scoped>
 .table-container {
@@ -130,6 +162,7 @@ th {
   width: 50%;
   white-space: nowrap;
   overflow: visible;
+  font-weight: bold;
 }
 .tdartist {
   width: 60%;

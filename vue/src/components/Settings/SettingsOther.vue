@@ -8,13 +8,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  emits: ["set-setting"],
-  props: {
-    isoDates: Boolean,
-  },
-};
+<script setup>
+defineProps({
+  isoDates: Boolean,
+});
 </script>
 
 <style scoped>

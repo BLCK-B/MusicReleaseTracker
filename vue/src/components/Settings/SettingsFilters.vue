@@ -32,18 +32,15 @@
   </div>
 </template>
 
-<script>
-export default {
-  emits: ["set-setting"],
-  props: {
-    filterRemix: Boolean,
-    filterVIP: Boolean,
-    filterInstrumental: Boolean,
-    filterAcoustic: Boolean,
-    filterExtended: Boolean,
-    filterRemaster: Boolean,
-  },
-};
+<script setup>
+defineProps({
+  filterRemix: Boolean,
+  filterVIP: Boolean,
+  filterInstrumental: Boolean,
+  filterAcoustic: Boolean,
+  filterExtended: Boolean,
+  filterRemaster: Boolean,
+});
 </script>
 
 <style scoped>

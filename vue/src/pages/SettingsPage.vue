@@ -18,7 +18,11 @@
     </section>
 
     <section class="appearance">
-      <SettingsAppearance :autoTheme="autoTheme" @set-setting="setSetting" :primaryColor="primaryColor" :accentColor="accentColor" />
+      <SettingsAppearance
+        :autoTheme="autoTheme"
+        @set-setting="setSetting"
+        :primaryColor="primaryColor"
+        :accentColor="accentColor" />
     </section>
 
     <section class="other">

@@ -18,7 +18,11 @@
     </section>
 
     <section class="appearance">
-      <SettingsAppearance :autoTheme="autoTheme" @set-setting="setSetting" :primaryColor="primaryColor" :accentColor="accentColor" />
+      <SettingsAppearance
+        :autoTheme="autoTheme"
+        @set-setting="setSetting"
+        :primaryColor="primaryColor"
+        :accentColor="accentColor" />
     </section>
 
     <section class="other">
@@ -35,95 +39,87 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from "axios";
-import { mapState } from "vuex";
+import { useRouter } from "vue-router";
+import { ref, computed, onBeforeMount } from "vue";
+import { useStore } from "vuex";
 import SettingsOther from "../components/Settings/SettingsOther.vue";
 import SettingsDangerZone from "../components/Settings/SettingsDangerZone.vue";
 import SettingsFilters from "../components/Settings/SettingsFilters.vue";
 import SettingsAppearance from "../components/Settings/SettingsAppearance.vue";
 import SettingsSelf from "../components/Settings/SettingsSelf.vue";
 
-export default {
-  components: {
-    SettingsOther,
-    SettingsDangerZone,
-    SettingsFilters,
-    SettingsAppearance,
-    SettingsSelf,
-  },
-  data() {
-    return {
-      filterRemix: false,
-      filterVIP: false,
-      filterInstrumental: false,
-      filterAcoustic: false,
-      filterExtended: false,
-      filterRemaster: false,
-      isoDates: false,
-      accentColor: "N",
-      autoTheme: false,
-      appVersion: "",
-    };
-  },
-  computed: {
-    ...mapState(["primaryColor"]),
-  },
-  created() {
-    axios
-      .get("/api/settingsOpened")
-      .then((response) => {
-        this.filterRemix = response.data.filterRemix === "true";
-        this.filterVIP = response.data.filterVIP === "true";
-        this.filterInstrumental = response.data.filterInstrumental === "true";
-        this.filterAcoustic = response.data.filterAcoustic === "true";
-        this.filterExtended = response.data.filterExtended === "true";
-        this.filterRemaster = response.data.filterRemaster === "true";
-        this.isoDates = response.data.isoDates === "true";
-        this.autoTheme = response.data.autoTheme === "true";
-        if (this.autoTheme == "false") this.primaryColor = response.data.theme;
-        this.accentColor = response.data.accent;
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    axios
-      .get("/api/getAppVersion")
-      .then((response) => {
-        this.appVersion = response.data;
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  },
-  methods: {
-    // close settings, trigger rebuild combview in app
-    clickClose() {
-      this.$store.commit("SET_SETTINGS_OPEN", false);
-      this.$router.push("/");
-    },
-    // write single setting in config
-    setSetting(name, value) {
-      switch (name) {
-        case "theme":
-          this.$store.commit("SET_PRIMARY_COLOR", value);
-          break;
-        case "accent":
-          this.$store.commit("SET_ACCENT_COLOR", value);
-          this.accentColor = value;
-          break;
-        case "isoDates":
-          this.$store.commit("SET_ISODATES", value);
-          break;
-        case "autoTheme":
-          this.autoTheme = value;
-          break;
-      }
-      axios.post(`/api/setSetting`, { name: name, value: value }).catch((error) => {
-        console.error(error);
-      });
-    },
-  },
+const router = useRouter();
+const store = useStore();
+
+const filterRemix = ref(false);
+const filterVIP = ref(false);
+const filterInstrumental = ref(false);
+const filterAcoustic = ref(false);
+const filterExtended = ref(false);
+const filterRemaster = ref(false);
+const accentColor = ref("N");
+const autoTheme = ref(false);
+const appVersion = ref("");
+
+const primaryColor = computed(() => store.state.primaryColor);
+const isoDates = computed(() => store.state.isoDates);
+
+onBeforeMount(() => {
+  axios
+    .get("/api/settingsOpened")
+    .then((response) => {
+      filterRemix.value = response.data.filterRemix === "true";
+      filterVIP.value = response.data.filterVIP === "true";
+      filterInstrumental.value = response.data.filterInstrumental === "true";
+      filterAcoustic.value = response.data.filterAcoustic === "true";
+      filterExtended.value = response.data.filterExtended === "true";
+      filterRemaster.value = response.data.filterRemaster === "true";
+      autoTheme.value = response.data.autoTheme === "true";
+      store.commit("SET_ISODATES", response.data.isoDates === "true");
+      if (autoTheme.value) primaryColor.value = response.data.theme;
+      accentColor.value = response.data.accent;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  axios
+    .get("/api/getAppVersion")
+    .then((response) => {
+      appVersion.value = response.data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+
+// close settings, trigger rebuild combview in app
+const clickClose = () => {
+  store.commit("SET_SETTINGS_OPEN", false);
+  router.push("/");
+};
+
+// write single setting in config
+const setSetting = (name, value) => {
+  switch (name) {
+    case "theme":
+      store.commit("SET_PRIMARY_COLOR", value);
+      break;
+    case "accent":
+      store.commit("SET_ACCENT_COLOR", value);
+      accentColor.value = value;
+      break;
+    case "isoDates":
+      store.commit("SET_ISODATES", value);
+      break;
+    case "autoTheme":
+      autoTheme.value = value;
+      break;
+  }
+  axios.post(`/api/setSetting`, { name: name, value: value }).catch((error) => {
+    console.error(error);
+  });
 };
 </script>
 

@@ -2,47 +2,56 @@
   <p class="title">Appearance</p>
   <div class="appearancecont">
     <div class="theme-buttons">
-      <input type="radio" :checked="primaryColor === 'black'" @change="$emit('set-setting', 'theme', 'black')" :disabled="autoTheme" />
+      <input
+        :checked="primaryColor === 'black'"
+        :disabled="autoTheme"
+        type="radio"
+        @change="$emit('set-setting', 'theme', 'black')" />
       <label :class="{ disabled: autoTheme }">Black</label>
-      <input type="radio" :checked="primaryColor === 'dark'" @change="$emit('set-setting', 'theme', 'dark')" :disabled="autoTheme" />
+      <input
+        :checked="primaryColor === 'dark'"
+        :disabled="autoTheme"
+        type="radio"
+        @change="$emit('set-setting', 'theme', 'dark')" />
       <label :class="{ disabled: autoTheme }">Dark</label>
-      <input type="radio" :checked="primaryColor === 'light'" @change="$emit('set-setting', 'theme', 'light')" :disabled="autoTheme" />
+      <input
+        :checked="primaryColor === 'light'"
+        :disabled="autoTheme"
+        type="radio"
+        @change="$emit('set-setting', 'theme', 'light')" />
       <label :class="{ disabled: autoTheme }">Light</label>
 
       <div class="colorindicator"></div>
     </div>
 
     <div class="accent-buttons">
-      <input type="radio" :checked="accentColor === 'cactus'" @change="$emit('set-setting', 'accent', 'cactus')" />
+      <input :checked="accentColor === 'cactus'" type="radio" @change="$emit('set-setting', 'accent', 'cactus')" />
       <label>Cactus</label>
-      <input type="radio" :checked="accentColor === 'cloud'" @change="$emit('set-setting', 'accent', 'cloud')" />
+      <input :checked="accentColor === 'cloud'" type="radio" @change="$emit('set-setting', 'accent', 'cloud')" />
       <label>Cloud</label>
-      <input type="radio" :checked="accentColor === 'lavender'" @change="$emit('set-setting', 'accent', 'lavender')" />
+      <input :checked="accentColor === 'lavender'" type="radio" @change="$emit('set-setting', 'accent', 'lavender')" />
       <label>Lavender</label>
-      <input type="radio" :checked="accentColor === 'ocean'" @change="$emit('set-setting', 'accent', 'ocean')" />
+      <input :checked="accentColor === 'ocean'" type="radio" @change="$emit('set-setting', 'accent', 'ocean')" />
       <label>Ocean</label>
-      <input type="radio" :checked="accentColor === 'rose'" @change="$emit('set-setting', 'accent', 'rose')" />
+      <input :checked="accentColor === 'rose'" type="radio" @change="$emit('set-setting', 'accent', 'rose')" />
       <label>Rose</label>
-      <input type="radio" :checked="accentColor === 'warm'" @change="$emit('set-setting', 'accent', 'warm')" />
+      <input :checked="accentColor === 'warm'" type="radio" @change="$emit('set-setting', 'accent', 'warm')" />
       <label>Warm</label>
     </div>
   </div>
 
   <div class="belowAppearance">
-    <input type="checkbox" :checked="autoTheme" @change="$emit('set-setting', 'autoTheme', $event.target.checked)" />
+    <input :checked="autoTheme" type="checkbox" @change="$emit('set-setting', 'autoTheme', $event.target.checked)" />
     <label>Match system theme</label>
   </div>
 </template>
 
-<script>
-export default {
-  emits: ["set-setting"],
-  props: {
-    primaryColor: String,
-    accentColor: String,
-    autoTheme: Boolean,
-  },
-};
+<script setup>
+defineProps({
+  primaryColor: String,
+  accentColor: String,
+  autoTheme: Boolean,
+});
 </script>
 
 <style scoped>

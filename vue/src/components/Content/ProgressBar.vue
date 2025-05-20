@@ -1,22 +1,16 @@
 <template>
-    <div class="progress-container">
-      <div class="progressbar" :style="{ width: `${progress}%` }"></div>
-    </div>
+  <div class="progress-container">
+    <div class="progressbar" :style="{ width: `${progress}%` }"></div>
+  </div>
 </template>
-  
-<script>
-import { mapState, mapMutations } from 'vuex';
 
-export default {
-    computed: {
-        ...mapState([
-            'progress',
-        ]),
-    },
-    methods: {
-        ...mapMutations(['setProgress']),
-    },
-}
+<script setup>
+import { computed } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+
+const progress = computed(() => store.state.progress);
 </script>
 
 <style scoped>

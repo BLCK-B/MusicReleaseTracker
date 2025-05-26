@@ -22,9 +22,11 @@ describe("ArtistsAddNew.vue", () => {
       },
       mutations,
     });
+    axios.get.mockClear();
+    axios.post.mockClear();
   });
 
-  async function mountAndAddArtist(store) {
+  async function setup(store) {
     const wrapper = mount(ArtistsAddNew, {
       props: { addVisibility: true },
       global: { plugins: [store] },
@@ -35,12 +37,11 @@ describe("ArtistsAddNew.vue", () => {
     const addButton = wrapper.find('[data-testid="add-button"]');
     const closeButton = wrapper.find('[data-testid="close-button"]');
 
-    axios.post.mockResolvedValue({ data: {} });
     return { wrapper, input, addButton, closeButton };
   }
 
   it("Validates user input and if invalid, disables confirm button.", async () => {
-    const { wrapper, input, addButton } = await mountAndAddArtist(store);
+    const { wrapper, input, addButton } = await setup(store);
 
     // empty input forbidden
     await input.setValue("");
@@ -59,7 +60,7 @@ describe("ArtistsAddNew.vue", () => {
   });
 
   it("Emits close event when close button is clicked.", async () => {
-    const { wrapper, closeButton } = await mountAndAddArtist(store);
+    const { wrapper, closeButton } = await setup(store);
 
     await closeButton.trigger("click");
 
@@ -67,7 +68,7 @@ describe("ArtistsAddNew.vue", () => {
   });
 
   it("Sets new artist as selected artist.", async () => {
-    const { input, addButton } = await mountAndAddArtist(store);
+    const { input, addButton } = await setup(store);
 
     await input.setValue("Joe");
     await addButton.trigger("click");
@@ -76,7 +77,7 @@ describe("ArtistsAddNew.vue", () => {
   });
 
   it("Requests artistList reload when artist added.", async () => {
-    const { input, addButton } = await mountAndAddArtist(store);
+    const { input, addButton } = await setup(store);
 
     await input.setValue("Joe");
     await addButton.trigger("click");
@@ -85,7 +86,7 @@ describe("ArtistsAddNew.vue", () => {
   });
 
   it("Emits close event when artist added.", async () => {
-    const { wrapper, input, addButton } = await mountAndAddArtist(store);
+    const { wrapper, input, addButton } = await setup(store);
 
     await input.setValue("Joe");
     await addButton.trigger("click");

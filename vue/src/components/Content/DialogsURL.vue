@@ -8,7 +8,7 @@
       <p>
         Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
-      <input v-model="input" placeholder="https://musicbrainz.org/artist/id/..." />
+      <input v-model="userInput" placeholder="https://musicbrainz.org/artist/id/..." />
       <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -23,7 +23,7 @@
       <p>
         Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
-      <input v-model="input" placeholder="https://beatport.com/artist/artistname/id/..." />
+      <input v-model="userInput" placeholder="https://beatport.com/artist/artistname/id/..." />
       <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -38,7 +38,7 @@
       <p>
         Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
       </p>
-      <input v-model="input" placeholder="https://junodownload.com/artists/artistname/..." />
+      <input v-model="userInput" placeholder="https://junodownload.com/artists/artistname/..." />
       <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -54,7 +54,7 @@
         Find an auto-generated "Topic" channel of <span class="artistText">{{ selectedArtist }}</span
         >. Either a channel ID or URL is accepted. <br />Channel handles will not work.
       </p>
-      <input v-model="input" placeholder="https://youtube.com/channel/UCwZEU0wAwIyZb..." />
+      <input v-model="userInput" placeholder="https://youtube.com/channel/UCwZEU0wAwIyZb..." />
       <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />

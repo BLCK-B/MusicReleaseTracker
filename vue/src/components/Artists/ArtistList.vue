@@ -64,7 +64,6 @@ const previewVis = computed(() => store.state.previewVis);
 watch(
   () => store.state.loadListRequest,
   (newValue) => {
-    console.log("kkot");
     if (newValue) {
       store.commit("SET_LOAD_REQUEST", false);
       loadList();

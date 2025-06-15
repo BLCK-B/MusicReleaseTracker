@@ -17,6 +17,7 @@ describe("ArtistList.vue", () => {
       },
       SET_SELECTED_ARTIST: vi.fn(),
       SET_TABLE_CONTENT: vi.fn(),
+      SET_SOURCE_TAB: vi.fn(),
     };
 
     store = createStore({

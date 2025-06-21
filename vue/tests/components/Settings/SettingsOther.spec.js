@@ -1,14 +1,12 @@
-import SettingsAppearance from "@/components/Settings/SettingsAppearance.vue";
+import SettingsOther from "@/components/Settings/SettingsOther.vue";
 import { expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
-describe("SettingsAppearance.vue", () => {
+describe("SettingsOther.vue", () => {
   async function setup() {
-    const wrapper = mount(SettingsAppearance, {
+    const wrapper = mount(SettingsOther, {
       props: {
-        primaryColor: "",
-        accentColor: "",
-        autoTheme: false,
+        isoDates: false,
       },
     });
     return { wrapper };
@@ -16,11 +14,10 @@ describe("SettingsAppearance.vue", () => {
 
   it("Every input emits set-setting.", async () => {
     const { wrapper } = await setup();
-    const inputs = wrapper.findAll('input[type="checkbox"], input[type="radio"]');
+    const inputs = wrapper.findAll('input[type="checkbox"]');
 
     let i = 0;
     for (let input of inputs) {
-      console.log(i);
       await input.setChecked();
 
       const emittedEvent = wrapper.emitted("set-setting")[i];

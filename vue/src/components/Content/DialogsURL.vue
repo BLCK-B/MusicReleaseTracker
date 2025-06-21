@@ -1,60 +1,13 @@
 <template>
   <div v-if="!urlExists && allowButtons && selectedArtist">
-    <div v-show="sourceTab === 'musicbrainz'" class="dialog">
+    <div class="dialog">
       <div class="nameLink">
-        <h1>MusicBrainz</h1>
-        <a href="https://musicbrainz.org" target="_blank">musicbrainz.org</a>
+        <h1>{{ currentSource.title }}</h1>
+        <!-- v-if to prevent empty URL flashing -->
+        <a v-if="currentSource.linkText" :href="currentSource.link" target="_blank">{{ currentSource.linkText }}</a>
       </div>
-      <p>
-        Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
-      </p>
-      <input v-model="userInput" placeholder="https://musicbrainz.org/artist/id/..." />
-      <button @click="clickConfirmURL" class="imgbutton">
-        <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
-        <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
-      </button>
-    </div>
-
-    <div v-show="sourceTab === 'beatport'" class="dialog">
-      <div class="nameLink">
-        <h1>Beatport</h1>
-        <a href="https://beatport.com" target="_blank">beatport.com</a>
-      </div>
-      <p>
-        Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
-      </p>
-      <input v-model="userInput" placeholder="https://beatport.com/artist/artistname/id/..." />
-      <button @click="clickConfirmURL" class="imgbutton">
-        <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
-        <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
-      </button>
-    </div>
-
-    <div v-show="sourceTab === 'junodownload'" class="dialog">
-      <div class="nameLink">
-        <h1>Junodownload</h1>
-        <a href="https://junodownload.com" target="_blank">junodownload.com</a>
-      </div>
-      <p>
-        Find <span class="artistText">{{ selectedArtist }}</span> on the site and copy URL.
-      </p>
-      <input v-model="userInput" placeholder="https://junodownload.com/artists/artistname/..." />
-      <button @click="clickConfirmURL" class="imgbutton">
-        <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
-        <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
-      </button>
-    </div>
-
-    <div v-show="sourceTab === 'youtube'" class="dialog">
-      <div class="nameLink">
-        <h1>Youtube</h1>
-        <a href="https://youtube.com" target="_blank">youtube.com</a>
-      </div>
-      <p>
-        Find an auto-generated "Topic" channel of <span class="artistText">{{ selectedArtist }}</span
-        >. Either a channel ID or URL is accepted. <br />Channel handles will not work.
-      </p>
-      <input v-model="userInput" placeholder="https://youtube.com/channel/UCwZEU0wAwIyZb..." />
+      <p v-html="currentSource.instructions"></p>
+      <input v-model="userInput" :placeholder="currentSource.placeholder" />
       <button @click="clickConfirmURL" class="imgbutton">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
@@ -69,6 +22,7 @@ import { useStore } from "vuex";
 import { ref, computed, watch } from "vue";
 
 const store = useStore();
+
 const userInput = ref("");
 const tableData = computed(() => store.state.tableData);
 const sourceTab = computed(() => store.state.sourceTab);
@@ -76,6 +30,39 @@ const allowButtons = computed(() => store.state.allowButtons);
 const selectedArtist = computed(() => store.state.selectedArtist);
 const primaryColor = computed(() => store.state.primaryColor);
 const urlExists = computed(() => store.state.urlExists);
+
+const sources = computed(() => ({
+  musicbrainz: {
+    title: "MusicBrainz",
+    link: "https://musicbrainz.org",
+    linkText: "musicbrainz.org",
+    placeholder: "https://musicbrainz.org/artist/id/...",
+    instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
+  },
+  beatport: {
+    title: "Beatport",
+    link: "https://beatport.com",
+    linkText: "beatport.com",
+    placeholder: "https://beatport.com/artist/artistname/id/...",
+    instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
+  },
+  junodownload: {
+    title: "Junodownload",
+    link: "https://junodownload.com",
+    linkText: "junodownload.com",
+    placeholder: "https://junodownload.com/artists/artistname/...",
+    instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
+  },
+  youtube: {
+    title: "Youtube",
+    link: "https://youtube.com",
+    linkText: "youtube.com",
+    placeholder: "https://youtube.com/channel/UCwZEU0wAwIyZb...",
+    instructions: `Find an auto-generated "Topic" channel of <b>${selectedArtist.value}</b>. Both channel ID and URL are accepted.<br/>Channel handles will not work.`,
+  },
+}));
+
+const currentSource = computed(() => sources.value[sourceTab.value] || "this source is undefined");
 
 watch(tableData, () => {
   determineDiagShow();
@@ -179,9 +166,5 @@ button:hover {
 :disabled {
   opacity: 0.5;
   pointer-events: none;
-}
-.artistText {
-  user-select: text;
-  font-weight: bold;
 }
 </style>

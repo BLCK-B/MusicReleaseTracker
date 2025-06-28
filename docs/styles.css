@@ -1,0 +1,182 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #1e1e1e;
+  color: #f1f1f1;
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-bottom: 2px solid #a659d3;
+  background: radial-gradient(circle at top, #a659d320 10%, transparent 100%);
+}
+
+.logo {
+  width: 130px;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  color: #CCCCFF;
+  font-size: 28px;
+  margin: 0;
+}
+
+.description {
+  padding: 2rem 2rem;
+  max-width: 900px;
+  margin: auto;
+  text-align: left;
+}
+.description h2 {
+  color: #CCCCFF;
+  margin-bottom: 1rem;
+}
+.description p {
+  color: #ddd;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.compare {
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+}
+.compare h2 {
+  margin-bottom: 0rem;
+  color: #CCCCFF;
+}
+.gallery {
+  margin: 0 15px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+}
+.gallery img {
+  height: 100%;
+  max-height: 420px;
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.6);
+}
+
+.gallery-btns {
+  display: flex;
+  gap: 15px;
+}
+.gallery-btn {
+  position: relative;
+  background: #9d66ef;
+  color: black;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  height: 2em;
+}
+.gallery-btn:hover {
+  opacity: 80%;
+}
+
+.downloads {
+  background-color: black;
+  padding: 2rem 1rem;
+  margin-top: 2rem;
+  color: #f1f1f1;
+}
+.downloads h2 {
+  text-align: center;
+  color: #CCCCFF;
+  margin-bottom: 2rem;
+}
+
+.download-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+@media (max-width: 768px) {
+  .download-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.download-row {
+  background: linear-gradient(
+	to bottom right,
+	#80569f 0%,
+	#998af0 65%
+  );
+  border-radius: 10px;
+  padding: 2rem;
+  flex: 1 1 30%;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  justify-content: flex-start;
+}
+
+.download-row1 {
+  filter: hue-rotate(0deg);
+}
+
+.download-row2 {
+  filter: hue-rotate(280deg);
+}
+
+.download-row3 {
+  filter: hue-rotate(90deg);
+}
+
+
+.download-os {
+  display: flex;
+  align-items: center;
+  font-size: 1.4rem;
+  color: black;
+}
+
+.download-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; 
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.download-buttons a {
+  background-color: rgba(204, 204, 255, 0.75);
+  color: #111;
+  padding: 0.5rem 0.9rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: 0.1s ease;
+}
+.download-buttons a:hover {
+  filter: contrast(1.6);
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+footer a {
+  color: #a659d3;
+  text-decoration: none;
+}

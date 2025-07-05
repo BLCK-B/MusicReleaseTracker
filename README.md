@@ -14,6 +14,7 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
   </a>
 </p>
 
+ 
 ##
 
 <p align="center">
@@ -23,9 +24,7 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 
 ##
 
-Latest information is compiled into a simple overview. This is achieved through custom processing.
-
-You will no longer have to search social media or streaming services. Never miss a new song or album again.
+You will no longer have to search social media or streaming services. Never miss a new song or album again. You can choose exactly which sources to use, and which artists you want to track. Latest information is compiled into a simple overview. This is achieved through custom processing. When you want the latest information, just press the refresh button and MusicReleaseTracker will do the job for you. Combining more sources means that you are less likely to miss anything. Best of all, you don’t need any accounts to use it. MRT runs locally on your computer.
 
 Currently available sources: `Beatport`, `Musicbrainz`, `Junodownload`, `Youtube`.
 
@@ -36,6 +35,8 @@ Currently available sources: `Beatport`, `Musicbrainz`, `Junodownload`, `Youtube
 If you find a bug, which may well happen, report it at the [issue tracker](https://github.com/BLCK-B/MusicReleaseTracker/issues). An [email](https://github.com/BLCK-B) is acceptable, too.
 
 For compilation and contribution, see [CONTRIBUTING.md](https://github.com/BLCK-B/MusicReleaseTracker/blob/main/CONTRIBUTING.md).
+
+<img src="https://img.shields.io/github/commits-since/BLCK-B/musicreleasetracker/latest">
 
 ---
 

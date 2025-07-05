@@ -8,10 +8,15 @@
           <button
             @click="deleteUrl()"
             :disabled="sourceTab == null || sourceTab == 'combview' || selectedArtist == '' || !allowButtons"
-            class="deletebtn">
+            class="deletebtn"
+            data-testid="delete-url-button">
             delete selected URL
           </button>
-          <button @click="clickDeleteArtist()" :disabled="selectedArtist == '' || !allowButtons" class="deletebtn">
+          <button
+            @click="clickDeleteArtist()"
+            :disabled="selectedArtist == '' || !allowButtons"
+            class="deletebtn"
+            data-testid="delete-button">
             delete artist
           </button>
         </div>
@@ -82,7 +87,6 @@ const loadList = () => {
 };
 
 const handleItemClick = (artist) => {
-  if (artist === selectedArtist.value) return;
   axios
     .post("/api/getTableData", { source: sourceTab.value, artist: artist })
     .then((response) => {

@@ -1,11 +1,12 @@
 <template>
   <p class="title">Danger zone</p>
   <div class="dangercont">
-    <button v-if="settingsProtection" @click="resetSettings">Reset settings</button>
-    <button v-if="!settingsProtection" @click="resetSettings" @mouseleave="resetProtection">confirm</button>
-
-    <button v-if="dbProtection" @click="resetDB">Reset database</button>
-    <button v-if="!dbProtection" @click="resetDB" @mouseleave="resetProtection">confirm</button>
+    <button @click="resetSettings" @mouseleave="resetProtection" data-testid="reset-settings-btn">
+      {{ settingsProtection ? "Reset settings" : "Confirm" }}
+    </button>
+    <button @click="resetDB" @mouseleave="resetProtection" data-testid="reset-db-btn">
+      {{ dbProtection ? "Reset database" : "Confirm" }}
+    </button>
   </div>
 </template>
 
@@ -16,7 +17,6 @@ import axios from "axios";
 const settingsProtection = ref(true);
 const dbProtection = ref(true);
 
-// default the settings
 const resetSettings = () => {
   if (settingsProtection.value === true) {
     settingsProtection.value = false;
@@ -27,7 +27,6 @@ const resetSettings = () => {
   }
 };
 
-// default the database
 const resetDB = () => {
   if (dbProtection.value === true) {
     dbProtection.value = false;

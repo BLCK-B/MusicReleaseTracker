@@ -2,21 +2,21 @@
   <div v-if="!previewVis">
     <div class="artistListNormal">
       <div class="buttonspace">
-        <button @mousedown="clickAddArtist()" class="addbtn" :disabled="!allowButtons">add artist</button>
-        <button @click="showMore()" class="morebtn">more</button>
-        <div class="dropdown" v-if="showDropdown">
+        <button :disabled="!allowButtons" class="addbtn" @mousedown="clickAddArtist()">add artist</button>
+        <button class="morebtn" @click="showMore()">more</button>
+        <div v-if="showDropdown" class="dropdown">
           <button
-            @click="deleteUrl()"
             :disabled="sourceTab == null || sourceTab == 'combview' || selectedArtist == '' || !allowButtons"
             class="deletebtn"
-            data-testid="delete-url-button">
+            data-testid="delete-url-button"
+            @click="deleteUrl()">
             delete selected URL
           </button>
           <button
-            @click="clickDeleteArtist()"
             :disabled="selectedArtist == '' || !allowButtons"
             class="deletebtn"
-            data-testid="delete-button">
+            data-testid="delete-button"
+            @click="clickDeleteArtist()">
             delete artist
           </button>
         </div>
@@ -28,9 +28,9 @@
         <li
           v-for="item in artistsArrayList"
           :key="item"
-          @mousedown="handleItemClick(item)"
           :class="{ highlighted: item === selectedArtist }"
-          class="listbtn">
+          class="listbtn"
+          @mousedown="handleItemClick(item)">
           <div class="listitems">
             {{ item }}
           </div>
@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";
 import ArtistsAddNew from "@/components/Artists/ArtistsAddNew.vue";
@@ -98,8 +98,14 @@ const handleItemClick = (artist) => {
     });
 };
 
-const clickAddArtist = () => (addVisibility.value = true);
-const closeAddNew = () => (addVisibility.value = false);
+const clickAddArtist = () => {
+  addVisibility.value = true;
+};
+
+const closeAddNew = () => {
+  addVisibility.value = false;
+  loadList();
+};
 
 // delete all (last selected) artist entries from db, rebuild combview
 const clickDeleteArtist = () => {

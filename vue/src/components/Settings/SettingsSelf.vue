@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <a href="https://blck-b.github.io" target="_blank">
+    <a href="https://github.com/BLCK-B" target="_blank">
       <img class="blckimg" src="../icons/blcktext.png" alt="logo" />
     </a>
-    <a href="https://github.com/BLCK-B/MusicReleaseTracker" target="_blank">
+    <a href="https://blck-b.github.io/MusicReleaseTracker/" target="_blank">
       <img class="mrtimg" src="../icons/MRTlogo.png" alt="logo" />
     </a>
   </div>

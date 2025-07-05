@@ -1,14 +1,13 @@
 <template>
-  <div v-if="!urlExists && allowButtons && selectedArtist">
+  <div v-if="!urlExists && selectedArtist && currentSource.linkText">
     <div class="dialog">
       <div class="nameLink">
         <h1>{{ currentSource.title }}</h1>
-        <!-- v-if to prevent empty URL flashing -->
-        <a v-if="currentSource.linkText" :href="currentSource.link" target="_blank">{{ currentSource.linkText }}</a>
+        <a :href="currentSource.link" target="_blank">{{ currentSource.linkText }}</a>
       </div>
       <p v-html="currentSource.instructions"></p>
       <input v-model="userInput" :placeholder="currentSource.placeholder" />
-      <button @click="clickConfirmURL" class="imgbutton" data-testid="confirm-button">
+      <button @click="clickConfirmURL" :disabled="!allowButtons" class="imgbutton" data-testid="confirm-button">
         <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
         <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
       </button>

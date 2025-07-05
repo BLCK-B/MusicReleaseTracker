@@ -24,7 +24,9 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 
 ##
 
-You will no longer have to search social media or streaming services. Never miss a new song or album again. You can choose exactly which sources to use, and which artists you want to track. Latest information is compiled into a simple overview. This is achieved through custom processing. When you want the latest information, just press the refresh button and MusicReleaseTracker will do the job for you. Combining more sources means that you are less likely to miss anything. Best of all, you don’t need any accounts to use it. MRT runs locally on your computer.
+You will no longer have to search social media or streaming services. Never miss a new song or album again. You can choose exactly which sources to use, and which artists you want to track. Latest information is compiled into a simple overview. This is achieved through custom processing.
+
+For the latest information, just press the refresh button and MusicReleaseTracker will do the job for you. Combining more sources means that you are less likely to miss anything. Best of all, you don’t need any accounts to use it. MRT runs locally on your computer.
 
 Currently available sources: `Beatport`, `Musicbrainz`, `Junodownload`, `Youtube`.
 

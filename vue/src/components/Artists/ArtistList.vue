@@ -1,22 +1,37 @@
+<!--
+  -         MusicReleaseTracker
+  -         Copyright (C) 2023 - 2025 BLCK
+  -         This program is free software: you can redistribute it and/or modify
+  -         it under the terms of the GNU General Public License as published by
+  -         the Free Software Foundation, either version 3 of the License, or
+  -         (at your option) any later version.
+  -         This program is distributed in the hope that it will be useful,
+  -         but WITHOUT ANY WARRANTY; without even the implied warranty of
+  -         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  -         GNU General Public License for more details.
+  -         You should have received a copy of the GNU General Public License
+  -         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
   <div v-if="!previewVis">
     <div class="artistListNormal">
       <div class="buttonspace">
-        <button @mousedown="clickAddArtist()" class="addbtn" :disabled="!allowButtons">add artist</button>
-        <button @click="showMore()" class="morebtn">more</button>
-        <div class="dropdown" v-if="showDropdown">
+        <button :disabled="!allowButtons" class="addbtn" @mousedown="clickAddArtist()">add artist</button>
+        <button class="morebtn" @click="showMore()">more</button>
+        <div v-if="showDropdown" class="dropdown">
           <button
-            @click="deleteUrl()"
             :disabled="sourceTab == null || sourceTab == 'combview' || selectedArtist == '' || !allowButtons"
             class="deletebtn"
-            data-testid="delete-url-button">
+            data-testid="delete-url-button"
+            @click="deleteUrl()">
             delete selected URL
           </button>
           <button
-            @click="clickDeleteArtist()"
             :disabled="selectedArtist == '' || !allowButtons"
             class="deletebtn"
-            data-testid="delete-button">
+            data-testid="delete-button"
+            @click="clickDeleteArtist()">
             delete artist
           </button>
         </div>
@@ -28,9 +43,9 @@
         <li
           v-for="item in artistsArrayList"
           :key="item"
-          @mousedown="handleItemClick(item)"
           :class="{ highlighted: item === selectedArtist }"
-          class="listbtn">
+          class="listbtn"
+          @mousedown="handleItemClick(item)">
           <div class="listitems">
             {{ item }}
           </div>
@@ -45,8 +60,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import { useStore } from "vuex";
+import {computed, onMounted, ref, watch} from "vue";
+import {useStore} from "vuex";
 import axios from "axios";
 import ArtistsAddNew from "@/components/Artists/ArtistsAddNew.vue";
 import ArtistsPreviewDialog from "@/components/Artists/ArtistsPreviewDialog.vue";
@@ -98,8 +113,14 @@ const handleItemClick = (artist) => {
     });
 };
 
-const clickAddArtist = () => (addVisibility.value = true);
-const closeAddNew = () => (addVisibility.value = false);
+const clickAddArtist = () => {
+  addVisibility.value = true;
+};
+
+const closeAddNew = () => {
+  addVisibility.value = false;
+  loadList();
+};
 
 // delete all (last selected) artist entries from db, rebuild combview
 const clickDeleteArtist = () => {

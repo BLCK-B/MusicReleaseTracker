@@ -68,7 +68,7 @@ const isoDates = computed(() => store.state.isoDates);
 
 onBeforeMount(() => {
   axios
-    .get("/api/settingsOpened")
+    .get("/api/settingsData")
     .then((response) => {
       filterRemix.value = response.data.filterRemix === "true";
       filterVIP.value = response.data.filterVIP === "true";
@@ -85,7 +85,7 @@ onBeforeMount(() => {
       console.error(error);
     });
   axios
-    .get("/api/getAppVersion")
+    .get("/api/appVersion")
     .then((response) => {
       appVersion.value = response.data;
     })
@@ -117,7 +117,7 @@ const setSetting = (name, value) => {
       autoTheme.value = value;
       break;
   }
-  axios.post(`/api/setSetting`, { name: name, value: value }).catch((error) => {
+  axios.put(`/api/setting?name=${name}&value=${value}`).catch((error) => {
     console.error(error);
   });
 };

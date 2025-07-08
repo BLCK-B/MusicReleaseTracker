@@ -37,10 +37,10 @@ const primaryColor = computed(() => store.state.primaryColor);
 
 function clickAdd() {
   try {
-    const artistname = encodeURIComponent(input.value.trim());
-    axios.post("/api/clickArtistAdd", artistname);
+    const artistId = input.value.trim();
+    axios.post(`/api/artist/${artistId}`);
     input.value = "";
-    store.commit("SET_SELECTED_ARTIST", artistname);
+    store.commit("SET_SELECTED_ARTIST", artistId);
     emit("close-add-new");
     store.commit("SET_LOAD_REQUEST", true);
   } catch (error) {

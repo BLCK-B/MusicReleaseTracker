@@ -39,6 +39,9 @@ describe("ArtistList.vue", () => {
     axios.post.mockResolvedValue({
       data: [],
     });
+    axios.delete.mockResolvedValue({
+      data: [],
+    });
     axios.get.mockClear();
     axios.post.mockClear();
   });
@@ -81,7 +84,12 @@ describe("ArtistList.vue", () => {
 
     await items[1].trigger("mousedown");
 
-    expect(axios.post).toHaveBeenCalledWith("/api/getTableData", { artist: "Artist 2", source: "beatport" });
+    expect(axios.get).toHaveBeenCalledWith("/api/tableData", {
+      params: {
+        artist: "Artist 2",
+        source: "beatport",
+      },
+    });
   });
 
   it("Calls delete artist on delete button click.", async () => {
@@ -89,7 +97,7 @@ describe("ArtistList.vue", () => {
 
     await deleteButton.trigger("click");
 
-    expect(axios.post).toHaveBeenCalledWith("/api/deleteArtist", "Artist 1");
+    expect(axios.delete).toHaveBeenCalledWith(`/api/artist/Artist 1`);
   });
 
   it("Deletes URL and loads table when button clicked.", async () => {
@@ -97,7 +105,17 @@ describe("ArtistList.vue", () => {
 
     await deleteUrlButton.trigger("click");
 
-    expect(axios.post).toHaveBeenCalledWith("/api/deleteUrl", { artist: "Artist 1", source: "beatport" });
-    expect(axios.post).toHaveBeenCalledWith("/api/getTableData", { artist: "Artist 1", source: "beatport" });
+    expect(axios.delete).toHaveBeenCalledWith("/api/url", {
+      params: {
+        artist: "Artist 1",
+        source: "beatport",
+      },
+    });
+    expect(axios.get).toHaveBeenCalledWith("/api/tableData", {
+      params: {
+        artist: "Artist 1",
+        source: "beatport",
+      },
+    });
   });
 });

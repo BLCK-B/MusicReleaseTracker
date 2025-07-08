@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -48,62 +48,50 @@ public class ApiController {
         return sendRequest.loadList();
     }
 
-    @PostMapping ("/getTableData")
-    public List<MediaItem> getTableData(@RequestBody Map<String, String> requestData) {
-        return sendRequest.getTableData(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
+    @GetMapping("/tableData")
+    public List<MediaItem> tableData(@RequestParam String source, @RequestParam String artist) {
+        return sendRequest.getTableData(TablesEnum.valueOf(source), artist);
     }
 
-    @PostMapping("/clickArtistAdd")
-    public void clickArtistAdd(@RequestBody String artistname) {
-        artistname = URLDecoder.decode(artistname, StandardCharsets.UTF_8).replace("=" , "").trim();
-        sendRequest.addNewArtist(artistname);
+    @PostMapping("/artist/{artistId}")
+    public void addArtist(@PathVariable String artistId) {
+        sendRequest.addNewArtist(artistId);
     }
 
-    @PostMapping ("/deleteArtist")
-    public void deleteArtist(@RequestBody String artist) {
-        artist = URLDecoder.decode(artist, StandardCharsets.UTF_8).replace("=" , "").trim();
-        sendRequest.deleteArtist(artist);
+    @DeleteMapping("/artist/{artistId}")
+    public void deleteArtist(@PathVariable String artistId) {
+        sendRequest.deleteArtist(artistId);
     }
 
-    @PostMapping("/deleteUrl")
-    public void deleteUrl(@RequestBody Map<String, String> requestData) {
-        sendRequest.deleteSourceID(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
+    @GetMapping("/urlExists")
+    public boolean urlExists(@RequestParam String source, @RequestParam String artist) {
+        return sendRequest.checkExistURL(TablesEnum.valueOf(source), artist);
     }
 
-    @PostMapping ("/cleanArtistSource")
-    public void cleanArtistSource(@RequestBody Map<String, String> requestData) {
-        sendRequest.cleanArtistSource(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
+    @PostMapping("/scrapePreview")
+    public void scrapePreview(@RequestParam String source, @RequestParam String artist, @RequestParam String url) {
+        String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
+        sendRequest.scrapePreview(TablesEnum.valueOf(source), artist, decodedUrl);
     }
 
-    @PostMapping ("/saveUrl")
-    public void saveUrl(@RequestBody Map<String, String> requestData) {
-        sendRequest.saveUrl(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
+    @PostMapping("/confirmSaveUrl")
+    public void confirmSaveUrl(@RequestParam String source, @RequestParam String artist) {
+        sendRequest.saveUrl(TablesEnum.valueOf(source), artist);
     }
 
-    @PostMapping ("/clickAddURL")
-    public void clickAddURL(@RequestBody Map<String, String> requestData) {
-        String url = URLDecoder.decode( requestData.get("url"), StandardCharsets.UTF_8);
-		sendRequest.scrapePreview(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"), url);
+    @DeleteMapping("/url")
+    public void deleteUrl(@RequestParam String source, @RequestParam String artist) {
+        sendRequest.deleteSourceID(TablesEnum.valueOf(source), artist);
     }
 
-    @RequestMapping ("/clickScrape")
-    public void clickScrape() {
+    @PostMapping("/cleanArtistSource")
+    public void cleanArtistSource(@RequestParam String source, @RequestParam String artist) {
+        sendRequest.cleanArtistSource(TablesEnum.valueOf(source), artist);
+    }
+
+    @PostMapping("/scrape")
+    public void scrape() {
         sendRequest.clickScrape();
-    }
-
-    @PostMapping("/setSetting")
-    public void setSetting(@RequestBody Map<String, String> requestData) {
-        sendRequest.setSetting(requestData.get("name"), requestData.get("value"));
-    }
-
-    @GetMapping("/getThemeConfig")
-    public Map<String,String> getThemeConfig() {
-        return sendRequest.getThemeConfig();
-    }
-
-    @GetMapping("/settingsOpened")
-    public Map<String, String> settingsOpened() {
-        return sendRequest.settingsOpened();
     }
 
     @PostMapping("/cancelScrape")
@@ -111,18 +99,28 @@ public class ApiController {
         sendRequest.cancelScrape();
     }
 
+    @PutMapping("/setting")
+    public void setting(@RequestParam String name,  @RequestParam String value) {
+        sendRequest.setSetting(name, value);
+    }
+
+    @GetMapping("/themeConfig")
+    public Map<String,String> themeConfig() {
+        return sendRequest.getThemeConfig();
+    }
+
+    @GetMapping("/settingsData")
+    public Map<String, String> settingsData() {
+        return sendRequest.settingsOpened();
+    }
+
     @PostMapping("/fillCombview")
     public void fillCombview() {
         sendRequest.fillCombview();
     }
 
-    @PostMapping("/checkExistURL")
-    public boolean checkExistURL(@RequestBody Map<String, String> requestData) {
-        return sendRequest.checkExistURL(TablesEnum.valueOf(requestData.get("source")), requestData.get("artist"));
-    }
-
-    @GetMapping("/getScrapeDate")
-    public String getScrapeDate() {
+    @GetMapping("/scrapeDate")
+    public String scrapeDate() {
         return sendRequest.getScrapeDate();
     }
 
@@ -135,8 +133,9 @@ public class ApiController {
     public void resetDB() {
         sendRequest.resetDB();
     }
-    @GetMapping("/getAppVersion")
-    public String getAppVersion() {
+
+    @GetMapping("/appVersion")
+    public String appVersion() {
         return sendRequest.getAppVersion();
     }
 

@@ -59,7 +59,12 @@ describe("ArtistsPreviewDialog.vue", () => {
 
     await cancelButton.trigger("click");
 
-    expect(axios.post).toHaveBeenCalledWith("/api/cleanArtistSource", { artist: "joe", source: "beatport" });
+    expect(axios.post).toHaveBeenCalledWith("/api/cleanArtistSource", null, {
+      params: {
+        artist: "joe",
+        source: "beatport",
+      },
+    });
   });
 
   it("Makes a request to save url on confirm clicked.", async () => {
@@ -67,7 +72,12 @@ describe("ArtistsPreviewDialog.vue", () => {
 
     await confirmButton.trigger("click");
 
-    expect(axios.post).toHaveBeenCalledWith("/api/saveUrl", { artist: "joe", source: "beatport" });
+    expect(axios.post).toHaveBeenCalledWith("/api/confirmSaveUrl", null, {
+      params: {
+        artist: "joe",
+        source: "beatport",
+      },
+    });
   });
 
   it("Closes preview on any confirm click.", async () => {

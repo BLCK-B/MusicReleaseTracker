@@ -88,7 +88,12 @@ const loadList = () => {
 
 const handleItemClick = (artist) => {
   axios
-    .post("/api/getTableData", { source: sourceTab.value, artist: artist })
+    .get("/api/tableData", {
+      params: {
+        source: sourceTab.value,
+        artist: artist,
+      },
+    })
     .then((response) => {
       store.commit("SET_SELECTED_ARTIST", artist);
       store.commit("SET_TABLE_CONTENT", response.data);
@@ -111,7 +116,7 @@ const closeAddNew = () => {
 const clickDeleteArtist = () => {
   if (selectedArtist.value !== "") {
     axios
-      .post("/api/deleteArtist", selectedArtist.value)
+      .delete(`/api/artist/${selectedArtist.value}`)
       .then(() => {
         store.commit("SET_SELECTED_ARTIST", "");
         store.commit("SET_SOURCE_TAB", "combview");
@@ -126,10 +131,19 @@ const clickDeleteArtist = () => {
 const showMore = () => (showDropdown.value = !showDropdown.value);
 
 const deleteUrl = () => {
-  // set null specific URL, trigger table reload
-  axios.post("/api/deleteUrl", { source: sourceTab.value, artist: selectedArtist.value }).then(() => {
-    handleItemClick(selectedArtist.value);
-  });
+  axios
+    .delete("/api/url", {
+      params: {
+        source: sourceTab.value,
+        artist: selectedArtist.value,
+      },
+    })
+    .then(() => {
+      handleItemClick(selectedArtist.value);
+    })
+    .catch((error) => {
+      console.error("Error deleting URL:", error);
+    });
 };
 </script>
 

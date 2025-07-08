@@ -6,33 +6,35 @@ To submit a change:
 
 - create a fork
 - clone repository, push your changes to fork
-- verify passing tests
+- run tests
 - submit a pull request
 
-Tests that verify your change are required, at least where possible.
+New tests that verify your change are required, at least where possible.
 
 ---
 
 ## Setup
-- git clone fork
-- in your IDE, set Java SDK or GraalVM of project and Gradle
-- refresh Gradle
+- fork
+- git clone your fork
+- in your IDE, set up Java SDK for project and Gradle
+- sync Gradle
 - `cd vue` `npm install`
 
 ## Tests
-Currently, I only have backend unit tests in `src/test`. Right click the folder or `./gradlew test` to run them.
+Backend tests can be found in `src/test/`. Right click the folder or `./gradlew test` to run them. Frontend tests are 
+in `vue/tests/`. They are run with `npm run test`.
 
 ## Run
 
-`./gradlew bootRun` - run Java backend at port set in `application.properties` (you can connect with browser at localhost:port)
+`./gradlew bootRun` - run backend at port set in `application.properties` (you can connect with browser at localhost:port)
 
-`cd vue` `npm run dev` - (needs backend) run Vite frontend and `o + enter` to open in browser
+`cd vue` `npm run dev` - (needs backend) run frontend
 
 `cd vue` `npm run electron` - (needs backend) run Electron window
 
-## Distribute
+## Distribution
 
-If you *need* distribution details, please refer to [blog (2024)](https://blck-b.github.io/post/java-native-pipe/).
+If you *need* distribution details, ask or refer to [blog (2024)](https://blck-b.github.io/post/java-native-pipe/).
 
 `cd vue` `npm run buildVue` - build frontend static files
 
@@ -43,5 +45,5 @@ If you *need* distribution details, please refer to [blog (2024)](https://blck-b
 scripts in `vue/package.json` - use these to export electron
 
 ### Tracing
-Generating graal aot `tracing` works for me only by running the generated bootJar as `java -jar 
+Generating graal aot `tracing` works for me only by running the generated bootJar with arguments: `java -jar 
 -agentlib:native-image-agent=config-output-dir=tracing MRT-X.jar`

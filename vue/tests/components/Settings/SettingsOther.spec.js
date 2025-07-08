@@ -21,7 +21,7 @@ describe("SettingsOther.vue", () => {
       await input.setChecked();
 
       const emittedEvent = wrapper.emitted("set-setting")[i];
-      expect(typeof emittedEvent[0]).toBe("string");
+      expect(typeof emittedEvent[1]).toBe("string");
       ++i;
     }
   });

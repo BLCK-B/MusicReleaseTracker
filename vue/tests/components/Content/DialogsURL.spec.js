@@ -83,14 +83,14 @@ describe("DialogsURL.vue", () => {
 
   it("Sends request and opens preview when confirm clicked.", async () => {
     store.commit("SET_URL_EXISTS", false);
-    const { wrapper, dialog, confirmButton } = await setup(store);
+    const { wrapper, confirmButton } = await setup(store);
 
     const input = wrapper.find("input");
     input.element.value = "some url";
     await input.trigger("input");
     await confirmButton.trigger("click");
 
-    expect(axios.post).toHaveBeenCalledWith("/api/clickAddURL", expect.anything());
+    expect(axios.post).toHaveBeenCalledWith("/api/scrapePreview", null, expect.anything());
     expect(mutations.SET_PREVIEW_VIS).toHaveBeenCalledWith(expect.anything(), true);
   });
 });

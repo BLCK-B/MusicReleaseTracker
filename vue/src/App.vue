@@ -35,7 +35,7 @@ onMounted(() => {
 const loadTheme = () => {
   // on start, load themes from config
   axios
-    .get("/api/getThemeConfig")
+    .get("/api/themeConfig")
     .then((response) => {
       store.commit("SET_PRIMARY_COLOR", response.data.theme);
       store.commit("SET_ACCENT_COLOR", response.data.accent);
@@ -48,7 +48,7 @@ const loadTheme = () => {
 const detectTheme = () => {
   // detecting system theme on load
   axios
-    .get("/api/settingsOpened")
+    .get("/api/settingsData")
     .then((response) => {
       const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
       if (response.data.autoTheme === "true") {

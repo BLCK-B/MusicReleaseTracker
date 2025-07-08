@@ -60,7 +60,7 @@ onBeforeMount(() => {
       if (sourceTab.value === "") setStoreTab("combview");
       else handleSourceClick(sourceTab.value);
     });
-  axios.get("/api/getScrapeDate").then((response) => {
+  axios.get("/api/scrapeDate").then((response) => {
     scrapeLast.value = response.data;
   });
 });
@@ -79,7 +79,12 @@ const setStoreTab = (source) => {
 // load respective table
 const handleSourceClick = (source) => {
   axios
-    .post("/api/getTableData", { source: source, artist: selectedArtist.value })
+    .get("/api/tableData", {
+      params: {
+        source: source,
+        artist: selectedArtist.value,
+      },
+    })
     .then((response) => {
       store.commit("SET_TABLE_CONTENT", response.data);
     })
@@ -105,7 +110,7 @@ const clickScrape = () => {
       store.commit("SET_PROGRESS", progress);
     };
 
-    axios.post("/api/clickScrape").then(() => {
+    axios.post("/api/scrape").then(() => {
       isActive.value = false;
       store.commit("SET_ALLOW_BUTTONS", true);
       eventSource.value.close();
@@ -121,8 +126,11 @@ const clickScrape = () => {
       scrapeLast.value = time;
       scrapeDateInfo.value = true;
       handleSourceClick("combview");
-
-      axios.post(`/api/setSetting`, { name: "lastScrape", value: time }).catch((error) => {
+      const params = new URLSearchParams({
+        name: "lastScrape",
+        value: time,
+      });
+      axios.put(`/api/setting?${params.toString()}`).catch((error) => {
         console.error(error);
       });
     });

@@ -28,16 +28,30 @@ const selectedArtist = computed(() => store.state.selectedArtist);
 const hideTable = computed(() => tableData.value.length === 0);
 
 function clickCancel() {
-  axios.post("/api/cleanArtistSource", { source: sourceTab.value, artist: selectedArtist.value }).catch((error) => {
-    console.error(error);
-  });
+  axios
+    .post("/api/cleanArtistSource", null, {
+      params: {
+        source: sourceTab.value,
+        artist: selectedArtist.value,
+      },
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   store.commit("SET_PREVIEW_VIS", false);
 }
 
 function clickConfirm() {
-  axios.post("/api/saveUrl", { source: sourceTab.value, artist: selectedArtist.value }).catch((error) => {
-    console.error(error);
-  });
+  axios
+    .post("/api/confirmSaveUrl", null, {
+      params: {
+        source: sourceTab.value,
+        artist: selectedArtist.value,
+      },
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   store.commit("SET_PREVIEW_VIS", false);
 }
 </script>

@@ -74,12 +74,25 @@ const clickConfirmURL = () => {
   userInput.value = "";
   if (url) {
     axios
-      .post("/api/clickAddURL", { source: sourceTab.value, artist: selectedArtist.value, url: url })
+      .post("/api/scrapePreview", null, {
+        params: {
+          source: sourceTab.value,
+          artist: selectedArtist.value,
+          url: url,
+        },
+      })
       .then(() => {
-        axios.post("/api/getTableData", { source: sourceTab.value, artist: selectedArtist.value }).then((response) => {
-          store.commit("SET_TABLE_CONTENT", response.data);
-          store.commit("SET_PREVIEW_VIS", true);
-        });
+        axios
+          .get("/api/tableData", {
+            params: {
+              source: sourceTab.value,
+              artist: selectedArtist.value,
+            },
+          })
+          .then((response) => {
+            store.commit("SET_TABLE_CONTENT", response.data);
+            store.commit("SET_PREVIEW_VIS", true);
+          });
       })
       .catch((error) => {
         console.error(error);
@@ -90,7 +103,12 @@ const clickConfirmURL = () => {
 const determineDiagShow = () => {
   if (tableData.value.length === 0) {
     axios
-      .post("/api/checkExistURL", { source: sourceTab.value, artist: selectedArtist.value })
+      .get("/api/urlExists", {
+        params: {
+          source: sourceTab.value,
+          artist: selectedArtist.value,
+        },
+      })
       .then((response) => {
         store.commit("SET_URL_EXISTS", response.data);
       })

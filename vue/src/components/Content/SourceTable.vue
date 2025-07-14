@@ -4,27 +4,7 @@
       <div v-for="(mediaItem, mediaIndex) in tableData" :key="mediaIndex" class="aBubble">
         <table>
           <tbody>
-            <!-- album -->
-            <template v-if="isAlbum(mediaItem)">
-              <tr class="album-header">
-                <td class="tdalbumname">
-                  {{ mediaItem.album }}
-                </td>
-                <td class="tdartist"></td>
-                <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
-              </tr>
-              <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" class="album-bubble">
-                <td class="tdsong">{{ song.name }}</td>
-              </tr>
-            </template>
-            <!-- separate songs -->
-            <template v-else>
-              <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" class="single-bubble">
-                <td class="tdsong">{{ mediaItem.name }}</td>
-                <td v-if="artistColumnVisible" class="tdartist">{{ mediaItem.artists }}</td>
-                <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
-              </tr>
-            </template>
+            <MediaItem :mediaItem="mediaItem" />
           </tbody>
         </table>
       </div>
@@ -47,47 +27,19 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { onMounted, computed } from "vue";
+import { computed } from "vue";
+import MediaItem from "./MediaItem.vue";
 
 const store = useStore();
 
 const tableData = computed(() => store.state.tableData);
-const selectedArtist = computed(() => store.state.selectedArtist);
 const previewVis = computed(() => store.state.previewVis);
-const isoDates = computed(() => store.state.isoDates);
 const sourceTab = computed(() => store.state.sourceTab);
 const urlExists = computed(() => store.state.urlExists);
-
-onMounted(() => {
-  isDateInFuture();
-});
-
-const artistColumnVisible = computed(() => {
-  return !(sourceTab.value !== "combview" && selectedArtist.value !== "");
-});
 
 const tableVisible = computed(() => {
   return tableData.value.some((item) => item.song !== null);
 });
-
-const isAlbum = (mediaItem) => {
-  return mediaItem.songs && mediaItem.songs.length;
-};
-
-const isDateInFuture = (dateString) => {
-  return new Date(dateString) > new Date();
-};
-
-const formatDate = (dateString) => {
-  if (!isoDates.value) {
-    if (dateString === undefined) return dateString;
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}. ${month}. ${year}`;
-  } else return dateString;
-};
 </script>
 
 <style scoped>
@@ -99,47 +51,12 @@ const formatDate = (dateString) => {
   flex-direction: column;
   align-items: center;
   transform: translateX(-90px);
-  user-select: text;
   margin-bottom: 10vh;
 }
 table {
   border-collapse: collapse;
   table-layout: fixed;
   width: 100%;
-}
-th,
-td {
-  padding: 4px;
-  text-overflow: ellipsis;
-}
-th {
-  background-color: var(--primary-color);
-  border: none;
-  position: sticky;
-  top: 0;
-}
-.tdsong {
-  width: 80%;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.tdalbumname {
-  width: 50%;
-  white-space: nowrap;
-  overflow: visible;
-  font-weight: bold;
-}
-.tdartist {
-  width: 60%;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.tddate {
-  width: 100px;
-  min-width: 100px;
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 10px;
 }
 .emptynotice {
   position: fixed;
@@ -164,22 +81,6 @@ th {
   width: 60%;
   border-radius: 5px;
   margin-bottom: 3px;
-}
-.single-bubble {
-  background-color: var(--primary-color);
-}
-.future-date {
-  opacity: 50%;
-}
-tr.single-bubble {
-  display: flex;
-  justify-content: space-between;
-}
-.album-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3px 0px;
 }
 @media (max-width: 1100px) {
   .aBubble {

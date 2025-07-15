@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -51,7 +51,8 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
             return;
-
+        if (true)
+            return;
         String url = "https://www.junodownload.com/artists/" + id + "/releases/?music_product_type=single&laorder=date_down";
 
         Document doc = null;
@@ -101,7 +102,13 @@ public final class ScraperJunodownload extends Scraper implements ScraperInterfa
         super.source = TablesEnum.junodownload;
         super.insertSet(
                 processInfo(
-                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
+                        artistToSongList(
+                                List.of(songsArray),
+                                songArtist,
+                                List.of(datesArray),
+                                null,
+                                null
+                        )));
     }
 
     public void reduceToID() {

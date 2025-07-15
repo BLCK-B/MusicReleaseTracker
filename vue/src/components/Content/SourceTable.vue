@@ -1,5 +1,7 @@
 <template>
   <div v-if="tableVisible" class="table-container">
+    <!-- <SongDetails /> -->
+
     <div class="table-body">
       <div v-for="(mediaItem, mediaIndex) in tableData" :key="mediaIndex" class="aBubble">
         <table>
@@ -29,6 +31,7 @@
 import { useStore } from "vuex";
 import { computed } from "vue";
 import MediaItem from "./MediaItem.vue";
+import SongDetails from "./SongDetails.vue";
 
 const store = useStore();
 

@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -60,13 +60,20 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         catch (Exception e) {
             throw new ScraperGenericException(url);
         }
+
         String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
         String[] datesArray = doc.select("first-release-date").eachText().toArray(new String[0]);
 
         super.source = TablesEnum.musicbrainz;
         super.insertSet(
                 processInfo(
-                        artistToSongList(List.of(songsArray), songArtist, List.of(datesArray), null)));
+                        artistToSongList(
+                                List.of(songsArray),
+                                songArtist,
+                                List.of(datesArray),
+                                null,
+                                null
+                        )));
     }
 
     public void reduceToID() {

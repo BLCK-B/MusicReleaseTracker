@@ -73,14 +73,20 @@ public class Scraper {
      * @param types may be null
      * @return {@code List<Song>}
      */
-    public List<Song> artistToSongList(List<String> names, String artist, List<String> dates, List<String> types) {
+    public List<Song> artistToSongList(List<String> names,
+                                       String artist,
+                                       List<String> dates,
+                                       List<String> types,
+                                       List<String> thumbnails) {
         return IntStream.range(0, Math.min(names.size(), dates.size()))
                 .filter(i -> names.get(i) != null && artist != null && dates.get(i) != null)
                 .mapToObj(i -> new Song(
                         names.get(i),
                         artist,
                         dates.get(i),
-                        types == null ? null : types.get(i)))
+                        types == null ? null : types.get(i),
+                        thumbnails == null ? null : thumbnails.get(i))
+                )
                 .collect(Collectors.toList());
     }
 
@@ -99,7 +105,12 @@ public class Scraper {
 
         return songList.stream()
                 .filter(song -> isValidDate(song.getDate(), formatter))
-                .map(song -> new Song(unifyAphostrophes(song.getName()), song.getArtists(), song.getDate(), song.getType().orElse("")))
+                .map(song -> new Song(unifyAphostrophes(song.getName()),
+                        song.getArtists(),
+                        song.getDate(),
+                        song.getType().orElse(""),
+                        song.getThumbnailUrl().orElse("")
+                ))
                 .sorted((song1, song2) -> song1.compareDates(song2, formatter))
                 .distinct() // remove all name duplicates but the oldest by date
                 .toList().reversed(); // newest by date

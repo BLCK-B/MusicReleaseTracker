@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -63,6 +63,7 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
         catch (Exception e) {
             throw new ScraperGenericException(url);
         }
+
         // pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
         String JSON = script.first().data();
@@ -88,7 +89,14 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
         super.source = TablesEnum.beatport;
         super.insertSet(
                 processInfo(
-                        artistToSongList(songsArrayList, songArtist, datesArrayList, typesArrayList)));
+                        artistToSongList(
+                                songsArrayList,
+                                songArtist,
+                                datesArrayList,
+                                typesArrayList,
+                                null
+                        )
+                ));
     }
 
     public void reduceToID() {

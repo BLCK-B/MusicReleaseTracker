@@ -113,6 +113,7 @@ th {
   color: var(--accent-contrast);
 }
 .future-date {
+  background-color: var(--duller-color);
   opacity: 50%;
 }
 tr.single-bubble {

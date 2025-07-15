@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -70,9 +70,9 @@ public class DBqueriesTest {
         lenient().when(store.getDBpath()).thenReturn(HelperDB.testDBpath);
         dBqueriesClass = new DBqueries(store, log, settingsIO, migrateDB);
         songList = List.of(
-            new Song("song1", "artist1", "2022-01-01", "remix"),
-            new Song("song2", "artist1", "2022-01-01", "type"),
-            new Song("song3", "artist2", "2022-01-01", "Remixed"));
+                new Song("song1", "artist1", "2022-01-01", "remix", null),
+                new Song("song2", "artist1", "2022-01-01", "type", null),
+                new Song("song3", "artist2", "2022-01-01", "Remixed", null));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class DBqueriesTest {
     void getSinglesOnlyFromCombview() {
         dBqueriesClass.batchInsertCombview(songList);
 
-        assertEquals(3,dBqueriesClass.readCombviewSingles().size());
+        assertEquals(3, dBqueriesClass.readCombviewSingles().size());
     }
 
     @Test
@@ -126,17 +126,17 @@ public class DBqueriesTest {
     @Test
     void albumSongsSortedByName() {
         songList = List.of(
-                new Song("C", "artist", "2022-01-01"),
-                new Song("A", "artist", "2022-01-01"),
-                new Song("B", "artist", "2022-01-01"));
+                new Song("C", "artist", "2022-01-01", null, null),
+                new Song("A", "artist", "2022-01-01", null, null),
+                new Song("B", "artist", "2022-01-01", null, null));
         songList.get(0).setAlbumID("album");
         songList.get(1).setAlbumID("album");
         songList.get(2).setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
         List<Song> expected = List.of(
-                new Song("A", "artist", "2022-01-01"),
-                new Song("B", "artist", "2022-01-01"),
-                new Song("C", "artist", "2022-01-01"));
+                new Song("A", "artist", "2022-01-01", null, null),
+                new Song("B", "artist", "2022-01-01", null, null),
+                new Song("C", "artist", "2022-01-01", null, null));
 
         List<Song> output = dBqueriesClass.readCombviewAlbums().getFirst().getAlbumSongs();
 
@@ -149,7 +149,7 @@ public class DBqueriesTest {
         songList.getFirst().setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
 
-        assertEquals(2,dBqueriesClass.readCombviewSingles().size());
+        assertEquals(2, dBqueriesClass.readCombviewSingles().size());
     }
 
     @Test
@@ -157,7 +157,7 @@ public class DBqueriesTest {
         songList.getFirst().setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
 
-        assertEquals(1,dBqueriesClass.readCombviewAlbums().size());
+        assertEquals(1, dBqueriesClass.readCombviewAlbums().size());
     }
 
     @Test
@@ -177,15 +177,15 @@ public class DBqueriesTest {
     @Test
     void dataFromCombviewIsSortedByNewestDate() {
         songList = List.of(
-                new Song("song", "artist", "2022-01-03"),
-                new Song("song", "artist", "2022-01-02"),
-                new Song("albumSong", "artist", "2022-01-04"));
+                new Song("song", "artist", "2022-01-03", null, null),
+                new Song("song", "artist", "2022-01-02", null, null),
+                new Song("albumSong", "artist", "2022-01-04", null, null));
         songList.get(2).setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
         List<Song> expected = List.of(
-                new Song("albumSong", "artist", "2022-01-04"),
-                new Song("song", "artist", "2022-01-03"),
-                new Song("song", "artist", "2022-01-02"));
+                new Song("albumSong", "artist", "2022-01-04", null, null),
+                new Song("song", "artist", "2022-01-03", null, null),
+                new Song("song", "artist", "2022-01-02", null, null));
 
         List<MediaItem> mediaItems = dBqueriesClass.loadCombviewTable();
 
@@ -196,15 +196,15 @@ public class DBqueriesTest {
     @Test
     void dataFromCombviewIsSecondarilySortedByName() {
         songList = List.of(
-                new Song("B", "artist", "2022-01-01"),
-                new Song("A", "artist", "2022-01-01"),
-                new Song("C", "artist", "2022-01-01"));
+                new Song("B", "artist", "2022-01-01", null, null),
+                new Song("A", "artist", "2022-01-01", null, null),
+                new Song("C", "artist", "2022-01-01", null, null));
         songList.get(2).setAlbumID("album");
         dBqueriesClass.batchInsertCombview(songList);
         List<Song> expected = List.of(
-                new Song("A", "artist", "2022-01-01"),
-                new Song("B", "artist", "2022-01-01"),
-                new Song("C", "artist", "2022-01-01"));
+                new Song("A", "artist", "2022-01-01", null, null),
+                new Song("B", "artist", "2022-01-01", null, null),
+                new Song("C", "artist", "2022-01-01", null, null));
 
         List<MediaItem> mediaItems = dBqueriesClass.loadCombviewTable();
 
@@ -244,7 +244,7 @@ public class DBqueriesTest {
         HashMap<String, String> filterWords = new HashMap<>();
         filterWords.put("remix", "true");
 
-        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", "type"), filterWords));
+        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", "type", null), filterWords));
     }
 
     @Test
@@ -252,7 +252,7 @@ public class DBqueriesTest {
         HashMap<String, String> filterWords = new HashMap<>();
         filterWords.put("remix", "true");
 
-        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("REMIXsong", "", "", "type"), filterWords));
+        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("REMIXsong", "", "", "type", null), filterWords));
     }
 
     @Test
@@ -260,7 +260,7 @@ public class DBqueriesTest {
         HashMap<String, String> filterWords = new HashMap<>();
         filterWords.put("remix", "true");
 
-        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", "typeRemix"), filterWords));
+        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", "typeRemix", null), filterWords));
     }
 
     @Test
@@ -268,7 +268,7 @@ public class DBqueriesTest {
         HashMap<String, String> filterWords = new HashMap<>();
         filterWords.put("remix", "true");
 
-        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", ""), filterWords));
+        assertTrue(dBqueriesClass.songPassesFilterCheck(new Song("song", "", "", null, null), filterWords));
     }
 
     @Test
@@ -276,7 +276,7 @@ public class DBqueriesTest {
         HashMap<String, String> filterWords = new HashMap<>();
         filterWords.put("remix", "true");
 
-        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("songRemix)", "", ""), filterWords));
+        assertFalse(dBqueriesClass.songPassesFilterCheck(new Song("songRemix)", "", "", null, null), filterWords));
     }
 
     @Test
@@ -286,7 +286,7 @@ public class DBqueriesTest {
         when(settingsIO.getFilterValues()).thenReturn(filterWords);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         songList = List.of(
-                new Song("songRemixed", "artist", "2022-01-01"));
+                new Song("songRemixed", "artist", "2022-01-01", null, null));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.youtube, 10);
 
         assertEquals(1, dBqueriesClass.getSourceTablesDataForCombview().size());
@@ -307,8 +307,8 @@ public class DBqueriesTest {
     @Test
     void truncateAllScrapeTables() {
         songList = List.of(
-           new Song("song1", "artist1", "2022-01-01"),
-           new Song("song2", "artist1", "2022-01-01"));
+                new Song("song1", "artist1", "2022-01-01", null, null),
+                new Song("song2", "artist1", "2022-01-01", null, null));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
         dBqueriesClass.batchInsertCombview(songList);
@@ -327,7 +327,8 @@ public class DBqueriesTest {
     }
 
     @Test
-    void clearArtistDataFrom() {;
+    void clearArtistDataFrom() {
+        ;
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         assertEquals(2, HelperDB.getCountOf(HelperDB.testDBpath, "beatport", "artist", "artist1"));
 
@@ -351,7 +352,6 @@ public class DBqueriesTest {
         assertEquals(0, HelperDB.getCountOf(HelperDB.testDBpath, "beatport", "artist", "artist1"));
         assertEquals(0, HelperDB.getCountOf(HelperDB.testDBpath, "combview", "artist", "artist1"));
     }
-
 
 
 }

@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -24,13 +24,13 @@ public class SongTest {
 
     @Test
     void getSingleArtist() {
-        Song song = new Song("", "artist","");
+        Song song = new Song("", "artist","", null, null);
         assertEquals("artist", song.getArtists());
     }
 
     @Test
     void getOrderedArtistsByAlphabet() {
-        Song song = new Song("", "zilch","");
+        Song song = new Song("", "zilch","", null, null);
         song.appendArtist("bob");
         song.appendArtist("joe");
         song.appendArtist("joe");
@@ -39,28 +39,28 @@ public class SongTest {
 
     @Test
     void toStringWithType() {
-        Song song = new Song("song", "artist","date", "type");
+        Song song = new Song("song", "artist","date", "type", null);
 
         assertEquals("song artist date type", song.toString());
     }
 
     @Test
     void toStringWithNoType() {
-        Song song = new Song("song", "artist","date");
+        Song song = new Song("song", "artist","date", null, null);
 
         assertEquals("song artist date", song.toString());
     }
 
     @Test
     void argumentNullTypeIsEmpty() {
-        Song song = new Song("song", "artist","date", null);
+        Song song = new Song("song", "artist","date", null, null);
 
         assertThat(song.getType()).isEmpty();
     }
 
     @Test
     void argumentEmptyStringTypeIsEmpty() {
-        Song song = new Song("song", "artist", "date", "");
+        Song song = new Song("song", "artist", "date", "", null);
 
         assertThat(song.getType()).isEmpty();
     }

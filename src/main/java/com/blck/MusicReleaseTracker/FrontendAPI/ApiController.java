@@ -16,7 +16,9 @@
 package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
+import com.blck.MusicReleaseTracker.DTO.SongDetails;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.GUIController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -68,12 +70,6 @@ public class ApiController {
         return sendRequest.checkExistURL(TablesEnum.valueOf(source), artist);
     }
 
-    @PostMapping("/scrapePreview")
-    public void scrapePreview(@RequestParam String source, @RequestParam String artist, @RequestParam String url) {
-        String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
-        sendRequest.scrapePreview(TablesEnum.valueOf(source), artist, decodedUrl);
-    }
-
     @PostMapping("/confirmSaveUrl")
     public void confirmSaveUrl(@RequestParam String source, @RequestParam String artist) {
         sendRequest.saveUrl(TablesEnum.valueOf(source), artist);
@@ -82,6 +78,12 @@ public class ApiController {
     @DeleteMapping("/url")
     public void deleteUrl(@RequestParam String source, @RequestParam String artist) {
         sendRequest.deleteSourceID(TablesEnum.valueOf(source), artist);
+    }
+
+    @PostMapping("/scrapePreview")
+    public void scrapePreview(@RequestParam String source, @RequestParam String artist, @RequestParam String url) {
+        String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
+        sendRequest.scrapePreview(TablesEnum.valueOf(source), artist, decodedUrl);
     }
 
     @PostMapping("/cleanArtistSource")
@@ -100,7 +102,7 @@ public class ApiController {
     }
 
     @PutMapping("/setting")
-    public void setting(@RequestParam String name,  @RequestParam String value) {
+    public void setting(@RequestParam String name, @RequestParam String value) {
         sendRequest.setSetting(name, value);
     }
 
@@ -137,6 +139,11 @@ public class ApiController {
     @GetMapping("/appVersion")
     public String appVersion() {
         return sendRequest.getAppVersion();
+    }
+
+    @GetMapping("/songDetails/{source}/{song}")
+    public SongDetails songDetails(@PathVariable String source, @PathVariable Song song) {
+        return sendRequest.getSongDetails(TablesEnum.valueOf(source), song);
     }
 
 }

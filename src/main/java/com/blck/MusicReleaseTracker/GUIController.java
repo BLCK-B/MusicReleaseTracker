@@ -25,7 +25,6 @@ import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
-import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -141,7 +140,8 @@ public class GUIController {
     }
 
     public void clickScrape() {
-        scrapeProcess.scrapeData(new ScraperManager(log, DB));
+//        scrapeProcess.scrapeData(new ScraperManager(log, DB));
+        scrapeProcess.downloadThumbnails();
         scrapeProcess.fillCombviewTable();
         DB.vacuum();
     }

@@ -20,6 +20,7 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
+import com.blck.MusicReleaseTracker.Scraping.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -40,16 +41,18 @@ public class Main {
     private final StartSetup startSetup;
     private final ValueStore store;
     private final AppConfig appConfig;
+    private final ThumbnailService thumbnailService;
 
     @Autowired
     public Main(AppConfig appConfig, ValueStore store, SettingsIO settingsIO,
-                ErrorLogging errorLogging, StartSetup startSetup, MigrateDB manageDB) {
+                ErrorLogging errorLogging, StartSetup startSetup, MigrateDB manageDB, ThumbnailService thumbnailService) {
         this.settingsIO = settingsIO;
         this.log = errorLogging;
         this.startSetup = startSetup;
         this.manageDB = manageDB;
         this.store = store;
         this.appConfig = appConfig;
+        this.thumbnailService = thumbnailService;
     }
 
     public static void main(String[] args) {
@@ -91,6 +94,7 @@ public class Main {
             manageDB.migrateDB(store.getDBpath(), store.getDBpathTemplate());
             settingsIO.updateSettings();
             store.setBackendReady();
+            thumbnailService.getAllThumbnailUrls().forEach(System.out::println);
         }
     }
 

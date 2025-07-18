@@ -73,7 +73,7 @@ public class StartSetup {
     }
 
     /**
-     *  Create AppData dir, handle sqlite temporary files.
+     *  Create AppData dirs, handle sqlite temporary files.
      */
     public void createDirs() {
         String appDataPath = store.getAppDataPath();
@@ -82,6 +82,8 @@ public class StartSetup {
             // junk folder because sqlite did not delete temp files in "temp"
             File tempfolder = new File(appDataPath + "temp");
             tempfolder.mkdirs();
+            File thumbFolder = new File(appDataPath + "thumbnails");
+            thumbFolder.mkdirs();
             Arrays.stream(tempfolder.listFiles()).forEach(File::delete);
             System.setProperty("org.sqlite.tmpdir", appDataPath + "temp");
         } catch (Exception e) {

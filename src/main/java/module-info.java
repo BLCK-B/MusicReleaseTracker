@@ -11,8 +11,10 @@ module com.blck.MusicReleaseTracker {
     requires org.xerial.sqlitejdbc;
     requires com.fasterxml.jackson.databind;
 	requires java.desktop;
+    requires java.net.http;
+    requires jakarta.annotation;
 
-	opens com.blck.MusicReleaseTracker;
+    opens com.blck.MusicReleaseTracker;
     opens com.blck.MusicReleaseTracker.Core;
     opens com.blck.MusicReleaseTracker.DataObjects;
     opens com.blck.MusicReleaseTracker.DB;

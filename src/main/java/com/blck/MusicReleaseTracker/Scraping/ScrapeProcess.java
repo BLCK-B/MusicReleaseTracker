@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -36,6 +36,7 @@ public class ScrapeProcess {
 	private final ErrorLogging log;
 	private final DBqueries DB;
 	private final SSEController SSE;
+	private final ThumbnailService thumbnailService;
 	public boolean scrapeCancel = false;
 
 	@Autowired
@@ -69,6 +70,10 @@ public class ScrapeProcess {
 		}
 		SSE.complete();
 		System.gc();
+	}
+
+	public void downloadThumbnails() {
+		thumbnailService.loadThumbnails(DB.getSourceTablesDataForCombview());
 	}
 
 	/**

@@ -15,6 +15,7 @@
   <!-- separate songs -->
   <template v-else>
     <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" @click="contextMenu(mediaItem)" class="single-bubble">
+      <img :src="mediaItem.thumbnailUrl" alt="X" class="thumbnail-image" loading="lazy" />
       <td class="tdsong">{{ mediaItem.name }}</td>
       <td v-if="artistColumnVisible" class="tdartist">{{ mediaItem.artists }}</td>
       <td class="tddate">{{ formatDate(mediaItem.date) }}</td>

@@ -3,7 +3,7 @@
     <!-- <SongDetails /> -->
 
     <div class="table-body">
-      <div v-for="(mediaItem, mediaIndex) in tableData" :key="mediaIndex" class="aBubble">
+      <div v-for="(mediaItem, mediaIndex) in tableDataWithThumbnails" :key="mediaIndex" class="aBubble">
         <table>
           <tbody>
             <MediaItem :mediaItem="mediaItem" />
@@ -29,9 +29,10 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed, watch, ref } from "vue";
 import MediaItem from "./MediaItem.vue";
 import SongDetails from "./SongDetails.vue";
+import axios from "axios";
 
 const store = useStore();
 
@@ -42,6 +43,43 @@ const urlExists = computed(() => store.state.urlExists);
 
 const tableVisible = computed(() => {
   return tableData.value.some((item) => item.song !== null);
+});
+
+const thumbnailUrls = ref([]);
+
+watch(tableData, (newTableData) => {
+  axios;
+  axios
+    .post("/api/thumbnailUrls", getThumbnailKeys())
+    .then((response) => {
+      thumbnailUrls.value = response.data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+
+const getThumbnailKeys = () => {
+  return tableData.value.map((song) => (song.name + song.date).toLowerCase().replace(/[^a-z0-9]/g, ""));
+};
+
+const getThumbnailUrl = (song) => {
+  const key = "/thumbnails/" + (song.name + song.date).toLowerCase().replace(/[^a-z0-9]/g, "");
+  const match = thumbnailUrls.value.find((url) => url.startsWith(key)) || null;
+  if (!match) return null;
+  return "http://localhost:57782" + match;
+};
+
+const tableDataWithThumbnails = computed(() => {
+  if (!thumbnailUrls.value) {
+    return tableData.value;
+  }
+  console.log(thumbnailUrls);
+  return tableData.value.map((item) => ({
+    ...item,
+    // thumbnailUrl: "http://localhost:57782/thumbnails/stay20240411_20250718_182058.jpg",
+    thumbnailUrl: getThumbnailUrl(item),
+  }));
 });
 </script>
 

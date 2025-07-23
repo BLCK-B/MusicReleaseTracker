@@ -15,7 +15,9 @@
   <!-- separate songs -->
   <template v-else>
     <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" @click="contextMenu(mediaItem)" class="single-bubble">
-      <img :src="mediaItem.thumbnailUrl" alt="X" class="thumbnail-image" loading="lazy" />
+      <td>
+        <img :src="mediaItem.thumbnailUrl" class="thumbnail" loading="lazy" />
+      </td>
       <td class="tdsong">{{ mediaItem.name }}</td>
       <td v-if="artistColumnVisible" class="tdartist">{{ mediaItem.artists }}</td>
       <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
@@ -72,8 +74,10 @@ const contextMenu = (mediaItem) => {
 <style scoped>
 th,
 td {
-  padding: 4px;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 th {
   background-color: var(--primary-color);
@@ -85,6 +89,7 @@ th {
   width: 80%;
   white-space: nowrap;
   overflow: hidden;
+  margin-left: 8px;
 }
 .tdalbumname {
   width: 50%;
@@ -126,5 +131,19 @@ tr.single-bubble {
   justify-content: space-between;
   align-items: center;
   padding: 3px 0px;
+}
+.thumbnail {
+  width: 35px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  border: 1px transparent;
+  border-radius: 4px;
+  border: 1px solid var(--primary-color);
+  transition: 0.3s;
+}
+.thumbnail:hover {
+  width: 80px;
 }
 </style>

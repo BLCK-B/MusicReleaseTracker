@@ -25,7 +25,9 @@ import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
+import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
+import com.blck.MusicReleaseTracker.Scraping.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  Class with methods called from ApiController
+ * Class with methods called from ApiController
  */
 @Component
 public class GUIController {
@@ -45,17 +47,19 @@ public class GUIController {
     private final SettingsIO settingsIO;
     private final DBqueries DB;
     private final MigrateDB manageDB;
+    private final ThumbnailService thumbnailService;
     private String tempID;
 
     @Autowired
     public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                         SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB) {
+                         SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB, ThumbnailService thumbnailService) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
         this.settingsIO = settingsIO;
         this.DB = dBqueries;
         this.manageDB = manageDB;
+        this.thumbnailService = thumbnailService;
     }
 
     public boolean isBackendReady() {
@@ -124,7 +128,7 @@ public class GUIController {
     }
 
     public void saveUrl(TablesEnum source, String artist) {
-       DB.updateArtistSourceID(artist, source, tempID);
+        DB.updateArtistSourceID(artist, source, tempID);
     }
 
     public boolean checkExistURL(TablesEnum source, String artist) {
@@ -140,7 +144,7 @@ public class GUIController {
     }
 
     public void clickScrape() {
-//        scrapeProcess.scrapeData(new ScraperManager(log, DB));
+        scrapeProcess.scrapeData(new ScraperManager(log, DB));
         scrapeProcess.downloadThumbnails();
         scrapeProcess.fillCombviewTable();
         DB.vacuum();
@@ -148,6 +152,10 @@ public class GUIController {
 
     public void cancelScrape() {
         scrapeProcess.scrapeCancel = true;
+    }
+
+    public List<String> getThumbnailUrls() {
+        return thumbnailService.getAllThumbnailUrls();
     }
 
     public Map<String, String> settingsOpened() {

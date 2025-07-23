@@ -55,6 +55,11 @@ public class ApiController {
         return sendRequest.getTableData(TablesEnum.valueOf(source), artist);
     }
 
+    @PostMapping("/thumbnailUrls")
+    public List<String> thumbnailUrls(@RequestBody List<String> keys) {
+        return sendRequest.getThumbnailUrls();
+    }
+
     @PostMapping("/artist/{artistId}")
     public void addArtist(@PathVariable String artistId) {
         sendRequest.addNewArtist(artistId);

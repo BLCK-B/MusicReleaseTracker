@@ -84,6 +84,7 @@ public class ThumbnailService {
                 } else {
                     throw new IOException("Failed to download image, status: " + response.statusCode());
                 }
+                Thread.sleep(250);
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to load thumbnail: ", e);
@@ -119,8 +120,8 @@ public class ThumbnailService {
         }
 
         File[] files = thumbnailsDir.listFiles((dir, name) -> {
-            String lower = name.toLowerCase();
-            return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png");
+            String lowerCase = name.toLowerCase();
+            return lowerCase.endsWith(".jpg") || lowerCase.endsWith(".jpeg") || lowerCase.endsWith(".png");
         });
 
         if (files == null || files.length == 0) {

@@ -41,10 +41,11 @@ public class ScrapeProcess {
 
 	@Autowired
 	public ScrapeProcess(ErrorLogging errorLogging, DBqueries dBqueries,
-						 SSEController sseController) {
+						 SSEController sseController, ThumbnailService thumbnailService) {
 		this.log = errorLogging;
 		this.DB = dBqueries;
 		this.SSE = sseController;
+		this.thumbnailService = thumbnailService;
 	}
 
 	/**

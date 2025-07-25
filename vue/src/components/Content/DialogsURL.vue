@@ -1,3 +1,18 @@
+<!--
+  -         MusicReleaseTracker
+  -         Copyright (C) 2023 - 2025 BLCK
+  -         This program is free software: you can redistribute it and/or modify
+  -         it under the terms of the GNU General Public License as published by
+  -         the Free Software Foundation, either version 3 of the License, or
+  -         (at your option) any later version.
+  -         This program is distributed in the hope that it will be useful,
+  -         but WITHOUT ANY WARRANTY; without even the implied warranty of
+  -         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  -         GNU General Public License for more details.
+  -         You should have received a copy of the GNU General Public License
+  -         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
   <div v-if="!urlExists && selectedArtist && currentSource.linkText">
     <div class="dialog">
@@ -7,9 +22,9 @@
       </div>
       <p v-html="currentSource.instructions"></p>
       <input v-model="userInput" :placeholder="currentSource.placeholder" />
-      <button @click="clickConfirmURL" :disabled="!allowButtons" class="imgbutton" data-testid="confirm-button">
-        <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
-        <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
+      <button :disabled="!allowButtons" class="imgbutton" data-testid="confirm-button" @click="clickConfirmURL">
+        <img v-if="primaryColor !== 'light'" alt="OK" class="image" src="../icons/confirmdark.png" />
+        <img v-if="primaryColor === 'light'" alt="OK" class="image" src="../icons/confirmlight.png" />
       </button>
     </div>
   </div>
@@ -17,8 +32,8 @@
 
 <script setup>
 import axios from "axios";
-import { useStore } from "vuex";
-import { ref, computed, watch } from "vue";
+import {useStore} from "vuex";
+import {computed, ref, watch} from "vue";
 
 const store = useStore();
 
@@ -43,13 +58,6 @@ const sources = computed(() => ({
     link: "https://beatport.com",
     linkText: "beatport.com",
     placeholder: "https://beatport.com/artist/artistname/id/...",
-    instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
-  },
-  junodownload: {
-    title: "Junodownload",
-    link: "https://junodownload.com",
-    linkText: "junodownload.com",
-    placeholder: "https://junodownload.com/artists/artistname/...",
     instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
   },
   youtube: {

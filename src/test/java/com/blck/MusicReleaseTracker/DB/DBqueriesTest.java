@@ -310,14 +310,14 @@ public class DBqueriesTest {
                 new Song("song1", "artist1", "2022-01-01", null, null),
                 new Song("song2", "artist1", "2022-01-01", null, null));
         dBqueriesClass.batchInsertSongs(songList, TablesEnum.musicbrainz, 10);
-        dBqueriesClass.batchInsertSongs(songList, TablesEnum.junodownload, 10);
+        dBqueriesClass.batchInsertSongs(songList, TablesEnum.beatport, 10);
         dBqueriesClass.batchInsertCombview(songList);
-        int entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "musicbrainz", "junodownload");
+        int entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "musicbrainz", "beatport");
         assertEquals(6, entries);
 
         dBqueriesClass.truncateAllTables();
 
-        entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "musicbrainz", "junodownload");
+        entries = HelperDB.getNumEntries(HelperDB.testDBpath, "combview", "musicbrainz", "beatport");
         assertEquals(0, entries);
     }
 

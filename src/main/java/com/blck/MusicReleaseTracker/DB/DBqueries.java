@@ -22,7 +22,10 @@ import com.blck.MusicReleaseTracker.DataObjects.Album;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -383,7 +386,6 @@ public class DBqueries {
                     switch (webSource) {
                         case musicbrainz -> scrapers.add(new ScraperMusicbrainz(store, log, this, artist, url));
                         case beatport -> scrapers.add(new ScraperBeatport(store, log, this, artist, url));
-                        case junodownload -> scrapers.add(new ScraperJunodownload(store, log, this, artist, url));
                         case youtube -> scrapers.add(new ScraperYoutube(store, log, this, artist, url));
                     }
                 }

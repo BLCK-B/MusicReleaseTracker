@@ -1,28 +1,42 @@
+<!--
+  -         MusicReleaseTracker
+  -         Copyright (C) 2023 - 2025 BLCK
+  -         This program is free software: you can redistribute it and/or modify
+  -         it under the terms of the GNU General Public License as published by
+  -         the Free Software Foundation, either version 3 of the License, or
+  -         (at your option) any later version.
+  -         This program is distributed in the hope that it will be useful,
+  -         but WITHOUT ANY WARRANTY; without even the implied warranty of
+  -         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  -         GNU General Public License for more details.
+  -         You should have received a copy of the GNU General Public License
+  -         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
   <div class="wrapper">
     <div class="tabs">
-      <div @mousedown="setStoreTab('beatport')" :class="{ active: activeTab === 'beatport' }" class="sourceTab">BP</div>
-      <div @mousedown="setStoreTab('musicbrainz')" :class="{ active: activeTab === 'musicbrainz' }" class="sourceTab">MB</div>
-      <div @mousedown="setStoreTab('junodownload')" :class="{ active: activeTab === 'junodownload' }" class="sourceTab">JD</div>
-      <div @mousedown="setStoreTab('youtube')" :class="{ active: activeTab === 'youtube' }" class="sourceTab">YT</div>
+      <div :class="{ active: activeTab === 'beatport' }" class="sourceTab" @mousedown="setStoreTab('beatport')">BP</div>
+      <div :class="{ active: activeTab === 'musicbrainz' }" class="sourceTab" @mousedown="setStoreTab('musicbrainz')">MB</div>
+      <div :class="{ active: activeTab === 'youtube' }" class="sourceTab" @mousedown="setStoreTab('youtube')">YT</div>
     </div>
 
-    <button @click="openSettings()" class="settingsButton" :disabled="!allowButtons">
-      <img v-if="primaryColor === 'black'" class="imageSettings" src="../icons/optionsblack.png" alt="Settings" />
-      <img v-else-if="primaryColor === 'dark'" class="imageSettings" src="../icons/optionsdark.png" alt="Settings" />
-      <img v-else-if="primaryColor === 'light'" class="imageSettings" src="../icons/optionslight.png" alt="Settings" />
+    <button :disabled="!allowButtons" class="settingsButton" @click="openSettings()">
+      <img v-if="primaryColor === 'black'" alt="Settings" class="imageSettings" src="../icons/optionsblack.png" />
+      <img v-else-if="primaryColor === 'dark'" alt="Settings" class="imageSettings" src="../icons/optionsdark.png" />
+      <img v-else-if="primaryColor === 'light'" alt="Settings" class="imageSettings" src="../icons/optionslight.png" />
     </button>
     <button
-      @click="clickScrape"
-      @mouseover="scrapeHover"
-      @mouseleave="scrapeMouseOff"
+      :class="{ scrapeActive: isActive }"
       class="scrapeButton"
-      :class="{ scrapeActive: isActive }">
-      <img class="imageScrape" src="../icons/refreshuniversal.png" alt="Refresh" />
+      @click="clickScrape"
+      @mouseleave="scrapeMouseOff"
+      @mouseover="scrapeHover">
+      <img alt="Refresh" class="imageScrape" src="../icons/refreshuniversal.png" />
     </button>
 
     <transition name="fade">
-      <div class="scrapenotice" @mouseover="scrapeMouseOff" v-if="scrapeDateInfo">
+      <div v-if="scrapeDateInfo" class="scrapenotice" @mouseover="scrapeMouseOff">
         <p>Last scrape: {{ scrapeLast }}</p>
       </div>
     </transition>
@@ -30,9 +44,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount } from "vue";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+import {computed, onBeforeMount, ref, watch} from "vue";
+import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 import axios from "axios";
 
 const activeTab = ref("");

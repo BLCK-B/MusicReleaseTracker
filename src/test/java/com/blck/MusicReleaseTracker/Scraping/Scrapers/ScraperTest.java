@@ -100,19 +100,6 @@ public class ScraperTest {
     }
 
     @Test
-    void reduceToIDJunodownload() {
-        scraper = new ScraperJunodownload(null,null, null, null, "https://www.junodownload" +
-                ".com/artists/artistname/releases/");
-        assertEquals("artistname", scraper.getID());
-
-        scraper = new ScraperJunodownload(null,null, null, null, "https://www.junodownload.com/artists/artistname");
-        assertEquals("artistname", scraper.getID());
-
-        scraper = new ScraperJunodownload(null,null, null, null, "artistname");
-        assertEquals("artistname", scraper.getID());
-    }
-
-    @Test
     void reduceToIDYoutube() {
         scraper = new ScraperYoutube(null,null, null, null, "https://www.youtube.com/channel/123-id-123");
         assertEquals("123-id-123", scraper.getID());

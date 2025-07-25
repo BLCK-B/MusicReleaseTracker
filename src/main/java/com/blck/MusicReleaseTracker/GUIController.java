@@ -26,7 +26,10 @@ import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
 import com.blck.MusicReleaseTracker.Scraping.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -116,7 +119,6 @@ public class GUIController {
             switch (source) {
                 case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, DB, artist, url);
                 case beatport -> scraper = new ScraperBeatport(store, log, DB, artist, url);
-                case junodownload -> scraper = new ScraperJunodownload(store, log, DB, artist, url);
                 case youtube -> scraper = new ScraperYoutube(store, log, DB, artist, url);
             }
             id = scraper.getID();

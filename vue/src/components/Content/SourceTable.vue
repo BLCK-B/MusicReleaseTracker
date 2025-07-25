@@ -64,7 +64,7 @@ const getThumbnailKeys = () => {
 };
 
 const getThumbnailUrl = (song) => {
-  const key = "/thumbnails/" + (song.name + song.date).toLowerCase().replace(/[^a-z0-9]/g, "");
+  const key = "/thumbnails/" + (String(song.name) + String(song.date)).toLowerCase().replace(/[^a-z0-9]/g, "");
   const match = thumbnailUrls.value.find((url) => url.startsWith(key)) || null;
   if (!match) return null;
   return "http://localhost:57782" + match;

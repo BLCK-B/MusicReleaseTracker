@@ -455,11 +455,12 @@ public class DBqueries {
             for (Song songObject : songList) {
                 if (i == 115)
                     break;
+                String thumbnailUrl = songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null;
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
                 pstmt.setString(4, songObject.getAlbum());
-                pstmt.setString(5, songObject.getThumbnailUrl().get());
+                pstmt.setString(5, thumbnailUrl);
                 ++i;
                 pstmt.addBatch();
             }

@@ -70,7 +70,6 @@ public class Main {
         };
     }
 
-
     @Component
     public class StartupRunner implements CommandLineRunner {
         /**

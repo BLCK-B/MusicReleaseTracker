@@ -15,8 +15,10 @@
 
 package com.blck.MusicReleaseTracker.Scraping;
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
+import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
+import org.jsoup.HttpStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,59 +43,69 @@ import java.util.stream.Stream;
 @Service
 public class ThumbnailService {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
     private final ValueStore valueStore;
 
+    private final ErrorLogging log;
+
+    private final int downloadDelay = 300;
+
+    public boolean scrapeCancel = false;
+
     @Autowired
-    public ThumbnailService(ValueStore valueStore) {
+    public ThumbnailService(ValueStore valueStore, ErrorLogging log) {
         this.valueStore = valueStore;
+        this.log = log;
     }
 
-    public void loadThumbnails(List<Song> songs) {
+    public void loadThumbnails(List<MediaItem> mediaItems) {
+        scrapeCancel = false;
         try {
             Path thumbnailsDir = Paths.get(valueStore.getAppDataPath(), "thumbnails");
 
-            for (Song song : songs) {
-                String key = (song.getName() + song.getDate()).toLowerCase().replaceAll("[^a-z0-9]", "");
+            for (MediaItem item : mediaItems) {
+                if (scrapeCancel) {
+                    return;
+                }
+                String key = (item.getName() + item.getDate()).toLowerCase().replaceAll("[^a-z0-9]", "");
 
-                String url = song.getThumbnailUrl().get();
-                if (!isValidUrl(url))
-                    continue;
-
-                Optional<Path> existing = findExistingThumbnail(thumbnailsDir, key);
-                if (existing.isPresent()) {
-                    System.out.println("Thumbnail exists: " + existing.get());
+                String url = item.getThumbnailUrl().orElse(null);
+                if (!isValidUrl(url)) {
                     continue;
                 }
 
-                String timestamp = LocalDateTime.now().format(FORMATTER);
-                String filename = key + "_" + timestamp + ".jpg";
-                Path imagePath = thumbnailsDir.resolve(filename);
+                Optional<Path> existingMatch = findExistingThumbnail(thumbnailsDir, key);
+                if (existingMatch.isPresent()) {
+                    continue;
+                }
+//                TODO: use img format from url
+                String fileName = key + "_" + LocalDateTime.now().format(FORMATTER) + ".jpg";
+                Path imagePath = thumbnailsDir.resolve(fileName);
 
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(song.getThumbnailUrl().get()))
+                        .uri(URI.create(url))
                         .GET()
                         .build();
 
                 HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(imagePath));
 
-                if (response.statusCode() == 200) {
-                    System.out.println("Downloaded thumbnail: " + imagePath);
-                } else {
-                    throw new IOException("Failed to download image, status: " + response.statusCode());
+                if (response.statusCode() != 200) {
+                    log.error(new HttpStatusException("", response.statusCode(), url), ErrorLogging.Severity.WARNING, "Thumbnail download failed.");
                 }
-                Thread.sleep(250);
+                Thread.sleep(downloadDelay);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load thumbnail: ", e);
+            log.error(e, ErrorLogging.Severity.WARNING, "Failed to load thumbnails.");
         }
     }
 
     private boolean isValidUrl(String url) {
-        if (url == null || url.isBlank())
+        if (url == null || url.isBlank()) {
             return false;
+        }
         try {
             URI uri = URI.create(url.trim());
             String scheme = uri.getScheme();
@@ -120,8 +132,8 @@ public class ThumbnailService {
         }
 
         File[] files = thumbnailsDir.listFiles((dir, name) -> {
-            String lowerCase = name.toLowerCase();
-            return lowerCase.endsWith(".jpg") || lowerCase.endsWith(".jpeg") || lowerCase.endsWith(".png");
+            String lowerCaseName = name.toLowerCase();
+            return lowerCaseName.endsWith(".jpg") || lowerCaseName.endsWith(".jpeg") || lowerCaseName.endsWith(".png");
         });
 
         if (files == null || files.length == 0) {
@@ -131,5 +143,9 @@ public class ThumbnailService {
         return Arrays.stream(files)
                 .map(file -> "/thumbnails/" + file.getName())
                 .collect(Collectors.toList());
+    }
+
+    public void removeOldThumbnails() {
+//        TODO
     }
 }

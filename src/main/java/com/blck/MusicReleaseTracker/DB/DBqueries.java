@@ -37,9 +37,14 @@ import java.util.stream.Collectors;
 public class DBqueries {
 
     private final ValueStore store;
+
     private final ErrorLogging log;
+
     private final MigrateDB manageDB;
+
     private final SettingsIO settingsIO;
+
+    private final int combviewSize = 100;
 
     @Autowired
     public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, MigrateDB manageDB) {
@@ -122,15 +127,17 @@ public class DBqueries {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(
-                    "SELECT song, artist, date FROM combview WHERE album IS NULL ORDER BY date DESC, song LIMIT 1000"
+                    "SELECT song, artist, date, thumbnail FROM combview WHERE album IS NULL ORDER BY date DESC, song LIMIT 1000"
             );
-            while (rs.next())
+            while (rs.next()) {
                 singles.add(new Song(
                         rs.getString("song"),
                         rs.getString("artist"),
                         rs.getString("date"),
                         null,
-                        null));
+                        rs.getString("thumbnail"))
+                );
+            }
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview table");
         }
@@ -149,7 +156,7 @@ public class DBqueries {
                     "SELECT DISTINCT album FROM combview WHERE album IS NOT NULL ORDER BY date LIMIT 300"
             );
             PreparedStatement pstmt = conn.prepareStatement(
-                    "SELECT song, artist, date FROM combview WHERE album = ? ORDER BY song LIMIT 100"
+                    "SELECT song, artist, date, thumbnail FROM combview WHERE album = ? ORDER BY song LIMIT 100"
             );
             while (rs1.next()) {
                 final String albumName =  rs1.getString("album");
@@ -162,7 +169,8 @@ public class DBqueries {
                             rs2.getString("artist"),
                             rs2.getString("date"),
                             null,
-                            null));
+                            rs2.getString("thumbnail"))
+                    );
                 albums.add(new Album(albumName, albumSongs));
             }
         } catch (SQLException e) {
@@ -443,6 +451,7 @@ public class DBqueries {
     }
 
     /**
+     * Batch inserts songs to combview table from a list depending on the song dates - prefers newer.
      *
      * @param songList songs
      */
@@ -453,7 +462,7 @@ public class DBqueries {
             );
             int i = 0;
             for (Song songObject : songList) {
-                if (i == 115)
+                if (i == combviewSize)
                     break;
                 String thumbnailUrl = songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null;
                 pstmt.setString(1, songObject.getName());

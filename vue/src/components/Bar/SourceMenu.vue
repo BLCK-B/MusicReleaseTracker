@@ -1,18 +1,3 @@
-<!--
-  -         MusicReleaseTracker
-  -         Copyright (C) 2023 - 2025 BLCK
-  -         This program is free software: you can redistribute it and/or modify
-  -         it under the terms of the GNU General Public License as published by
-  -         the Free Software Foundation, either version 3 of the License, or
-  -         (at your option) any later version.
-  -         This program is distributed in the hope that it will be useful,
-  -         but WITHOUT ANY WARRANTY; without even the implied warranty of
-  -         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  -         GNU General Public License for more details.
-  -         You should have received a copy of the GNU General Public License
-  -         along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
 <template>
   <div class="wrapper">
     <div class="tabs">
@@ -37,16 +22,16 @@
 
     <transition name="fade">
       <div v-if="scrapeDateInfo" class="scrapenotice" @mouseover="scrapeMouseOff">
-        <p>Last scrape: {{ scrapeLast }}</p>
+        <p>Last refresh: {{ scrapeLast }}</p>
       </div>
     </transition>
   </div>
 </template>
 
 <script setup>
-import {computed, onBeforeMount, ref, watch} from "vue";
-import {useStore} from "vuex";
-import {useRouter} from "vue-router";
+import { computed, onBeforeMount, ref, watch } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 import axios from "axios";
 
 const activeTab = ref("");
@@ -128,6 +113,7 @@ const clickScrape = () => {
       isActive.value = false;
       store.commit("SET_ALLOW_BUTTONS", true);
       eventSource.value.close();
+      store.commit("SET_PROGRESS", 0.0);
 
       const currentTime = new Date();
       const time = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)

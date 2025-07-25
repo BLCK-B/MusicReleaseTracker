@@ -34,9 +34,13 @@ import java.util.stream.Collectors;
 public class ScrapeProcess {
 
 	private final ErrorLogging log;
+
 	private final DBqueries DB;
+
 	private final SSEController SSE;
+
 	private final ThumbnailService thumbnailService;
+
 	public boolean scrapeCancel = false;
 
 	@Autowired
@@ -64,17 +68,28 @@ public class ScrapeProcess {
 		while (!scrapeCancel) {
 			remaining = scraperManager.scrapeNext();
 			progress = ((double) initSize - (double) remaining) / (double) initSize;
-			if (progress == 1.0)
-				break;
-			else
+			if (progress == 1.0) {
 				SSE.sendProgress(progress);
+				break;
+			}
+			else {
+				SSE.sendProgress(progress);
+			}
 		}
-		SSE.complete();
-		System.gc();
 	}
 
+	/**
+	 * Downloads thumbnails for combview songs.
+	 */
 	public void downloadThumbnails() {
-		thumbnailService.loadThumbnails(DB.getSourceTablesDataForCombview());
+		thumbnailService.loadThumbnails(DB.loadCombviewTable());
+	}
+
+	/**
+	 * Closes SSE emitter for frontend progress bar.
+	 */
+	public void closeSSE() {
+		SSE.complete();
 	}
 
 	/**
@@ -85,7 +100,7 @@ public class ScrapeProcess {
 		List<Song> songList = DB.getSourceTablesDataForCombview();
 		if (songList.isEmpty())
 			return;
-
+// TODO: chaining - return streams
 		songList = mergeNameArtistDuplicates(songList);
 		songList = mergeNameDateDuplicates(songList);
 		songList = mergeSongsWithinDaysApart(songList, 7);

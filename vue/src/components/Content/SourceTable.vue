@@ -31,7 +31,6 @@
 import { useStore } from "vuex";
 import { computed, watch, ref } from "vue";
 import MediaItem from "./MediaItem.vue";
-import SongDetails from "./SongDetails.vue";
 import axios from "axios";
 
 const store = useStore();

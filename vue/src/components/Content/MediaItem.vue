@@ -74,6 +74,7 @@ const contextMenu = (mediaItem) => {
 <style scoped>
 th,
 td {
+  user-select: text;
   text-overflow: ellipsis;
   display: flex;
   align-items: center;
@@ -113,11 +114,11 @@ th {
   border-radius: 5px;
   background-color: var(--primary-color);
 }
-.single-bubble:hover,
+/* .single-bubble:hover,
 .album-bubble:hover {
   background-color: var(--accent-color);
   color: var(--accent-contrast);
-}
+} */
 .future-date {
   background-color: var(--duller-color);
   opacity: 50%;

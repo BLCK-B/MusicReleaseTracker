@@ -16,9 +16,7 @@
 package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
-import com.blck.MusicReleaseTracker.DTO.SongDetails;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.GUIController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -146,9 +144,9 @@ public class ApiController {
         return sendRequest.getAppVersion();
     }
 
-    @GetMapping("/songDetails/{source}/{song}")
-    public SongDetails songDetails(@PathVariable String source, @PathVariable Song song) {
-        return sendRequest.getSongDetails(TablesEnum.valueOf(source), song);
-    }
+//    @GetMapping("/songDetails/{source}/{song}")
+//    public SongDetails songDetails(@PathVariable String source, @PathVariable Song song) {
+//        return sendRequest.getSongDetails(TablesEnum.valueOf(source), song);
+//    }
 
 }

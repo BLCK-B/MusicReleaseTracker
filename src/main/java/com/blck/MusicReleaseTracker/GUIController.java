@@ -20,9 +20,7 @@ import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.MigrateDB;
-import com.blck.MusicReleaseTracker.DTO.SongDetails;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
-import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
@@ -139,21 +137,26 @@ public class GUIController {
         return DB.getArtistSourceID(artist, source).isPresent();
     }
 
-    public SongDetails getSongDetails(TablesEnum source, Song song) {
-        String ID = String.valueOf(DB.getArtistSourceID(song.getArtists(), source));
-//        SongDetails songDetails = new SongDetails(DB.);
-        return null;
-    }
+//    public SongDetails getSongDetails(TablesEnum source, Song song) {
+//        String ID = String.valueOf(DB.getArtistSourceID(song.getArtists(), source));
+////        SongDetails songDetails = new SongDetails(DB.);
+//        return null;
+//    }
 
     public void clickScrape() {
         scrapeProcess.scrapeData(new ScraperManager(log, DB));
-        scrapeProcess.downloadThumbnails();
         scrapeProcess.fillCombviewTable();
+        if (settingsIO.readSetting("loadThumbnails").equals("true")) {
+            scrapeProcess.downloadThumbnails();
+        }
+        scrapeProcess.closeSSE();
         DB.vacuum();
+        System.gc();
     }
 
     public void cancelScrape() {
         scrapeProcess.scrapeCancel = true;
+        thumbnailService.scrapeCancel = true;
     }
 
     public List<String> getThumbnailUrls() {

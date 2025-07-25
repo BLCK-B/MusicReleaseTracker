@@ -32,9 +32,11 @@ public enum SettingsModel {
     filterInstrumental(false),
     filterRemaster(false),
     filterRemix(false),
-    filterVIP(false);
+    filterVIP(false),
+    loadThumbnails(true); // TODO: add to frontend
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private final Object value;
 
     SettingsModel(Object value) {
@@ -43,8 +45,9 @@ public enum SettingsModel {
 
     public static JsonNode getSettingsModel() {
         var model = objectMapper.createObjectNode();
-        for (SettingsModel setting : SettingsModel.values())
+        for (SettingsModel setting : SettingsModel.values()) {
             model.put(setting.name(), setting.getValue().toString());
+        }
         return model;
     }
 

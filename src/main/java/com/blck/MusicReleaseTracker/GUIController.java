@@ -160,6 +160,7 @@ public class GUIController {
     }
 
     public List<String> getThumbnailUrls() {
+        // TODO: return only urls for needed keys
         return thumbnailService.getAllThumbnailUrls();
     }
 

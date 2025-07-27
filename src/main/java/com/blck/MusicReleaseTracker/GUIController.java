@@ -137,6 +137,7 @@ public class GUIController {
         return DB.getArtistSourceID(artist, source).isPresent();
     }
 
+//    TODO
 //    public SongDetails getSongDetails(TablesEnum source, Song song) {
 //        String ID = String.valueOf(DB.getArtistSourceID(song.getArtists(), source));
 ////        SongDetails songDetails = new SongDetails(DB.);

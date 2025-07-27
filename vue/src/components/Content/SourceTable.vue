@@ -1,7 +1,5 @@
 <template>
   <div v-if="tableVisible" class="table-container">
-    <!-- <SongDetails /> -->
-
     <div class="table-body">
       <div v-for="(mediaItem, mediaIndex) in tableDataWithThumbnails" :key="mediaIndex" class="aBubble">
         <table>

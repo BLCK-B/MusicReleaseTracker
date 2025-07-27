@@ -9,7 +9,7 @@
       <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
     </tr>
     <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" @click="contextMenu(song)" class="album-bubble">
-      <td class="tdsong">{{ song.name }}</td>
+      <td class="tdsong pad">{{ song.name }}</td>
     </tr>
   </template>
   <!-- separate songs -->
@@ -114,6 +114,7 @@ th {
   border-radius: 5px;
   background-color: var(--primary-color);
 }
+/* TODO */
 /* .single-bubble:hover,
 .album-bubble:hover {
   background-color: var(--accent-color);
@@ -146,5 +147,8 @@ tr.single-bubble {
 }
 .thumbnail:hover {
   width: 80px;
+}
+.pad {
+  padding: 4px;
 }
 </style>

@@ -7,7 +7,7 @@
     </div>
     <div class="flex-padding">
       <input type="checkbox" :checked="loadThumbnails" @change="$emit('set-setting', 'loadThumbnails', $event.target.checked)" />
-      <label>Download thumbnails</label>
+      <label>Download thumbnails (feature preview)</label>
     </div>
   </div>
 </template>

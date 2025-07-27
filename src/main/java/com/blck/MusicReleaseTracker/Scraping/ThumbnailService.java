@@ -53,6 +53,8 @@ public class ThumbnailService {
 
     private final int downloadDelay = 300;
 
+    private final String slash = File.separator;
+
     public boolean scrapeCancel = false;
 
     @Autowired
@@ -125,7 +127,7 @@ public class ThumbnailService {
     }
 
     public List<String> getAllThumbnailUrls() {
-        String thumbnailsDirPath = valueStore.getAppDataPath() + "thumbnails/";
+        String thumbnailsDirPath = valueStore.getAppDataPath() + "thumbnails" + slash;
         File thumbnailsDir = new File(thumbnailsDirPath);
         if (!thumbnailsDir.exists() || !thumbnailsDir.isDirectory()) {
             return Collections.emptyList();
@@ -141,11 +143,12 @@ public class ThumbnailService {
         }
 
         return Arrays.stream(files)
-                .map(file -> "/thumbnails/" + file.getName())
+                .map(file -> "/thumbnails/" + file.getName()) // forward slashes intentional
                 .collect(Collectors.toList());
     }
 
-    public void removeOldThumbnails() {
-//        TODO
+//    TODO
+    public void removeOldThumbnails(int oldInDays) {
+
     }
 }

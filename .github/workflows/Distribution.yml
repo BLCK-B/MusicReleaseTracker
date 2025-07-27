@@ -77,7 +77,7 @@ jobs:
       - name: Build native executable
         run: |
           chmod +x ./gradlew
-          ./gradlew nativeCompile
+          ./gradlew nativeCompile --stacktrace
       - name: Move native executable
         run: mv build/native/nativeCompile/MusicReleaseTracker* vue/buildResources/
       - name: Electron builder

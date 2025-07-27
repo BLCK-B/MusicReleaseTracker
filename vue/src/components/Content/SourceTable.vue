@@ -119,6 +119,7 @@ table {
   width: 60%;
   border-radius: 5px;
   margin-bottom: 3px;
+  margin-bottom: 6px;
 }
 @media (max-width: 1100px) {
   .aBubble {

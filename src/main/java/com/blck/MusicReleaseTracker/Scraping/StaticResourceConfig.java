@@ -40,7 +40,6 @@ public class StaticResourceConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/thumbnails/**")
-                .addResourceLocations(getPath())
-                .setCachePeriod(3600);
+                .addResourceLocations(getPath());
     }
 }

@@ -33,7 +33,7 @@ public enum SettingsModel {
     filterRemaster(false),
     filterRemix(false),
     filterVIP(false),
-    loadThumbnails(true); // TODO: add to frontend
+    loadThumbnails(true);
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

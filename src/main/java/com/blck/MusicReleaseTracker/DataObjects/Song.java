@@ -23,10 +23,17 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Song implements Comparable<Song>, MediaItem {
+
     private final String songName;
+
     private final SortedSet<String> songArtists;
+
     private final String songDate;
+
     private final Optional<String> songType;
+
+    private final Optional<String> songThumbnailUrl;
+
     private String album;
 
     /**
@@ -36,7 +43,7 @@ public class Song implements Comparable<Song>, MediaItem {
      * @param songDate yyyy-MM-dd
      * @param songType type of song for filtering purposes like remix, instrumental
      */
-    public Song(String songName, String songArtists, String songDate, String songType) {
+    public Song(String songName, String songArtists, String songDate, String songType, String songThumbnailUrl) {
         this.songName = songName;
         this.songArtists = new TreeSet<>();
         this.songArtists.add(songArtists);
@@ -47,20 +54,10 @@ public class Song implements Comparable<Song>, MediaItem {
             this.songType = Optional.empty();
         else
             this.songType = Optional.of(songType);
-    }
-
-    /**
-     *  Constructor for song with unspecified type.
-     * @param songName name of the song
-     * @param songArtists best created with just one artist
-     * @param songDate yyyy-MM-dd
-     */
-    public Song(String songName, String songArtists, String songDate) {
-        this.songName = songName;
-        this.songArtists = new TreeSet<>();
-        this.songArtists.add(songArtists);
-        this.songDate = songDate;
-        this.songType = Optional.empty();
+        if (songThumbnailUrl == null)
+            this.songThumbnailUrl = Optional.empty();
+        else
+            this.songThumbnailUrl = Optional.of(songThumbnailUrl);
     }
 
     public String getAlbum() {
@@ -85,6 +82,10 @@ public class Song implements Comparable<Song>, MediaItem {
 
     public Optional<String> getType() {
         return songType;
+    }
+
+    public Optional<String> getThumbnailUrl() {
+        return songThumbnailUrl;
     }
 
     /**

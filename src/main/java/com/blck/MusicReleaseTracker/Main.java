@@ -57,7 +57,7 @@ public class Main {
     }
 
     /**
-     *  CORS redirect mapping for dev cross-origin permission
+     *  CORS redirect mapping for dev cross-origin permission TODO: chrome again
      */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -69,7 +69,6 @@ public class Main {
             }
         };
     }
-
 
     @Component
     public class StartupRunner implements CommandLineRunner {

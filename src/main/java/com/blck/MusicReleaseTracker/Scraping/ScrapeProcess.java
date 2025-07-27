@@ -1,6 +1,6 @@
 /*
  *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
+ *         Copyright (C) 2023 - 2025 BLCK
  *         This program is free software: you can redistribute it and/or modify
  *         it under the terms of the GNU General Public License as published by
  *         the Free Software Foundation, either version 3 of the License, or
@@ -34,16 +34,22 @@ import java.util.stream.Collectors;
 public class ScrapeProcess {
 
 	private final ErrorLogging log;
+
 	private final DBqueries DB;
+
 	private final SSEController SSE;
+
+	private final ThumbnailService thumbnailService;
+
 	public boolean scrapeCancel = false;
 
 	@Autowired
 	public ScrapeProcess(ErrorLogging errorLogging, DBqueries dBqueries,
-						 SSEController sseController) {
+						 SSEController sseController, ThumbnailService thumbnailService) {
 		this.log = errorLogging;
 		this.DB = dBqueries;
 		this.SSE = sseController;
+		this.thumbnailService = thumbnailService;
 	}
 
 	/**
@@ -62,13 +68,28 @@ public class ScrapeProcess {
 		while (!scrapeCancel) {
 			remaining = scraperManager.scrapeNext();
 			progress = ((double) initSize - (double) remaining) / (double) initSize;
-			if (progress == 1.0)
-				break;
-			else
+			if (progress == 1.0) {
 				SSE.sendProgress(progress);
+				break;
+			}
+			else {
+				SSE.sendProgress(progress);
+			}
 		}
+	}
+
+	/**
+	 * Downloads thumbnails for combview songs.
+	 */
+	public void downloadThumbnails() {
+		thumbnailService.loadThumbnails(DB.loadCombviewTable());
+	}
+
+	/**
+	 * Closes SSE emitter for frontend progress bar.
+	 */
+	public void closeSSE() {
 		SSE.complete();
-		System.gc();
 	}
 
 	/**
@@ -79,7 +100,7 @@ public class ScrapeProcess {
 		List<Song> songList = DB.getSourceTablesDataForCombview();
 		if (songList.isEmpty())
 			return;
-
+// TODO: chaining - return streams
 		songList = mergeNameArtistDuplicates(songList);
 		songList = mergeNameDateDuplicates(songList);
 		songList = mergeSongsWithinDaysApart(songList, 7);

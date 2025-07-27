@@ -28,7 +28,7 @@ You will no longer have to search social media or streaming services. Never miss
 
 For the latest information, just press the refresh button and MusicReleaseTracker will do the job for you. Combining more sources means that you are less likely to miss anything. Best of all, you don’t need any accounts to use it. MRT runs locally on your computer.
 
-Currently available sources: `Beatport`, `Musicbrainz`, `Junodownload`, `Youtube`.
+Currently available sources: `Beatport`, `Musicbrainz` and `Youtube`.
 
 ##
 
@@ -46,7 +46,7 @@ For compilation and contribution, see [CONTRIBUTING.md](https://github.com/BLCK-
 
 Delays during scraping prevent excessive traffic.
 
-I have no affiliation with Musicbrainz, Beatport, Junodownload or Youtube.
+I have no affiliation with any of the external sources and websites.
 
 ---
 

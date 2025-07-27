@@ -1,36 +1,35 @@
 <template>
   <div class="wrapper">
     <div class="tabs">
-      <div @mousedown="setStoreTab('beatport')" :class="{ active: activeTab === 'beatport' }" class="sourceTab">BP</div>
-      <div @mousedown="setStoreTab('musicbrainz')" :class="{ active: activeTab === 'musicbrainz' }" class="sourceTab">MB</div>
-      <div @mousedown="setStoreTab('junodownload')" :class="{ active: activeTab === 'junodownload' }" class="sourceTab">JD</div>
-      <div @mousedown="setStoreTab('youtube')" :class="{ active: activeTab === 'youtube' }" class="sourceTab">YT</div>
+      <div :class="{ active: activeTab === 'beatport' }" class="sourceTab" @mousedown="setStoreTab('beatport')">BP</div>
+      <div :class="{ active: activeTab === 'musicbrainz' }" class="sourceTab" @mousedown="setStoreTab('musicbrainz')">MB</div>
+      <div :class="{ active: activeTab === 'youtube' }" class="sourceTab" @mousedown="setStoreTab('youtube')">YT</div>
     </div>
 
-    <button @click="openSettings()" class="settingsButton" :disabled="!allowButtons">
-      <img v-if="primaryColor === 'black'" class="imageSettings" src="../icons/optionsblack.png" alt="Settings" />
-      <img v-else-if="primaryColor === 'dark'" class="imageSettings" src="../icons/optionsdark.png" alt="Settings" />
-      <img v-else-if="primaryColor === 'light'" class="imageSettings" src="../icons/optionslight.png" alt="Settings" />
+    <button :disabled="!allowButtons" class="settingsButton" @click="openSettings()">
+      <img v-if="primaryColor === 'black'" alt="Settings" class="imageSettings" src="../icons/optionsblack.png" />
+      <img v-else-if="primaryColor === 'dark'" alt="Settings" class="imageSettings" src="../icons/optionsdark.png" />
+      <img v-else-if="primaryColor === 'light'" alt="Settings" class="imageSettings" src="../icons/optionslight.png" />
     </button>
     <button
-      @click="clickScrape"
-      @mouseover="scrapeHover"
-      @mouseleave="scrapeMouseOff"
+      :class="{ scrapeActive: isActive }"
       class="scrapeButton"
-      :class="{ scrapeActive: isActive }">
-      <img class="imageScrape" src="../icons/refreshuniversal.png" alt="Refresh" />
+      @click="clickScrape"
+      @mouseleave="scrapeMouseOff"
+      @mouseover="scrapeHover">
+      <img alt="Refresh" class="imageScrape" src="../icons/refreshuniversal.png" />
     </button>
 
     <transition name="fade">
-      <div class="scrapenotice" @mouseover="scrapeMouseOff" v-if="scrapeDateInfo">
-        <p>Last scrape: {{ scrapeLast }}</p>
+      <div v-if="scrapeDateInfo" class="scrapenotice" @mouseover="scrapeMouseOff">
+        <p>Last refresh: {{ scrapeLast }}</p>
       </div>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeMount } from "vue";
+import { computed, onBeforeMount, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -114,6 +113,7 @@ const clickScrape = () => {
       isActive.value = false;
       store.commit("SET_ALLOW_BUTTONS", true);
       eventSource.value.close();
+      store.commit("SET_PROGRESS", 0.0);
 
       const currentTime = new Date();
       const time = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)

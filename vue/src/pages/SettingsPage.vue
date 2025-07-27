@@ -26,7 +26,7 @@
     </section>
 
     <section class="other">
-      <SettingsOther :isoDates="isoDates" @set-setting="setSetting" />
+      <SettingsOther :isoDates="isoDates" :loadThumbnails="loadThumbnails" @set-setting="setSetting" />
     </section>
 
     <section class="danger">
@@ -62,6 +62,7 @@ const filterRemaster = ref(false);
 const accentColor = ref("N");
 const autoTheme = ref(false);
 const appVersion = ref("");
+const loadThumbnails = ref(false);
 
 const primaryColor = computed(() => store.state.primaryColor);
 const isoDates = computed(() => store.state.isoDates);
@@ -80,6 +81,7 @@ onBeforeMount(() => {
       store.commit("SET_ISODATES", response.data.isoDates === "true");
       if (autoTheme.value) primaryColor.value = response.data.theme;
       accentColor.value = response.data.accent;
+      loadThumbnails.value = response.data.loadThumbnails === "true";
     })
     .catch((error) => {
       console.error(error);
@@ -115,6 +117,9 @@ const setSetting = (name, value) => {
       break;
     case "autoTheme":
       autoTheme.value = value;
+      break;
+    case "loadThumbnails":
+      loadThumbnails.value = value;
       break;
   }
   axios.put(`/api/setting?name=${name}&value=${value}`).catch((error) => {

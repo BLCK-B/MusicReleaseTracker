@@ -34,7 +34,6 @@ const mutations = {
   },
   SET_PROGRESS(state, progress) {
     state.progress = progress * 100;
-    if (state.progress == 100) state.progress = 0;
   },
   SET_SETTINGS_OPEN(state, settingsOpen) {
     state.settingsOpen = settingsOpen;

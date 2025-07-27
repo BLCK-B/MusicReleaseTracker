@@ -7,9 +7,9 @@
       </div>
       <p v-html="currentSource.instructions"></p>
       <input v-model="userInput" :placeholder="currentSource.placeholder" />
-      <button @click="clickConfirmURL" :disabled="!allowButtons" class="imgbutton" data-testid="confirm-button">
-        <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
-        <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
+      <button :disabled="!allowButtons" class="imgbutton" data-testid="confirm-button" @click="clickConfirmURL">
+        <img v-if="primaryColor !== 'light'" alt="OK" class="image" src="../icons/confirmdark.png" />
+        <img v-if="primaryColor === 'light'" alt="OK" class="image" src="../icons/confirmlight.png" />
       </button>
     </div>
   </div>
@@ -18,7 +18,7 @@
 <script setup>
 import axios from "axios";
 import { useStore } from "vuex";
-import { ref, computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const store = useStore();
 
@@ -43,13 +43,6 @@ const sources = computed(() => ({
     link: "https://beatport.com",
     linkText: "beatport.com",
     placeholder: "https://beatport.com/artist/artistname/id/...",
-    instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
-  },
-  junodownload: {
-    title: "Junodownload",
-    link: "https://junodownload.com",
-    linkText: "junodownload.com",
-    placeholder: "https://junodownload.com/artists/artistname/...",
     instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
   },
   youtube: {

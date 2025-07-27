@@ -13,17 +13,8 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker.DataObjects;
+package com.blck.MusicReleaseTracker.DTO;
 
-import java.util.Optional;
-
-/**
- * MediaItem may represent a {@code Song} or an {@code Album}. </br>
- * The shared parameters of a song and album are are date and name.
- */
-public interface MediaItem {
-	String getDate();
-	String getName();
-	String getAlbum();
-	Optional<String> getThumbnailUrl();
-}
+public record SongDetails(
+  String directUrl
+) { }

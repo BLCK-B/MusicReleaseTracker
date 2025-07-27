@@ -43,7 +43,6 @@ public class SSEController {
      * Close emitter and conclude progress bar
      */
     public void complete() {
-		sendProgress(1.0);
 		emitter.complete();
     }
 

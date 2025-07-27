@@ -22,7 +22,10 @@ import com.blck.MusicReleaseTracker.DataObjects.Album;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +37,14 @@ import java.util.stream.Collectors;
 public class DBqueries {
 
     private final ValueStore store;
+
     private final ErrorLogging log;
+
     private final MigrateDB manageDB;
+
     private final SettingsIO settingsIO;
+
+    private final int combviewSize = 100;
 
     @Autowired
     public DBqueries(ValueStore valueStore, ErrorLogging errorLogging, SettingsIO settingsIO, MigrateDB manageDB) {
@@ -79,11 +87,15 @@ public class DBqueries {
                     "SELECT song, date FROM " + source + " WHERE artist = ? ORDER BY date DESC, song LIMIT 50");
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
-            while (rs.next())
+            while (rs.next()) {
                 tableContent.add(new Song(
                         rs.getString("song"),
                         name,
-                        rs.getString("date")));
+                        rs.getString("date"),
+                        null,
+                        null)
+                );
+            }
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error loading table");
         }
@@ -115,13 +127,17 @@ public class DBqueries {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(
-                    "SELECT song, artist, date FROM combview WHERE album IS NULL ORDER BY date DESC, song LIMIT 1000"
+                    "SELECT song, artist, date, thumbnail FROM combview WHERE album IS NULL ORDER BY date DESC, song LIMIT 1000"
             );
-            while (rs.next())
+            while (rs.next()) {
                 singles.add(new Song(
                         rs.getString("song"),
                         rs.getString("artist"),
-                        rs.getString("date")));
+                        rs.getString("date"),
+                        null,
+                        rs.getString("thumbnail"))
+                );
+            }
         } catch (SQLException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "error loading combview table");
         }
@@ -140,7 +156,7 @@ public class DBqueries {
                     "SELECT DISTINCT album FROM combview WHERE album IS NOT NULL ORDER BY date LIMIT 300"
             );
             PreparedStatement pstmt = conn.prepareStatement(
-                    "SELECT song, artist, date FROM combview WHERE album = ? ORDER BY song LIMIT 100"
+                    "SELECT song, artist, date, thumbnail FROM combview WHERE album = ? ORDER BY song LIMIT 100"
             );
             while (rs1.next()) {
                 final String albumName =  rs1.getString("album");
@@ -151,7 +167,10 @@ public class DBqueries {
                     albumSongs.add(new Song(
                             rs2.getString("song"),
                             rs2.getString("artist"),
-                            rs2.getString("date")));
+                            rs2.getString("date"),
+                            null,
+                            rs2.getString("thumbnail"))
+                    );
                 albums.add(new Album(albumName, albumSongs));
             }
         } catch (SQLException e) {
@@ -306,9 +325,10 @@ public class DBqueries {
                     try {
                         songType = rs.getString("type");
                     } catch (Exception ignored){} // check column count?
+                    String songThumbnail = rs.getString("thumbnail");
 
-                    if (songPassesFilterCheck(new Song(songName, songArtist, songDate, songType), filterWords))
-                        songObjectList.add(new Song(songName, songArtist, songDate, songType));
+                    if (songPassesFilterCheck(new Song(songName, songArtist, songDate, songType, songThumbnail), filterWords))
+                        songObjectList.add(new Song(songName, songArtist, songDate, songType, songThumbnail));
                 }
             }
         } catch (Exception e) {
@@ -374,7 +394,6 @@ public class DBqueries {
                     switch (webSource) {
                         case musicbrainz -> scrapers.add(new ScraperMusicbrainz(store, log, this, artist, url));
                         case beatport -> scrapers.add(new ScraperBeatport(store, log, this, artist, url));
-                        case junodownload -> scrapers.add(new ScraperJunodownload(store, log, this, artist, url));
                         case youtube -> scrapers.add(new ScraperYoutube(store, log, this, artist, url));
                     }
                 }
@@ -401,9 +420,9 @@ public class DBqueries {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             String sql;
             if (songList.getFirst().getType().isPresent())
-                sql = "insert into " + source + "(song, artist, date, type) values(?, ?, ?, ?)";
+                sql = "insert into " + source + "(song, artist, date, type, thumbnail) values(?, ?, ?, ?, ?)";
             else
-                sql = "insert into " + source + "(song, artist, date) values(?, ?, ?)";
+                sql = "insert into " + source + "(song, artist, date, thumbnail) values(?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             int i = 0;
             for (Song songObject : songList) {
@@ -412,8 +431,13 @@ public class DBqueries {
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
-                if (songList.getFirst().getType().isPresent())
+
+                if (songList.getFirst().getType().isPresent()) {
                     pstmt.setString(4, songObject.getType().get());
+                    pstmt.setString(5, songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null);
+                } else {
+                    pstmt.setString(4, songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null);
+                }
                 ++i;
                 pstmt.addBatch();
             }
@@ -427,22 +451,25 @@ public class DBqueries {
     }
 
     /**
+     * Batch inserts songs to combview table from a list depending on the song dates - prefers newer.
      *
      * @param songList songs
      */
     public void batchInsertCombview(List<Song> songList) {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement(
-                    "insert into combview (song, artist, date, album) values(?, ?, ?, ?)"
+                    "insert into combview (song, artist, date, album, thumbnail) values(?, ?, ?, ?, ?)"
             );
             int i = 0;
             for (Song songObject : songList) {
-                if (i == 115)
+                if (i == combviewSize)
                     break;
+                String thumbnailUrl = songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null;
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
                 pstmt.setString(4, songObject.getAlbum());
+                pstmt.setString(5, thumbnailUrl);
                 ++i;
                 pstmt.addBatch();
             }
@@ -471,8 +498,8 @@ public class DBqueries {
     private List<MediaItem> disableR() {
         if (Locale.getDefault().getLanguage().equals("ru")) {
             return List.of(
-                new Song("For security, russian is disallowed.", "", "01-01-2000"),
-                new Song("This can be disabled by changing system language.", "", "01-02-2000"));
+                new Song("For security, russian is disallowed.", "", "01-01-2000", null, null),
+                new Song("This can be disabled by changing system language.", "", "01-02-2000", null, null));
         }
         return null;
     }

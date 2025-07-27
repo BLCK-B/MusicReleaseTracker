@@ -56,7 +56,6 @@ public class MigrateDB {
                     artist text PRIMARY KEY,
                     urlmusicbrainz text,
                     urlbeatport text,
-                    urljunodownload text,
                     urlyoutube text
                     );
                     """);
@@ -66,7 +65,8 @@ public class MigrateDB {
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL,
-                    album text
+                    album text,
+                    thumbnail text
                     );
                     """);
 
@@ -74,7 +74,8 @@ public class MigrateDB {
                     CREATE TABLE IF NOT EXISTS musicbrainz (
                     song text NOT NULL,
                     artist text NOT NULL,
-                    date text NOT NULL
+                    date text NOT NULL,
+                    thumbnail text
                     );
                     """);
 
@@ -83,15 +84,8 @@ public class MigrateDB {
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL,
-                    type text NOT NULL
-                    );
-                    """);
-
-            stmt.addBatch("""
-                    CREATE TABLE IF NOT EXISTS junodownload (
-                    song text NOT NULL,
-                    artist text NOT NULL,
-                    date text NOT NULL
+                    type text NOT NULL,
+                    thumbnail text
                     );
                     """);
 
@@ -99,7 +93,8 @@ public class MigrateDB {
                     CREATE TABLE IF NOT EXISTS youtube (
                     song text NOT NULL,
                     artist text NOT NULL,
-                    date text NOT NULL
+                    date text NOT NULL,
+                    thumbnail text
                     );
                     """);
 

@@ -1,14 +1,29 @@
+<!--
+  ~         MusicReleaseTracker
+  ~         Copyright (C) 2023 - 2025 BLCK
+  ~         This program is free software: you can redistribute it and/or modify
+  ~         it under the terms of the GNU General Public License as published by
+  ~         the Free Software Foundation, either version 3 of the License, or
+  ~         (at your option) any later version.
+  ~         This program is distributed in the hope that it will be useful,
+  ~         but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~         GNU General Public License for more details.
+  ~         You should have received a copy of the GNU General Public License
+  ~         along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>MusicReleaseTracker</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link href="styles.css" rel="stylesheet" />
 </head>
 <body>
   <header>
-    <img src="MRTlogo.svg" class="logo" alt="Logo">
+    <img alt="Logo" class="logo" src="MRTlogo.svg">
     <h1>MusicReleaseTracker</h1>
     <p>Never miss a new song or album again. No accounts needed.</p>
   </header>
@@ -16,7 +31,7 @@
   <section class="description">
     <h2>Stay on top</h2>
     <p>
-      I needed a better way to keep track of new music from my favourite artists. Streaming services and their recommendation algorithms often miss things. Thankfully, there are websites that have just the information I need. I built this tool to collect the information from these sources. Custom processing - the magic behind the scenes - creates a simple overview of the latest singles and albums. Currently supported sources are <strong>Beatport</strong>, <strong>Musicbrainz</strong>, <strong>Junodownload</strong>, and <strong>Youtube</strong>.
+      I needed a better way to keep track of new music from my favourite artists. Streaming services and their recommendation algorithms often miss things. Thankfully, there are websites that have just the information I need. I built this tool to collect the information from these sources. Custom processing - the magic behind the scenes - creates a simple overview of the latest singles and albums. Currently supported sources are <strong>Beatport</strong>, <strong>Musicbrainz</strong> and <strong>Youtube</strong>.
     </p>
 	<p>
       You can choose exactly which sources to use, and which artists you want to track. When you want the latest information, just press the refresh button and MusicReleaseTracker will do the job for you. Combining more sources means that you are less likely to miss anything. Sometimes, it can see into the future! Best of all, you don’t need any accounts to use it.
@@ -26,7 +41,7 @@
   <section class="compare">
     <div class="gallery">
 	  <h2 id="gallery-title">One simple overview</h2>
-      <img src="screenshot1.png" id="gallery-image" alt="App Screenshot">
+      <img alt="App Screenshot" id="gallery-image" src="screenshot1.png">
 	  <div class="gallery-btns">
 	    <button class="gallery-btn" onclick="changeImage(-1)">&#9664;</button>
 		<button class="gallery-btn" onclick="changeImage(1)">&#9654;</button>
@@ -40,8 +55,8 @@
       The tool is free, runs locally on your computer, and the source code is public. It’s available for <strong>Windows</strong>, <strong>Linux</strong>, and <strong>macOS</strong>. For more information, support, or your feedback, visit the repository:
     </p>
 
-	<a href="https://github.com/BLCK-B/MusicReleaseTracker" target="_blank" style="display: flex; align-items: center; text-decoration: none; height: 110px; background-color: #353535; border-radius: 12px; padding: 10px; color: white;">
-      <img src="github.svg" height="80" width="80" alt="logo" style="margin-right: 20px;">
+	<a href="https://github.com/BLCK-B/MusicReleaseTracker" style="display: flex; align-items: center; text-decoration: none; height: 110px; background-color: #353535; border-radius: 12px; padding: 10px; color: white;" target="_blank">
+      <img alt="logo" height="80" src="github.svg" style="margin-right: 20px;" width="80">
       <div style="line-height: 1.2; padding: 0; margin: 0;">
         <h3 style="margin: 0; padding: 0; color: white;">Github repository</h3>
 		<p style="margin: 0; padding: 0; color: white;">Source code, binaries, bug reporting. Consider giving a&thinsp;✨</p>

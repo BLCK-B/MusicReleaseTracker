@@ -455,6 +455,12 @@
       ]
     },
     {
+      "type": "com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper"
+    },
+    {
+      "type": "com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz"
+    },
+    {
       "type": "com.blck.MusicReleaseTracker.Scraping.StaticResourceConfig",
       "allDeclaredFields": true
     },
@@ -973,6 +979,9 @@
       "type": "java.lang.reflect.GenericDeclaration"
     },
     {
+      "type": "java.lang.reflect.Method"
+    },
+    {
       "type": "java.lang.reflect.ParameterizedType",
       "methods": [
         {
@@ -1210,6 +1219,9 @@
       "type": "jdk.internal.misc.Unsafe"
     },
     {
+      "type": "jdk.internal.reflect.DirectMethodHandleAccessor"
+    },
+    {
       "type": "kotlin.Metadata"
     },
     {
@@ -1228,7 +1240,28 @@
       "type": "liquibase.change.DatabaseChange"
     },
     {
+      "type": "org.apache.catalina.authenticator.AuthenticatorBase"
+    },
+    {
+      "type": "org.apache.catalina.connector.CoyoteAdapter"
+    },
+    {
       "type": "org.apache.catalina.core.ApplicationContextFacade"
+    },
+    {
+      "type": "org.apache.catalina.core.ApplicationFilterChain"
+    },
+    {
+      "type": "org.apache.catalina.core.StandardContextValve"
+    },
+    {
+      "type": "org.apache.catalina.core.StandardEngineValve"
+    },
+    {
+      "type": "org.apache.catalina.core.StandardHostValve"
+    },
+    {
+      "type": "org.apache.catalina.core.StandardWrapperValve"
     },
     {
       "type": "org.apache.catalina.loader.JdbcLeakPrevention",
@@ -1254,6 +1287,12 @@
           "parameterTypes": []
         }
       ]
+    },
+    {
+      "type": "org.apache.catalina.valves.ErrorReportValve"
+    },
+    {
+      "type": "org.apache.coyote.AbstractProcessorLight"
     },
     {
       "type": "org.apache.coyote.AbstractProtocol",
@@ -1288,6 +1327,9 @@
       ]
     },
     {
+      "type": "org.apache.coyote.AbstractProtocol$ConnectionHandler"
+    },
+    {
       "type": "org.apache.coyote.UpgradeProtocol"
     },
     {
@@ -1301,6 +1343,9 @@
     },
     {
       "type": "org.apache.coyote.http11.Http11NioProtocol"
+    },
+    {
+      "type": "org.apache.coyote.http11.Http11Processor"
     },
     {
       "type": "org.apache.hc.client5.http.impl.classic.HttpClients"
@@ -1336,6 +1381,21 @@
     },
     {
       "type": "org.apache.tomcat.util.net.NioEndpoint"
+    },
+    {
+      "type": "org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"
+    },
+    {
+      "type": "org.apache.tomcat.util.net.SocketProcessorBase"
+    },
+    {
+      "type": "org.apache.tomcat.util.threads.TaskThread$WrappingRunnable"
+    },
+    {
+      "type": "org.apache.tomcat.util.threads.ThreadPoolExecutor"
+    },
+    {
+      "type": "org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker"
     },
     {
       "type": "org.apache.tomcat.websocket.server.WsFilter"
@@ -4247,6 +4307,9 @@
       "allDeclaredFields": true
     },
     {
+      "type": "org.springframework.web.method.support.InvocableHandlerMethod"
+    },
+    {
       "type": "org.springframework.web.method.support.UriComponentsContributor"
     },
     {
@@ -4507,6 +4570,9 @@
     {
       "type": "org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping",
       "allDeclaredFields": true
+    },
+    {
+      "type": "org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod"
     },
     {
       "type": "org.springframework.web.servlet.resource.ResourceUrlProvider",
@@ -5060,6 +5126,9 @@
       "glob": "META-INF/resources/accent-ocean.css"
     },
     {
+      "glob": "META-INF/resources/accent-rose.css"
+    },
+    {
       "glob": "META-INF/resources/accent-warm.css"
     },
     {
@@ -5088,9 +5157,6 @@
     },
     {
       "glob": "META-INF/resources/assets/optionsdark-ymr6Vwzk.png"
-    },
-    {
-      "glob": "META-INF/resources/assets/optionslight-B8QchSUy.png"
     },
     {
       "glob": "META-INF/resources/assets/refreshuniversal-3TIkIW2C.png"
@@ -6059,6 +6125,9 @@
       "glob": "resources/accent-ocean.css"
     },
     {
+      "glob": "resources/accent-rose.css"
+    },
+    {
       "glob": "resources/accent-warm.css"
     },
     {
@@ -6087,9 +6156,6 @@
     },
     {
       "glob": "resources/assets/optionsdark-ymr6Vwzk.png"
-    },
-    {
-      "glob": "resources/assets/optionslight-B8QchSUy.png"
     },
     {
       "glob": "resources/assets/refreshuniversal-3TIkIW2C.png"
@@ -6122,6 +6188,9 @@
       "glob": "static/accent-ocean.css"
     },
     {
+      "glob": "static/accent-rose.css"
+    },
+    {
       "glob": "static/accent-warm.css"
     },
     {
@@ -6152,9 +6221,6 @@
       "glob": "static/assets/optionsdark-ymr6Vwzk.png"
     },
     {
-      "glob": "static/assets/optionslight-B8QchSUy.png"
-    },
-    {
       "glob": "static/assets/refreshuniversal-3TIkIW2C.png"
     },
     {
@@ -6180,6 +6246,14 @@
     {
       "module": "java.base",
       "glob": "sun/net/idn/uidna.spp"
+    },
+    {
+      "module": "java.logging",
+      "glob": "sun/util/logging/resources/logging_cs.properties"
+    },
+    {
+      "module": "java.logging",
+      "glob": "sun/util/logging/resources/logging_cs_CZ.properties"
     }
   ],
   "bundles": [

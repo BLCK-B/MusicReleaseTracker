@@ -44,6 +44,10 @@ If you *need* distribution details, ask or refer to [blog (2024)](https://blck-b
 
 scripts in `vue/package.json` - use these to export electron
 
+### No-nonsense distribution
+
+Generate static frontend files: `npm run buildVue`. Build bootJar in `build/libs/`: `./gradlew bootJar`. Run using args below and click through all you can - every setting, every menu. Ctrl+C to shut down. Copy whatever is in `tracing` in same dir over to `vue/buildResources/graal-tracing`. Push. Rest is handled by pipeline.
+
 ### Tracing
 Generating graal aot `tracing` works for me only by running the generated bootJar with arguments: `java -jar 
 -agentlib:native-image-agent=config-output-dir=tracing MRT-X.jar`

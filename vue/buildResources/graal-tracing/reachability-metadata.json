@@ -230,10 +230,6 @@
           "parameterTypes": []
         },
         {
-          "name": "cancelScrape",
-          "parameterTypes": []
-        },
-        {
           "name": "cleanArtistSource",
           "parameterTypes": [
             "java.lang.String",
@@ -243,6 +239,13 @@
         {
           "name": "deleteArtist",
           "parameterTypes": [
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "deleteUrl",
+          "parameterTypes": [
+            "java.lang.String",
             "java.lang.String"
           ]
         },
@@ -686,6 +689,15 @@
       ]
     },
     {
+      "type": "com.sun.crypto.provider.HmacCore$HmacSHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.sun.crypto.provider.HmacCore$HmacSHA384",
       "methods": [
         {
@@ -1092,6 +1104,17 @@
     },
     {
       "type": "java.util.concurrent.Executor"
+    },
+    {
+      "type": "java.util.concurrent.ForkJoinTask",
+      "fields": [
+        {
+          "name": "aux"
+        },
+        {
+          "name": "status"
+        }
+      ]
     },
     {
       "type": "java.util.concurrent.ThreadFactory"
@@ -4911,6 +4934,18 @@
       ]
     },
     {
+      "type": "sun.security.x509.OCSPNoCheckExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
       "type": "sun.security.x509.PrivateKeyUsageExtension",
       "methods": [
         {
@@ -5025,9 +5060,6 @@
       "glob": "META-INF/resources/accent-ocean.css"
     },
     {
-      "glob": "META-INF/resources/accent-rose.css"
-    },
-    {
       "glob": "META-INF/resources/accent-warm.css"
     },
     {
@@ -5046,10 +5078,10 @@
       "glob": "META-INF/resources/assets/crosslight-CRspF710.png"
     },
     {
-      "glob": "META-INF/resources/assets/index-Dv4cqcem.js"
+      "glob": "META-INF/resources/assets/index-DMWjgy4B.js"
     },
     {
-      "glob": "META-INF/resources/assets/index-FwmvZ6NR.css"
+      "glob": "META-INF/resources/assets/index-DRU71Dgq.css"
     },
     {
       "glob": "META-INF/resources/assets/optionsblack-vjTCXWXl.png"
@@ -6027,9 +6059,6 @@
       "glob": "resources/accent-ocean.css"
     },
     {
-      "glob": "resources/accent-rose.css"
-    },
-    {
       "glob": "resources/accent-warm.css"
     },
     {
@@ -6048,10 +6077,10 @@
       "glob": "resources/assets/crosslight-CRspF710.png"
     },
     {
-      "glob": "resources/assets/index-Dv4cqcem.js"
+      "glob": "resources/assets/index-DMWjgy4B.js"
     },
     {
-      "glob": "resources/assets/index-FwmvZ6NR.css"
+      "glob": "resources/assets/index-DRU71Dgq.css"
     },
     {
       "glob": "resources/assets/optionsblack-vjTCXWXl.png"
@@ -6093,9 +6122,6 @@
       "glob": "static/accent-ocean.css"
     },
     {
-      "glob": "static/accent-rose.css"
-    },
-    {
       "glob": "static/accent-warm.css"
     },
     {
@@ -6114,10 +6140,10 @@
       "glob": "static/assets/crosslight-CRspF710.png"
     },
     {
-      "glob": "static/assets/index-Dv4cqcem.js"
+      "glob": "static/assets/index-DMWjgy4B.js"
     },
     {
-      "glob": "static/assets/index-FwmvZ6NR.css"
+      "glob": "static/assets/index-DRU71Dgq.css"
     },
     {
       "glob": "static/assets/optionsblack-vjTCXWXl.png"

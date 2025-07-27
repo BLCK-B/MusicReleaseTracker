@@ -10,7 +10,6 @@
     </tr>
     <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" @click="contextMenu(song)" class="album-bubble">
       <td class="tdsong pad">{{ song.name }}</td>
-      <td class="tdsong pad">{{ song.name }}</td>
     </tr>
   </template>
   <!-- separate songs -->
@@ -18,7 +17,7 @@
     <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" @click="contextMenu(mediaItem)" class="single-bubble">
       <td>
         <img v-if="mediaItem.thumbnailUrl" :src="mediaItem.thumbnailUrl" class="thumbnail" loading="lazy" />
-        <img v-else src="../icons/noImg.png" class="thumbnail" loading="lazy" />
+        <img v-else src="../icons/noImg.png" class="no-thumbnail" loading="lazy" />
       </td>
       <td class="tdsong">{{ mediaItem.name }}</td>
       <td v-if="artistColumnVisible" class="tdartist">{{ mediaItem.artists }}</td>
@@ -137,7 +136,8 @@ tr.single-bubble {
   align-items: center;
   padding: 3px 0px;
 }
-.thumbnail {
+.thumbnail,
+.no-thumbnail {
   width: 35px;
   aspect-ratio: 1 / 1;
   object-fit: cover;

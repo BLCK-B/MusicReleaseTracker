@@ -24,6 +24,7 @@ updates:
     schedule:
       interval: "monthly"
     groups:
-      all-dependencies:
-        patterns:
-          - "*"
+      minor-and-patches:
+        update-types:
+          - "patch"
+          - "minor"

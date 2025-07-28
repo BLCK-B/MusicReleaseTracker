@@ -22,7 +22,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/vue" 
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       all-dependencies:
         patterns:

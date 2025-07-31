@@ -55,7 +55,7 @@ public class ApiController {
 
     @PostMapping("/thumbnailUrls")
     public List<String> thumbnailUrls(@RequestBody List<String> keys) {
-        return sendRequest.getThumbnailUrls();
+        return sendRequest.getThumbnailUrls(keys);
     }
 
     @PostMapping("/artist/{artistId}")

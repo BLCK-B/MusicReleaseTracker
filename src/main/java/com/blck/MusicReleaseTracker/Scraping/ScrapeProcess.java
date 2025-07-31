@@ -82,7 +82,7 @@ public class ScrapeProcess {
 	 * Downloads thumbnails for combview songs.
 	 */
 	public void downloadThumbnails() {
-		thumbnailService.loadThumbnails(DB.loadCombviewTable());
+		thumbnailService.loadThumbnails(DB.loadCombviewTable(), 300);
 	}
 
 	/**

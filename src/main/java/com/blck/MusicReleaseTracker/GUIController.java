@@ -160,9 +160,8 @@ public class GUIController {
         thumbnailService.scrapeCancel = true;
     }
 
-    public List<String> getThumbnailUrls() {
-        // TODO: return only urls for needed keys
-        return thumbnailService.getAllThumbnailUrls();
+    public List<String> getThumbnailUrls(List<String> keys) {
+        return thumbnailService.getAllThumbnailUrlsMatchingKeys(keys);
     }
 
     public Map<String, String> settingsOpened() {

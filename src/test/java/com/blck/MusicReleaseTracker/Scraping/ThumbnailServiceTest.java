@@ -33,6 +33,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -44,9 +45,15 @@ import static org.mockito.Mockito.*;
 public class ThumbnailServiceTest {
 
     public final static String testResources = Paths.get("src", "test", "testresources") + File.separator;
+
     public final Path thumbFolder = Path.of(testResources + "thumbnails");
 
     private final HttpResponse<Path> mockResponse = mock(HttpResponse.class);
+
+    private final List<MediaItem> newMediaItems = List.of(
+            new Song("calling", "artist", "2026-05-21", "", "https://example1.com"),
+            new Song("change", "artist", "2024-11-15", "", "https://example2.com")
+    );
 
     @Mock
     ValueStore store;
@@ -64,6 +71,11 @@ public class ThumbnailServiceTest {
     void setUp() throws Exception {
         lenient().when(store.getAppDataPath()).thenReturn(testResources);
         lenient().when(mockResponse.statusCode()).thenReturn(200);
+
+        ThumbnailService.httpClient = spy(HttpClient.newHttpClient());
+        HttpResponse<Path> mockResponse = mock(HttpResponse.class);
+        lenient().doReturn(mockResponse).when(ThumbnailService.httpClient).send(any(), any());
+
         prepareTestThumbnails();
     }
 
@@ -131,35 +143,47 @@ public class ThumbnailServiceTest {
     }
 
     @Test
-    void loadThumbnails() {
+    void loadThumbnails() throws Exception {
         removeTestThumbnails();
-        List<MediaItem> mediaItems = List.of(
-                new Song("song1", "artist", "2025-04-23", "", "https://example1.com"),
-                new Song("song2", "artist", "2025-04-23", "", "https://example2.com"),
-                new Song("song3", "artist", "2025-04-23", "", "https://example3.com")
-        );
 
-        thumbnailService.loadThumbnails(mediaItems, 0);
+        thumbnailService.loadThumbnails(newMediaItems, 0);
 
-        List<String> keys = List.of("song120250423", "song220250423", "song320250423");
-        List<String> urls = thumbnailService.getAllThumbnailUrlsMatchingKeys(keys);
-        assertEquals(urls.size(), keys.size());
+        verify(ThumbnailService.httpClient, times(2)).send(any(), any());
     }
 
     @Test
-    void doesNotDownloadExistingImages() throws IOException, InterruptedException {
-        List<MediaItem> mediaItems = List.of(
-                new Song("calling", "artist", "2026-05-21", "", "https://example1.com"),
-                new Song("change", "artist", "2024-11-15", "", "https://example2.com")
-        );
-
-        ThumbnailService.httpClient = spy(HttpClient.newHttpClient());
-        HttpResponse<Path> mockResponse = mock(HttpResponse.class);
-        lenient().doReturn(mockResponse).when(ThumbnailService.httpClient).send(any(), any());
-
-        thumbnailService.loadThumbnails(mediaItems, 0);
+    void doesNotDownloadExistingImages() throws Exception {
+        thumbnailService.loadThumbnails(newMediaItems, 0);
 
         verify(ThumbnailService.httpClient, never()).send(any(), any());
+    }
+
+    @Test
+    void stopsOnScrapeCancel() throws Exception {
+        removeTestThumbnails();
+        lenient().when(ThumbnailService.httpClient.send(any(), any())).thenAnswer(invocation -> {
+            thumbnailService.scrapeCancel = true;
+            return mockResponse;
+        });
+
+        thumbnailService.loadThumbnails(newMediaItems, 0);
+
+        verify(ThumbnailService.httpClient, times(1)).send(any(), any());
+    }
+
+    @Test
+    void removeThumbnailsOlderThan() {
+        List<String> keys = List.of("calling20260521", "change20241115", "louder20250423", "change20241115");
+
+        thumbnailService.removeThumbnailsOlderThan(LocalDate.parse("2025-07-26"));
+
+        List<String> urls = thumbnailService.getAllThumbnailUrlsMatchingKeys(keys);
+        assertAll(
+                () -> assertEquals(3, urls.size()),
+                () -> assertTrue(urls.contains("/thumbnails/calling20260521_20250727.jpg")),
+                () -> assertTrue(urls.contains("/thumbnails/louder20250423_20250727.jpeg")),
+                () -> assertTrue(urls.contains("/thumbnails/change20241115_20250727.png"))
+        );
     }
 
 }

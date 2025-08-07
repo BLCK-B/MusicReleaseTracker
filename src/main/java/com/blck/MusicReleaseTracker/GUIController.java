@@ -32,6 +32,7 @@ import com.blck.MusicReleaseTracker.Scraping.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,12 +96,11 @@ public class GUIController {
     }
 
     public List<MediaItem> getTableData(TablesEnum source, String artist) {
-        if (artist == null)
+        if (artist == null || artist.isBlank() || source == TablesEnum.combview) {
             return DB.loadCombviewTable();
-        else if (source == TablesEnum.combview || artist.isBlank())
-            return DB.loadCombviewTable();
-        else
+        } else {
             return DB.loadTable(source, artist);
+        }
     }
 
     public void fillCombview() {
@@ -140,17 +140,22 @@ public class GUIController {
 //    TODO
 //    public SongDetails getSongDetails(TablesEnum source, Song song) {
 //        String ID = String.valueOf(DB.getArtistSourceID(song.getArtists(), source));
-////        SongDetails songDetails = new SongDetails(DB.);
+
+    /// /        SongDetails songDetails = new SongDetails(DB.);
 //        return null;
 //    }
-
     public void clickScrape() {
         scrapeProcess.scrapeData(new ScraperManager(log, DB));
         scrapeProcess.fillCombviewTable();
         if (settingsIO.readSetting("loadThumbnails").equals("true")) {
             scrapeProcess.downloadThumbnails();
         }
+        cleanupTasks();
+    }
+
+    private void cleanupTasks() {
         scrapeProcess.closeSSE();
+        thumbnailService.removeThumbnailsOlderThan(LocalDate.now().minusMonths(6));
         DB.vacuum();
         System.gc();
     }

@@ -31,6 +31,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -42,7 +43,9 @@ import java.util.stream.Stream;
 public class ThumbnailService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     public static HttpClient httpClient = HttpClient.newHttpClient();
+
     private final ValueStore valueStore;
 
     private final ErrorLogging log;
@@ -131,9 +134,28 @@ public class ThumbnailService {
         return !getAllThumbnailUrlsMatchingKeys(List.of(key)).isEmpty();
     }
 
-    //    TODO
-    public void removeOldThumbnails(int oldInDays) {
+    public void removeThumbnailsOlderThan(LocalDate localDate) {
+        String thumbnailsDirPath = valueStore.getAppDataPath() + "thumbnails" + slash;
+        File thumbnailsDir = new File(thumbnailsDirPath);
 
+        try (Stream<Path> paths = Files.list(thumbnailsDir.toPath())) {
+            paths.forEach(path -> {
+                String fileName = path.getFileName().toString();
+                String[] parts = fileName.split("_");
+                String fileDate = parts[1].split("\\.")[0];
+                try {
+                    LocalDate localFileDate = LocalDate.parse(fileDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
+                    if (localFileDate.isBefore(localDate)) {
+                        Files.delete(path);
+                    }
+                } catch (Exception e) {
+                    log.error(e, ErrorLogging.Severity.WARNING, "Failed to remove thumbnail");
+                }
+            });
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            log.error(e, ErrorLogging.Severity.WARNING, "Remove thumbnails fail");
+        }
     }
 
     private boolean isValidFormat(Path path) {

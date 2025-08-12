@@ -38,23 +38,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class with methods called from ApiController
+ * First layer to be called from ApiController
  */
 @Component
-public class GUIController {
+public class ServiceLayer {
 
     private final ValueStore store;
+
     private final ErrorLogging log;
+
     private final ScrapeProcess scrapeProcess;
+
     private final SettingsIO settingsIO;
+
     private final DBqueries DB;
+
     private final MigrateDB manageDB;
+
     private final ThumbnailService thumbnailService;
+
     private String tempID;
 
     @Autowired
-    public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                         SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB, ThumbnailService thumbnailService) {
+    public ServiceLayer(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
+                        SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB, ThumbnailService thumbnailService) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;

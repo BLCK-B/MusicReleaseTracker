@@ -17,7 +17,7 @@ package com.blck.MusicReleaseTracker.FrontendAPI;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
-import com.blck.MusicReleaseTracker.GUIController;
+import com.blck.MusicReleaseTracker.ServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,16 +26,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-/** API controller receives REST requests from vue and passes them to GUIController */
+/**
+ * API controller receives REST requests from vue and passes them to ServiceLayer
+ */
 @RestController
 @RequestMapping("/api")
 public class ApiController {
 
-    private final GUIController sendRequest;
+    private final ServiceLayer sendRequest;
 
     @Autowired
-    public ApiController(GUIController guiController) {
-        this.sendRequest = guiController;
+    public ApiController(ServiceLayer serviceLayer) {
+        this.sendRequest = serviceLayer;
     }
 
     @GetMapping("/isBackendReady")
@@ -110,7 +112,7 @@ public class ApiController {
     }
 
     @GetMapping("/themeConfig")
-    public Map<String,String> themeConfig() {
+    public Map<String, String> themeConfig() {
         return sendRequest.getThemeConfig();
     }
 

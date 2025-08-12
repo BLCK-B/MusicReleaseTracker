@@ -29,16 +29,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-/** entry point class with startup logic */
+
+/**
+ * entry point class with startup logic
+ */
 @SpringBootApplication
 @EnableConfigurationProperties(AppConfig.class)
 public class Main {
 
     private final SettingsIO settingsIO;
+
     private final ErrorLogging log;
+
     private final MigrateDB manageDB;
+
     private final StartSetup startSetup;
+
     private final ValueStore store;
+
     private final AppConfig appConfig;
 
     @Autowired
@@ -57,7 +65,7 @@ public class Main {
     }
 
     /**
-     *  CORS redirect mapping for dev cross-origin permission TODO: chrome again
+     * CORS redirect mapping for dev cross-origin permission TODO: chrome again
      */
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -73,17 +81,17 @@ public class Main {
     @Component
     public class StartupRunner implements CommandLineRunner {
         /**
-         *  entry method: load config, paths, create file structure, update DB and settings
+         * entry method: load config, paths, create file structure, update DB and settings
          */
         @Override
         public void run(String... args) {
             System.out.println("""
-                 __  __ ____ _____
-                |  \\/  |  _ \\_   _|
-                | |\\/| | |_) || |
-                | |  | |  _ < | |
-                |_|  |_|_| \\_\\|_|
-            """);
+                         __  __ ____ _____
+                        |  \\/  |  _ \\_   _|
+                        | |\\/| | |_) || |
+                        | |  | |  _ < | |
+                        |_|  |_|_| \\_\\|_|
+                    """);
             store.setAppVersion(appConfig.version());
             startSetup.createPaths();
             startSetup.createDirs();

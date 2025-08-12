@@ -28,11 +28,14 @@ import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
 
-public final class ScraperYoutube extends Scraper implements ScraperInterface {
+public final class ScraperYoutube extends Scraper {
 
     private final String songArtist;
+
     private final boolean isIDnull;
+
     private String id;
+
     public ScraperYoutube(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
         super(store, log, DB);
         this.songArtist = songArtist;
@@ -41,6 +44,7 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
         isIDnull = (id == null);
         reduceToID();
     }
+
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
@@ -52,11 +56,9 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
         try {
             doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
                     .timeout(timeout).get();
-        }
-        catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ScraperGenericException(url);
         }
 
@@ -84,6 +86,7 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
                         )));
     }
 
+    @Override
     public void reduceToID() {
         if (isIDnull)
             return;
@@ -100,7 +103,7 @@ public final class ScraperYoutube extends Scraper implements ScraperInterface {
                 id = id.substring(idStartIndex, idEndIndex);
             else // if no other '/'
                 id = id.substring(idStartIndex);
-        // UCWaKvFOf-a7vENyuEsZkNqg
+            // UCWaKvFOf-a7vENyuEsZkNqg
         }
     }
 

@@ -30,10 +30,12 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class ScraperBeatport extends Scraper implements ScraperInterface {
+public final class ScraperBeatport extends Scraper {
 
     private final String songArtist;
+
     private final boolean isIDnull;
+
     private String id;
 
     public ScraperBeatport(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
@@ -103,6 +105,7 @@ public final class ScraperBeatport extends Scraper implements ScraperInterface {
                 ));
     }
 
+    @Override
     public void reduceToID() {
         if (isIDnull)
             return;

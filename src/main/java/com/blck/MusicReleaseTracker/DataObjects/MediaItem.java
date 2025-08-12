@@ -22,8 +22,12 @@ import java.util.Optional;
  * The shared parameters of a song and album are are date and name.
  */
 public interface MediaItem {
-	String getDate();
-	String getName();
-	String getAlbum();
-	Optional<String> getThumbnailUrl();
+
+    String getDate();
+
+    String getName();
+
+    String getAlbum();
+
+    Optional<String> getThumbnailUrl();
 }

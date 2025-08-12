@@ -24,26 +24,28 @@ import java.util.Optional;
  * @param songs list of songs that the album consists of
  */
 public record Album(String album, List<Song> songs) implements MediaItem {
-	public List<Song> getAlbumSongs() {
-		return songs;
-	}
-	@Override
-	public String getDate() {
-		return songs.getFirst().getDate();
-	}
 
-	@Override
-	public Optional<String> getThumbnailUrl() {
-		return songs.getFirst().getThumbnailUrl();
-	}
+    public List<Song> getAlbumSongs() {
+        return songs;
+    }
 
-	@Override
-	public String getAlbum() {
-		return album;
-	}
+    @Override
+    public String getDate() {
+        return songs.getFirst().getDate();
+    }
 
-	@Override
-	public String getName() {
-		return songs.getFirst().getName();
-	}
+    @Override
+    public Optional<String> getThumbnailUrl() {
+        return songs.getFirst().getThumbnailUrl();
+    }
+
+    @Override
+    public String getAlbum() {
+        return album;
+    }
+
+    @Override
+    public String getName() {
+        return songs.getFirst().getName();
+    }
 }

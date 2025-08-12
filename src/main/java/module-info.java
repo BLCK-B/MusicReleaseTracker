@@ -10,7 +10,7 @@ module com.blck.MusicReleaseTracker {
     requires spring.webmvc;
     requires org.xerial.sqlitejdbc;
     requires com.fasterxml.jackson.databind;
-	requires java.desktop;
+    requires java.desktop;
     requires java.net.http;
     requires jakarta.annotation;
 
@@ -29,5 +29,7 @@ module com.blck.MusicReleaseTracker {
     exports com.blck.MusicReleaseTracker.FrontendAPI;
     exports com.blck.MusicReleaseTracker.JsonSettings;
     exports com.blck.MusicReleaseTracker.Scraping;
+    exports com.blck.MusicReleaseTracker.Scraping.Thumbnails;
+    opens com.blck.MusicReleaseTracker.Scraping.Thumbnails;
 }
 

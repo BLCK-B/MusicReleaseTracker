@@ -33,117 +33,117 @@ import java.util.Map;
 @RequestMapping("/api")
 public class ApiController {
 
-    private final ServiceLayer sendRequest;
+    private final ServiceLayer serviceLayer;
 
     @Autowired
     public ApiController(ServiceLayer serviceLayer) {
-        this.sendRequest = serviceLayer;
+        this.serviceLayer = serviceLayer;
     }
 
     @GetMapping("/isBackendReady")
     public boolean isBackendReady() {
-        return sendRequest.isBackendReady();
+        return serviceLayer.isBackendReady();
     }
 
     @GetMapping("/loadList")
     public List<String> loadList() {
-        return sendRequest.loadList();
+        return serviceLayer.loadList();
     }
 
     @GetMapping("/tableData")
     public List<MediaItem> tableData(@RequestParam String source, @RequestParam String artist) {
-        return sendRequest.getTableData(TablesEnum.valueOf(source), artist);
+        return serviceLayer.getTableData(TablesEnum.valueOf(source), artist);
     }
 
     @PostMapping("/thumbnailUrls")
     public List<String> thumbnailUrls(@RequestBody List<String> keys) {
-        return sendRequest.getThumbnailUrls(keys);
+        return serviceLayer.getThumbnailUrls(keys);
     }
 
     @PostMapping("/artist/{artistId}")
     public void addArtist(@PathVariable String artistId) {
-        sendRequest.addNewArtist(artistId);
+        serviceLayer.addNewArtist(artistId);
     }
 
     @DeleteMapping("/artist/{artistId}")
     public void deleteArtist(@PathVariable String artistId) {
-        sendRequest.deleteArtist(artistId);
+        serviceLayer.deleteArtist(artistId);
     }
 
     @GetMapping("/urlExists")
     public boolean urlExists(@RequestParam String source, @RequestParam String artist) {
-        return sendRequest.checkExistURL(TablesEnum.valueOf(source), artist);
+        return serviceLayer.checkExistURL(TablesEnum.valueOf(source), artist);
     }
 
     @PostMapping("/confirmSaveUrl")
     public void confirmSaveUrl(@RequestParam String source, @RequestParam String artist) {
-        sendRequest.saveUrl(TablesEnum.valueOf(source), artist);
+        serviceLayer.saveUrl(TablesEnum.valueOf(source), artist);
     }
 
     @DeleteMapping("/url")
     public void deleteUrl(@RequestParam String source, @RequestParam String artist) {
-        sendRequest.deleteSourceID(TablesEnum.valueOf(source), artist);
+        serviceLayer.deleteSourceID(TablesEnum.valueOf(source), artist);
     }
 
     @PostMapping("/scrapePreview")
     public void scrapePreview(@RequestParam String source, @RequestParam String artist, @RequestParam String url) {
         String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
-        sendRequest.scrapePreview(TablesEnum.valueOf(source), artist, decodedUrl);
+        serviceLayer.scrapePreview(TablesEnum.valueOf(source), artist, decodedUrl);
     }
 
     @PostMapping("/cleanArtistSource")
     public void cleanArtistSource(@RequestParam String source, @RequestParam String artist) {
-        sendRequest.cleanArtistSource(TablesEnum.valueOf(source), artist);
+        serviceLayer.cleanArtistSource(TablesEnum.valueOf(source), artist);
     }
 
     @PostMapping("/scrape")
     public void scrape() {
-        sendRequest.clickScrape();
+        serviceLayer.clickScrape();
     }
 
     @PostMapping("/cancelScrape")
     public void cancelScrape() {
-        sendRequest.cancelScrape();
+        serviceLayer.cancelScrape();
     }
 
     @PutMapping("/setting")
     public void setting(@RequestParam String name, @RequestParam String value) {
-        sendRequest.setSetting(name, value);
+        serviceLayer.setSetting(name, value);
     }
 
     @GetMapping("/themeConfig")
     public Map<String, String> themeConfig() {
-        return sendRequest.getThemeConfig();
+        return serviceLayer.getThemeConfig();
     }
 
     @GetMapping("/settingsData")
     public Map<String, String> settingsData() {
-        return sendRequest.settingsOpened();
+        return serviceLayer.settingsOpened();
     }
 
     @PostMapping("/fillCombview")
     public void fillCombview() {
-        sendRequest.fillCombview();
+        serviceLayer.fillCombview();
     }
 
     @GetMapping("/scrapeDate")
     public String scrapeDate() {
-        return sendRequest.getScrapeDate();
+        return serviceLayer.getScrapeDate();
     }
 
     @PostMapping("/resetSettings")
     public void resetSettings() {
-        sendRequest.resetSettings();
+        serviceLayer.resetSettings();
     }
 
     @PostMapping("/resetDB")
     public void resetDB() {
-        sendRequest.resetDB();
+        serviceLayer.resetDB();
     }
 
     @GetMapping("/appVersion")
     public String appVersion() {
-        return sendRequest.getAppVersion();
+        return serviceLayer.getAppVersion();
     }
 
 //    TODO

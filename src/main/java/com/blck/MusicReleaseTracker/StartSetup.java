@@ -26,8 +26,11 @@ import java.util.Arrays;
 
 @Component
 public class StartSetup {
+
     final String slash = File.separator;
+
     private final ValueStore store;
+
     private final ErrorLogging log;
 
     @Autowired
@@ -37,7 +40,7 @@ public class StartSetup {
     }
 
     /**
-     *  Prepare system file paths:
+     * Prepare system file paths:
      *  <ul>
      *     <li>AppData / user.home</li>
      *     <li>DB</li>
@@ -59,21 +62,21 @@ public class StartSetup {
 
         store.setAppDataPath(appDataPath);
         store.setConfigPath(
-            Paths.get(appDataPath, "MRTsettings.json")
+                Paths.get(appDataPath, "MRTsettings.json")
         );
         store.setDBpath(
-            Paths.get(appDataPath,  "musicdata.db")
+                Paths.get(appDataPath, "musicdata.db")
         );
         store.setDBpathTemplate(
-            Paths.get(appDataPath, "DBTemplate.db")
+                Paths.get(appDataPath, "DBTemplate.db")
         );
         store.setErrorLogsPath(
-            Paths.get(appDataPath, "errorlogs.txt")
+                Paths.get(appDataPath, "errorlogs.txt")
         );
     }
 
     /**
-     *  Create AppData dirs, handle sqlite temporary files.
+     * Create AppData dirs, handle sqlite temporary files.
      */
     public void createDirs() {
         String appDataPath = store.getAppDataPath();

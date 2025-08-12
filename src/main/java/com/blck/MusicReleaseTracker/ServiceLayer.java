@@ -28,7 +28,7 @@ import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
-import com.blck.MusicReleaseTracker.Scraping.ThumbnailService;
+import com.blck.MusicReleaseTracker.Scraping.Thumbnails.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

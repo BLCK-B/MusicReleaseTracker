@@ -13,7 +13,7 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker.Scraping;
+package com.blck.MusicReleaseTracker.Scraping.Thumbnails;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;

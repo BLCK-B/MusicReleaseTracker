@@ -1,4 +1,6 @@
 <template>
+  <SongDetails />
+
   <div v-if="tableVisible" class="table-container">
     <div class="table-body">
       <div v-for="(mediaItem, mediaIndex) in tableDataWithThumbnails" :key="mediaIndex" class="aBubble">
@@ -30,6 +32,7 @@
 import { useStore } from "vuex";
 import { computed, watch, ref } from "vue";
 import MediaItem from "./MediaItem.vue";
+import SongDetails from "./SongDetails.vue";
 import axios from "axios";
 
 const store = useStore();

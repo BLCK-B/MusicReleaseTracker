@@ -14,6 +14,7 @@ const state = {
   previewVis: false,
   isoDates: false,
   urlExists: false,
+  selectedSongDetails: undefined,
 };
 
 const mutations = {
@@ -52,6 +53,9 @@ const mutations = {
   },
   SET_URL_EXISTS(state, urlExists) {
     state.urlExists = urlExists;
+  },
+  SET_SELECTED_SONG_DETAILS(state, selected) {
+    state.selectedSongDetails = selected;
   },
 };
 

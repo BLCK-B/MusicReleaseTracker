@@ -2,15 +2,21 @@
   <div v-if="selected">
     <div class="overlay" @click="closeCard"></div>
     <Card :cardSize="'l'" class="details-card">
-      <div class="content-wrapper">
-        <img v-if="selected.thumbnailUrl" :src="selected.thumbnailUrl" class="thumbnail" loading="lazy" />
-        <img v-else src="../icons/noImg.png" class="no-thumbnail" loading="lazy" />
+      <div class="inner-wrapper">
+        <div
+          class="background-blur"
+          :style="{ backgroundImage: selected.thumbnailUrl ? `url(${selected.thumbnailUrl})` : 'url(../icons/noImg.png)' }"></div>
 
-        <div class="info-wrapper">
-          <div class="song-name">{{ selected.name }}</div>
-          <div class="artists">{{ selected.artists }}</div>
-          <div class="date">Released: {{ formatDate(selected.date) }}</div>
-          <div class="scrape-link">{{ scrapeLink }}</div>
+        <div class="content-wrapper">
+          <img v-if="selected.thumbnailUrl" :src="selected.thumbnailUrl" class="thumbnail" loading="lazy" />
+          <img v-else src="../icons/noImg.png" class="thumbnail" loading="lazy" />
+
+          <div class="info-wrapper">
+            <div class="song-name">{{ selected.name }}</div>
+            <div class="artists">{{ selected.artists }}</div>
+            <div class="date">Released: {{ formatDate(selected.date) }}</div>
+            <div class="scrape-link">{{ scrapeLink }}</div>
+          </div>
         </div>
       </div>
     </Card>
@@ -51,21 +57,39 @@ const closeCard = () => {
   z-index: 3;
 }
 
+.inner-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  display: block;
+}
+
+.background-blur {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.2;
+  filter: blur(6px);
+}
+
 .content-wrapper {
   display: flex;
   gap: 20px;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
-.thumbnail,
-.no-thumbnail {
+.thumbnail {
   width: 150px;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  object-position: center;
-  display: block;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .info-wrapper {

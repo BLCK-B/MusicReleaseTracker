@@ -65,6 +65,7 @@ const getThumbnailKeys = () => {
 };
 
 const getThumbnailUrl = (song) => {
+  // http://localhost:57782/thumbnails/stay20240411_20250718_182058.jpg
   const key = "/thumbnails/" + (String(song.name) + String(song.date)).toLowerCase().replace(/[^a-z0-9]/g, "");
   const match = thumbnailUrls.value.find((url) => url.startsWith(key)) || null;
   if (!match) return null;
@@ -75,10 +76,8 @@ const tableDataWithThumbnails = computed(() => {
   if (!thumbnailUrls.value) {
     return tableData.value;
   }
-  console.log(thumbnailUrls);
   return tableData.value.map((item) => ({
     ...item,
-    // thumbnailUrl: "http://localhost:57782/thumbnails/stay20240411_20250718_182058.jpg",
     thumbnailUrl: getThumbnailUrl(item),
   }));
 });

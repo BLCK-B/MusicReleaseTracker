@@ -97,6 +97,10 @@ public class Main {
             startSetup.createDirs();
             manageDB.migrateDB(store.getDBpath(), store.getDBpathTemplate());
             settingsIO.updateSettings();
+            if (settingsIO.readSetting("flippedThumbSwitch").equals("false")) { // TODO: next release
+                settingsIO.writeSetting("loadThumbnails", "true");
+                settingsIO.writeSetting("flippedThumbSwitch", "true");
+            }
             store.setBackendReady();
         }
     }

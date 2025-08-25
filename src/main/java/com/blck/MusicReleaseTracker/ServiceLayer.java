@@ -22,6 +22,7 @@ import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
+import com.blck.MusicReleaseTracker.Misc.UpdateChecker;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
@@ -57,11 +58,13 @@ public class ServiceLayer {
 
     private final ThumbnailService thumbnailService;
 
+    private final UpdateChecker updateChecker;
+
     private String tempID;
 
     @Autowired
     public ServiceLayer(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                        SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB, ThumbnailService thumbnailService) {
+                        SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB, ThumbnailService thumbnailService, UpdateChecker updateChecker) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
@@ -69,6 +72,7 @@ public class ServiceLayer {
         this.DB = dBqueries;
         this.manageDB = manageDB;
         this.thumbnailService = thumbnailService;
+        this.updateChecker = updateChecker;
     }
 
     public boolean isBackendReady() {
@@ -144,13 +148,6 @@ public class ServiceLayer {
         return DB.getArtistSourceID(artist, source).isPresent();
     }
 
-//    TODO
-//    public SongDetails getSongDetails(TablesEnum source, Song song) {
-//        String ID = String.valueOf(DB.getArtistSourceID(song.getArtists(), source));
-
-    /// /        SongDetails songDetails = new SongDetails(DB.);
-//        return null;
-//    }
     public void clickScrape() {
         scrapeProcess.scrapeData(new ScraperManager(log, DB));
         scrapeProcess.fillCombviewTable();
@@ -206,5 +203,9 @@ public class ServiceLayer {
 
     public String getAppVersion() {
         return store.getAppVersion();
+    }
+
+    public boolean isNewUpdate() {
+        return updateChecker.isUpdateAfter(store.getAppVersion());
     }
 }

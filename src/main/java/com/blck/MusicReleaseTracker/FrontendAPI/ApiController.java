@@ -146,10 +146,8 @@ public class ApiController {
         return serviceLayer.getAppVersion();
     }
 
-//    TODO
-//    @GetMapping("/songDetails/{source}/{song}")
-//    public SongDetails songDetails(@PathVariable String source, @PathVariable Song song) {
-//        return sendRequest.getSongDetails(TablesEnum.valueOf(source), song);
-//    }
-
+    @GetMapping("/isNewUpdate")
+    public boolean isNewUpdate() {
+        return serviceLayer.isNewUpdate();
+    }
 }

@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- *  The default settings file definition. The enum specifies options which are then converted to JSON representation.
+ * The default settings file definition. The enum specifies options which are then converted to JSON representation.
  */
 public enum SettingsModel {
     theme("black"),
@@ -33,7 +33,8 @@ public enum SettingsModel {
     filterRemaster(false),
     filterRemix(false),
     filterVIP(false),
-    loadThumbnails(false);
+    loadThumbnails(true),
+    flippedThumbSwitch(false); // TODO: next release
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

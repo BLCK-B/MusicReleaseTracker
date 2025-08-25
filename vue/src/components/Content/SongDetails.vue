@@ -2,16 +2,16 @@
   <div v-if="selected">
     <div class="overlay" @click="closeCard"></div>
     <Card :cardSize="'l'" class="details-card" ref="cardToCapture">
-      <div class="inner-wrapper">
+      <div class="bg-helper">
         <div
           class="background-blur"
           :style="{ backgroundImage: selected.thumbnailUrl ? `url(${selected.thumbnailUrl})` : 'url(../icons/noImg.png)' }"></div>
 
-        <div class="content-wrapper">
+        <div class="content">
           <img v-if="selected.thumbnailUrl" :src="selected.thumbnailUrl" class="thumbnail" loading="lazy" />
           <img v-else src="../icons/noImg.png" class="thumbnail" loading="lazy" />
 
-          <div class="info-wrapper">
+          <div class="info-text">
             <div class="song-name">{{ selected.name }}</div>
             <div class="artists">{{ selected.artists }}</div>
             <div class="date">Released: {{ formatDate(selected.date) }}</div>
@@ -19,6 +19,7 @@
         </div>
         <div class="search-links">
           <a :href="searchLinks.spotify" target="_blank" class="link">Spotify</a>
+          <a :href="searchLinks.applemusic" target="_blank" class="link">Apple Music</a>
           <a :href="searchLinks.soundcloud" target="_blank" class="link">SoundCloud</a>
           <a :href="searchLinks.bandcamp" target="_blank" class="link">Bandcamp</a>
           <a :href="searchLinks.youtube" target="_blank" class="link">YouTube</a>
@@ -48,6 +49,7 @@ const searchLinks = computed(() => {
     youtubemusic: `https://music.youtube.com/search?q=${term}`,
     soundcloud: `https://soundcloud.com/search?q=${term}`,
     bandcamp: `https://bandcamp.com/search?q=${term}`,
+    applemusic: `https://music.apple.com/us/search?term=${term}`,
     google: `https://www.google.com/search?q=${term}`,
   };
 });
@@ -76,12 +78,9 @@ const cardToCapture = ref(null);
   z-index: 3;
 }
 
-.inner-wrapper {
+.bg-helper {
   position: relative;
-  width: 100%;
-  height: 100%;
   min-height: 100%;
-  display: block;
 }
 
 .background-blur {
@@ -93,25 +92,14 @@ const cardToCapture = ref(null);
   background-size: cover;
   background-position: center;
   opacity: 0.2;
-  filter: blur(6px);
+  filter: blur(4px);
 }
 
-.content-wrapper {
+.content {
   display: flex;
   gap: 20px;
   align-items: center;
   position: relative;
-  z-index: 1;
-}
-
-.content-wrapper-download {
-  bottom: 0px;
-  display: flex;
-  gap: 10px;
-  font-weight: bold;
-  align-items: center;
-  position: absolute;
-  z-index: 1;
 }
 
 .thumbnail {
@@ -126,10 +114,11 @@ const cardToCapture = ref(null);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.info-wrapper {
+.info-text {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  user-select: text;
 }
 
 .song-name {
@@ -152,14 +141,14 @@ const cardToCapture = ref(null);
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.45);
   z-index: 2;
 }
 
 .search-links {
   display: flex;
-  gap: 10px;
-  margin-top: 35px;
+  gap: 8px;
+  margin-top: 40px;
   flex-wrap: wrap;
   font-size: 14px;
   position: relative;

@@ -48,7 +48,8 @@ public class ThumbnailServiceTest {
 
     public final Path thumbFolder = Path.of(testResources + "thumbnails");
 
-    private final HttpResponse<Path> mockResponse = mock(HttpResponse.class);
+    @Mock
+    private HttpResponse<Path> mockResponse;
 
     private final List<MediaItem> newMediaItems = List.of(
             new Song("calling", "artist", "2026-05-21", "", "https://example1.com"),
@@ -73,13 +74,13 @@ public class ThumbnailServiceTest {
         lenient().when(mockResponse.statusCode()).thenReturn(200);
 
         ThumbnailService.httpClient = spy(HttpClient.newHttpClient());
-        HttpResponse<Path> mockResponse = mock(HttpResponse.class);
         lenient().doReturn(mockResponse).when(ThumbnailService.httpClient).send(any(), any());
 
         prepareTestThumbnails();
     }
 
     void prepareTestThumbnails() throws IOException {
+        thumbFolder.toFile().mkdirs();
         removeTestThumbnails();
         Files.createDirectories(thumbFolder);
         Files.createFile(thumbFolder.resolve("calling20260521_20250727.jpg"));

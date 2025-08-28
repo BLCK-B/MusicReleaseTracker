@@ -22,38 +22,49 @@ import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
+import com.blck.MusicReleaseTracker.Misc.UpdateChecker;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
-import com.blck.MusicReleaseTracker.Scraping.ThumbnailService;
+import com.blck.MusicReleaseTracker.Scraping.Thumbnails.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Class with methods called from ApiController
+ * First layer to be called from ApiController
  */
 @Component
-public class GUIController {
+public class ServiceLayer {
 
     private final ValueStore store;
+
     private final ErrorLogging log;
+
     private final ScrapeProcess scrapeProcess;
+
     private final SettingsIO settingsIO;
+
     private final DBqueries DB;
+
     private final MigrateDB manageDB;
+
     private final ThumbnailService thumbnailService;
+
+    private final UpdateChecker updateChecker;
+
     private String tempID;
 
     @Autowired
-    public GUIController(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
-                         SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB, ThumbnailService thumbnailService) {
+    public ServiceLayer(ValueStore valueStore, ErrorLogging errorLogging, ScrapeProcess scrapeProcess,
+                        SettingsIO settingsIO, DBqueries dBqueries, MigrateDB manageDB, ThumbnailService thumbnailService, UpdateChecker updateChecker) {
         this.store = valueStore;
         this.log = errorLogging;
         this.scrapeProcess = scrapeProcess;
@@ -61,6 +72,7 @@ public class GUIController {
         this.DB = dBqueries;
         this.manageDB = manageDB;
         this.thumbnailService = thumbnailService;
+        this.updateChecker = updateChecker;
     }
 
     public boolean isBackendReady() {
@@ -95,12 +107,11 @@ public class GUIController {
     }
 
     public List<MediaItem> getTableData(TablesEnum source, String artist) {
-        if (artist == null)
+        if (artist == null || artist.isBlank() || source == TablesEnum.combview) {
             return DB.loadCombviewTable();
-        else if (source == TablesEnum.combview || artist.isBlank())
-            return DB.loadCombviewTable();
-        else
+        } else {
             return DB.loadTable(source, artist);
+        }
     }
 
     public void fillCombview() {
@@ -137,20 +148,18 @@ public class GUIController {
         return DB.getArtistSourceID(artist, source).isPresent();
     }
 
-//    TODO
-//    public SongDetails getSongDetails(TablesEnum source, Song song) {
-//        String ID = String.valueOf(DB.getArtistSourceID(song.getArtists(), source));
-////        SongDetails songDetails = new SongDetails(DB.);
-//        return null;
-//    }
-
     public void clickScrape() {
         scrapeProcess.scrapeData(new ScraperManager(log, DB));
         scrapeProcess.fillCombviewTable();
         if (settingsIO.readSetting("loadThumbnails").equals("true")) {
             scrapeProcess.downloadThumbnails();
         }
+        cleanupTasks();
+    }
+
+    private void cleanupTasks() {
         scrapeProcess.closeSSE();
+        thumbnailService.removeThumbnailsOlderThan(LocalDate.now().minusMonths(6));
         DB.vacuum();
         System.gc();
     }
@@ -160,9 +169,8 @@ public class GUIController {
         thumbnailService.scrapeCancel = true;
     }
 
-    public List<String> getThumbnailUrls() {
-        // TODO: return only urls for needed keys
-        return thumbnailService.getAllThumbnailUrls();
+    public List<String> getThumbnailUrls(List<String> keys) {
+        return thumbnailService.getAllThumbnailUrlsMatchingKeys(keys);
     }
 
     public Map<String, String> settingsOpened() {
@@ -195,5 +203,9 @@ public class GUIController {
 
     public String getAppVersion() {
         return store.getAppVersion();
+    }
+
+    public boolean isNewUpdate() {
+        return updateChecker.isUpdateAfter(store.getAppVersion());
     }
 }

@@ -36,7 +36,7 @@ repositories {
 }
 
 graalvmNative {
-    binaries.all {
+    binaries.configureEach {
         imageName.set("MusicReleaseTracker")
         buildArgs.add('--verbose')
         // https://graalvm.org/dev/reference-manual/native-image/optimizations-and-performance
@@ -53,7 +53,7 @@ java {
 
 dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.47.0.0'
-    implementation 'org.jsoup:jsoup:1.20.1'
+    implementation 'org.jsoup:jsoup:1.21.1'
 
     testImplementation(platform('org.junit:junit-bom:5.13.4'))
     testImplementation 'org.junit.jupiter:junit-jupiter-api'

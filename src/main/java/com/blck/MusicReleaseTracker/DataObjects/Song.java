@@ -38,19 +38,17 @@ public class Song implements Comparable<Song>, MediaItem {
 
     /**
      *
-     * @param songName name of the song
+     * @param songName    name of the song
      * @param songArtists best created with just one artist
-     * @param songDate yyyy-MM-dd
-     * @param songType type of song for filtering purposes like remix, instrumental
+     * @param songDate    yyyy-MM-dd
+     * @param songType    type of song for filtering purposes like remix, instrumental
      */
     public Song(String songName, String songArtists, String songDate, String songType, String songThumbnailUrl) {
         this.songName = songName;
         this.songArtists = new TreeSet<>();
         this.songArtists.add(songArtists);
         this.songDate = songDate;
-        if (songType == null)
-            this.songType = Optional.empty();
-        else if (songType.isBlank())
+        if (songType == null || songType.isBlank())
             this.songType = Optional.empty();
         else
             this.songType = Optional.of(songType);
@@ -97,12 +95,6 @@ public class Song implements Comparable<Song>, MediaItem {
         this.songArtists.add(artist);
     }
 
-    @Override
-    public String toString() {
-        return songName + " " + getArtists() + " " + songDate +
-                (songType.map(type -> " " + type).orElse(""));
-    }
-
     /**
      *
      * @param formatter date formatter (yyyy-MM-dd)
@@ -140,5 +132,11 @@ public class Song implements Comparable<Song>, MediaItem {
     @Override
     public int hashCode() {
         return getName().toLowerCase().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return songName + " " + getArtists() + " " + songDate +
+                (songType.map(type -> " " + type).orElse(""));
     }
 }

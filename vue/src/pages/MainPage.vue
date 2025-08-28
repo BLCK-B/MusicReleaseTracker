@@ -52,7 +52,6 @@ const previewVis = computed(() => store.state.previewVis);
   width: 8px;
   background: transparent;
 }
-
 .app {
   display: flex;
   position: fixed;

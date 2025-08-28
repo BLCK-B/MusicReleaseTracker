@@ -27,10 +27,12 @@ import org.jsoup.nodes.Document;
 import java.net.SocketTimeoutException;
 import java.util.List;
 
-public final class ScraperMusicbrainz extends Scraper implements ScraperInterface {
+public final class ScraperMusicbrainz extends Scraper {
 
     private final String songArtist;
+
     private final boolean isIDnull;
+
     private String id;
 
     public ScraperMusicbrainz(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
@@ -41,6 +43,7 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         isIDnull = (id == null);
         reduceToID();
     }
+
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull)
@@ -51,13 +54,11 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
         Document doc = null;
         try {
             doc = Jsoup.connect(url).userAgent(
-                    "MusicReleaseTracker/v" + store.getAppVersion() +  " ( https://github.com/BLCK-B/MusicReleaseTracker )")
+                            "MusicReleaseTracker/v" + store.getAppVersion() + " ( https://github.com/BLCK-B/MusicReleaseTracker )")
                     .timeout(timeout).get();
-        }
-        catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ScraperGenericException(url);
         }
 
@@ -76,6 +77,7 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
                         )));
     }
 
+    @Override
     public void reduceToID() {
         if (isIDnull)
             return;
@@ -91,7 +93,7 @@ public final class ScraperMusicbrainz extends Scraper implements ScraperInterfac
                 id = id.substring(idStartIndex, idEndIndex);
             else // if no other '/'
                 id = id.substring(idStartIndex);
-        // ad110705-cbe6-4c47-9b99-8526e6db0f41
+            // ad110705-cbe6-4c47-9b99-8526e6db0f41
         }
     }
 

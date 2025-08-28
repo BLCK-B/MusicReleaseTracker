@@ -1,4 +1,6 @@
 <template>
+  <SongDetails />
+
   <div v-if="tableVisible" class="table-container">
     <div class="table-body">
       <div v-for="(mediaItem, mediaIndex) in tableDataWithThumbnails" :key="mediaIndex" class="aBubble">
@@ -30,6 +32,7 @@
 import { useStore } from "vuex";
 import { computed, watch, ref } from "vue";
 import MediaItem from "./MediaItem.vue";
+import SongDetails from "./SongDetails.vue";
 import axios from "axios";
 
 const store = useStore();
@@ -62,6 +65,7 @@ const getThumbnailKeys = () => {
 };
 
 const getThumbnailUrl = (song) => {
+  // http://localhost:57782/thumbnails/stay20240411_20250718_182058.jpg
   const key = "/thumbnails/" + (String(song.name) + String(song.date)).toLowerCase().replace(/[^a-z0-9]/g, "");
   const match = thumbnailUrls.value.find((url) => url.startsWith(key)) || null;
   if (!match) return null;
@@ -72,10 +76,8 @@ const tableDataWithThumbnails = computed(() => {
   if (!thumbnailUrls.value) {
     return tableData.value;
   }
-  console.log(thumbnailUrls);
   return tableData.value.map((item) => ({
     ...item,
-    // thumbnailUrl: "http://localhost:57782/thumbnails/stay20240411_20250718_182058.jpg",
     thumbnailUrl: getThumbnailUrl(item),
   }));
 });

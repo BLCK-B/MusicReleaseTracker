@@ -68,14 +68,14 @@ const formatDate = (dateString) => {
 };
 
 const contextMenu = (mediaItem) => {
-  console.log(mediaItem.name);
+  store.commit("SET_SELECTED_SONG_DETAILS", mediaItem);
 };
 </script>
 
 <style scoped>
 th,
 td {
-  user-select: text;
+  user-select: none;
   text-overflow: ellipsis;
   display: flex;
   align-items: center;
@@ -115,13 +115,11 @@ th {
   border-radius: 5px;
   background-color: var(--primary-color);
 }
-/* TODO */
-/* TODO */
-/* .single-bubble:hover,
+.single-bubble:hover,
 .album-bubble:hover {
   background-color: var(--accent-color);
   color: var(--accent-contrast);
-} */
+}
 .future-date {
   background-color: var(--duller-color);
   opacity: 50%;
@@ -144,10 +142,6 @@ tr.single-bubble {
   object-position: center;
   display: block;
   border-radius: 4px;
-  transition: 0.3s;
-}
-.thumbnail:hover {
-  width: 80px;
 }
 .pad {
   padding: 5px;

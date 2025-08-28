@@ -13,7 +13,7 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker.Scraping;
+package com.blck.MusicReleaseTracker.Scraping.Thumbnails;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
@@ -31,12 +31,11 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,13 +44,11 @@ public class ThumbnailService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    public static HttpClient httpClient = HttpClient.newHttpClient();
 
     private final ValueStore valueStore;
 
     private final ErrorLogging log;
-
-    private final int downloadDelay = 300;
 
     private final String slash = File.separator;
 
@@ -63,7 +60,7 @@ public class ThumbnailService {
         this.log = log;
     }
 
-    public void loadThumbnails(List<MediaItem> mediaItems) {
+    public void loadThumbnails(List<MediaItem> mediaItems, int downloadDelay) {
         scrapeCancel = false;
         try {
             Path thumbnailsDir = Paths.get(valueStore.getAppDataPath(), "thumbnails");
@@ -79,11 +76,10 @@ public class ThumbnailService {
                     continue;
                 }
 
-                Optional<Path> existingMatch = findExistingThumbnail(thumbnailsDir, key);
-                if (existingMatch.isPresent()) {
+                if (doesThumbnailExist(thumbnailsDir, key)) {
                     continue;
                 }
-//                TODO: use img format from url
+
                 String fileName = key + "_" + LocalDateTime.now().format(FORMATTER) + ".jpg";
                 Path imagePath = thumbnailsDir.resolve(fileName);
 
@@ -104,7 +100,7 @@ public class ThumbnailService {
         }
     }
 
-    private boolean isValidUrl(String url) {
+    public boolean isValidUrl(String url) {
         if (url == null || url.isBlank()) {
             return false;
         }
@@ -117,38 +113,62 @@ public class ThumbnailService {
         }
     }
 
-    private Optional<Path> findExistingThumbnail(Path dir, String key) throws IOException {
-        try (Stream<Path> files = Files.list(dir)) {
-            return files
-                    .filter(Files::isRegularFile)
-                    .filter(p -> p.getFileName().toString().startsWith(key + "_"))
-                    .findFirst();
-        }
-    }
-
-    public List<String> getAllThumbnailUrls() {
+    public List<String> getAllThumbnailUrlsMatchingKeys(List<String> keys) {
         String thumbnailsDirPath = valueStore.getAppDataPath() + "thumbnails" + slash;
         File thumbnailsDir = new File(thumbnailsDirPath);
         if (!thumbnailsDir.exists() || !thumbnailsDir.isDirectory()) {
             return Collections.emptyList();
         }
 
-        File[] files = thumbnailsDir.listFiles((dir, name) -> {
-            String lowerCaseName = name.toLowerCase();
-            return lowerCaseName.endsWith(".jpg") || lowerCaseName.endsWith(".jpeg") || lowerCaseName.endsWith(".png");
-        });
-
-        if (files == null || files.length == 0) {
-            return Collections.emptyList();
+        try (Stream<Path> paths = Files.list(thumbnailsDir.toPath())) {
+            return paths
+                    .filter(path -> startsWithKey(path, keys))
+                    .map(path -> "/thumbnails/" + path.getFileName()) // forward slashes intentional
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        return Arrays.stream(files)
-                .map(file -> "/thumbnails/" + file.getName()) // forward slashes intentional
-                .collect(Collectors.toList());
     }
 
-//    TODO
-    public void removeOldThumbnails(int oldInDays) {
+    public boolean doesThumbnailExist(Path dir, String key) {
+        return !getAllThumbnailUrlsMatchingKeys(List.of(key)).isEmpty();
+    }
 
+    public void removeThumbnailsOlderThan(LocalDate localDate) {
+        String thumbnailsDirPath = valueStore.getAppDataPath() + "thumbnails" + slash;
+        File thumbnailsDir = new File(thumbnailsDirPath);
+
+        try (Stream<Path> paths = Files.list(thumbnailsDir.toPath())) {
+            paths.forEach(path -> {
+                String fileName = path.getFileName().toString();
+                String[] parts = fileName.split("_");
+                String fileDate = parts[1].split("\\.")[0];
+                try {
+                    LocalDate localFileDate = LocalDate.parse(fileDate, DateTimeFormatter.ofPattern("yyyyMMdd"));
+                    if (localFileDate.isBefore(localDate)) {
+                        Files.delete(path);
+                    }
+                } catch (Exception e) {
+                    log.error(e, ErrorLogging.Severity.WARNING, "Failed to remove thumbnail");
+                }
+            });
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            log.error(e, ErrorLogging.Severity.WARNING, "Remove thumbnails fail");
+        }
+    }
+
+    private boolean isValidFormat(Path path) {
+        if (!Files.isRegularFile(path)) {
+            return false;
+        }
+        String name = path.getFileName().toString().toLowerCase();
+        return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png");
+    }
+
+    private boolean startsWithKey(Path path, List<String> keys) {
+        String filename = path.getFileName().toString().toLowerCase();
+        return keys.stream()
+                .anyMatch(filename::startsWith);
     }
 }

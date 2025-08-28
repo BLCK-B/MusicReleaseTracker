@@ -19,17 +19,26 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
-/** a central value store of variables shared among classes */
+/**
+ * a central value store of variables shared among classes
+ */
 @Component
 public class ValueStore {
 
     private String appDataPath;
+
     private Path DBpath;
+
     private Path DBpathTemplate;
+
     private Path configPath;
+
     private Path errorLogsPath;
+
     private String scrapeDate;
+
     private String appVersion;
+
     private boolean backendReady = false;
 
     public boolean isBackendReady() {

@@ -18,9 +18,9 @@ defineProps({
   transform: translate(-50%, -50%);
   background: var(--duller-color);
   border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1;
   padding: 16px;
+  border: 2px solid var(--dull-color);
 }
 
 .s {

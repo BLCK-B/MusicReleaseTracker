@@ -13,7 +13,7 @@
  *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.blck.MusicReleaseTracker.Scraping;
+package com.blck.MusicReleaseTracker.Scraping.Thumbnails;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -34,7 +34,7 @@ public class StaticResourceConfig implements WebMvcConfigurer {
             appData = System.getProperty("user.home");
         else
             throw new UnsupportedOperationException("unsupported OS");
-       return "file:" + slash + appData + slash + "MusicReleaseTracker" + slash + "thumbnails";
+        return "file:" + slash + appData + slash + "MusicReleaseTracker" + slash + "thumbnails";
     }
 
     @Override

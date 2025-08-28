@@ -34,11 +34,14 @@ import java.util.stream.IntStream;
  * The common denominator of specific web source scrapers with super methods and other to be overriden. </br>
  * It is not abstract because we need instantiation.
  */
-public class Scraper {
+public abstract class Scraper {
 
     protected final ErrorLogging log;
+
     protected final ValueStore store;
+
     private final DBqueries DB;
+
     public TablesEnum source;
 
     public Scraper(ValueStore store, ErrorLogging errorLogging, DBqueries DB) {
@@ -48,29 +51,30 @@ public class Scraper {
     }
 
     /**
-     * Scraper data from given source and inserts them into the respective source table.
+     * Scrapes data from given source and inserts them into the respective source table.
      *
      * @param timeout Jsoup timeout
-	 */
-    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
-        System.out.println("The method scrape() is to be overriden.");
-    }
+     */
+    public abstract void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException;
 
     /**
      *
      * @return base artist identifier for a given source
      */
-    public String getID() {
-        return "The method getID() is to be overriden.";
-    }
+    public abstract String getID();
+
+    /**
+     * Reduces to base id when possible. Does not discard otherwise.
+     */
+    public abstract void reduceToID();
 
     /**
      * Creates a {@code List<Song>} from song names, dates, types of one artist.
      *
-     * @param names
-     * @param artist
-     * @param dates
-     * @param types may be null
+     * @param names  list of song names
+     * @param artist songs from this artist
+     * @param dates  release dates of songs
+     * @param types  may be null
      * @return {@code List<Song>}
      */
     public List<Song> artistToSongList(List<String> names,
@@ -124,7 +128,7 @@ public class Scraper {
 
     /**
      *
-     * @param date a date to check
+     * @param date      a date to check
      * @param formatter formatter object with specified date format
      * @return if the date is valid in the requested format
      */

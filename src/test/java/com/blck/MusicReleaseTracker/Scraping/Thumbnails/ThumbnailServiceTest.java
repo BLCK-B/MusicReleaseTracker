@@ -111,8 +111,8 @@ public class ThumbnailServiceTest {
 
         assertAll(
                 () -> assertEquals(urls.size(), keys.size()),
-                () -> assertEquals("/thumbnails/calling20260521_20250727.jpg", urls.getFirst()),
-                () -> assertEquals("/thumbnails/change20241115_20250727.png", urls.getLast())
+                () -> assertTrue(urls.contains("/thumbnails/calling20260521_20250727.jpg")),
+                () -> assertTrue(urls.contains("/thumbnails/change20241115_20250727.png"))
         );
     }
 

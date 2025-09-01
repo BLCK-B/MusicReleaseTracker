@@ -45,10 +45,20 @@ const urlExists = computed(() => store.state.urlExists);
 const tableVisible = computed(() => {
   return tableData.value.some((item) => item.song !== null);
 });
+// TODO: actual urls in album thumbnails
+const tableDataWithThumbnails = computed(() => {
+  if (!thumbnailUrls.value) {
+    return tableData.value;
+  }
+  return tableData.value.map((item) => ({
+    ...item,
+    thumbnailUrl: getThumbnailUrl(item),
+  }));
+});
 
 const thumbnailUrls = ref([]);
 
-watch(tableData, (newTableData) => {
+watch(tableData, () => {
   axios;
   axios
     .post("/api/thumbnailUrls", getThumbnailKeys())
@@ -71,16 +81,6 @@ const getThumbnailUrl = (song) => {
   if (!match) return null;
   return "http://localhost:57782" + match;
 };
-
-const tableDataWithThumbnails = computed(() => {
-  if (!thumbnailUrls.value) {
-    return tableData.value;
-  }
-  return tableData.value.map((item) => ({
-    ...item,
-    thumbnailUrl: getThumbnailUrl(item),
-  }));
-});
 </script>
 
 <style scoped>
@@ -118,6 +118,7 @@ table {
   font-weight: bold;
 }
 .aBubble {
+  position: relative;
   background-color: var(--duller-color);
   width: 60%;
   border-radius: 5px;

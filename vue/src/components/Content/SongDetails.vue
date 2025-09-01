@@ -1,11 +1,13 @@
 <template>
   <div v-if="selected">
     <div class="overlay" @click="closeCard"></div>
-    <Card :cardSize="'l'" class="details-card" ref="cardToCapture">
+    <Card :cardSize="'l'" class="details-card">
       <div class="bg-helper">
         <div
           class="background-blur"
-          :style="{ backgroundImage: selected.thumbnailUrl ? `url(${selected.thumbnailUrl})` : 'url(../icons/noImg.png)' }"></div>
+          :style="{
+            backgroundImage: selected.thumbnailUrl ? `url(${selected.thumbnailUrl})` : 'url(../icons/noImg.png)',
+          }"></div>
 
         <div class="content">
           <img v-if="selected.thumbnailUrl" :src="selected.thumbnailUrl" class="thumbnail" loading="lazy" />
@@ -32,7 +34,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
 import Card from "../Util/Card.vue";
 
@@ -68,8 +70,6 @@ const formatDate = (dateString) => {
 const closeCard = () => {
   store.commit("SET_SELECTED_SONG_DETAILS", undefined);
 };
-
-const cardToCapture = ref(null);
 </script>
 
 <style scoped>

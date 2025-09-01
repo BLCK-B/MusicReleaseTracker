@@ -6,11 +6,16 @@
       <div :class="{ active: activeTab === 'youtube' }" class="sourceTab" @mousedown="setStoreTab('youtube')">YT</div>
     </div>
 
+    <a v-if="isMrtUpdate" href="https://github.com/BLCK-B/MusicReleaseTracker/releases" target="_blank" class="newUpdateLink">
+      Download new version
+    </a>
+
     <button :disabled="!allowButtons" class="settingsButton" @click="openSettings()">
       <img v-if="primaryColor === 'black'" alt="Settings" class="imageSettings" src="../icons/optionsblack.png" />
       <img v-else-if="primaryColor === 'dark'" alt="Settings" class="imageSettings" src="../icons/optionsdark.png" />
       <img v-else-if="primaryColor === 'light'" alt="Settings" class="imageSettings" src="../icons/optionslight.png" />
     </button>
+
     <button
       :class="{ scrapeActive: isActive }"
       class="scrapeButton"
@@ -29,7 +34,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeMount, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -39,6 +44,7 @@ const eventSource = ref(null);
 const scrapeDateInfo = ref(false);
 const scrapeLast = ref("-");
 const isActive = ref(false);
+const isMrtUpdate = ref(false);
 
 const router = useRouter();
 const store = useStore();
@@ -47,8 +53,13 @@ const allowButtons = computed(() => store.state.allowButtons);
 const primaryColor = computed(() => store.state.primaryColor);
 const selectedArtist = computed(() => store.state.selectedArtist);
 
-// load last clicked tab, otherwise combview as default, load scrapeLast time
-onBeforeMount(() => {
+// trigger handleSourceClick if tab is not combview
+watch(sourceTab, (tabValue) => {
+  activeTab.value = tabValue;
+  if (tabValue) handleSourceClick(tabValue);
+});
+
+onMounted(() => {
   activeTab.value = sourceTab.value;
   axios
     .post("/api/fillCombview")
@@ -62,12 +73,8 @@ onBeforeMount(() => {
   axios.get("/api/scrapeDate").then((response) => {
     scrapeLast.value = response.data;
   });
-});
 
-// trigger handleSourceClick if tab is not combview
-watch(sourceTab, (tabValue) => {
-  activeTab.value = tabValue;
-  if (tabValue) handleSourceClick(tabValue);
+  mrtUpdateCheck();
 });
 
 // set store tab, trigger handleSourceClick
@@ -75,8 +82,9 @@ const setStoreTab = (source) => {
   if (sourceTab.value === source) source = "combview";
   store.commit("SET_SOURCE_TAB", source);
 };
+
 // load respective table
-const handleSourceClick = (source) => {
+const handleSourceClick = async (source) => {
   axios
     .get("/api/tableData", {
       params: {
@@ -91,6 +99,7 @@ const handleSourceClick = (source) => {
       console.error(error);
     });
 };
+
 // trigger scraping or cancel it, SSE listener for progressbar
 const clickScrape = () => {
   scrapeDateInfo.value = false;
@@ -136,16 +145,34 @@ const clickScrape = () => {
     });
   }
 };
+
 const scrapeHover = () => {
   scrapeDateInfo.value = true;
 };
+
 const scrapeMouseOff = () => {
   scrapeDateInfo.value = false;
 };
-// open settings
+
 const openSettings = () => {
   router.push("/settings");
   store.commit("SET_SETTINGS_OPEN", true);
+};
+
+const mrtUpdateCheck = async () => {
+  const today = new Date().toISOString().slice(0, 10);
+  if (localStorage.getItem("updateCheck") === today) {
+    return;
+  }
+  axios
+    .get("/api/isNewUpdate")
+    .then((response) => {
+      isMrtUpdate.value = response.data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  localStorage.setItem("updateCheck", today);
 };
 </script>
 
@@ -208,10 +235,6 @@ const openSettings = () => {
   overflow: hidden;
   background-color: var(--duller-color);
   margin-right: 5px;
-  opacity: 0.85;
-}
-.tabs:hover {
-  opacity: 1;
 }
 .active {
   transition: 0.1s;
@@ -222,6 +245,37 @@ const openSettings = () => {
 }
 .active:hover {
   background-color: var(--accent-color);
+}
+
+.newUpdateLink {
+  font-weight: bold;
+  border-radius: 50px;
+  width: 175px;
+  padding: 8px;
+  border: 3px solid var(--accent-color);
+  background-color: transparent;
+  color: var(--primary-contrast);
+  margin-right: 25px;
+  opacity: 0.85;
+  text-decoration: none;
+  text-align: center;
+}
+.newUpdateLink:hover {
+  opacity: 1;
+}
+.newUpdateLink {
+  animation: hueRotate 15s linear infinite;
+}
+@keyframes hueRotate {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(360deg);
+  }
+  100% {
+    filter: hue-rotate(0deg);
+  }
 }
 
 .scrapenotice {

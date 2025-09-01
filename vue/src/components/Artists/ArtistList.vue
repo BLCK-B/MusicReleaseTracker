@@ -75,7 +75,7 @@ onMounted(() => {
   loadList();
 });
 
-const loadList = () => {
+const loadList = async () => {
   axios
     .get("/api/loadList")
     .then((response) => {
@@ -86,7 +86,7 @@ const loadList = () => {
     });
 };
 
-const handleItemClick = (artist) => {
+const handleItemClick = async (artist) => {
   axios
     .get("/api/tableData", {
       params: {

@@ -1,16 +1,22 @@
 <template>
   <!-- album -->
   <template v-if="isAlbum(mediaItem)">
-    <tr class="album-header">
-      <td class="tdalbumname">
-        {{ mediaItem.album }}
-      </td>
-      <td class="tdartist"></td>
-      <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
-    </tr>
-    <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" @click="contextMenu(song)" class="album-bubble">
-      <td class="tdsong pad">{{ song.name }}</td>
-    </tr>
+    <table class="album">
+      <tr class="album-header">
+        <td class="tdalbumname">
+          {{ mediaItem.album }}
+        </td>
+        <td class="tdartist"></td>
+        <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
+      </tr>
+      <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" @click="contextMenu(song)" class="album-bubble">
+        <td>
+          <img v-if="song.thumbnailUrl" :src="song.thumbnailUrl" class="thumbnail" loading="lazy" />
+          <img v-else src="../icons/noImg.png" class="no-thumbnail" loading="lazy" />
+          <span class="tdsong pad">{{ song.name }}</span>
+        </td>
+      </tr>
+    </table>
   </template>
   <!-- separate songs -->
   <template v-else>
@@ -119,6 +125,8 @@ th {
 .album-bubble:hover {
   background-color: var(--accent-color);
   color: var(--accent-contrast);
+  position: relative;
+  width: 100%;
 }
 .future-date {
   background-color: var(--duller-color);
@@ -132,7 +140,8 @@ tr.single-bubble {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 3px 0px;
+  padding: 5px 0px;
+  padding-left: 10px;
 }
 .thumbnail,
 .no-thumbnail {
@@ -145,5 +154,8 @@ tr.single-bubble {
 }
 .pad {
   padding: 5px;
+}
+.album {
+  margin-bottom: 3px;
 }
 </style>

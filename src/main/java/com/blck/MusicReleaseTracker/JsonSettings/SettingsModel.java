@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * The default settings file definition. The enum specifies options which are then converted to JSON representation.
  */
 public enum SettingsModel {
-    theme("black"),
+    theme("dark"),
     accent("cactus"),
     lastScrape("-"),
     isoDates(false),

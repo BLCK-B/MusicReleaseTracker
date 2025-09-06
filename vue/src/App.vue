@@ -52,7 +52,7 @@ const detectTheme = () => {
     .then((response) => {
       const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
       if (response.data.autoTheme === "true") {
-        if (prefersDarkMode.matches) store.commit("SET_PRIMARY_COLOR", "black");
+        if (prefersDarkMode.matches) store.commit("SET_PRIMARY_COLOR", "dark");
         else store.commit("SET_PRIMARY_COLOR", "light");
       }
     })

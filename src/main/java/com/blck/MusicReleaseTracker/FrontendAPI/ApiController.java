@@ -26,9 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-/**
- * API controller receives REST requests from vue and passes them to ServiceLayer
- */
 @RestController
 @RequestMapping("/api")
 public class ApiController {

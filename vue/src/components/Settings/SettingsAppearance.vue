@@ -3,12 +3,6 @@
   <div class="appearancecont">
     <div class="theme-buttons">
       <input
-        :checked="primaryColor === 'black'"
-        :disabled="autoTheme"
-        type="radio"
-        @change="$emit('set-setting', 'theme', 'black')" />
-      <label :class="{ disabled: autoTheme }">Black</label>
-      <input
         :checked="primaryColor === 'dark'"
         :disabled="autoTheme"
         type="radio"
@@ -63,9 +57,11 @@ defineProps({
   accent-color: var(--dull-color);
 }
 .theme-buttons {
+  margin-top: 5px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: 30%;
+  height: 35px;
   line-height: 18px;
   padding-right: 5px;
   border-right: 2px solid var(--dull-color);

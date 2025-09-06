@@ -1,6 +1,6 @@
 <template>
   <div v-if="selected">
-    <div class="overlay" @click="closeCard"></div>
+    <div class="overlay" @mousedown="closeCard"></div>
     <Card :cardSize="'l'" class="details-card">
       <div class="bg-helper">
         <div
@@ -141,7 +141,7 @@ const closeCard = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 2;
 }
 

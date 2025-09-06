@@ -101,6 +101,9 @@ public class Main {
                 settingsIO.writeSetting("loadThumbnails", "true");
                 settingsIO.writeSetting("flippedThumbSwitch", "true");
             }
+            if (settingsIO.readSetting("theme").equals("black")) { // TODO: future release
+                settingsIO.writeSetting("theme", "dark");
+            }
             store.setBackendReady();
         }
     }

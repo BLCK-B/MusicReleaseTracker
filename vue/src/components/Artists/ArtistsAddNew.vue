@@ -60,7 +60,7 @@ function clickAdd() {
   height: 38px;
 }
 .pill {
-  border: 2px solid var(--dull-color);
+  border: 2px solid var(--accent-color);
   width: 220px;
 }
 button {
@@ -69,8 +69,8 @@ button {
 input {
   position: absolute;
   height: 26px;
-  background-color: var(--accent-color);
-  color: black;
+  background-color: var(--primary-color);
+  color: var(--contrast-color);
   width: 152px;
   padding-left: 6px;
   border: none;
@@ -81,7 +81,7 @@ input:focus {
 }
 .buttons {
   height: 28px;
-  background-color: var(--primary-color);
+  background-color: var(--duller-color);
   align-content: center;
 }
 .imgbutton,

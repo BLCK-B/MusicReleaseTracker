@@ -2,25 +2,29 @@
   <!-- album -->
   <template v-if="isAlbum(mediaItem)">
     <table class="album">
-      <tr class="album-header">
-        <td class="tdalbumname">
-          {{ mediaItem.album }}
-        </td>
-        <td class="tdartist"></td>
-        <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
-      </tr>
-      <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" @click="contextMenu(song)" class="album-bubble">
-        <td>
-          <img v-if="song.thumbnailUrl" :src="song.thumbnailUrl" class="thumbnail" loading="lazy" />
-          <img v-else src="../icons/noImg.png" class="no-thumbnail" loading="lazy" />
-          <span class="tdsong pad">{{ song.name }}</span>
-        </td>
-      </tr>
+      <tbody>
+        <tr class="album-header">
+          <td class="tdalbumname">
+            {{ mediaItem.album }}
+          </td>
+          <td class="tdartist"></td>
+          <td class="tddate">{{ formatDate(mediaItem.date) }}</td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr v-for="(song, songIndex) in mediaItem.songs" :key="songIndex" @mousedown="contextMenu(song)" class="album-bubble">
+          <td>
+            <img v-if="song.thumbnailUrl" :src="song.thumbnailUrl" class="thumbnail" loading="lazy" />
+            <img v-else src="../icons/noImg.png" class="no-thumbnail" loading="lazy" />
+            <span class="tdsong pad">{{ song.name }}</span>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </template>
   <!-- separate songs -->
   <template v-else>
-    <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" @click="contextMenu(mediaItem)" class="single-bubble">
+    <tr :class="{ 'future-date': isDateInFuture(mediaItem.date) }" @mousedown="contextMenu(mediaItem)" class="single-bubble">
       <td>
         <img v-if="mediaItem.thumbnailUrl" :src="mediaItem.thumbnailUrl" class="thumbnail" loading="lazy" />
         <img v-else src="../icons/noImg.png" class="no-thumbnail" loading="lazy" />

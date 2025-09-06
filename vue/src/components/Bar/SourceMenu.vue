@@ -11,9 +11,8 @@
     </a>
 
     <button :disabled="!allowButtons" class="settingsButton" @click="openSettings()">
-      <img v-if="primaryColor === 'black'" alt="Settings" class="imageSettings" src="../icons/optionsblack.png" />
-      <img v-else-if="primaryColor === 'dark'" alt="Settings" class="imageSettings" src="../icons/optionsdark.png" />
-      <img v-else-if="primaryColor === 'light'" alt="Settings" class="imageSettings" src="../icons/optionslight.png" />
+      <img v-if="primaryColor === 'dark'" alt="Settings" class="imageSettings" src="../icons/optionsdark.png" />
+      <img v-else alt="Settings" class="imageSettings" src="../icons/optionslight.png" />
     </button>
 
     <button
@@ -248,10 +247,9 @@ const mrtUpdateCheck = async () => {
 }
 
 .newUpdateLink {
-  font-weight: bold;
   border-radius: 50px;
-  width: 175px;
-  padding: 8px;
+  width: 165px;
+  padding: 5px;
   border: 3px solid var(--accent-color);
   background-color: transparent;
   color: var(--primary-contrast);

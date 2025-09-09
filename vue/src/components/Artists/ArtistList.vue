@@ -6,14 +6,14 @@
         <button class="morebtn" @click="showMore()">more</button>
         <div v-if="showDropdown" class="dropdown">
           <button
-            :disabled="sourceTab == null || sourceTab == 'combview' || selectedArtist == '' || !allowButtons"
+            :disabled="sourceTab == null || sourceTab === 'combview' || selectedArtist === '' || !allowButtons"
             class="deletebtn"
             data-testid="delete-url-button"
             @click="deleteUrl()">
             delete selected URL
           </button>
           <button
-            :disabled="selectedArtist == '' || !allowButtons"
+            :disabled="selectedArtist === '' || !allowButtons"
             class="deletebtn"
             data-testid="delete-button"
             @click="clickDeleteArtist()">
@@ -25,7 +25,7 @@
       <ArtistsAddNew :addVisibility="addVisibility" @close-add-new="closeAddNew" />
 
       <div class="artistlist">
-        <li
+        <div
           v-for="item in artistsArrayList"
           :key="item"
           :class="{ highlighted: item === selectedArtist }"
@@ -34,9 +34,9 @@
           <div class="listitems">
             {{ item }}
           </div>
-        </li>
+        </div>
         <!-- adding height for enabling scroll all the way -->
-        <li v-for="item in artistsArrayList" :key="item"></li>
+        <div v-for="item in artistsArrayList" :key="item"></div>
       </div>
     </div>
   </div>
@@ -179,8 +179,7 @@ button:active {
   white-space: nowrap;
   overflow: hidden;
   padding-left: 6px;
-  margin: 0;
-  margin-left: 2px;
+  margin: 0 0 0 2px;
 }
 .artistlist {
   height: calc(100vh - 40px);

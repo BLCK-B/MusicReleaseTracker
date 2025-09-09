@@ -16,7 +16,7 @@
   align-items: center;
   margin-left: 30px;
   margin-right: 30px;
-  gap: 0px;
+  gap: 0;
 }
 .blckimg {
   height: 36px;

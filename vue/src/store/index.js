@@ -1,4 +1,3 @@
-// vuex store
 import { createStore } from "vuex";
 
 const state = {

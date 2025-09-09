@@ -1,5 +1,5 @@
 import SettingsDangerZone from "@/components/Settings/SettingsDangerZone.vue";
-import { expect, it } from "vitest";
+import { expect, vi, describe, beforeEach, it } from "vitest";
 import { mount } from "@vue/test-utils";
 import axios from "axios";
 

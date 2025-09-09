@@ -1,7 +1,7 @@
 <template>
   <div v-if="selected">
     <div class="overlay" @mousedown="closeCard"></div>
-    <Card :cardSize="'l'" class="details-card">
+    <PopoverCard :cardSize="'l'" class="details-card">
       <div class="bg-helper">
         <div
           class="background-blur"
@@ -29,14 +29,14 @@
           <a :href="searchLinks.google" target="_blank" class="link">Google</a>
         </div>
       </div>
-    </Card>
+    </PopoverCard>
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
-import Card from "../Util/Card.vue";
+import PopoverCard from "../Util/PopoverCard.vue";
 
 const store = useStore();
 
@@ -106,11 +106,6 @@ const closeCard = () => {
   width: 150px;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.mrtlogo {
-  width: 50px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 

@@ -62,8 +62,4 @@ const resetProtection = () => {
 .danger button:hover {
   background-color: red;
 }
-
-.disabled {
-  opacity: 0.3;
-}
 </style>

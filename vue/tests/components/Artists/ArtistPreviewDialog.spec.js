@@ -1,8 +1,8 @@
 import ArtistsPreviewDialog from "@/components/Artists/ArtistsPreviewDialog.vue";
 import { createStore } from "vuex";
-import { expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import axios from "axios";
+import { expect, vi, describe, beforeEach, it } from "vitest";
 
 vi.mock("axios");
 

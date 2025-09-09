@@ -144,8 +144,7 @@ tr.single-bubble {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 0px;
-  padding-left: 10px;
+  padding: 5px 0px 5px 10px;
 }
 .thumbnail,
 .no-thumbnail {

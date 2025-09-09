@@ -58,7 +58,4 @@ defineProps({
 input {
   margin-right: 5px;
 }
-.disabled {
-  opacity: 0.3;
-}
 </style>

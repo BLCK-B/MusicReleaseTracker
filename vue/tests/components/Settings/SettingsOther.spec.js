@@ -1,5 +1,5 @@
 import SettingsOther from "@/components/Settings/SettingsOther.vue";
-import { expect, it } from "vitest";
+import { expect, describe, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
 describe("SettingsOther.vue", () => {

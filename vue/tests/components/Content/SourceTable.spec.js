@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import SourceTable from "@/components/Content/SourceTable.vue";
 import { createStore } from "vuex";
-import { expect, vi } from "vitest";
+import { expect, vi, describe, beforeEach, it } from "vitest";
 
 describe("SourceTable.vue", () => {
   let store;

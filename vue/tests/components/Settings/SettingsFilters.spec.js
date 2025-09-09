@@ -1,5 +1,5 @@
 import SettingsAppearance from "@/components/Settings/SettingsAppearance.vue";
-import { expect, it } from "vitest";
+import { expect, describe, it } from "vitest";
 import { mount } from "@vue/test-utils";
 
 describe("SettingsAppearance.vue", () => {

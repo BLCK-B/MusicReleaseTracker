@@ -120,8 +120,7 @@ p {
   width: 400px;
   height: 300px;
   color: var(--contrast-color);
-  padding: 10px;
-  padding-left: 12px;
+  padding: 10px 10px 10px 12px;
   border-radius: 8px;
 }
 .nameLink {

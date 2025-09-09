@@ -2,7 +2,7 @@ import { mount } from "@vue/test-utils";
 import DialogsURL from "@/components/Content/DialogsURL.vue";
 import { createStore } from "vuex";
 import axios from "axios";
-import { expect, vi } from "vitest";
+import { expect, vi, describe, beforeEach, it } from "vitest";
 
 vi.mock("axios");
 
@@ -60,21 +60,21 @@ describe("DialogsURL.vue", () => {
 
   it("Is visible when artist and source are selected and ID does not exist.", async () => {
     store.commit("SET_URL_EXISTS", false);
-    const { wrapper, dialog } = await setup(store);
+    const { dialog } = await setup(store);
 
     expect(dialog.exists()).toBe(true);
   });
 
   it("Is not visible when ID exists.", async () => {
     store.commit("SET_URL_EXISTS", true);
-    const { wrapper, dialog } = await setup(store);
+    const {dialog } = await setup(store);
 
     expect(dialog.exists()).toBe(false);
   });
 
   it("Does not send request when user input is empty.", async () => {
     store.commit("SET_URL_EXISTS", false);
-    const { wrapper, dialog, confirmButton } = await setup(store);
+    const { confirmButton } = await setup(store);
 
     await confirmButton.trigger("click");
 

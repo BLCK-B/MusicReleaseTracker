@@ -2,7 +2,7 @@ import { mount } from "@vue/test-utils";
 import ArtistList from "@/components/Artists/ArtistList.vue";
 import { createStore } from "vuex";
 import axios from "axios";
-import { expect, vi } from "vitest";
+import { expect, vi, describe, beforeEach, it } from "vitest";
 
 vi.mock("axios");
 

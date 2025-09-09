@@ -103,7 +103,7 @@ const handleSourceClick = async (source) => {
 const clickScrape = () => {
   scrapeDateInfo.value = false;
   if (!allowButtons.value) {
-    eventSource.value.close;
+    eventSource.value.close();
     axios.post("/api/cancelScrape").then(() => {
       store.commit("SET_ALLOW_BUTTONS", true);
       isActive.value = false;
@@ -250,9 +250,9 @@ const mrtUpdateCheck = async () => {
   border-radius: 50px;
   width: 165px;
   padding: 5px;
-  border: 3px solid var(--accent-color);
+  border: 2px solid var(--accent-color);
   background-color: transparent;
-  color: var(--primary-contrast);
+  color: var(--contrast-color);
   margin-right: 25px;
   opacity: 0.85;
   text-decoration: none;

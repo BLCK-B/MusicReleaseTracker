@@ -1,86 +1,20 @@
 {
   "author": "BLCK",
   "name": "mrt",
-  "version": "10.1.0",
+  "version": "11.0.0",
   "description": "MusicReleaseTracker",
   "type": "module",
   "main": "electron-main.js",
   "private": true,
-  "build": {
-    "directories": {
-      "output": "distribution",
-      "buildResources": "buildResources"
-    },
-    "appId": "blck.mrt",
-    "productName": "MusicReleaseTracker",
-    "asar": true,
-    "win": {
-      "artifactName": "MRT-${version}-win.${ext}",
-      "extraFiles": [
-        {
-          "from": "buildResources/MusicReleaseTracker.exe",
-          "to": "buildResources/MusicReleaseTracker.exe"
-        }
-      ],
-      "target": [
-        "msi"
-      ],
-      "icon": "buildResources/MRTicon.ico"
-    },
-    "msi": {
-      "perMachine": true,
-      "oneClick": false,
-      "createDesktopShortcut": false,
-      "createStartMenuShortcut": true,
-      "shortcutName": "MusicReleaseTracker",
-      "runAfterFinish": false
-    },
-    "linux": {
-      "artifactName": "MRT-${version}-linux.${ext}",
-      "extraFiles": [
-        {
-          "from": "buildResources/MusicReleaseTracker",
-          "to": "buildResources/MusicReleaseTracker"
-        }
-      ],
-      "target": [
-        "AppImage"
-      ],
-      "icon": "buildResources/MRTicon.png",
-      "category": "Utility"
-    },
-    "mac": {
-      "artifactName": "MRT-${version}-mac.${ext}",
-      "extraFiles": [
-        {
-          "from": "buildResources/MusicReleaseTracker",
-          "to": "buildResources/MusicReleaseTracker"
-        }
-      ],
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "arm64"
-          ]
-        }
-      ],
-      "icon": "buildResources/AplIcon.png",
-      "category": "public.app-category.utilities",
-      "darkModeSupport": true
-    },
-    "electronLanguages": [
-      "en"
-    ]
-  },
   "scripts": {
     "dev": "vite",
     "buildVue": "vite build --emptyOutDir",
     "preview": "vite preview",
     "electron": "cross-env NODE_ENV=development electron .",
-    "distExe": "electron-builder --dir",
-    "distInstaller": "electron-builder",
-    "test": "vitest"
+    "distExe": "electron-builder --dir --config electron-build-config.json",
+    "distInstaller": "electron-builder --config electron-build-config.json",
+    "test": "vitest",
+    "lint": "eslint . --ext .js,.vue"
   },
   "dependencies": {
     "axios": "^1.11.0",

@@ -24,11 +24,13 @@ const store = useStore();
 
 const userInput = ref("");
 const tableData = computed(() => store.state.tableData);
-const sourceTab = computed(() => store.state.sourceTab);
+const sourceTab = computed<sourceType>(() => store.state.sourceTab);
 const allowButtons = computed(() => store.state.allowButtons);
 const selectedArtist = computed(() => store.state.selectedArtist);
 const primaryColor = computed(() => store.state.primaryColor);
 const urlExists = computed(() => store.state.urlExists);
+
+type sourceType = "musicbrainz" | "beatport" | "youtube";
 
 const sources = computed(() => ({
   musicbrainz: {
@@ -54,7 +56,7 @@ const sources = computed(() => ({
   },
 }));
 
-const currentSource = computed(() => sources.value[sourceTab.value] || "this source is undefined");
+const currentSource = computed(() => sources.value[sourceTab.value]);
 
 watch(tableData, () => {
   determineDiagShow();

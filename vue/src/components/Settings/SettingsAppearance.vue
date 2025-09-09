@@ -35,7 +35,7 @@
   </div>
 
   <div class="belowAppearance">
-    <input :checked="autoTheme" type="checkbox" @change="$emit('set-setting', 'autoTheme', $event.target.checked)" />
+    <input :checked="autoTheme" type="checkbox" @change="onChange" data-setting="autoTheme"/>
     <label>Match system theme</label>
   </div>
 </template>
@@ -46,6 +46,13 @@ defineProps({
   accentColor: String,
   autoTheme: Boolean,
 });
+
+const emit = defineEmits(['set-setting']);
+
+const onChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  emit('set-setting', target.dataset.setting, target.checked);
+};
 </script>
 
 <style scoped>

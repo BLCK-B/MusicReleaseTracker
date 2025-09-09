@@ -10,7 +10,7 @@ axios.defaults.baseURL = "http://localhost:57782";
 
 const store = useStore();
 
-const appliedStyles = ref([]);
+const appliedStyles = ref<HTMLLinkElement[]>([]);
 const theme = ref("");
 const accent = ref("");
 
@@ -61,7 +61,7 @@ const detectTheme = () => {
     });
 };
 
-const applyTheme = (newTheme, newAccent) => {
+const applyTheme = (newTheme: string, newAccent: string) => {
   theme.value = newTheme.toLowerCase();
   accent.value = newAccent.toLowerCase();
   // remove previously applied css

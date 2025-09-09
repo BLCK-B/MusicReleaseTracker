@@ -56,7 +56,7 @@ const searchLinks = computed(() => {
   };
 });
 
-const formatDate = (dateString) => {
+const formatDate = (dateString: string) => {
   if (!isoDates.value) {
     if (dateString === undefined) return dateString;
     const date = new Date(dateString);

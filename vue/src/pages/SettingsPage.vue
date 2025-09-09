@@ -79,7 +79,6 @@ onBeforeMount(() => {
       filterRemaster.value = response.data.filterRemaster === "true";
       autoTheme.value = response.data.autoTheme === "true";
       store.commit("SET_ISODATES", response.data.isoDates === "true");
-      if (autoTheme.value) primaryColor.value = response.data.theme;
       accentColor.value = response.data.accent;
       loadThumbnails.value = response.data.loadThumbnails === "true";
     })
@@ -103,7 +102,7 @@ const clickClose = () => {
 };
 
 // write single setting in config
-const setSetting = (name, value) => {
+const setSetting = (name: string, value: any) => {
   switch (name) {
     case "theme":
       store.commit("SET_PRIMARY_COLOR", value);

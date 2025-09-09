@@ -30,7 +30,7 @@
           :key="item"
           :class="{ highlighted: item === selectedArtist }"
           class="listbtn"
-          @mousedown="handleItemClick(item)">
+          @mousedown="artistSelected(item)">
           <div class="listitems">
             {{ item }}
           </div>
@@ -86,7 +86,7 @@ const loadList = async () => {
     });
 };
 
-const handleItemClick = async (artist) => {
+const artistSelected = async (artist: string) => {
   axios
     .get("/api/tableData", {
       params: {
@@ -139,7 +139,7 @@ const deleteUrl = () => {
       },
     })
     .then(() => {
-      handleItemClick(selectedArtist.value);
+      artistSelected(selectedArtist.value);
     })
     .catch((error) => {
       console.error("Error deleting URL:", error);

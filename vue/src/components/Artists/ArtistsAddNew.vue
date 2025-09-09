@@ -30,7 +30,10 @@ const emit = defineEmits(["close-add-new"]);
 const input = ref("");
 const store = useStore();
 // empty input forbidden
-const rules = [(value) => !!value.trim(), (value) => (value || "").length <= 25];
+const rules: Array<(value: string) => boolean> = [
+  (value) => !!value.trim(),
+  (value) => (value || "").length <= 25
+];
 const isValid = computed(() => rules.every((rule) => rule(input.value)));
 
 const primaryColor = computed(() => store.state.primaryColor);

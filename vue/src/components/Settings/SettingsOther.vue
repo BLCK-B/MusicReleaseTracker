@@ -2,11 +2,11 @@
   <p class="title">Other</p>
   <div class="flex-items">
     <div class="flex-padding">
-      <input type="checkbox" :checked="isoDates" @change="$emit('set-setting', 'isoDates', $event.target.checked)" />
+      <input type="checkbox" :checked="isoDates" @change="onChange" data-setting="isoDates"/>
       <label>Dates as yyyy-MM-dd</label>
     </div>
     <div class="flex-padding">
-      <input type="checkbox" :checked="loadThumbnails" @change="$emit('set-setting', 'loadThumbnails', $event.target.checked)" />
+      <input type="checkbox" :checked="loadThumbnails" @change="onChange" data-setting="loadThumbnails" />
       <label>Download thumbnails</label>
     </div>
   </div>
@@ -17,6 +17,13 @@ defineProps({
   isoDates: Boolean,
   loadThumbnails: Boolean,
 });
+
+const emit = defineEmits(['set-setting']);
+
+const onChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  emit('set-setting', target.dataset.setting, target.checked);
+};
 </script>
 
 <style scoped>

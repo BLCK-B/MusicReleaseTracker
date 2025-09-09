@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   isoDates: Boolean,
   loadThumbnails: Boolean,

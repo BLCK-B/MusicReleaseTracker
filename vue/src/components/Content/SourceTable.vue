@@ -28,7 +28,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useStore } from "vuex";
 import { computed, watch, ref } from "vue";
 import MediaItem from "./MediaItem.vue";

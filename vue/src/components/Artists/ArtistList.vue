@@ -44,7 +44,7 @@
   <ArtistsPreviewDialog v-if="previewVis" class="preview" />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";

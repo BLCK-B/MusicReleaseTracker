@@ -36,7 +36,7 @@
   </template>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
 

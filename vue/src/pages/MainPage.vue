@@ -27,7 +27,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ArtistList from "@/components/Artists/ArtistList.vue";
 import SourceMenu from "@/components/Bar/SourceMenu.vue";
 import SourceTable from "@/components/Content/SourceTable.vue";

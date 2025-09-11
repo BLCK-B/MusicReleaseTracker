@@ -1,17 +1,3 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2025 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
 package com.blck.MusicReleaseTracker.Scraping;
 
@@ -35,7 +21,7 @@ public class ScraperManager {
     /**
      *
      * @param log error logging
-     * @param DB database
+     * @param DB  database
      */
     public ScraperManager(ErrorLogging log, DBqueries DB) {
         this.log = log;
@@ -50,8 +36,8 @@ public class ScraperManager {
     /**
      * Custom minimum delay time for testing purposes.
      *
-     * @param log error logging
-     * @param DB database
+     * @param log             error logging
+     * @param DB              database
      * @param customSleepTime ms
      */
     public ScraperManager(ErrorLogging log, DBqueries DB, int customSleepTime) {
@@ -110,9 +96,9 @@ public class ScraperManager {
     /**
      * Handling of scraper fail cases.
      *
-     * @param i retry attempt, {@code i == 2} removes all scrapers of this source from queue
+     * @param i       retry attempt, {@code i == 2} removes all scrapers of this source from queue
      * @param scraper failing Scraper object
-     * @param e exception thrown by {@code scraper}
+     * @param e       exception thrown by {@code scraper}
      */
     private void scrapeErrorLaunder(int i, Scraper scraper, Exception e) {
         if (e instanceof ScraperTimeoutException)

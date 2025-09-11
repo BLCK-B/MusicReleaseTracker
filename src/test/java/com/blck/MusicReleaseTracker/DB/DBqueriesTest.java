@@ -1,17 +1,3 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2025 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
 package com.blck.MusicReleaseTracker.DB;
 
@@ -120,7 +106,7 @@ public class DBqueriesTest {
         List<Album> albums = dBqueriesClass.readCombviewAlbums();
 
         assertEquals(2, albums.size());
-        assertEquals(2, albums.get(1).getAlbumSongs().size());
+        assertEquals(2, albums.get(1).getSongs().size());
     }
 
     @Test
@@ -138,7 +124,7 @@ public class DBqueriesTest {
                 new Song("B", "artist", "2022-01-01", null, null),
                 new Song("C", "artist", "2022-01-01", null, null));
 
-        List<Song> output = dBqueriesClass.readCombviewAlbums().getFirst().getAlbumSongs();
+        List<Song> output = dBqueriesClass.readCombviewAlbums().getFirst().getSongs();
 
         for (int i = 0; i < expected.size(); ++i)
             assertEquals(expected.get(i).getName(), output.get(i).getName());

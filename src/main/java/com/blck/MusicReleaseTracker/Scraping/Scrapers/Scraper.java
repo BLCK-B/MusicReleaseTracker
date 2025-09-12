@@ -77,7 +77,7 @@ public abstract class Scraper {
                         types == null ? null : types.get(i),
                         thumbnails == null ? null : thumbnails.get(i))
                 )
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

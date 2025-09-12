@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import {useStore} from "vuex";
+import {useMainStore} from "@/store/mainStore.ts";
 import {computed, watch, ref} from "vue";
 import MediaItem from "./MediaItem.vue";
 import SongDetails from "./SongDetails.vue";
@@ -37,26 +37,12 @@ import axios from "axios";
 import type {MediaItemType} from "@/types/MediaItemType.ts";
 import type {SongType} from "@/types/SongType.ts";
 
-const store = useStore();
+const store = useMainStore();
 
-const tableData = computed(() => store.state.tableData);
-const previewVis = computed(() => store.state.previewVis);
-const sourceTab = computed(() => store.state.sourceTab);
-const urlExists = computed(() => store.state.urlExists);
-
-const tableVisible = computed(() => {
-  return tableData.value.some((item: MediaItemType) => item.songs !== null);
-});
-
-const tableDataWithThumbnails = computed(() => { // TODO: actual urls in album thumbnails
-  if (!thumbnailUrls.value) {
-    return tableData.value;
-  }
-  return tableData.value.map((item: SongType) => ({
-    ...item,
-    thumbnailUrl: getThumbnailUrl(item),
-  }));
-});
+const tableData = computed(() => store.tableData);
+const previewVis = computed(() => store.previewVis);
+const sourceTab = computed(() => store.sourceTab);
+const urlExists = computed(() => store.urlExists);
 
 const thumbnailUrls = ref<string[]>([]);
 
@@ -71,20 +57,44 @@ watch(tableData, () => {
       });
 });
 
-const getThumbnailKeys = () => {
-  return tableData.value.map(
-      (mediaItem: MediaItemType) => (mediaItem.songs[0]!.name + mediaItem.songs[0]!.date)
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g, "")
-  );
+const tableVisible = computed(() => {
+  return tableData.value.some((item: MediaItemType) => item.songs !== null);
+});
+
+const tableDataWithThumbnails = computed(() => {
+  // base case for tableData thumbnailUrl watcher
+  if (!thumbnailUrls.value) {
+    return tableData;
+  }
+  return tableData.value.map((item: MediaItemType) => {
+    return {
+      ...item,
+      songs: addThumbnailUrls(item.songs) as SongType[]
+    };
+  });
+});
+
+const addThumbnailUrls = (songs: SongType[]) => {
+  return songs.map(song => {
+    // http://localhost:57782/thumbnails/stay20240411_20250718_182058.jpg
+    const key = "/thumbnails/" + (String(song.name) + String(song.date)).toLowerCase().replace(/[^a-z0-9]/g, "");
+    const match = thumbnailUrls.value.find((url) => url.startsWith(key)) || null;
+    const thumbnailUrl = match ? "http://localhost:57782" + match : null;
+    return {
+      ...song,
+      thumbnailUrl
+    };
+  });
 };
 
-const getThumbnailUrl = (song: SongType) => {
-  // http://localhost:57782/thumbnails/stay20240411_20250718_182058.jpg
-  const key = "/thumbnails/" + (String(song.name) + String(song.date)).toLowerCase().replace(/[^a-z0-9]/g, "");
-  const match = thumbnailUrls.value.find((url) => url.startsWith(key)) || null;
-  if (!match) return null;
-  return "http://localhost:57782" + match;
+const getThumbnailKeys = () => {
+  return tableData.value.flatMap((mediaItem: MediaItemType) =>
+      mediaItem.songs.map(song =>
+          (song.name + song.date)
+              .toLowerCase()
+              .replace(/[^a-z0-9]/g, "")
+      )
+  );
 };
 </script>
 

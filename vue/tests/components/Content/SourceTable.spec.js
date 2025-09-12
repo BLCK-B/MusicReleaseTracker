@@ -1,90 +1,74 @@
-import { mount } from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import SourceTable from "@/components/Content/SourceTable.vue";
-import { createStore } from "vuex";
-import { expect, vi, describe, beforeEach, it } from "vitest";
+import {useMainStore} from "@/store/mainStore.ts";
+import {expect, vi, describe, beforeEach, it} from "vitest";
+import {nextTick} from "vue";
+import {createTestingPinia} from "@pinia/testing";
 
 describe("SourceTable.vue", () => {
-  let store;
-  let mutations;
+    let store;
 
-  beforeEach(() => {
-    mutations = {
-      SET_URL_EXISTS(state, value) {
-        state.urlExists = value;
-      },
-      SET_TABLE_CONTENT(state, value) {
-        state.tableData = value;
-      },
-      SET_SOURCE_TAB(state, value) {
-        state.sourceTab = value;
-      },
-      SET_SELECTED_ARTIST: vi.fn(),
-      SET_ALLOW_BUTTONS: vi.fn(),
-      SET_PREVIEW_VIS: vi.fn(),
-    };
+    async function setup() {
+        const wrapper = mount(SourceTable, {
+            global: {
+                plugins: [createTestingPinia({
+                    createSpy: vi.fn,
+                    stubActions: false,
+                    initialState: {
+                        mainStore: {
+                            tableData: [{song: "something"}],
+                            selectedArtist: "artist",
+                            previewVis: false,
+                            isoDates: false,
+                            sourceTab: "beatport",
+                            urlExists: false,
+                        }
+                    }
+                })],
+            },
+        });
+        store = useMainStore();
+        return {wrapper};
+    }
 
-    store = createStore({
-      state() {
-        return {
-          tableData: [{ song: "something" }],
-          selectedArtist: "artist",
-          previewVis: false,
-          isoDates: false,
-          sourceTab: "beatport",
-          urlExists: false,
-        };
-      },
-      mutations,
+    it("Table container is visible only when table data is not empty.", async () => {
+        const {wrapper} = await setup(store);
+
+        expect(wrapper.find(".table-container").exists()).toBe(true);
+
+        store.setTableContent([]);
+        await nextTick();
+
+        expect(wrapper.find(".table-container").exists()).toBe(false);
     });
-  });
 
-  async function setup(store) {
-    const wrapper = mount(SourceTable, {
-      global: {
-        plugins: [store],
-      },
+    it("Quick guide is visible when nothing else is and sourceTab = combview.", async () => {
+        const {wrapper} = await setup(store);
+
+        expect(wrapper.find(".quickstart").exists()).toBe(false);
+
+        store.setTableContent([]);
+        store.setSourceTab("combview");
+        await nextTick();
+
+        expect(wrapper.find(".quickstart").exists()).toBe(true);
     });
-    return { wrapper };
-  }
 
-  it("Table container is visible only when table data is not empty.", async () => {
-    const { wrapper } = await setup(store);
+    it("Text: empty table is visible when nothing else is, URL exists and sourceTab != combview.", async () => {
+        const {wrapper} = await setup(store);
 
-    expect(wrapper.find(".table-container").exists()).toBe(true);
+        expect(wrapper.find(".emptynotice").exists()).toBe(false);
 
-    store.commit("SET_TABLE_CONTENT", []);
-    await wrapper.vm.$nextTick();
+        store.setTableContent([]);
+        store.setSourceTab("beatport");
+        store.setUrlExists(true);
+        await nextTick();
 
-    expect(wrapper.find(".table-container").exists()).toBe(false);
-  });
+        expect(wrapper.find(".emptynotice").exists()).toBe(true);
 
-  it("Quick guide is visible when nothing else is and sourceTab = combview.", async () => {
-    const { wrapper } = await setup(store);
+        store.setSourceTab("combview");
+        await nextTick();
 
-    expect(wrapper.find(".quickstart").exists()).toBe(false);
-
-    store.commit("SET_TABLE_CONTENT", []);
-    store.commit("SET_SOURCE_TAB", "combview");
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.find(".quickstart").exists()).toBe(true);
-  });
-
-  it("Text: empty table is visible when nothing else is, URL exists and sourceTab != combview.", async () => {
-    const { wrapper } = await setup(store);
-
-    expect(wrapper.find(".emptynotice").exists()).toBe(false);
-
-    store.commit("SET_TABLE_CONTENT", []);
-    store.commit("SET_SOURCE_TAB", "beatport");
-    store.commit("SET_URL_EXISTS", true);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.find(".emptynotice").exists()).toBe(true);
-
-    store.commit("SET_SOURCE_TAB", "combview");
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.find(".emptynotice").exists()).toBe(false);
-  });
+        expect(wrapper.find(".emptynotice").exists()).toBe(false);
+    });
 });

@@ -34,11 +34,11 @@ import SourceTable from "@/components/Content/SourceTable.vue";
 import DialogsURL from "@/components/Content/DialogsURL.vue";
 import ProgressBar from "@/components/Content/ProgressBar.vue";
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
 
-const store = useStore();
+const store = useMainStore();
 
-const previewVis = computed(() => store.state.previewVis);
+const previewVis = computed(() => store.previewVis);
 </script>
 
 <style scoped>

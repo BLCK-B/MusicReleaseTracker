@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
 import axios from "axios";
 
 defineProps({
@@ -28,7 +28,7 @@ defineProps({
 const emit = defineEmits(["close-add-new"]);
 
 const input = ref("");
-const store = useStore();
+const store = useMainStore();
 // empty input forbidden
 const rules: Array<(value: string) => boolean> = [
   (value) => !!value.trim(),
@@ -36,16 +36,16 @@ const rules: Array<(value: string) => boolean> = [
 ];
 const isValid = computed(() => rules.every((rule) => rule(input.value)));
 
-const primaryColor = computed(() => store.state.primaryColor);
+const primaryColor = computed(() => store.primaryColor);
 
 function clickAdd() {
   try {
     const artistId = String(input.value).trim();
     axios.post(`/api/artist/${artistId}`);
     input.value = "";
-    store.commit("SET_SELECTED_ARTIST", artistId);
+    store.setSelectedArtist(artistId);
     emit("close-add-new");
-    store.commit("SET_LOAD_REQUEST", true);
+    store.setLoadRequest(true);
   } catch (error) {
     console.error(error);
   }

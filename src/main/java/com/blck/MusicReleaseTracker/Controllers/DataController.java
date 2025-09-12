@@ -1,5 +1,5 @@
 
-package com.blck.MusicReleaseTracker.FrontendAPI;
+package com.blck.MusicReleaseTracker.Controllers;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DTO.MediaItemDTO;

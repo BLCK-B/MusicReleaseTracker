@@ -40,15 +40,15 @@
 
 <script setup lang="ts">
 import {computed} from "vue";
-import {useStore} from "vuex";
+import {useMainStore} from "@/store/mainStore.ts";
 import type {MediaItemType} from "@/types/MediaItemType.ts";
 import type {SongType} from "@/types/SongType.ts";
 
-const store = useStore();
+const store = useMainStore();
 
-const selectedArtist = computed(() => store.state.selectedArtist);
-const isoDates = computed(() => store.state.isoDates);
-const sourceTab = computed(() => store.state.sourceTab);
+const selectedArtist = computed(() => store.selectedArtist);
+const isoDates = computed(() => store.isoDates);
+const sourceTab = computed(() => store.sourceTab);
 
 const props = defineProps<{
   mediaItem: MediaItemType
@@ -65,7 +65,7 @@ const isDateInFuture = (dateString: string) => {
 };
 
 const isAlbum = (mediaItem: MediaItemType) => {
-  return mediaItem.songs && mediaItem.songs.length;
+  return mediaItem.album;
 };
 
 const artistColumnVisible = computed(() => {
@@ -74,7 +74,7 @@ const artistColumnVisible = computed(() => {
 
 const formatDate = (dateString: string) => {
   if (!isoDates.value) {
-    if (dateString === undefined) return dateString;
+    if (dateString === undefined) return undefined;
     const date = new Date(dateString);
     const day = date.getDate();
     const month = date.getMonth() + 1;
@@ -84,7 +84,7 @@ const formatDate = (dateString: string) => {
 };
 
 const showSongCard = (song: SongType) => {
-  store.commit("SET_SELECTED_SONG_DETAILS", song);
+  store.setSelectedSongDetails(song);
 };
 </script>
 

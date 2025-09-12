@@ -37,9 +37,10 @@
 
 <script setup lang="ts">
 import {computed, ref, watch, onMounted} from "vue";
-import {useStore} from "vuex";
 import {useRouter} from "vue-router";
+import { useMainStore } from "@/store/mainStore.ts";
 import axios from "axios";
+import type {WebSources} from "@/types/Sources.ts";
 
 const activeTab = ref("");
 const eventSource = ref<EventSource | null>(null);
@@ -49,11 +50,11 @@ const isActive = ref(false);
 const isMrtUpdate = ref(false);
 
 const router = useRouter();
-const store = useStore();
-const sourceTab = computed(() => store.state.sourceTab);
-const allowButtons = computed(() => store.state.allowButtons);
-const primaryColor = computed(() => store.state.primaryColor);
-const selectedArtist = computed(() => store.state.selectedArtist);
+const store = useMainStore();
+const sourceTab = computed(() => store.sourceTab);
+const allowButtons = computed(() => store.allowButtons);
+const primaryColor = computed(() => store.primaryColor);
+const selectedArtist = computed(() => store.selectedArtist);
 
 // trigger sourceClick if tab is not combview
 watch(sourceTab, (tabValue) => {
@@ -69,8 +70,7 @@ onMounted(() => {
         console.error(error);
       })
       .then(() => {
-        if (sourceTab.value === "") setStoreTab("combview");
-        else sourceClick(sourceTab.value);
+        sourceClick(sourceTab.value);
       });
   axios.get("/api/scrapeDate").then((response) => {
     scrapeLast.value = response.data;
@@ -80,9 +80,9 @@ onMounted(() => {
 });
 
 // set store tab, trigger sourceClick
-const setStoreTab = (source: string) => {
+const setStoreTab = (source: WebSources) => {
   if (sourceTab.value === source) source = "combview";
-  store.commit("SET_SOURCE_TAB", source);
+  store.setSourceTab(source);
 };
 
 // load respective table
@@ -95,7 +95,7 @@ const sourceClick = async (source: string) => {
         },
       })
       .then((response) => {
-        store.commit("SET_TABLE_CONTENT", response.data);
+        store.setTableContent(response.data);
       })
       .catch((error) => {
         console.error(error);
@@ -110,25 +110,25 @@ const clickScrape = () => {
       eventSource.value.close();
     }
     axios.post("/api/cancelScrape").then(() => {
-      store.commit("SET_ALLOW_BUTTONS", true);
+      store.setAllowButtons(true);
       isActive.value = false;
     });
   } else {
-    store.commit("SET_ALLOW_BUTTONS", false);
+    store.setAllowButtons(false);
     isActive.value = true;
     eventSource.value = new EventSource("http://localhost:57782/progress");
     eventSource.value.onmessage = (event) => {
       const progress = parseFloat(event.data);
-      store.commit("SET_PROGRESS", progress);
+      store.setProgress(progress);
     };
 
     axios.post("/api/scrape").then(() => {
       isActive.value = false;
-      store.commit("SET_ALLOW_BUTTONS", true);
+      store.setAllowButtons(true);
       if (eventSource.value) {
         eventSource.value.close();
       }
-      store.commit("SET_PROGRESS", 0.0);
+      store.setProgress(0.0);
 
       const currentTime = new Date();
       const time = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)
@@ -162,7 +162,7 @@ const scrapeMouseOff = () => {
 
 const openSettings = () => {
   router.push("/settings");
-  store.commit("SET_SETTINGS_OPEN", true);
+  store.setSettingsOpen(true);
 };
 
 const mrtUpdateCheck = async () => {

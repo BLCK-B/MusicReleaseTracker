@@ -3,6 +3,7 @@ package com.blck.MusicReleaseTracker.Scraping.Thumbnails;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
+import com.blck.MusicReleaseTracker.DataObjects.Album;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +37,13 @@ public class ThumbnailServiceTest {
 
     @Mock
     private HttpResponse<Path> mockResponse;
-
     private final List<MediaItem> newMediaItems = List.of(
             new Song("calling", "artist", "2026-05-21", "", "https://example1.com"),
-            new Song("change", "artist", "2024-11-15", "", "https://example2.com")
+            new Song("change", "artist", "2024-11-15", "", "https://example2.com"),
+            new Album("album", List.of(
+                    new Song("late", "artist", "2028-04-21", "", "https://example3.com"),
+                    new Song("soon", "artist", "2028-03-21", "", "https://example4.com")
+            ))
     );
 
     @Mock
@@ -73,6 +77,8 @@ public class ThumbnailServiceTest {
         Files.createFile(thumbFolder.resolve("louder20250423_20250727.jpeg"));
         Files.createFile(thumbFolder.resolve("partofme20250123_20250725.jpg"));
         Files.createFile(thumbFolder.resolve("change20241115_20250727.png"));
+        Files.createFile(thumbFolder.resolve("late20280421_20250725.png"));
+        Files.createFile(thumbFolder.resolve("soon20280321_20250725.png"));
     }
 
     void removeTestThumbnails() {
@@ -91,14 +97,15 @@ public class ThumbnailServiceTest {
 
     @Test
     void getAllThumbnailUrlsMatchingKeys() {
-        List<String> keys = List.of("calling20260521", "change20241115");
+        List<String> keys = List.of("calling20260521", "change20241115", "late20280421");
 
         List<String> urls = thumbnailService.getAllThumbnailUrlsMatchingKeys(keys);
 
         assertAll(
                 () -> assertEquals(urls.size(), keys.size()),
                 () -> assertTrue(urls.contains("/thumbnails/calling20260521_20250727.jpg")),
-                () -> assertTrue(urls.contains("/thumbnails/change20241115_20250727.png"))
+                () -> assertTrue(urls.contains("/thumbnails/change20241115_20250727.png")),
+                () -> assertTrue(urls.contains("/thumbnails/late20280421_20250725.png"))
         );
     }
 
@@ -135,7 +142,7 @@ public class ThumbnailServiceTest {
 
         thumbnailService.loadThumbnails(newMediaItems, 0);
 
-        verify(ThumbnailService.httpClient, times(2)).send(any(), any());
+        verify(ThumbnailService.httpClient, times(4)).send(any(), any());
     }
 
     @Test

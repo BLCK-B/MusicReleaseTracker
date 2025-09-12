@@ -1,96 +1,96 @@
-import { mount } from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import ArtistsAddNew from "@/components/Artists/ArtistsAddNew.vue";
-import { createStore } from "vuex";
+import {useMainStore} from "@/store/mainStore.ts";
 import axios from "axios";
-import { expect, vi, describe, beforeEach, it } from "vitest";
+import {expect, vi, describe, beforeEach, it} from "vitest";
+import {createTestingPinia} from "@pinia/testing";
 
 vi.mock("axios");
 
 describe("ArtistsAddNew.vue", () => {
-  let store;
-  let mutations;
+    let store;
 
-  beforeEach(() => {
-    mutations = {
-      SET_SELECTED_ARTIST: vi.fn(),
-      SET_LOAD_REQUEST: vi.fn(),
-    };
-
-    store = createStore({
-      state() {
-        return { primaryColor: "dark" };
-      },
-      mutations,
-    });
-    axios.get.mockClear();
-    axios.post.mockClear();
-  });
-
-  async function setup(store) {
-    const wrapper = mount(ArtistsAddNew, {
-      props: { addVisibility: true },
-      global: { plugins: [store] },
+    beforeEach(() => {
+        axios.get.mockClear();
+        axios.post.mockClear();
     });
 
-    const input = wrapper.find("input");
+    async function setup() {
+        const wrapper = mount(ArtistsAddNew, {
+            props: {addVisibility: true},
+            global: {
+                plugins: [createTestingPinia({
+                    createSpy: vi.fn,
+                    stubActions: false,
+                    initialState: {
+                        mainStore: {
+                            primaryColor: "dark"
+                        }
+                    }
+                })],
+            },
+        });
+        store = useMainStore();
 
-    const addButton = wrapper.find('[data-testid="add-button"]');
-    const closeButton = wrapper.find('[data-testid="close-button"]');
+        const input = wrapper.find("input");
 
-    return { wrapper, input, addButton, closeButton };
-  }
+        const addButton = wrapper.find('[data-testid="add-button"]');
+        const closeButton = wrapper.find('[data-testid="close-button"]');
 
-  it("Validates user input and if invalid, disables confirm button.", async () => {
-    const { wrapper, input, addButton } = await setup(store);
+        return {wrapper, input, addButton, closeButton};
+    }
 
-    // empty input forbidden
-    await input.setValue("");
-    expect(wrapper.vm.isValid).toBe(false);
-    expect(addButton.attributes("disabled")).toBeDefined();
+    it("Validates user input and if invalid, disables confirm button.", async () => {
+        const {wrapper, input, addButton} = await setup(store);
 
-    // limit input length
-    await input.setValue("A".repeat(30));
-    expect(wrapper.vm.isValid).toBe(false);
-    expect(addButton.attributes("disabled")).toBeDefined();
+        // empty input forbidden
+        await input.setValue("");
+        expect(wrapper.vm.isValid).toBe(false);
+        expect(addButton.attributes("disabled")).toBeDefined();
 
-    // valid input
-    await input.setValue("Joe");
-    expect(wrapper.vm.isValid).toBe(true);
-    expect(addButton.attributes("disabled")).toBeUndefined();
-  });
+        // limit input length
+        await input.setValue("A".repeat(30));
+        expect(wrapper.vm.isValid).toBe(false);
+        expect(addButton.attributes("disabled")).toBeDefined();
 
-  it("Emits close event when close button is clicked.", async () => {
-    const { wrapper, closeButton } = await setup(store);
+        // valid input
+        await input.setValue("Joe");
+        expect(wrapper.vm.isValid).toBe(true);
+        expect(addButton.attributes("disabled")).toBeUndefined();
+    });
 
-    await closeButton.trigger("click");
+    it("Emits close event when close button is clicked.", async () => {
+        const {wrapper, closeButton} = await setup(store);
 
-    expect(wrapper.emitted("close-add-new")).toHaveLength(1);
-  });
+        await closeButton.trigger("click");
 
-  it("Sets new artist as selected artist.", async () => {
-    const { input, addButton } = await setup(store);
+        expect(wrapper.emitted("close-add-new")).toHaveLength(1);
+    });
 
-    await input.setValue("Joe");
-    await addButton.trigger("click");
+    it("Sets new artist as selected artist.", async () => {
+        const {input, addButton} = await setup(store);
 
-    expect(mutations.SET_SELECTED_ARTIST).toHaveBeenCalledWith(expect.anything(), encodeURIComponent("Joe"));
-  });
+        await input.setValue("Joe");
+        await addButton.trigger("click");
 
-  it("Requests artistList reload when artist added.", async () => {
-    const { input, addButton } = await setup(store);
+        expect(store.selectedArtist).toBe("Joe");
+    });
 
-    await input.setValue("Joe");
-    await addButton.trigger("click");
+    it("Requests artistList reload when artist added.", async () => {
+        const {input, addButton} = await setup(store);
 
-    expect(mutations.SET_LOAD_REQUEST).toHaveBeenCalledWith(expect.anything(), true);
-  });
+        await input.setValue("Joe");
+        await addButton.trigger("click");
 
-  it("Emits close event when artist added.", async () => {
-    const { wrapper, input, addButton } = await setup(store);
+        expect(store.loadListRequest).toBe(true);
+    });
 
-    await input.setValue("Joe");
-    await addButton.trigger("click");
+    it("Emits close event when artist added.", async () => {
+        const {wrapper, input, addButton} = await setup(store);
 
-    expect(wrapper.emitted("close-add-new")).toHaveLength(1);
-  });
+        await input.setValue("Joe");
+        await addButton.trigger("click");
+
+        expect(wrapper.emitted("close-add-new")).toHaveLength(1);
+    });
 });

@@ -35,13 +35,13 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
 import PopoverCard from "../Util/PopoverCard.vue";
 
-const store = useStore();
+const store = useMainStore();
 
-const selected = computed(() => store.state.selectedSongDetails);
-const isoDates = computed(() => store.state.isoDates);
+const selected = computed(() => store.selectedSongDetails);
+const isoDates = computed(() => store.isoDates);
 
 const searchLinks = computed(() => {
   const term = encodeURIComponent(`${selected.value.artists} ${selected.value.name}`);
@@ -68,7 +68,7 @@ const formatDate = (dateString: string) => {
 };
 
 const closeCard = () => {
-  store.commit("SET_SELECTED_SONG_DETAILS", undefined);
+  store.setSelectedSongDetails(null);
 };
 </script>
 

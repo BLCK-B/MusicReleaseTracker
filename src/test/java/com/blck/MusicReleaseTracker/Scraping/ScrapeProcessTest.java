@@ -4,7 +4,7 @@ package com.blck.MusicReleaseTracker.Scraping;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
-import com.blck.MusicReleaseTracker.FrontendAPI.SseController;
+import com.blck.MusicReleaseTracker.Controllers.SseController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

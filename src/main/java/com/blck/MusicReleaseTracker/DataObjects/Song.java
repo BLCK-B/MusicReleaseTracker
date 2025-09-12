@@ -1,5 +1,7 @@
 package com.blck.MusicReleaseTracker.DataObjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -43,6 +45,7 @@ public class Song implements Comparable<Song>, MediaItem {
             this.thumbnailUrl = Optional.of(thumbnailUrl);
     }
 
+    @JsonIgnore
     @Override
     public List<Song> getSongs() {
         return List.of(this);

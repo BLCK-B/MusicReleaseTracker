@@ -1,4 +1,4 @@
-package com.blck.MusicReleaseTracker.FrontendAPI;
+package com.blck.MusicReleaseTracker.Controllers;
 
 import com.blck.MusicReleaseTracker.ServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;

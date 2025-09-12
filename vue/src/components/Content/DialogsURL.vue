@@ -6,10 +6,10 @@
         <a :href="currentSource.link" target="_blank">{{ currentSource.linkText }}</a>
       </div>
       <p v-html="currentSource.instructions"></p>
-      <input v-model="userInput" :placeholder="currentSource.placeholder" />
+      <input v-model="userInput" :placeholder="currentSource.placeholder"/>
       <button :disabled="!allowButtons" class="imgbutton" data-testid="confirm-button" @click="clickConfirmURL">
-        <img v-if="primaryColor !== 'light'" alt="OK" class="image" src="../icons/confirmdark.png" />
-        <img v-if="primaryColor === 'light'" alt="OK" class="image" src="../icons/confirmlight.png" />
+        <img v-if="primaryColor !== 'light'" alt="OK" class="image" src="../icons/confirmdark.png"/>
+        <img v-if="primaryColor === 'light'" alt="OK" class="image" src="../icons/confirmlight.png"/>
       </button>
     </div>
   </div>
@@ -17,22 +17,29 @@
 
 <script setup lang="ts">
 import axios from "axios";
-import { useStore } from "vuex";
-import { computed, ref, watch } from "vue";
+import {useMainStore} from "@/store/mainStore.ts";
+import {computed, ref, watch} from "vue";
+import type {WebSources} from "@/types/Sources.ts";
 
-const store = useStore();
+const store = useMainStore();
 
 const userInput = ref("");
-const tableData = computed(() => store.state.tableData);
-const sourceTab = computed<sourceType>(() => store.state.sourceTab);
-const allowButtons = computed(() => store.state.allowButtons);
-const selectedArtist = computed(() => store.state.selectedArtist);
-const primaryColor = computed(() => store.state.primaryColor);
-const urlExists = computed(() => store.state.urlExists);
+const tableData = computed(() => store.tableData);
+const sourceTab = computed<WebSources>(() => store.sourceTab);
+const allowButtons = computed(() => store.allowButtons);
+const selectedArtist = computed(() => store.selectedArtist);
+const primaryColor = computed(() => store.primaryColor);
+const urlExists = computed(() => store.urlExists);
 
-type sourceType = "musicbrainz" | "beatport" | "youtube";
+type SourceDetails = {
+  title: string;
+  link: string;
+  linkText: string;
+  placeholder: string;
+  instructions: string;
+};
 
-const sources = computed(() => ({
+const sources = computed<Record<WebSources, SourceDetails>>(() => ({
   musicbrainz: {
     title: "MusicBrainz",
     link: "https://musicbrainz.org",
@@ -54,6 +61,9 @@ const sources = computed(() => ({
     placeholder: "https://youtube.com/channel/UCwZEU0wAwIyZb...",
     instructions: `Find an auto-generated "Topic" channel of <b>${selectedArtist.value}</b>. Both channel ID and URL are accepted.<br/>Channel handles will not work.`,
   },
+  combview: {
+    title: "", link: "", linkText: "", placeholder: "", instructions: "",
+  }
 }));
 
 const currentSource = computed(() => sources.value[sourceTab.value]);
@@ -69,48 +79,48 @@ const clickConfirmURL = () => {
   userInput.value = "";
   if (url) {
     axios
-      .post("/api/scrapePreview", null, {
-        params: {
-          source: sourceTab.value,
-          artist: selectedArtist.value,
-          url: url,
-        },
-      })
-      .then(() => {
-        axios
-          .get("/api/tableData", {
-            params: {
-              source: sourceTab.value,
-              artist: selectedArtist.value,
-            },
-          })
-          .then((response) => {
-            store.commit("SET_TABLE_CONTENT", response.data);
-            store.commit("SET_PREVIEW_VIS", true);
-          });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+        .post("/api/scrapePreview", null, {
+          params: {
+            source: sourceTab.value,
+            artist: selectedArtist.value,
+            url: url,
+          },
+        })
+        .then(() => {
+          axios
+              .get("/api/tableData", {
+                params: {
+                  source: sourceTab.value,
+                  artist: selectedArtist.value,
+                },
+              })
+              .then((response) => {
+                store.setTableContent(response.data);
+                store.setPreviewVis(true);
+              });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
   }
 };
 
 const determineDiagShow = () => {
   if (tableData.value.length === 0) {
     axios
-      .get("/api/urlExists", {
-        params: {
-          source: sourceTab.value,
-          artist: selectedArtist.value,
-        },
-      })
-      .then((response) => {
-        store.commit("SET_URL_EXISTS", response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  } else store.commit("SET_URL_EXISTS", true);
+        .get("/api/urlExists", {
+          params: {
+            source: sourceTab.value,
+            artist: selectedArtist.value,
+          },
+        })
+        .then((response) => {
+          store.setUrlExists(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+  } else store.setUrlExists(true);
 };
 </script>
 
@@ -118,6 +128,7 @@ const determineDiagShow = () => {
 p {
   line-height: 1.4;
 }
+
 .dialog {
   width: 400px;
   height: 300px;
@@ -125,10 +136,12 @@ p {
   padding: 10px 10px 10px 12px;
   border-radius: 8px;
 }
+
 .nameLink {
   display: flex;
   align-items: center;
 }
+
 input {
   background-color: var(--duller-color);
   color: var(--contrast-color);
@@ -140,9 +153,11 @@ input {
   border-radius: 3px;
   padding-left: 5px;
 }
+
 input:focus {
   outline: none;
 }
+
 a {
   margin-left: 30px;
   padding: 6px;
@@ -152,17 +167,21 @@ a {
   font-weight: bold;
   text-decoration: none;
 }
+
 h1 {
   font-size: 18px;
   font-weight: normal;
 }
+
 button {
   color: black;
   border: none;
 }
+
 button:hover {
   opacity: 70%;
 }
+
 .imgbutton,
 .image {
   height: 26px;
@@ -171,9 +190,11 @@ button:hover {
   float: right;
   background-color: transparent;
 }
+
 .imgbutton:hover {
   opacity: 50%;
 }
+
 :disabled {
   opacity: 0.5;
   pointer-events: none;

@@ -46,26 +46,26 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
 import axios from "axios";
 import ArtistsAddNew from "@/components/Artists/ArtistsAddNew.vue";
 import ArtistsPreviewDialog from "@/components/Artists/ArtistsPreviewDialog.vue";
 
-const store = useStore();
+const store = useMainStore();
 const addVisibility = ref(false);
 const artistsArrayList = ref([]);
 const showDropdown = ref(false);
 
-const allowButtons = computed(() => store.state.allowButtons);
-const sourceTab = computed(() => store.state.sourceTab);
-const selectedArtist = computed(() => store.state.selectedArtist);
-const previewVis = computed(() => store.state.previewVis);
+const allowButtons = computed(() => store.allowButtons);
+const sourceTab = computed(() => store.sourceTab);
+const selectedArtist = computed(() => store.selectedArtist);
+const previewVis = computed(() => store.previewVis);
 
 watch(
-  () => store.state.loadListRequest,
+  () => store.loadListRequest,
   (newValue) => {
     if (newValue) {
-      store.commit("SET_LOAD_REQUEST", false);
+      store.setLoadRequest(false);
       loadList();
     }
   }
@@ -95,8 +95,8 @@ const artistSelected = async (artist: string) => {
       },
     })
     .then((response) => {
-      store.commit("SET_SELECTED_ARTIST", artist);
-      store.commit("SET_TABLE_CONTENT", response.data);
+      store.setSelectedArtist(artist);
+      store.setTableContent(response.data);
     })
     .catch((error) => {
       console.error(error);
@@ -118,8 +118,8 @@ const clickDeleteArtist = () => {
     axios
       .delete(`/api/artist/${selectedArtist.value}`)
       .then(() => {
-        store.commit("SET_SELECTED_ARTIST", "");
-        store.commit("SET_SOURCE_TAB", "combview");
+        store.setSelectedArtist("");
+        store.setSourceTab("combview")
         loadList();
       })
       .catch((error) => {

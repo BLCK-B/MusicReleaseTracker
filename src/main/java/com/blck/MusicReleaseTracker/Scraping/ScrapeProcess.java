@@ -4,7 +4,7 @@ package com.blck.MusicReleaseTracker.Scraping;
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
-import com.blck.MusicReleaseTracker.FrontendAPI.SseController;
+import com.blck.MusicReleaseTracker.Controllers.SseController;
 import com.blck.MusicReleaseTracker.Scraping.Thumbnails.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

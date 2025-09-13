@@ -1,7 +1,7 @@
 :root {
-    --primary-color: #282828;
-    --contrast-color: white;
-    --dull-color: #646464;
-    --duller-color: #404040;
-    --subtle-color: #212121;
+  --primary-color: #212121;
+  --contrast-color: white;
+  --dull-color: #5d5d5d;
+  --duller-color: #3c3c3c;
+  --subtle-color: #1a1a1a;
 }

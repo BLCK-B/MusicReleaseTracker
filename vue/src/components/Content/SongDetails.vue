@@ -44,6 +44,17 @@ const selected = computed(() => store.selectedSongDetails);
 const isoDates = computed(() => store.isoDates);
 
 const searchLinks = computed(() => {
+  if (!selected.value) {
+    return {
+      spotify: '',
+      youtube: '',
+      youtubemusic: '',
+      soundcloud: '',
+      bandcamp: '',
+      applemusic: '',
+      google: '',
+    };
+  }
   const term = encodeURIComponent(`${selected.value.artists} ${selected.value.name}`);
   return {
     spotify: `https://open.spotify.com/search/${term}`,

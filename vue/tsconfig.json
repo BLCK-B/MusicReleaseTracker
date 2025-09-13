@@ -1,15 +1,11 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
+    {
+      "path": "./tsconfig.app.json"
     },
-    "types": ["vitest/globals"]
-  },
-  "include": ["src/**/*.ts", "src/**/*.vue", "tests/**/*.ts"]
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

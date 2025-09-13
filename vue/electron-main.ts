@@ -8,7 +8,9 @@ import windowStateKeeper from "electron-window-state";
 import fs from "fs";
 import os from "os";
 
-axios.defaults.baseURL = "http://localhost:57782";
+const backendUrl = "http://localhost:57782";
+
+axios.defaults.baseURL = backendUrl;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -67,8 +69,8 @@ function createWindow() {
         return {action: "deny"};
     });
 
-    if (process.env.NODE_ENV !== "development") win.loadURL("http://localhost:57782");
-    else win.loadURL("http://localhost:57782", {extraHeaders: "Cache-Control: no-cache"});
+    if (process.env.NODE_ENV !== "development") win.loadURL(backendUrl);
+    else win.loadURL(backendUrl, {extraHeaders: "Cache-Control: no-cache"});
 
     win.once("ready-to-show", () => {
         win.show();

@@ -4,6 +4,7 @@ package com.blck.MusicReleaseTracker.Scraping.Thumbnails;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
 import java.io.File;
 
@@ -27,5 +28,11 @@ public class StaticResourceConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/thumbnails/**")
                 .addResourceLocations(getPath());
+
+        registry.addResourceHandler("/**")
+                .addResourceLocations("file:./static/")
+                .setCachePeriod(3600)
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
     }
 }

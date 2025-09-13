@@ -12,6 +12,10 @@
       {
         "from": "buildResources/MusicReleaseTracker.exe",
         "to": "buildResources/MusicReleaseTracker.exe"
+      },
+      {
+        "from": "buildResources/static",
+        "to": "buildResources/static"
       }
     ],
     "target": [

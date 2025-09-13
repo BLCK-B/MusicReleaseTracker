@@ -1,0 +1,67 @@
+{
+  "appId": "blck.mrt",
+  "productName": "MusicReleaseTracker",
+  "asar": true,
+  "directories": {
+    "output": "distribution",
+    "buildResources": "buildResources"
+  },
+  "win": {
+    "artifactName": "MRT-${version}-win.${ext}",
+    "extraFiles": [
+      {
+        "from": "buildResources/MusicReleaseTracker.exe",
+        "to": "buildResources/MusicReleaseTracker.exe"
+      }
+    ],
+    "target": [
+      "msi"
+    ],
+    "icon": "buildResources/MRTicon.ico"
+  },
+  "msi": {
+    "perMachine": true,
+    "oneClick": false,
+    "createDesktopShortcut": false,
+    "createStartMenuShortcut": true,
+    "shortcutName": "MusicReleaseTracker",
+    "runAfterFinish": false
+  },
+  "linux": {
+    "artifactName": "MRT-${version}-linux.${ext}",
+    "extraFiles": [
+      {
+        "from": "buildResources/MusicReleaseTracker",
+        "to": "buildResources/MusicReleaseTracker"
+      }
+    ],
+    "target": [
+      "AppImage"
+    ],
+    "icon": "buildResources/MRTicon.png",
+    "category": "Utility"
+  },
+  "mac": {
+    "artifactName": "MRT-${version}-mac.${ext}",
+    "extraFiles": [
+      {
+        "from": "buildResources/MusicReleaseTracker",
+        "to": "buildResources/MusicReleaseTracker"
+      }
+    ],
+    "target": [
+      {
+        "target": "dmg",
+        "arch": [
+          "arm64"
+        ]
+      }
+    ],
+    "icon": "buildResources/AplIcon.png",
+    "category": "public.app-category.utilities",
+    "darkModeSupport": true
+  },
+  "electronLanguages": [
+    "en"
+  ]
+}

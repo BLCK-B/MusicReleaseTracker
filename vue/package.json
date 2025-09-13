@@ -1,108 +1,44 @@
 {
+  "version": "11.0.0",
   "author": "BLCK",
   "name": "mrt",
-  "version": "10.1.0",
   "description": "MusicReleaseTracker",
   "type": "module",
-  "main": "electron-main.js",
+  "main": "electron-main.ts",
   "private": true,
-  "build": {
-    "directories": {
-      "output": "distribution",
-      "buildResources": "buildResources"
-    },
-    "appId": "blck.mrt",
-    "productName": "MusicReleaseTracker",
-    "asar": true,
-    "win": {
-      "artifactName": "MRT-${version}-win.${ext}",
-      "extraFiles": [
-        {
-          "from": "buildResources/MusicReleaseTracker.exe",
-          "to": "buildResources/MusicReleaseTracker.exe"
-        }
-      ],
-      "target": [
-        "msi"
-      ],
-      "icon": "buildResources/MRTicon.ico"
-    },
-    "msi": {
-      "perMachine": true,
-      "oneClick": false,
-      "createDesktopShortcut": false,
-      "createStartMenuShortcut": true,
-      "shortcutName": "MusicReleaseTracker",
-      "runAfterFinish": false
-    },
-    "linux": {
-      "artifactName": "MRT-${version}-linux.${ext}",
-      "extraFiles": [
-        {
-          "from": "buildResources/MusicReleaseTracker",
-          "to": "buildResources/MusicReleaseTracker"
-        }
-      ],
-      "target": [
-        "AppImage"
-      ],
-      "icon": "buildResources/MRTicon.png",
-      "category": "Utility"
-    },
-    "mac": {
-      "artifactName": "MRT-${version}-mac.${ext}",
-      "extraFiles": [
-        {
-          "from": "buildResources/MusicReleaseTracker",
-          "to": "buildResources/MusicReleaseTracker"
-        }
-      ],
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "arm64"
-          ]
-        }
-      ],
-      "icon": "buildResources/AplIcon.png",
-      "category": "public.app-category.utilities",
-      "darkModeSupport": true
-    },
-    "electronLanguages": [
-      "en"
-    ]
-  },
   "scripts": {
     "dev": "vite",
-    "buildVue": "vite build --emptyOutDir",
+    "build": "vue-tsc -b && vite build --emptyOutDir",
     "preview": "vite preview",
     "electron": "cross-env NODE_ENV=development electron .",
-    "distExe": "electron-builder --dir",
-    "distInstaller": "electron-builder",
-    "test": "vitest"
+    "distExe": "electron-builder --dir --config electron-build-config.json",
+    "distInstaller": "electron-builder --config electron-build-config.json"
   },
   "dependencies": {
     "axios": "^1.11.0",
     "electron-window-state": "^5.0.3",
+    "jiti": "^2.5.1",
+    "pinia": "^3.0.3",
     "vue": "^3.5.20",
-    "vue-router": "^4.5.1",
-    "vuex": "^4.1.0"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.34.0",
+    "@eslint/js": "^9.35.0",
+    "@types/node": "^24.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.43.0",
+    "@typescript-eslint/parser": "^8.43.0",
     "@vitejs/plugin-vue": "^6.0.1",
-    "@vitest/ui": "^3.1.4",
-    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.8.1",
     "cross-env": "^10.0.0",
     "electron": "^37.4.0",
     "electron-builder": "^26.0.12",
-    "eslint": "^9.34.0",
+    "eslint": "^9.35.0",
     "eslint-plugin-vue": "^10.4.0",
-    "globals": "^16.2.0",
-    "jest": "^30.1.2",
+    "globals": "^16.3.0",
     "jsdom": "^26.1.0",
-    "vite": "^7.1.3",
-    "vitest": "^3.1.4"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0",
+    "vite": "^7.1.5",
+    "vue-tsc": "^3.0.7"
   }
 }

@@ -1,17 +1,3 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2025 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
 package com.blck.MusicReleaseTracker;
 
@@ -20,6 +6,7 @@ import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DB.MigrateDB;
+import com.blck.MusicReleaseTracker.DTO.MediaItemDTO;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Misc.UpdateChecker;
@@ -33,13 +20,14 @@ import com.blck.MusicReleaseTracker.Scraping.Thumbnails.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.print.attribute.standard.Media;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * First layer to be called from ApiController
+ * First layer to be called from DataController
  */
 @Component
 public class ServiceLayer {
@@ -106,12 +94,18 @@ public class ServiceLayer {
         DB.clearArtistDataFrom(artist, table);
     }
 
-    public List<MediaItem> getTableData(TablesEnum source, String artist) {
+    public List<MediaItemDTO> getTableData(TablesEnum source, String artist) {
         if (artist == null || artist.isBlank() || source == TablesEnum.combview) {
-            return DB.loadCombviewTable();
+            return mediaItemsToDTOs(DB.loadCombviewTable());
         } else {
-            return DB.loadTable(source, artist);
+            return mediaItemsToDTOs(DB.loadTable(source, artist));
         }
+    }
+
+    private List<MediaItemDTO> mediaItemsToDTOs(List<MediaItem> items) {
+        return items.stream()
+                .map(i -> new MediaItemDTO(i.getSongs(), i.getAlbum()))
+                .toList();
     }
 
     public void fillCombview() {
@@ -142,7 +136,7 @@ public class ServiceLayer {
         DB.updateArtistSourceID(artist, source, tempID);
     }
 
-    public boolean checkExistURL(TablesEnum source, String artist) {
+    public boolean doesUrlExist(TablesEnum source, String artist) {
         if (source == TablesEnum.combview)
             return false;
         return DB.getArtistSourceID(artist, source).isPresent();

@@ -3,12 +3,6 @@
   <div class="appearancecont">
     <div class="theme-buttons">
       <input
-        :checked="primaryColor === 'black'"
-        :disabled="autoTheme"
-        type="radio"
-        @change="$emit('set-setting', 'theme', 'black')" />
-      <label :class="{ disabled: autoTheme }">Black</label>
-      <input
         :checked="primaryColor === 'dark'"
         :disabled="autoTheme"
         type="radio"
@@ -41,17 +35,24 @@
   </div>
 
   <div class="belowAppearance">
-    <input :checked="autoTheme" type="checkbox" @change="$emit('set-setting', 'autoTheme', $event.target.checked)" />
+    <input :checked="autoTheme" type="checkbox" @change="onChange" data-setting="autoTheme"/>
     <label>Match system theme</label>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   primaryColor: String,
   accentColor: String,
   autoTheme: Boolean,
 });
+
+const emit = defineEmits(['set-setting']);
+
+const onChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  emit('set-setting', target.dataset.setting, target.checked);
+};
 </script>
 
 <style scoped>
@@ -63,9 +64,11 @@ defineProps({
   accent-color: var(--dull-color);
 }
 .theme-buttons {
+  margin-top: 5px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: 30%;
+  height: 35px;
   line-height: 18px;
   padding-right: 5px;
   border-right: 2px solid var(--dull-color);

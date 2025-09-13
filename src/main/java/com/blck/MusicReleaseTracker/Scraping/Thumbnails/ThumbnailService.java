@@ -1,23 +1,10 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2025 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
 package com.blck.MusicReleaseTracker.Scraping.Thumbnails;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
+import com.blck.MusicReleaseTracker.DataObjects.Song;
 import org.jsoup.HttpStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,34 +53,36 @@ public class ThumbnailService {
             Path thumbnailsDir = Paths.get(valueStore.getAppDataPath(), "thumbnails");
 
             for (MediaItem item : mediaItems) {
-                if (scrapeCancel) {
-                    return;
+                for (Song song : item.getSongs()) {
+                    if (scrapeCancel) {
+                        return;
+                    }
+                    String key = (song.getName() + song.getDate()).toLowerCase().replaceAll("[^a-z0-9]", "");
+
+                    String url = song.getThumbnailUrl().orElse(null);
+                    if (!isValidUrl(url)) {
+                        continue;
+                    }
+
+                    if (doesThumbnailExist(thumbnailsDir, key)) {
+                        continue;
+                    }
+
+                    String fileName = key + "_" + LocalDateTime.now().format(FORMATTER) + ".jpg";
+                    Path imagePath = thumbnailsDir.resolve(fileName);
+
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .GET()
+                            .build();
+
+                    HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(imagePath));
+
+                    if (response.statusCode() != 200) {
+                        log.error(new HttpStatusException("", response.statusCode(), url), ErrorLogging.Severity.WARNING, "Thumbnail download failed.");
+                    }
+                    Thread.sleep(downloadDelay);
                 }
-                String key = (item.getName() + item.getDate()).toLowerCase().replaceAll("[^a-z0-9]", "");
-
-                String url = item.getThumbnailUrl().orElse(null);
-                if (!isValidUrl(url)) {
-                    continue;
-                }
-
-                if (doesThumbnailExist(thumbnailsDir, key)) {
-                    continue;
-                }
-
-                String fileName = key + "_" + LocalDateTime.now().format(FORMATTER) + ".jpg";
-                Path imagePath = thumbnailsDir.resolve(fileName);
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .GET()
-                        .build();
-
-                HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(imagePath));
-
-                if (response.statusCode() != 200) {
-                    log.error(new HttpStatusException("", response.statusCode(), url), ErrorLogging.Severity.WARNING, "Thumbnail download failed.");
-                }
-                Thread.sleep(downloadDelay);
             }
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "Failed to load thumbnails.");
@@ -124,7 +113,7 @@ public class ThumbnailService {
             return paths
                     .filter(path -> startsWithKey(path, keys))
                     .map(path -> "/thumbnails/" + path.getFileName()) // forward slashes intentional
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

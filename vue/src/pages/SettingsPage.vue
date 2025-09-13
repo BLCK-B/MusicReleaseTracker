@@ -39,11 +39,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { ref, computed, onBeforeMount } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
 import SettingsOther from "../components/Settings/SettingsOther.vue";
 import SettingsDangerZone from "../components/Settings/SettingsDangerZone.vue";
 import SettingsFilters from "../components/Settings/SettingsFilters.vue";
@@ -51,7 +51,7 @@ import SettingsAppearance from "../components/Settings/SettingsAppearance.vue";
 import SettingsSelf from "../components/Settings/SettingsSelf.vue";
 
 const router = useRouter();
-const store = useStore();
+const store = useMainStore();
 
 const filterRemix = ref(false);
 const filterVIP = ref(false);
@@ -64,8 +64,8 @@ const autoTheme = ref(false);
 const appVersion = ref("");
 const loadThumbnails = ref(false);
 
-const primaryColor = computed(() => store.state.primaryColor);
-const isoDates = computed(() => store.state.isoDates);
+const primaryColor = computed(() => store.primaryColor);
+const isoDates = computed(() => store.isoDates);
 
 onBeforeMount(() => {
   axios
@@ -78,8 +78,7 @@ onBeforeMount(() => {
       filterExtended.value = response.data.filterExtended === "true";
       filterRemaster.value = response.data.filterRemaster === "true";
       autoTheme.value = response.data.autoTheme === "true";
-      store.commit("SET_ISODATES", response.data.isoDates === "true");
-      if (autoTheme.value) primaryColor.value = response.data.theme;
+      store.setIsoDates(response.data.isoDates === "true")
       accentColor.value = response.data.accent;
       loadThumbnails.value = response.data.loadThumbnails === "true";
     })
@@ -98,22 +97,22 @@ onBeforeMount(() => {
 
 // close settings, trigger rebuild combview in app
 const clickClose = () => {
-  store.commit("SET_SETTINGS_OPEN", false);
+  store.setSettingsOpen(false);
   router.push("/");
 };
 
 // write single setting in config
-const setSetting = (name, value) => {
+const setSetting = (name: string, value: any) => {
   switch (name) {
     case "theme":
-      store.commit("SET_PRIMARY_COLOR", value);
+      store.setPrimaryColor(value);
       break;
     case "accent":
-      store.commit("SET_ACCENT_COLOR", value);
+      store.setAccentColor(value);
       accentColor.value = value;
       break;
     case "isoDates":
-      store.commit("SET_ISODATES", value);
+      store.setIsoDates(value);
       break;
     case "autoTheme":
       autoTheme.value = value;

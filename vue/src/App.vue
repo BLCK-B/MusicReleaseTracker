@@ -2,20 +2,22 @@
   <RouterView />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import axios from "axios";
 import { ref, computed, watch, onMounted } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
+import type {AccentColors, PrimaryThemes} from "@/types/Theming.ts";
+
 axios.defaults.baseURL = "http://localhost:57782";
 
-const store = useStore();
+const store = useMainStore();
 
-const appliedStyles = ref([]);
+const appliedStyles = ref<HTMLLinkElement[]>([]);
 const theme = ref("");
 const accent = ref("");
 
-const primaryColor = computed(() => store.state.primaryColor);
-const accentColor = computed(() => store.state.accentColor);
+const primaryColor = computed<PrimaryThemes>(() => store.primaryColor);
+const accentColor = computed<AccentColors>(() => store.accentColor);
 
 watch(primaryColor, (newTheme) => {
   theme.value = newTheme;
@@ -37,8 +39,8 @@ const loadTheme = () => {
   axios
     .get("/api/themeConfig")
     .then((response) => {
-      store.commit("SET_PRIMARY_COLOR", response.data.theme);
-      store.commit("SET_ACCENT_COLOR", response.data.accent);
+      store.setPrimaryColor(response.data.theme);
+      store.setAccentColor(response.data.accent);
     })
     .catch((error) => {
       console.error(error);
@@ -52,8 +54,8 @@ const detectTheme = () => {
     .then((response) => {
       const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
       if (response.data.autoTheme === "true") {
-        if (prefersDarkMode.matches) store.commit("SET_PRIMARY_COLOR", "black");
-        else store.commit("SET_PRIMARY_COLOR", "light");
+        if (prefersDarkMode.matches) store.setPrimaryColor("dark");
+        else store.setPrimaryColor("light");
       }
     })
     .catch((error) => {
@@ -61,7 +63,7 @@ const detectTheme = () => {
     });
 };
 
-const applyTheme = (newTheme, newAccent) => {
+const applyTheme = (newTheme: string, newAccent: string) => {
   theme.value = newTheme.toLowerCase();
   accent.value = newAccent.toLowerCase();
   // remove previously applied css

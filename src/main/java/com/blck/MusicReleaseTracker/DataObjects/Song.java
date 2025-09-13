@@ -1,61 +1,54 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2025 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.blck.MusicReleaseTracker.DataObjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Song implements Comparable<Song>, MediaItem {
 
-    private final String songName;
+    private final String name;
 
-    private final SortedSet<String> songArtists;
+    private final SortedSet<String> artists;
 
-    private final String songDate;
+    private final String date;
 
-    private final Optional<String> songType;
+    private final Optional<String> type;
 
-    private final Optional<String> songThumbnailUrl;
+    private final Optional<String> thumbnailUrl;
 
     private String album;
 
     /**
      *
-     * @param songName    name of the song
+     * @param name        name of the song
      * @param songArtists best created with just one artist
-     * @param songDate    yyyy-MM-dd
-     * @param songType    type of song for filtering purposes like remix, instrumental
+     * @param date        yyyy-MM-dd
+     * @param type        type of song for filtering purposes like remix, instrumental
      */
-    public Song(String songName, String songArtists, String songDate, String songType, String songThumbnailUrl) {
-        this.songName = songName;
-        this.songArtists = new TreeSet<>();
-        this.songArtists.add(songArtists);
-        this.songDate = songDate;
-        if (songType == null || songType.isBlank())
-            this.songType = Optional.empty();
+    public Song(String name, String songArtists, String date, String type, String thumbnailUrl) {
+        this.name = name;
+        this.artists = new TreeSet<>();
+        this.artists.add(songArtists);
+        this.date = date;
+        if (type == null || type.isBlank())
+            this.type = Optional.empty();
         else
-            this.songType = Optional.of(songType);
-        if (songThumbnailUrl == null)
-            this.songThumbnailUrl = Optional.empty();
+            this.type = Optional.of(type);
+        if (thumbnailUrl == null)
+            this.thumbnailUrl = Optional.empty();
         else
-            this.songThumbnailUrl = Optional.of(songThumbnailUrl);
+            this.thumbnailUrl = Optional.of(thumbnailUrl);
+    }
+
+    @JsonIgnore
+    @Override
+    public List<Song> getSongs() {
+        return List.of(this);
     }
 
     public String getAlbum() {
@@ -67,23 +60,23 @@ public class Song implements Comparable<Song>, MediaItem {
     }
 
     public String getName() {
-        return songName;
+        return name;
     }
 
     public String getArtists() {
-        return String.join(", ", songArtists);
+        return String.join(", ", artists);
     }
 
     public String getDate() {
-        return songDate;
+        return date;
     }
 
     public Optional<String> getType() {
-        return songType;
+        return type;
     }
 
     public Optional<String> getThumbnailUrl() {
-        return songThumbnailUrl;
+        return thumbnailUrl;
     }
 
     /**
@@ -92,7 +85,7 @@ public class Song implements Comparable<Song>, MediaItem {
      * @param artist artist to add
      */
     public void appendArtist(String artist) {
-        this.songArtists.add(artist);
+        this.artists.add(artist);
     }
 
     /**
@@ -136,7 +129,7 @@ public class Song implements Comparable<Song>, MediaItem {
 
     @Override
     public String toString() {
-        return songName + " " + getArtists() + " " + songDate +
-                (songType.map(type -> " " + type).orElse(""));
+        return name + " " + getArtists() + " " + date +
+                (type.map(type -> " " + type).orElse(""));
     }
 }

@@ -5,13 +5,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
 
-const store = useStore();
+const store = useMainStore();
 
-const progress = computed(() => store.state.progress);
+const progress = computed(() => store.progress);
 
 const progressText = computed(() => {
   return progress.value === 100 ? "Loading thumbnails..." : "Fetching data...";

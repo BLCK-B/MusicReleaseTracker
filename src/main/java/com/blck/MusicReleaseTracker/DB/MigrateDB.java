@@ -1,17 +1,3 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2025 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 
 package com.blck.MusicReleaseTracker.DB;
 
@@ -111,7 +97,7 @@ public class MigrateDB {
      * Create a new DB file to replace {@code DB} if there is a structure difference. <br/>
      * Copies over some data: see {@code copyArtistsData}.
      *
-     * @param DB current DB path
+     * @param DB         current DB path
      * @param DBtemplate temporary template DB path
      */
     public void migrateDB(Path DB, Path DBtemplate) {
@@ -162,7 +148,7 @@ public class MigrateDB {
      */
     public Map<String, ArrayList<String>> getDBStructure(Path path) {
         if (Files.notExists(path))
-            throw new RuntimeException("file " + path +  " does not exist");
+            throw new RuntimeException("file " + path + " does not exist");
 
         HashMap<String, ArrayList<String>> tableMap = new HashMap<>();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + path)) {

@@ -14,16 +14,18 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  gap: 0px;
+  margin-left: 30px;
+  margin-right: 30px;
+  gap: 0;
 }
 .blckimg {
-  height: 48px;
+  height: 36px;
   background-color: black;
   border-radius: 5px;
   padding: 12px;
 }
 .mrtimg {
-  height: 72px;
+  height: 60px;
   border-radius: 10px;
 }
 </style>

@@ -1,18 +1,3 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2025 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -76,7 +61,7 @@ public class DBqueries {
     /**
      *
      * @param source web source
-     * @param name artist name
+     * @param name   artist name
      * @return list of {@code MediaItem}, in case of source table only songs are returned
      * @see MediaItem
      */
@@ -159,7 +144,7 @@ public class DBqueries {
                     "SELECT song, artist, date, thumbnail FROM combview WHERE album = ? ORDER BY song LIMIT 100"
             );
             while (rs1.next()) {
-                final String albumName =  rs1.getString("album");
+                final String albumName = rs1.getString("album");
                 pstmt.setString(1, albumName);
                 ResultSet rs2 = pstmt.executeQuery();
                 ArrayList<Song> albumSongs = new ArrayList<>();
@@ -198,9 +183,9 @@ public class DBqueries {
     /**
      * Sets an artist's ID for a specific source in {@code artists} table.
      *
-     * @param name artist name
+     * @param name   artist name
      * @param source web source
-     * @param newID new ID for building the URL
+     * @param newID  new ID for building the URL
      */
     public void updateArtistSourceID(String name, TablesEnum source, String newID) {
         String sql;
@@ -212,8 +197,7 @@ public class DBqueries {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             if (newID == null) {
                 pstmt.setString(1, name);
-            }
-            else {
+            } else {
                 pstmt.setString(1, newID);
                 pstmt.setString(2, name);
             }
@@ -225,7 +209,7 @@ public class DBqueries {
 
     /**
      *
-     * @param name artist name
+     * @param name   artist name
      * @param source web source
      * @return artist source ID
      */
@@ -243,7 +227,8 @@ public class DBqueries {
 
     /**
      * Clears artist-related entries from a source table (best effort: appended artists). </br>
-     * @param name artist name
+     *
+     * @param name  artist name
      * @param table any table
      */
     public void clearArtistDataFrom(String name, TablesEnum table) {
@@ -306,7 +291,7 @@ public class DBqueries {
 
     /**
      *
-     *  @return list of {@code Song} since this gathers data only from source tables
+     * @return list of {@code Song} since this gathers data only from source tables
      */
     public ArrayList<Song> getSourceTablesDataForCombview() {
         var filterWords = settingsIO.getFilterValues();
@@ -324,7 +309,8 @@ public class DBqueries {
                     String songType = null;
                     try {
                         songType = rs.getString("type");
-                    } catch (Exception ignored){} // check column count?
+                    } catch (Exception ignored) {
+                    } // check column count?
                     String songThumbnail = rs.getString("thumbnail");
 
                     if (songPassesFilterCheck(new Song(songName, songArtist, songDate, songType, songThumbnail), filterWords))
@@ -338,9 +324,9 @@ public class DBqueries {
     }
 
     /**
-     *  Checks if the song name of type contains anyn of the enabled filters.
+     * Checks if the song name of type contains anyn of the enabled filters.
      *
-     * @param song object
+     * @param song        object
      * @param filterWords may contain both true and false filters
      * @return true if no matches found
      */
@@ -409,8 +395,8 @@ public class DBqueries {
      * Batch inserts songs to a source table from a list depending on the song dates - prefers newer.
      *
      * @param songList songs
-     * @param source source table
-     * @param limit max number of songs from {@code songList}
+     * @param source   source table
+     * @param limit    max number of songs from {@code songList}
      */
     public void batchInsertSongs(List<Song> songList, TablesEnum source, int limit) {
         if (source == null)
@@ -498,8 +484,8 @@ public class DBqueries {
     private List<MediaItem> disableR() {
         if (Locale.getDefault().getLanguage().equals("ru")) {
             return List.of(
-                new Song("For security, russian is disallowed.", "", "01-01-2000", null, null),
-                new Song("This can be disabled by changing system language.", "", "01-02-2000", null, null));
+                    new Song("For security, russian is disallowed.", "", "01-01-2000", null, null),
+                    new Song("This can be disabled by changing system language.", "", "01-02-2000", null, null));
         }
         return null;
     }

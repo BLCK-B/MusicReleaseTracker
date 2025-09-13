@@ -3,27 +3,27 @@
     <h1>preview</h1>
     <p v-if="!hideTable">Confirm only if the table has usable information.</p>
     <p v-if="hideTable">Incorrect link.</p>
-    <button @click="clickConfirm" class="imgbutton" :disabled="hideTable" data-testid="confirm-button">
+    <button @click="clickConfirm" class="imgbutton" :disabled="hideTable" testid="confirm-button">
       <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
       <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
     </button>
-    <button @click="clickCancel" class="imgbutton" data-testid="cancel-button">
+    <button @click="clickCancel" class="imgbutton" testid="cancel-button">
       <img v-if="primaryColor !== 'light'" class="image" src="../icons/crossdark.png" alt="X" />
       <img v-if="primaryColor === 'light'" class="image" src="../icons/crosslight.png" alt="X" />
     </button>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
-import { useStore } from "vuex";
+import { useMainStore } from "@/store/mainStore.ts";
 import axios from "axios";
 
-const store = useStore();
-const tableData = computed(() => store.state.tableData);
-const primaryColor = computed(() => store.state.primaryColor);
-const sourceTab = computed(() => store.state.sourceTab);
-const selectedArtist = computed(() => store.state.selectedArtist);
+const store = useMainStore();
+const tableData = computed(() => store.tableData);
+const primaryColor = computed(() => store.primaryColor);
+const sourceTab = computed(() => store.sourceTab);
+const selectedArtist = computed(() => store.selectedArtist);
 
 const hideTable = computed(() => tableData.value.length === 0);
 
@@ -38,7 +38,7 @@ function clickCancel() {
     .catch((error) => {
       console.error(error);
     });
-  store.commit("SET_PREVIEW_VIS", false);
+  store.setPreviewVis(false);
 }
 
 function clickConfirm() {
@@ -52,7 +52,7 @@ function clickConfirm() {
     .catch((error) => {
       console.error(error);
     });
-  store.commit("SET_PREVIEW_VIS", false);
+  store.setPreviewVis(false);
 }
 </script>
 

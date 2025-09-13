@@ -1,7 +1,7 @@
 <template>
   <div v-if="selected">
-    <div class="overlay" @click="closeCard"></div>
-    <Card :cardSize="'l'" class="details-card">
+    <div class="overlay" @mousedown="closeCard"></div>
+    <PopoverCard :cardSize="'l'" class="details-card">
       <div class="bg-helper">
         <div
           class="background-blur"
@@ -29,21 +29,32 @@
           <a :href="searchLinks.google" target="_blank" class="link">Google</a>
         </div>
       </div>
-    </Card>
+    </PopoverCard>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
-import { useStore } from "vuex";
-import Card from "../Util/Card.vue";
+import { useMainStore } from "@/store/mainStore.ts";
+import PopoverCard from "../Util/PopoverCard.vue";
 
-const store = useStore();
+const store = useMainStore();
 
-const selected = computed(() => store.state.selectedSongDetails);
-const isoDates = computed(() => store.state.isoDates);
+const selected = computed(() => store.selectedSongDetails);
+const isoDates = computed(() => store.isoDates);
 
 const searchLinks = computed(() => {
+  if (!selected.value) {
+    return {
+      spotify: '',
+      youtube: '',
+      youtubemusic: '',
+      soundcloud: '',
+      bandcamp: '',
+      applemusic: '',
+      google: '',
+    };
+  }
   const term = encodeURIComponent(`${selected.value.artists} ${selected.value.name}`);
   return {
     spotify: `https://open.spotify.com/search/${term}`,
@@ -56,7 +67,7 @@ const searchLinks = computed(() => {
   };
 });
 
-const formatDate = (dateString) => {
+const formatDate = (dateString: string) => {
   if (!isoDates.value) {
     if (dateString === undefined) return dateString;
     const date = new Date(dateString);
@@ -68,7 +79,7 @@ const formatDate = (dateString) => {
 };
 
 const closeCard = () => {
-  store.commit("SET_SELECTED_SONG_DETAILS", undefined);
+  store.setSelectedSongDetails(null);
 };
 </script>
 
@@ -109,11 +120,6 @@ const closeCard = () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.mrtlogo {
-  width: 50px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
 .info-text {
   display: flex;
   flex-direction: column;
@@ -141,7 +147,7 @@ const closeCard = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.45);
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 2;
 }
 

@@ -1,18 +1,3 @@
-/*
- *         MusicReleaseTracker
- *         Copyright (C) 2023 - 2024 BLCK
- *         This program is free software: you can redistribute it and/or modify
- *         it under the terms of the GNU General Public License as published by
- *         the Free Software Foundation, either version 3 of the License, or
- *         (at your option) any later version.
- *         This program is distributed in the hope that it will be useful,
- *         but WITHOUT ANY WARRANTY; without even the implied warranty of
- *         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *         GNU General Public License for more details.
- *         You should have received a copy of the GNU General Public License
- *         along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.blck.MusicReleaseTracker.DB;
 
 import com.blck.MusicReleaseTracker.Core.TablesEnum;
@@ -87,9 +72,9 @@ public class HelperDB {
 
     public static boolean isArtistsColumnNotEmpty(Path path, String column) {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + path)) {
-             Statement stmt = conn.createStatement();
-             ResultSet resultSet = stmt.executeQuery(
-                     "SELECT 1 FROM artists WHERE " + column + " IS NOT NULL LIMIT 1");
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery(
+                    "SELECT 1 FROM artists WHERE " + column + " IS NOT NULL LIMIT 1");
             return resultSet.next();
         } catch (SQLException e) {
             throw new RuntimeException("Error checking if column contains data", e);
@@ -131,12 +116,12 @@ public class HelperDB {
     }
 
     public static void deleteTestDBs() {
-		try {
-			Files.deleteIfExists(testDBpath);
+        try {
+            Files.deleteIfExists(testDBpath);
             Files.deleteIfExists(testTemplateDBpath);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void createArtistsTestDB(String path, int columns) {
@@ -144,23 +129,23 @@ public class HelperDB {
             Statement stmt = conn.createStatement();
             switch (columns) {
                 case 1 -> stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS artists (
-                artist text PRIMARY KEY
-                );
-                """);
+                        CREATE TABLE IF NOT EXISTS artists (
+                        artist text PRIMARY KEY
+                        );
+                        """);
                 case 2 -> stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS artists (
-                artist text PRIMARY KEY,
-                urlbeatport text
-                );
-                """);
+                        CREATE TABLE IF NOT EXISTS artists (
+                        artist text PRIMARY KEY,
+                        urlbeatport text
+                        );
+                        """);
                 case 3 -> stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS artists (
-                artist text PRIMARY KEY,
-                urlbeatport text,
-                urlmusicbrainz text
-                );
-                """);
+                        CREATE TABLE IF NOT EXISTS artists (
+                        artist text PRIMARY KEY,
+                        urlbeatport text,
+                        urlmusicbrainz text
+                        );
+                        """);
                 default -> throw new RuntimeException("invalid number");
             }
         } catch (SQLException e) {
@@ -171,12 +156,12 @@ public class HelperDB {
     public static void fillArtistsTable(Path path, int columns) {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + path)) {
             PreparedStatement pstmt = conn.prepareStatement(
-                switch (columns) {
-                    case 1 -> "INSERT INTO artists (artist) values(?)";
-                    case 2 -> "INSERT INTO artists (artist, urlbeatport) values(?, ?)";
-                    case 3 -> "INSERT INTO artists (artist, urlbeatport, urlmusicbrainz) values(?, ?, ?)";
-                    default -> throw new RuntimeException("invalid number");
-                }
+                    switch (columns) {
+                        case 1 -> "INSERT INTO artists (artist) values(?)";
+                        case 2 -> "INSERT INTO artists (artist, urlbeatport) values(?, ?)";
+                        case 3 -> "INSERT INTO artists (artist, urlbeatport, urlmusicbrainz) values(?, ?, ?)";
+                        default -> throw new RuntimeException("invalid number");
+                    }
             );
             for (int i = 0; i < 3; ++i) {
                 switch (columns) {

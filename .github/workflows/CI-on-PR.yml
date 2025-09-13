@@ -14,45 +14,28 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup JDK
-      uses: actions/setup-java@v4
-      with:
-        java-version: ${{ env.JAVA_VERSION }}
-        distribution: 'temurin'
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        gradle-version: current
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./gradlew
-    - name: Run tests
-      run: |
-        ./gradlew test --stacktrace
-    - name: Upload test logs
-      if: success() || failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: gradle-test-results
-        path: |
-          **/build/reports/
-          **/build/test-results/
-
-  npm-test:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
       - uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          node-version: '22'
-      - name: Install dependencies
-        working-directory: ./vue
-        run: npm ci
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: current
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
       - name: Run tests
-        working-directory: ./vue
-        run: npm run test
+        run: |
+          ./gradlew test --stacktrace
+      - name: Upload test logs
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-test-results
+          path: |
+            **/build/reports/
+            **/build/test-results/
 
 

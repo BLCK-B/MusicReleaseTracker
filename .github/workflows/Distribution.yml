@@ -73,7 +73,7 @@ jobs:
           cd vue
           npm run build
       - name: Move frontend files to buildResources
-        run: mv src/main/resource/static vue/buildResources/static
+        run: mv src/main/resources/static vue/buildResources/static
       - name: Build native executable
         run: |
           chmod +x ./gradlew

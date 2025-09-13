@@ -53,7 +53,7 @@ import ArtistsPreviewDialog from "@/components/Artists/ArtistsPreviewDialog.vue"
 
 const store = useMainStore();
 const addVisibility = ref(false);
-const artistsArrayList = ref([]);
+const artistsArrayList = ref<string[]>([]);
 const showDropdown = ref(false);
 
 const allowButtons = computed(() => store.allowButtons);
@@ -112,7 +112,6 @@ const closeAddNew = () => {
   loadList();
 };
 
-// delete all (last selected) artist entries from db, rebuild combview
 const deleteArtist = () => {
   if (selectedArtist.value !== "") {
     axios

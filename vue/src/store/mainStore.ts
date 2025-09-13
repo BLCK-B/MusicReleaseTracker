@@ -61,8 +61,4 @@ export const useMainStore = defineStore("main", {
             this.selectedSongDetails = selected;
         },
     },
-    getters: {
-        getPrimaryColor: (state) => state.primaryColor,
-        getAccentColor: (state) => state.accentColor,
-    },
 });

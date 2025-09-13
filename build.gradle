@@ -58,11 +58,6 @@ bootJar {
     archiveFileName = "MRT-${version}.jar"
 }
 
-// generate aot tracing - rather see contributing.md
-//bootRun {
-//    jvmArgs("-agentlib:native-image-agent=config-output-dir=tracing")
-//}
-
 sourceSets {
     main {
         resources {

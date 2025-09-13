@@ -5,14 +5,9 @@ out/
 musicdata.db
 src/test/testresources/
 
-# include (only) graal aot tracing
-build/
-
+src/main/resources/static
+build
 .gradle
-# include graal AoT tracing
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

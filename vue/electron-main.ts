@@ -2,11 +2,11 @@
 import {app, BrowserWindow, Menu, shell, dialog} from "electron";
 import path from "path";
 import {fileURLToPath} from "url";
-import {spawn} from "child_process";
 import axios from "axios";
 import windowStateKeeper from "electron-window-state";
 import fs from "fs";
 import os from "os";
+import {execFile} from "node:child_process";
 
 const backendUrl = "http://localhost:57782";
 
@@ -69,8 +69,9 @@ function createWindow() {
         return {action: "deny"};
     });
 
-    if (process.env.NODE_ENV !== "development") win.loadURL(backendUrl);
-    else win.loadURL(backendUrl, {extraHeaders: "Cache-Control: no-cache"});
+    win.webContents.session.clearCache().then(r => {
+        win.loadURL(backendUrl);
+    });
 
     win.once("ready-to-show", () => {
         win.show();
@@ -83,7 +84,6 @@ function createWindow() {
     });
 }
 
-// could be better than this polling
 async function checkBackendReady() {
     let attempts = 0;
     while (true) {
@@ -103,7 +103,7 @@ async function checkBackendReady() {
     }
 }
 
-function writeLog(message) {
+function writeLog(message: string) {
     const timestamp = new Date().toISOString();
     const logMessage = `${timestamp} - Electron log: ${message}\n`;
     console.log(logMessage);
@@ -133,7 +133,13 @@ app.whenReady().then(async () => {
                 if (contents.includes("buildResources")) {
                     writeLog("buildResources is present");
                     const truePath = path.join(currentDir, "buildResources", "MusicReleaseTracker");
-                    externalEXE = spawn(truePath, {detached: false, stdio: "ignore"});
+                    // set working directory to avoid breaking static resources of backend
+                    const options = {
+                        cwd: path.dirname(truePath),
+                        detached: false,
+                        stdio: 'ignore',
+                    };
+                    externalEXE = execFile(truePath, options);
                     break;
                 }
             } catch (e) {

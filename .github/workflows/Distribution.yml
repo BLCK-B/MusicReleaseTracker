@@ -50,7 +50,7 @@ jobs:
       fail-fast: true
       matrix:
         os: ${{fromJson(inputs.platforms)}}
-        make-native: [yes]
+        make-native: [ yes ]
     steps:
       - uses: actions/checkout@v4
       - name: Setup GraalVM
@@ -68,17 +68,17 @@ jobs:
         run: |
           cd vue
           npm ci
-      - name: Build bootJar to create file structure
+      - name: Build frontend
         run: |
-          chmod +x ./gradlew
-          ./gradlew bootJar
-      - name: Copy AOT tracing info
-        run: cp vue/buildResources/graal-tracing/* build/resources/aot/META-INF/native-image/
+          cd vue
+          npm run build
+      - name: Move frontend files to buildResources
+        run: mv src/main/resources/static vue/buildResources/static
       - name: Build native executable
         run: |
           chmod +x ./gradlew
           ./gradlew nativeCompile --stacktrace
-      - name: Move native executable
+      - name: Move native executable to buildResources
         run: mv build/native/nativeCompile/MusicReleaseTracker* vue/buildResources/
       - name: Electron builder
         run: |

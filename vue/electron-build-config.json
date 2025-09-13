@@ -2,6 +2,10 @@
   "appId": "blck.mrt",
   "productName": "MusicReleaseTracker",
   "asar": true,
+  "files": [
+    "**/*",
+    "!buildResources/**"
+  ],
   "directories": {
     "output": "distribution",
     "buildResources": "buildResources"
@@ -12,6 +16,10 @@
       {
         "from": "buildResources/MusicReleaseTracker.exe",
         "to": "buildResources/MusicReleaseTracker.exe"
+      },
+      {
+        "from": "buildResources/static",
+        "to": "buildResources/static"
       }
     ],
     "target": [
@@ -33,6 +41,10 @@
       {
         "from": "buildResources/MusicReleaseTracker",
         "to": "buildResources/MusicReleaseTracker"
+      },
+      {
+        "from": "buildResources/static",
+        "to": "buildResources/static"
       }
     ],
     "target": [
@@ -47,6 +59,10 @@
       {
         "from": "buildResources/MusicReleaseTracker",
         "to": "buildResources/MusicReleaseTracker"
+      },
+      {
+        "from": "buildResources/static",
+        "to": "buildResources/static"
       }
     ],
     "target": [
@@ -60,8 +76,5 @@
     "icon": "buildResources/AplIcon.png",
     "category": "public.app-category.utilities",
     "darkModeSupport": true
-  },
-  "electronLanguages": [
-    "en"
-  ]
+  }
 }

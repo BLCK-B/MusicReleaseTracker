@@ -26,9 +26,11 @@ public class StaticResourceConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // making thumbnails available statically from appdata
         registry.addResourceHandler("/thumbnails/**")
                 .addResourceLocations(getPath());
-
+        // not thumbnails - get frontend files from static/ next to root instead of from
+        // resources to avoid graal compiler breaking our JS files
         registry.addResourceHandler("/**")
                 .addResourceLocations("file:./static/")
                 .setCachePeriod(3600)

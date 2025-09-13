@@ -56,7 +56,7 @@ function createWindow() {
         x: mainWindowState.x,
         y: mainWindowState.y,
         webPreferences: {
-            preload: path.join(__dirname, "electron-preload.js"),
+            preload: path.join(__dirname, "electron-preload.ts"),
         },
     });
 

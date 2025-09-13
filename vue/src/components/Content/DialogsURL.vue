@@ -7,7 +7,7 @@
       </div>
       <p v-html="currentSource.instructions"></p>
       <input v-model="userInput" :placeholder="currentSource.placeholder"/>
-      <button :disabled="!allowButtons" class="imgbutton" data-testid="confirm-button" @click="clickConfirmURL">
+      <button :disabled="!allowButtons" @click="clickConfirmURL" class="imgbutton" testid="confirm-button">
         <img v-if="primaryColor !== 'light'" alt="OK" class="image" src="../icons/confirmdark.png"/>
         <img v-if="primaryColor === 'light'" alt="OK" class="image" src="../icons/confirmlight.png"/>
       </button>

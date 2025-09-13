@@ -4,7 +4,7 @@
   "name": "mrt",
   "description": "MusicReleaseTracker",
   "type": "module",
-  "main": "electron-main.js",
+  "main": "electron-main.ts",
   "private": true,
   "scripts": {
     "dev": "vite",

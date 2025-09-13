@@ -3,11 +3,11 @@
     <h1>preview</h1>
     <p v-if="!hideTable">Confirm only if the table has usable information.</p>
     <p v-if="hideTable">Incorrect link.</p>
-    <button @click="clickConfirm" class="imgbutton" :disabled="hideTable" data-testid="confirm-button">
+    <button @click="clickConfirm" class="imgbutton" :disabled="hideTable" testid="confirm-button">
       <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
       <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
     </button>
-    <button @click="clickCancel" class="imgbutton" data-testid="cancel-button">
+    <button @click="clickCancel" class="imgbutton" testid="cancel-button">
       <img v-if="primaryColor !== 'light'" class="image" src="../icons/crossdark.png" alt="X" />
       <img v-if="primaryColor === 'light'" class="image" src="../icons/crosslight.png" alt="X" />
     </button>

@@ -8,8 +8,8 @@ vi.mock("axios");
 describe("SettingsDangerZone.vue", () => {
   async function setup() {
     const wrapper = mount(SettingsDangerZone);
-    const resetSettingsBtn = wrapper.find('[data-testid="reset-settings-btn"]');
-    const resetDbBtn = wrapper.find('[data-testid="reset-db-btn"]');
+    const resetSettingsBtn = wrapper.find('[testid="reset-settings-btn"]');
+    const resetDbBtn = wrapper.find('[testid="reset-db-btn"]');
     return { wrapper, resetSettingsBtn, resetDbBtn };
   }
 

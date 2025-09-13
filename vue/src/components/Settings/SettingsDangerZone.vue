@@ -1,10 +1,10 @@
 <template>
   <p class="title">Danger zone</p>
   <div class="dangercont">
-    <button @click="resetSettings" @mouseleave="resetProtection" data-testid="reset-settings-btn">
+    <button @click="resetSettings" @mouseleave="resetProtection" testid="reset-settings-btn">
       {{ settingsProtection ? "Reset settings" : "Confirm" }}
     </button>
-    <button @click="resetDB" @mouseleave="resetProtection" data-testid="reset-db-btn">
+    <button @click="resetDB" @mouseleave="resetProtection" testid="reset-db-btn">
       {{ dbProtection ? "Reset database" : "Confirm" }}
     </button>
   </div>

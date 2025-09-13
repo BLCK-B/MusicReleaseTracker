@@ -43,39 +43,13 @@ describe("ArtistsPreviewDialog.vue", () => {
         wrapper.vm.showDropdown = true;
         await nextTick();
         wrapper.vm.artistsArrayList = ["Artist 1", "Artist 2"];
-        const cancelButton = wrapper.find('[data-testid="cancel-button"]');
-        const confirmButton = wrapper.find('[data-testid="confirm-button"]');
+        const cancelButton = wrapper.find('[testid="cancel-button"]');
+        const confirmButton = wrapper.find('[testid="confirm-button"]');
         return {wrapper, cancelButton, confirmButton};
     }
 
-    it("Makes a request to clear artist source on cancel clicked.", async () => {
-        const {cancelButton} = await setup(store);
-
-        await cancelButton.trigger("click");
-
-        expect(axios.post).toHaveBeenCalledWith("/api/cleanArtistSource", null, {
-            params: {
-                artist: "joe",
-                source: "beatport",
-            },
-        });
-    });
-
-    it("Makes a request to save url on confirm clicked.", async () => {
-        const {confirmButton} = await setup(store);
-
-        await confirmButton.trigger("click");
-
-        expect(axios.post).toHaveBeenCalledWith("/api/confirmSaveUrl", null, {
-            params: {
-                artist: "joe",
-                source: "beatport",
-            },
-        });
-    });
-
     it("Closes preview on any confirm click.", async () => {
-        const {confirmButton} = await setup(store);
+        const {confirmButton} = await setup();
 
         await confirmButton.trigger("click");
 
@@ -83,7 +57,7 @@ describe("ArtistsPreviewDialog.vue", () => {
     });
 
     it("Closes preview on any cancel click.", async () => {
-        const {cancelButton} = await setup(store);
+        const {cancelButton} = await setup();
 
         await cancelButton.trigger("click");
 

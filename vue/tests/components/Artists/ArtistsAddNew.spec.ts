@@ -34,14 +34,14 @@ describe("ArtistsAddNew.vue", () => {
 
         const input = wrapper.find("input");
 
-        const addButton = wrapper.find('[data-testid="add-button"]');
-        const closeButton = wrapper.find('[data-testid="close-button"]');
+        const addButton = wrapper.find('[testid="add-button"]');
+        const closeButton = wrapper.find('[testid="close-button"]');
 
         return {wrapper, input, addButton, closeButton};
     }
 
     it("Validates user input and if invalid, disables confirm button.", async () => {
-        const {wrapper, input, addButton} = await setup(store);
+        const {wrapper, input, addButton} = await setup();
 
         // empty input forbidden
         await input.setValue("");
@@ -60,7 +60,7 @@ describe("ArtistsAddNew.vue", () => {
     });
 
     it("Emits close event when close button is clicked.", async () => {
-        const {wrapper, closeButton} = await setup(store);
+        const {wrapper, closeButton} = await setup();
 
         await closeButton.trigger("click");
 
@@ -68,7 +68,7 @@ describe("ArtistsAddNew.vue", () => {
     });
 
     it("Sets new artist as selected artist.", async () => {
-        const {input, addButton} = await setup(store);
+        const {input, addButton} = await setup();
 
         await input.setValue("Joe");
         await addButton.trigger("click");
@@ -77,7 +77,7 @@ describe("ArtistsAddNew.vue", () => {
     });
 
     it("Requests artistList reload when artist added.", async () => {
-        const {input, addButton} = await setup(store);
+        const {input, addButton} = await setup();
 
         await input.setValue("Joe");
         await addButton.trigger("click");
@@ -86,7 +86,7 @@ describe("ArtistsAddNew.vue", () => {
     });
 
     it("Emits close event when artist added.", async () => {
-        const {wrapper, input, addButton} = await setup(store);
+        const {wrapper, input, addButton} = await setup();
 
         await input.setValue("Joe");
         await addButton.trigger("click");

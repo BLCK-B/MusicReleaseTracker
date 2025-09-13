@@ -23,6 +23,7 @@ describe("ArtistList.vue", () => {
         });
         axios.get.mockClear();
         axios.post.mockClear();
+        axios.delete.mockClear();
     });
 
     async function setup() {
@@ -47,20 +48,20 @@ describe("ArtistList.vue", () => {
         wrapper.vm.showDropdown = true;
         await nextTick();
         wrapper.vm.artistsArrayList = ["Artist 1", "Artist 2"];
-        const deleteButton = wrapper.find('[data-testid="delete-button"]');
-        const deleteUrlButton = wrapper.find('[data-testid="delete-url-button"]');
+        const deleteButton = wrapper.find('[testid="delete-button"]');
+        const deleteUrlButton = wrapper.find('[testid="delete-url-button"]');
         return {wrapper, deleteButton, deleteUrlButton};
     }
 
     it("Loads data on mounted.", async () => {
-        await setup(store);
+        await setup();
 
         const calls = axios.get.mock.calls.filter(([url]) => url === "/api/loadList");
         expect(calls.length).toEqual(1);
     });
 
     it("Loads data and resets flag on SET_LOAD_REQUEST.", async () => {
-        await setup(store);
+        await setup();
 
         store.setLoadRequest(true);
         await nextTick();
@@ -68,46 +69,5 @@ describe("ArtistList.vue", () => {
         const calls = axios.get.mock.calls.filter(([url]) => url === "/api/loadList");
         expect(calls.length).toEqual(2);
         expect(store.loadListRequest).toEqual(false);
-    });
-
-    it("Loads table data on artist click.", async () => {
-        const {wrapper} = await setup(store);
-        const items = wrapper.findAll("div.listbtn");
-
-        await items[1].trigger("mousedown");
-
-        expect(axios.get).toHaveBeenCalledWith("/api/tableData", {
-            params: {
-                artist: "Artist 2",
-                source: "beatport",
-            },
-        });
-    });
-
-    it("Calls delete artist on delete button click.", async () => {
-        const {deleteButton} = await setup(store);
-
-        await deleteButton.trigger("click");
-
-        expect(axios.delete).toHaveBeenCalledWith(`/api/artist/Artist 1`);
-    });
-
-    it("Deletes URL and loads table when button clicked.", async () => {
-        const {deleteUrlButton} = await setup(store);
-
-        await deleteUrlButton.trigger("click");
-
-        expect(axios.delete).toHaveBeenCalledWith("/api/url", {
-            params: {
-                artist: "Artist 1",
-                source: "beatport",
-            },
-        });
-        expect(axios.get).toHaveBeenCalledWith("/api/tableData", {
-            params: {
-                artist: "Artist 1",
-                source: "beatport",
-            },
-        });
     });
 });

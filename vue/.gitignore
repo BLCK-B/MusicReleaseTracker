@@ -28,3 +28,4 @@ coverage
 *.sw?
 
 out/
+/buildResources/static/

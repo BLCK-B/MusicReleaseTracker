@@ -38,8 +38,6 @@ If you find a bug, which may well happen, report it at the [issue tracker](https
 
 For compilation and contribution, see [CONTRIBUTING.md](https://github.com/BLCK-B/MusicReleaseTracker/blob/main/CONTRIBUTING.md).
 
-<img src="https://img.shields.io/github/commits-since/BLCK-B/musicreleasetracker/latest">
-
 ---
 
 **Responsibility**:

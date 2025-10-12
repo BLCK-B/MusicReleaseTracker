@@ -2,14 +2,10 @@ Most issues and suggestions can be resolved via issues or discussions tab, respe
 
 You can contribute to code, e.g. a bugfix, if you wish. For any larger change and/or guidance, please ask beforehand.
 
-To submit a change:
-
 - create a fork
 - clone repository, push your changes to fork
 - run tests
 - submit a pull request
-
-New tests that verify your change are required, at least where possible.
 
 ---
 
@@ -17,14 +13,13 @@ New tests that verify your change are required, at least where possible.
 
 - fork
 - git clone your fork
-- in your IDE, set up Java SDK for project and Gradle
+- in IDE, set up Java SDK for project and Gradle
 - sync Gradle
 - `cd vue` `npm install`
 
 ## Tests
 
-Backend tests can be found in `src/test/`. Right click the folder or `./gradlew test` to run them. Frontend tests are
-in `vue/tests/`. They are run with `npm run test`.
+Backend tests can be found in `src/test/`. Right click the folder or `./gradlew test` to run them.
 
 ## Run
 
@@ -37,23 +32,14 @@ port)
 
 ## Distribution
 
-If you *need* distribution details, ask or refer to [blog (2024)](https://blck-b.github.io/post/java-native-pipe/).
-
 `cd vue` `npm run build` - build frontend static files
 
 `./gradlew bootJar` - build executable jar in `build/libs`
 
-`./gradlew nativeCompile` - (needs GraalVM) native backend compilation to `build/native/nativeCompile`
+`./gradlew nativeCompile` - (needs Graal JDK) native backend compilation to `build/native/nativeCompile`
 
 scripts in `vue/package.json` - use these to export electron
 
-### No-nonsense distribution
+### Pipeline
 
-Generate static frontend files: `npm run build`. Build bootJar in `build/libs/`: `./gradlew bootJar`. Run using args
-below and click through all you can - every setting, every menu. Ctrl+C to shut down. Copy whatever is in `tracing` in
-same dir over to `vue/buildResources/graal-tracing`. Push. Rest is handled by pipeline.
-
-### Tracing
-
-Generating graal aot `tracing` works for me only by running the generated bootJar with arguments: `java -jar 
--agentlib:native-image-agent=config-output-dir=tracing MRT-X.jar`
+Distribution is manually triggered in [Actions](https://github.com/BLCK-B/MusicReleaseTracker/blob/main/.github/workflows/Distribution.yml). Build-related resources are located in `vue/buildResources`, which is also used by the pipeline. No steps are needed to make a release, just run the workflow. App version is specified in `application.properties` and in `package.json`.

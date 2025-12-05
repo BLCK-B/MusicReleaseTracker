@@ -2,9 +2,9 @@
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.7'
+    id 'org.springframework.boot' version '4.0.0'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.graalvm.buildtools.native' version '0.10.6'
+    id 'org.graalvm.buildtools.native' version '0.11.3'
 }
 
 group 'com.blck'
@@ -32,12 +32,12 @@ graalvmNative {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(23)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
 dependencies {
-    implementation 'org.xerial:sqlite-jdbc:3.47.0.0'
+    implementation 'org.xerial:sqlite-jdbc:3.51.1.0'
     implementation 'org.jsoup:jsoup:1.21.2'
 
     testImplementation(platform('org.junit:junit-bom:6.0.1'))
@@ -47,7 +47,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.20.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

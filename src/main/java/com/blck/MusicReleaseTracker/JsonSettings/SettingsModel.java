@@ -1,8 +1,8 @@
 
 package com.blck.MusicReleaseTracker.JsonSettings;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * The default settings file definition. The enum specifies options which are then converted to JSON representation.
@@ -19,8 +19,7 @@ public enum SettingsModel {
     filterRemaster(false),
     filterRemix(false),
     filterVIP(false),
-    loadThumbnails(true),
-    flippedThumbSwitch(false); // TODO: next release
+    loadThumbnails(true);
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

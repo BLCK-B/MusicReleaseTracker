@@ -12,6 +12,9 @@ updates:
         update-types:
           - "patch"
           - "minor"
+    ignore:
+      - dependency-name: "org.graalvm.buildtools.native"
+        versions: [ ">=0.10.6" ]
   - package-ecosystem: "npm"
     directory: "/vue"
     schedule:

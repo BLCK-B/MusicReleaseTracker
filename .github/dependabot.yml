@@ -13,8 +13,6 @@ updates:
           - "patch"
           - "minor"
     ignore:
-      - dependency-name: "org.xerial:sqlite-jdbc"
-        versions: [ ">=3.47.0.0" ]
       - dependency-name: "org.graalvm.buildtools.native"
         versions: [ ">=0.10.6" ]
   - package-ecosystem: "npm"

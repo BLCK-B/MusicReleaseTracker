@@ -33,8 +33,7 @@ public final class ScraperYoutube extends Scraper {
 
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
-        if (isIDnull)
-            return;
+        if (isIDnull) return;
 
         String url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
 

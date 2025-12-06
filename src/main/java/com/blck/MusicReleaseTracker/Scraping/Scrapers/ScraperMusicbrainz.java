@@ -32,8 +32,7 @@ public final class ScraperMusicbrainz extends Scraper {
 
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
-        if (isIDnull)
-            return;
+        if (isIDnull) return;
 
         String url = "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
 

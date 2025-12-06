@@ -83,10 +83,6 @@ public class Main {
             startSetup.createDirs();
             manageDB.migrateDB(store.getDBpath(), store.getDBpathTemplate());
             settingsIO.updateSettings();
-            if (settingsIO.readSetting("flippedThumbSwitch").equals("false")) { // TODO: next release
-                settingsIO.writeSetting("loadThumbnails", "true");
-                settingsIO.writeSetting("flippedThumbSwitch", "true");
-            }
             if (settingsIO.readSetting("theme").equals("black")) { // TODO: future release
                 settingsIO.writeSetting("theme", "dark");
             }

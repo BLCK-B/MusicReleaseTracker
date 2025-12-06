@@ -3,9 +3,10 @@ package com.blck.MusicReleaseTracker.JsonSettings;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.JsonNodeException;
+import tools.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,7 @@ public class SettingsIO {
         File jsonFile = new File(String.valueOf(store.getConfigPath()));
         var fileContents = readJsonFile(jsonFile);
         HashMap<String, String> filterWords = new HashMap<>();
-        fileContents.fieldNames().forEachRemaining(fieldName -> {
+        fileContents.propertyNames().forEach(fieldName -> {
             if (fieldName.contains("filter"))
                 filterWords.put(fieldName, fileContents.get(fieldName).asText());
         });
@@ -83,7 +84,7 @@ public class SettingsIO {
     public void migrateDataToReference(JsonNode reference, JsonNode current) {
         if (current == null)
             return;
-        current.fieldNames().forEachRemaining(fieldName -> {
+        current.propertyNames().forEach(fieldName -> {
             if (reference.has(fieldName))
                 ((ObjectNode) reference).set(fieldName, current.get(fieldName));
         });
@@ -113,7 +114,7 @@ public class SettingsIO {
     public JsonNode readJsonFile(File file) {
         try {
             return objectMapper.readTree(file);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.WARNING, "error reading settings file - defaulting");
             defaultSettings();
         }

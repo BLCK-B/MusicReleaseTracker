@@ -10,7 +10,6 @@ import tools.jackson.databind.ObjectMapper;
 public enum SettingsModel {
     theme("dark"),
     accent("cactus"),
-    lastScrape("-"),
     isoDates(false),
     autoTheme(true),
     filterAcoustic(false),
@@ -19,6 +18,8 @@ public enum SettingsModel {
     filterRemaster(false),
     filterRemix(false),
     filterVIP(false),
+    filterRework(false),
+    filterPreview(false),
     loadThumbnails(true);
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import {computed, ref, watch, onMounted} from "vue";
 import {useRouter} from "vue-router";
-import { useMainStore } from "@/store/mainStore.ts";
+import {useMainStore} from "@/store/mainStore.ts";
 import axios from "axios";
 import type {WebSources} from "@/types/Sources.ts";
 
@@ -72,9 +72,7 @@ onMounted(() => {
       .then(() => {
         sourceClick(sourceTab.value);
       });
-  axios.get("/api/scrapeDate").then((response) => {
-    scrapeLast.value = response.data;
-  });
+  scrapeLast.value = localStorage.getItem("scrapeLast") ?? "-";
 
   mrtUpdateCheck();
 });
@@ -131,23 +129,17 @@ const clickScrape = () => {
       store.setProgress(0.0);
 
       const currentTime = new Date();
-      const time = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)
+      const formattedTime = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)
           .toString()
           .padStart(2, "0")} ${currentTime.getHours().toString().padStart(2, "0")}:${currentTime
           .getMinutes()
           .toString()
           .padStart(2, "0")}`;
 
-      scrapeLast.value = time;
+      scrapeLast.value = formattedTime;
       scrapeDateInfo.value = true;
       sourceClick("combview");
-      const params = new URLSearchParams({
-        name: "lastScrape",
-        value: time,
-      });
-      axios.put(`/api/setting?${params.toString()}`).catch((error) => {
-        console.error(error);
-      });
+      localStorage.setItem("scrapeLast", JSON.stringify(formattedTime));
     });
   }
 };

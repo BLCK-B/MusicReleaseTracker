@@ -182,11 +182,6 @@ public class ServiceLayer {
         return themesMap;
     }
 
-    public String getScrapeDate() {
-        store.setScrapeDate(settingsIO.readSetting("lastScrape"));
-        return store.getScrapeDate();
-    }
-
     public void resetSettings() {
         settingsIO.defaultSettings();
     }

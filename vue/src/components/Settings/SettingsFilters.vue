@@ -1,5 +1,5 @@
 <template>
-  <p><span class="title">Exclusion filters</span><br/>Select song types to be hidden.</p>
+  <p><span class="title">Exclusion filters</span><br/>Select song types you want to hide.</p>
 
   <div class="filters-buttons">
     <div>

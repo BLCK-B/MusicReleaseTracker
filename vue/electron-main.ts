@@ -1,12 +1,12 @@
 /* eslint-disable no-undef */
 import {app, BrowserWindow, Menu, shell, dialog} from "electron";
-import path from "path";
 import {fileURLToPath} from "url";
 import axios from "axios";
 import windowStateKeeper from "electron-window-state";
-import fs from "fs";
-import os from "os";
-import {execFile} from "node:child_process";
+import * as path from "path";
+import * as fs from "fs";
+import * as os from "os";
+import {type ChildProcess, execFile} from "node:child_process";
 
 const backendUrl = "http://localhost:57782";
 
@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const logFilePath = getLogPath();
 
 function getLogPath() {
-    let appDataPath;
+    let appDataPath = '';
     switch (process.platform) {
         case "win32":
             appDataPath = app.getPath("appData");
@@ -34,7 +34,7 @@ function getLogPath() {
 
 app.disableHardwareAcceleration();
 
-let externalEXE;
+let externalEXE: ChildProcess | undefined;
 
 function createWindow() {
     if (process.env.NODE_ENV !== "development") Menu.setApplicationMenu(null);
@@ -107,12 +107,12 @@ function writeLog(message: string) {
     const timestamp = new Date().toISOString();
     const logMessage = `${timestamp} - Electron log: ${message}\n`;
     console.log(logMessage);
-    fs.appendFile(logFilePath, logMessage, (err) => {
+    fs.appendFile(logFilePath, logMessage, (err: any) => {
         if (err) console.error("Error writing to log", err);
     });
 }
 
-function electronStartErrorDialog(error) {
+function electronStartErrorDialog(error: any) {
     dialog.showErrorBox(
         `Error: ${error.message}`,
         `Please report this at the issue tracker.\n\nThe error logs file is located in: ${logFilePath}`

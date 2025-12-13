@@ -28,11 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import ArtistList from "@/components/Artists/ArtistList.vue";
-import SourceMenu from "@/components/Bar/SourceMenu.vue";
-import SourceTable from "@/components/Content/SourceTable.vue";
-import DialogsURL from "@/components/Content/DialogsURL.vue";
-import ProgressBar from "@/components/Content/ProgressBar.vue";
+import * as ProgressBar from "@/components/Content/ProgressBar.vue";
+import * as ArtistList from "@/components/Artists/ArtistList.vue";
+import * as SourceMenu from "@/components/Bar/SourceMenu.vue";
+import * as SourceTable from "@/components/Content/SourceTable.vue";
+import * as DialogsURL from "@/components/Content/DialogsURL.vue";
 import { computed } from "vue";
 import { useMainStore } from "@/store/mainStore.ts";
 

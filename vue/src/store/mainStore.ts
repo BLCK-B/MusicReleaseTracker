@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import type {MediaItemType} from "@/types/MediaItemType.ts";
-import type {AccentColors, PrimaryThemes} from "@/types/Theming";
+import type {AccentColors, PrimaryThemes} from "@/types/Theming.ts";
 import type {SongType} from "@/types/SongType.ts";
 import type {WebSources} from "@/types/Sources.ts";
 

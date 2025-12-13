@@ -20,7 +20,6 @@ export default [
                 extraFileExtensions: [".vue"]
             }
         },
-        rules: {
-        }
+        rules: {}
     }
 ];

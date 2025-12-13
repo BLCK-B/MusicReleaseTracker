@@ -33,7 +33,6 @@ public class MigrateDB {
      * @param path DB file path
      */
     public void createDBandTables(Path path) {
-        // note: generate by string templates after preview
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + path)) {
             Statement stmt = conn.createStatement();
 

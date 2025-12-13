@@ -27,7 +27,7 @@ public class UpdateChecker {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode node = mapper.readTree(json);
 
-            StringBuilder latestVersion = new StringBuilder(node.path("tag_name").asText());
+            StringBuilder latestVersion = new StringBuilder(node.path("tag_name").asString());
             if (latestVersion == null) {
                 log.error(new Exception(), ErrorLogging.Severity.INFO, "Missing version tag in GitHub API response.");
                 return false;

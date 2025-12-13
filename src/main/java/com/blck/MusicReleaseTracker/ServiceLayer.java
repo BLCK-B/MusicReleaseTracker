@@ -20,7 +20,6 @@ import com.blck.MusicReleaseTracker.Scraping.Thumbnails.ThumbnailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.print.attribute.standard.Media;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;

@@ -6,6 +6,7 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import com.blck.MusicReleaseTracker.DB.MigrateDB;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -46,13 +47,14 @@ public class Main {
         this.appConfig = appConfig;
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
 
     /**
      * CORS redirect mapping for dev cross-origin permission TODO: chrome again
      */
+    @NullMarked
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -64,6 +66,7 @@ public class Main {
         };
     }
 
+    @NullMarked
     @Component
     public class StartupRunner implements CommandLineRunner {
         /**

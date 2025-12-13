@@ -167,6 +167,7 @@ const setSetting = (name: string, value: any) => {
   background-color: transparent;
   border: none;
   transition: 0s;
+  cursor: pointer;
 }
 
 .crossImgButton:hover {

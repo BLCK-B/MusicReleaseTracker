@@ -128,18 +128,20 @@ const clickScrape = () => {
       }
       store.setProgress(0.0);
 
-      const currentTime = new Date();
-      const formattedTime = `${currentTime.getDate().toString().padStart(2, "0")}.${(currentTime.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")} ${currentTime.getHours().toString().padStart(2, "0")}:${currentTime
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`;
+      const today = new Date();
+      const formattedTime = new Intl.DateTimeFormat("de-DE", {
+            day: "2-digit",
+            month: "2-digit",
+          }).format(today) + " " +
+        new Intl.DateTimeFormat("de-DE", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(today);
 
       scrapeLast.value = formattedTime;
       scrapeDateInfo.value = true;
       sourceClick("combview");
-      localStorage.setItem("scrapeLast", JSON.stringify(formattedTime));
+      localStorage.setItem("scrapeLast", formattedTime);
     });
   }
 };
@@ -189,6 +191,7 @@ const mrtUpdateCheck = async () => {
   font-weight: bold;
   flex-grow: 1;
   height: 38px;
+  cursor: pointer;
 }
 
 .imageSettings,
@@ -209,6 +212,7 @@ const mrtUpdateCheck = async () => {
   width: 35px;
   background-color: var(--accent-color);
   margin-right: 8px;
+  cursor: pointer;
 }
 
 .scrapeButton {
@@ -219,6 +223,7 @@ const mrtUpdateCheck = async () => {
   width: 35px;
   margin-right: 19px;
   border-radius: 50px;
+  cursor: pointer;
 }
 
 .scrapeActive {

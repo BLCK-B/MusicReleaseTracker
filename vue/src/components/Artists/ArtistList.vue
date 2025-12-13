@@ -1,43 +1,43 @@
 <template>
   <div v-if="!previewVis">
-    <div class="artistListNormal">
-      <div class="buttonspace">
-        <button :disabled="!allowButtons" class="addbtn" @mousedown="addArtist">add artist</button>
-        <button class="morebtn" @click="showMore()">more</button>
-        <div v-if="showDropdown" class="dropdown">
-          <button
-              :disabled="sourceTab == null || sourceTab === 'combview' || selectedArtist === '' || !allowButtons"
-              @click="deleteUrl"
-              class="deletebtn"
-              testid="delete-url-button">
-            delete selected URL
-          </button>
-          <button
-              :disabled="selectedArtist === '' || !allowButtons"
-              @click="deleteArtist"
-              class="deletebtn"
-              testid="delete-button">
-            delete artist
-          </button>
+    <div class="buttonspace">
+      <button :disabled="!allowButtons" class="addbtn" @mousedown="addArtist">add artist</button>
+      <button class="morebtn" @click="showMore()">more</button>
+      <div v-show="showDropdown" class="dropdown">
+        <button
+            :disabled="sourceTab == null || sourceTab === 'combview' || selectedArtist === '' || !allowButtons"
+            @click="deleteUrl"
+            class="deletebtn"
+            testid="delete-url-button">
+          delete selected URL
+        </button>
+        <button
+            :disabled="selectedArtist === '' || !allowButtons"
+            @click="deleteArtist"
+            class="deletebtn"
+            testid="delete-button">
+          delete artist
+        </button>
+      </div>
+    </div>
+
+    <ArtistsAddNew :addVisibility="addVisibility" @close-add-new="closeAddNew"/>
+
+    <div class="artistlist">
+      <div
+          v-for="item in artistsArrayList"
+          :key="item"
+          :class="{ highlighted: item === selectedArtist }"
+          class="listbtn"
+          @mousedown="artistSelected(item)">
+        <div class="listitems">
+          {{ item }}
         </div>
       </div>
-
-      <ArtistsAddNew :addVisibility="addVisibility" @close-add-new="closeAddNew"/>
-
-      <div class="artistlist">
-        <div
-            v-for="item in artistsArrayList"
-            :key="item"
-            :class="{ highlighted: item === selectedArtist }"
-            class="listbtn"
-            @mousedown="artistSelected(item)">
-          <div class="listitems">
-            {{ item }}
-          </div>
-        </div>
-        <!-- adding height for enabling scroll all the way -->
-        <div v-for="item in artistsArrayList" :key="item"></div>
-      </div>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
     </div>
   </div>
 
@@ -162,6 +162,7 @@ button {
   background-color: var(--duller-color);
   color: var(--contrast-color);
   opacity: 0.85;
+  cursor: pointer;
 }
 
 button:hover {
@@ -182,6 +183,7 @@ button:active {
   overflow: hidden;
   padding-left: 6px;
   margin: 0 0 0 2px;
+  cursor: pointer;
 }
 
 .artistlist {
@@ -207,8 +209,8 @@ button:active {
 
 .dropdown {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  display: flex;
+  flex-direction: column;
   background-color: var(--subtle-color);
   padding-right: 11px;
   padding-left: 7px;

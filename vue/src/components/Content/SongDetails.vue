@@ -37,10 +37,11 @@
 import { computed } from "vue";
 import { useMainStore } from "@/store/mainStore.ts";
 import PopoverCard from "../Util/PopoverCard.vue";
+import type {SongType} from "@/types/SongType.ts";
 
 const store = useMainStore();
 
-const selected = computed(() => store.selectedSongDetails);
+const selected = computed<SongType | null>(() => store.selectedSongDetails);
 const isoDates = computed(() => store.isoDates);
 
 const searchLinks = computed(() => {

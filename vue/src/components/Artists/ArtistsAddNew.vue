@@ -30,9 +30,9 @@ const emit = defineEmits(["close-add-new"]);
 const input = ref("");
 const store = useMainStore();
 // empty input forbidden
-const rules: Array<(value: string) => boolean> = [
-  (value) => !!value.trim(),
-  (value) => (value || "").length <= 25
+const rules = [
+  (value: string) => !!value.trim(),
+  (value: string) => (value || "").length <= 25
 ];
 const isValid = computed(() => rules.every((rule) => rule(input.value)));
 

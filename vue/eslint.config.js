@@ -12,16 +12,15 @@ export default [
     {
         files: ["**/*.ts", "**/*.vue"],
         languageOptions: {
-            parser: vueParser,       // ✅ parser object, not string
+            parser: vueParser,
             parserOptions: {
-                parser: tsParser,      // ✅ TS parser inside <script lang="ts">
+                parser: tsParser,
                 ecmaVersion: 2023,
                 sourceType: "module",
                 extraFileExtensions: [".vue"]
             }
         },
         rules: {
-            // TS-specific rules go here
         }
     }
 ];

@@ -69,7 +69,7 @@ function createWindow() {
         return {action: "deny"};
     });
 
-    win.webContents.session.clearCache().then(r => {
+    win.webContents.session.clearCache().then(() => {
         win.loadURL(backendUrl);
     });
 

@@ -31,9 +31,4 @@ public class MiscController {
     public boolean isNewUpdate() {
         return serviceLayer.isNewUpdate();
     }
-
-    @GetMapping("/scrapeDate")
-    public String scrapeDate() {
-        return serviceLayer.getScrapeDate();
-    }
 }

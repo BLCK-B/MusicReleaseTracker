@@ -5,7 +5,6 @@ import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.Core.ValueStore;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.exc.JsonNodeException;
 import tools.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,9 @@ import java.util.stream.Collectors;
 public class SettingsIO {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final ValueStore store;
+
     private final ErrorLogging log;
 
     @Autowired
@@ -45,7 +46,7 @@ public class SettingsIO {
         HashMap<String, String> filterWords = new HashMap<>();
         fileContents.propertyNames().forEach(fieldName -> {
             if (fieldName.contains("filter"))
-                filterWords.put(fieldName, fileContents.get(fieldName).asText());
+                filterWords.put(fieldName, fileContents.get(fieldName).asString());
         });
         return filterWords;
     }
@@ -142,7 +143,7 @@ public class SettingsIO {
     public String readSetting(String setting) {
         File jsonFile = new File(String.valueOf(store.getConfigPath()));
         try {
-            return readJsonFile(jsonFile).get(setting).asText();
+            return readJsonFile(jsonFile).get(setting).asString();
         } catch (NullPointerException e) {
             log.error(e, ErrorLogging.Severity.WARNING, "setting " + setting + " does not exist");
         }
@@ -173,7 +174,7 @@ public class SettingsIO {
         var allSettings = readJsonFile(jsonFile);
         return Arrays.stream(SettingsModel.values())
                 .collect(Collectors.toMap(
-                        Enum::name, setting -> allSettings.get(setting.name()).asText()
+                        Enum::name, setting -> allSettings.get(setting.name()).asString()
                 ));
     }
 

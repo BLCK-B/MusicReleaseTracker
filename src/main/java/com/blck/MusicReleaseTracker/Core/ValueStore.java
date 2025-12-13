@@ -21,8 +21,6 @@ public class ValueStore {
 
     private Path errorLogsPath;
 
-    private String scrapeDate;
-
     private String appVersion;
 
     private boolean backendReady = false;
@@ -81,14 +79,6 @@ public class ValueStore {
 
     public void setErrorLogsPath(Path errorLogsPath) {
         this.errorLogsPath = errorLogsPath;
-    }
-
-    public String getScrapeDate() {
-        return scrapeDate;
-    }
-
-    public void setScrapeDate(String scrapeDate) {
-        this.scrapeDate = scrapeDate;
     }
 
     @Override

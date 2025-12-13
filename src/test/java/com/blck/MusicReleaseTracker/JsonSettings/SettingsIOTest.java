@@ -62,7 +62,6 @@ public class SettingsIOTest {
         assertTrue(settingsIO.readJsonFile(settingsFile).size() > 1);
     }
 
-
     @Test
     void readJsonFileParseExceptionTriggersReset() throws IOException {
         try (FileWriter writer = new FileWriter(settingsFile)) {

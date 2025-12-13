@@ -1,7 +1,7 @@
 name: Bug Report
 description: Report an issue or unexpected behavior
 title: "[Bug]: "
-labels: ["bug"]
+labels: [ "bug" ]
 body:
   - type: markdown
     attributes:
@@ -12,24 +12,24 @@ body:
       label: Guidelines
       options:
         - label: I have searched the issue tracker for similar issues.
-          required: true
+          required: false
         - label: This issue contains only one bug or bugs with a common origin.
-          required: true
+          required: false
   - type: input
     attributes:
       label: MusicReleaseTracker version
     validations:
-      required: true
+      required: false
   - type: input
     attributes:
       label: Operating system
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: Bug description and reproduction steps
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: Additional information

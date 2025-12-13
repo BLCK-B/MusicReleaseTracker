@@ -42,24 +42,24 @@ type SourceDetails = {
 const sources = computed<Record<WebSources, SourceDetails>>(() => ({
   musicbrainz: {
     title: "MusicBrainz",
-    link: "https://musicbrainz.org",
+    link: `https://musicbrainz.org/search?query=${selectedArtist.value}&type=artist`,
     linkText: "musicbrainz.org",
     placeholder: "https://musicbrainz.org/artist/id/...",
-    instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
+    instructions: `Find <b>${selectedArtist.value}</b> on the website and copy URL of their page.<br/>This source does not provide thumbnails.`,
   },
   beatport: {
     title: "Beatport",
-    link: "https://beatport.com",
+    link: `https://www.beatport.com/search?q=${selectedArtist.value}`,
     linkText: "beatport.com",
     placeholder: "https://beatport.com/artist/artistname/id/...",
-    instructions: `Find <b>${selectedArtist.value}</b> on the site and copy URL.`,
+    instructions: `Find <b>${selectedArtist.value}</b> on the website and copy URL of their page.`,
   },
   youtube: {
     title: "Youtube",
-    link: "https://youtube.com",
+    link: `https://www.youtube.com/results?search_query=${selectedArtist.value}+-+topic&sp=EgIQAg%253D%253D`,
     linkText: "youtube.com",
     placeholder: "https://youtube.com/channel/UCwZEU0wAwIyZb...",
-    instructions: `Find an auto-generated "Topic" channel of <b>${selectedArtist.value}</b>. Both channel ID and URL are accepted.<br/>Channel handles will not work.`,
+    instructions: `Find an auto-generated channel called <b>${selectedArtist.value} - Topic</b>. You can find it by searching the artist name on YT and filtering by channels. Or try the link above.<br/>A channel ID and URL are supported. Channel handles will not work.`,
   },
   combview: {
     title: "", link: "", linkText: "", placeholder: "", instructions: "",

@@ -110,6 +110,7 @@ th {
   white-space: nowrap;
   overflow: hidden;
   margin-left: 8px;
+  cursor: pointer;
 }
 
 .tdalbumname {

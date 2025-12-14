@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build --emptyOutDir",
+    "build": "vue-tsc && vite build --emptyOutDir",
     "preview": "vite preview",
     "electron": "cross-env NODE_ENV=development electron .",
     "distExe": "electron-builder --dir --config electron-build-config.json",

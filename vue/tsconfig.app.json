@@ -19,6 +19,7 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true
   },
   "include": [
     "src/**/*.ts",

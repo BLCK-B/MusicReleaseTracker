@@ -49,7 +49,7 @@ import {useMainStore} from "@/store/mainStore.ts";
 import SettingsOther from "../components/Settings/SettingsOther.vue";
 import SettingsDangerZone from "../components/Settings/SettingsDangerZone.vue";
 import SettingsFilters from "../components/Settings/SettingsFilters.vue";
-import * as SettingsAppearance from "../components/Settings/SettingsAppearance.vue";
+import SettingsAppearance from "../components/Settings/SettingsAppearance.vue";
 import SettingsSelf from "../components/Settings/SettingsSelf.vue";
 
 const router = useRouter();

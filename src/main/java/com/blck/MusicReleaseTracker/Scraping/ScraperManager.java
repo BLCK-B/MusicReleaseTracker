@@ -101,11 +101,10 @@ public class ScraperManager {
      * @param e       exception thrown by {@code scraper}
      */
     private void scrapeErrorLaunder(int i, Scraper scraper, Exception e) {
-        i += 1;
         if (e instanceof ScraperTimeoutException)
-            log.error(e, ErrorLogging.Severity.INFO, scraper + " scraper threw " + e + " " + i + " times, " + e.getMessage());
+            log.error(e, ErrorLogging.Severity.INFO, scraper + " scraper threw " + e + " " + (i + 1) + " times, " + e.getMessage());
         else
-            log.error(e, ErrorLogging.Severity.WARNING, scraper + " scraper threw " + e + " " + i + " times, " + e.getMessage());
+            log.error(e, ErrorLogging.Severity.WARNING, scraper + " scraper threw " + e + " " + (i + 1) + " times, " + e.getMessage());
         // remove scrapers of a faulty source
         if (i == 2)
             scrapers.removeIf(s -> s.getClass().equals(scraper.getClass()));

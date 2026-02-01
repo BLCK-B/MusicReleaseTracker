@@ -13,6 +13,9 @@ import org.jsoup.nodes.Document;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 public final class ScraperYoutube extends Scraper {
 
@@ -48,16 +51,24 @@ public final class ScraperYoutube extends Scraper {
         }
 
         String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
-        String[] datesDirtyArray = doc.select("published").eachText().toArray(new String[0]);
+        String[] publishedDatesArray = doc.select("published").eachText().toArray(new String[0]);
+        String[] mediaDescriptionDatesArray = doc.select("media\\:description").eachText().toArray(new String[0]);
         String[] thumbnailUrlArray = doc.select("media\\:thumbnail").eachAttr("url").toArray(new String[0]);
 
         // cut date to yyyy-MM-dd
-        String[] datesArray = Arrays.stream(datesDirtyArray)
+        String[] publishedDates = Arrays.stream(publishedDatesArray)
                 .map(date -> date.substring(0, 10))
                 .toArray(String[]::new);
-        // first index is channel name
+
+        // remove first index, which is the channel name
         songsArray = Arrays.copyOfRange(songsArray, 1, songsArray.length);
-        datesArray = Arrays.copyOfRange(datesArray, 1, datesArray.length);
+        publishedDates = Arrays.copyOfRange(publishedDates, 1, publishedDates.length);
+
+        // topic channels contain a "published on" date in description, which is the real release date
+        String[] mediaDescriptionDates = extractDateFromDescription(mediaDescriptionDatesArray);
+
+        // date in the description seems to exist only when the video is uploaded later than release
+        String[] datesArray = mergeDescriptionAndPublishedDates(mediaDescriptionDates, publishedDates);
 
         super.source = TablesEnum.youtube;
         super.insertSet(
@@ -69,6 +80,29 @@ public final class ScraperYoutube extends Scraper {
                                 null,
                                 List.of(thumbnailUrlArray)
                         )));
+    }
+
+    public String[] extractDateFromDescription(String[] descriptionArray) {
+        Pattern releasedOnPattern = Pattern.compile("Released on:\\s*(\\d{4}-\\d{2}-\\d{2})");
+        return Arrays.stream(descriptionArray)
+                .map(desc -> {
+                    Matcher matcher = releasedOnPattern.matcher(desc);
+                    return matcher.find() ? matcher.group(1) : "";
+                })
+                .toArray(String[]::new);
+    }
+
+    public String[] mergeDescriptionAndPublishedDates(String[] preferredDates, String[] defaultDates) {
+        if (preferredDates.length != defaultDates.length) return defaultDates;
+
+        return IntStream.range(0, preferredDates.length)
+                .mapToObj(i -> {
+                    if (!preferredDates[i].isEmpty()) {
+                        return preferredDates[i];
+                    }
+                    return defaultDates[i];
+                })
+                .toArray(String[]::new);
     }
 
     @Override

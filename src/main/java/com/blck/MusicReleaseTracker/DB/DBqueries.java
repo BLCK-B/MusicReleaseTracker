@@ -484,8 +484,8 @@ public class DBqueries {
     private List<MediaItem> disableR() {
         if (Locale.getDefault().getLanguage().equals("ru")) {
             return List.of(
-                    new Song("For security, russian is disallowed.", "", "01-01-2000", null, null),
-                    new Song("This can be disabled by changing system language.", "", "01-02-2000", null, null));
+                    new Song("For security, russian is disallowed.", "", "01-01-2000", null, null)
+            );
         }
         return null;
     }

@@ -14,7 +14,6 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
   </a>
 </p>
 
- 
 ##
 
 <p align="center">
@@ -24,9 +23,13 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 
 ##
 
-You will no longer have to search social media or streaming services. Never miss a new song or album again. You can choose exactly which sources to use, and which artists to track. Latest information is compiled into a simple overview. This is achieved through custom processing.
+You will no longer have to search on social media or streaming services for new songs. You can choose exactly which
+sources to use,
+and which artists to track. Latest information is compiled into one simple overview.
+This is achieved through custom processing.
 
-For the latest information, press the refresh button. Combining more sources means that you are less likely to miss anything. Best of all, you don’t need any accounts - MRT runs locally on your computer.
+For the latest information, press the refresh button. Combining more sources means that you are less likely to miss
+anything. Best of all, you don’t need any accounts - MRT runs locally on your computer.
 
 Currently available sources: `Beatport`, `Musicbrainz` and `Youtube`.
 
@@ -34,9 +37,11 @@ Currently available sources: `Beatport`, `Musicbrainz` and `Youtube`.
 
 **Issue reporting and contributing**
 
-If you find a bug, which may well happen, report it at the [issue tracker](https://github.com/BLCK-B/MusicReleaseTracker/issues). An [email](https://github.com/BLCK-B) is acceptable, too.
+If you find a bug, which may well happen, report it at
+the [issue tracker](https://github.com/BLCK-B/MusicReleaseTracker/issues).
 
-For compilation and contribution, see [CONTRIBUTING.md](https://github.com/BLCK-B/MusicReleaseTracker/blob/main/CONTRIBUTING.md).
+For compilation and contribution,
+see [CONTRIBUTING.md](https://github.com/BLCK-B/MusicReleaseTracker/blob/main/CONTRIBUTING.md).
 
 ---
 
@@ -51,4 +56,6 @@ I have no affiliation with any of the external sources and websites.
 License
 -
 
-MusicReleaseTracker is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+MusicReleaseTracker is free software: you can redistribute it and/or modify it under the terms of
+the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.

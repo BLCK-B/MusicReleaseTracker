@@ -83,12 +83,12 @@ public class ScrapeProcessTest {
     void takeOlderSongArtistDuplicate() {
         List<Song> songList = List.of(
                 new Song("song", "artist", "2022-02-02", null, null),
-                new Song("song", "artist", "2023-01-01", null, null),
+                new Song("song", "artist", "2023-01-01", null, "example.com"),
                 new Song("song", "artist", "2022-01-01", null, null));
 
         List<Song> output = scrapeProcess.mergeNameArtistDuplicates(songList);
 
-        Song expected = new Song("song", "artist", "2022-01-01", null, null);
+        Song expected = new Song("song", "artist", "2022-01-01", null, "example.com");
         assertThat(expected).dataMatches(output.getFirst());
     }
 
@@ -108,12 +108,12 @@ public class ScrapeProcessTest {
         List<Song> songList = List.of(
                 new Song("song", "zilch", "2022-01-01", null, null),
                 new Song("song", "bob", "2022-01-01", null, null),
-                new Song("song", "joe", "2022-01-01", null, null),
+                new Song("song", "joe", "2022-01-01", null, "example.com"),
                 new Song("song", "joe", "2022-01-01", null, null));
 
         List<Song> output = scrapeProcess.mergeNameDateDuplicates(songList);
 
-        Song expected = new Song("song", "bob, joe, zilch", "2022-01-01", null, null);
+        Song expected = new Song("song", "bob, joe, zilch", "2022-01-01", null, "example.com");
         assertThat(expected).dataMatches(output.getFirst());
     }
 
@@ -183,11 +183,11 @@ public class ScrapeProcessTest {
     @Test
     void mergeSongsWithinDaysApart() {
         List<Song> songList = List.of(
-                new Song("song", "artist", "2020-01-05", null, null),
+                new Song("song", "artist", "2020-01-05", null, "example.com"),
                 new Song("song", "artist", "2020-01-04", null, null),
                 new Song("song", "artist", "2022-10-01", null, null));
         List<Song> expected = List.of(
-                new Song("song", "artist", "2020-01-04", null, null),
+                new Song("song", "artist", "2020-01-04", null, "example.com"),
                 new Song("song", "artist", "2022-10-01", null, null));
 
         List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
@@ -201,8 +201,8 @@ public class ScrapeProcessTest {
         List<Song> songList = List.of(
                 new Song("song", "joe", "2020-01-05", null, null),
                 new Song("song", "bob", "2020-01-03", null, null),
-                new Song("song", "zilch", "2020-01-04", null, null));
-        Song expected = new Song("song", "bob, joe, zilch", "2020-01-03", null, null);
+                new Song("song", "zilch", "2020-01-04", null, "example.com"));
+        Song expected = new Song("song", "bob, joe, zilch", "2020-01-03", null, "example.com");
 
         List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
 
@@ -226,9 +226,9 @@ public class ScrapeProcessTest {
     void identicalSongsSameDate() {
         List<Song> songList = List.of(
                 new Song("song", "artist", "2020-01-05", null, null),
-                new Song("song", "artist", "2020-01-05", null, null));
+                new Song("song", "artist", "2020-01-05", null, "example.com"));
         List<Song> expected = List.of(
-                new Song("song", "artist", "2020-01-05", null, null));
+                new Song("song", "artist", "2020-01-05", null, "example.com"));
 
         List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 1);
 

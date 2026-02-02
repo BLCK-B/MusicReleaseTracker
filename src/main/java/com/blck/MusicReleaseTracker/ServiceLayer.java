@@ -127,7 +127,7 @@ public class ServiceLayer {
             scraper.scrape(25000);
             tempID = id;
         } catch (Exception e) {
-            log.error(e, ErrorLogging.Severity.WARNING, "error scraping " + source + ", perhaps an incorrect link");
+            log.error(e, ErrorLogging.Severity.INFO, "error scraping " + source + ", perhaps an incorrect link: " + e.getMessage());
         }
     }
 

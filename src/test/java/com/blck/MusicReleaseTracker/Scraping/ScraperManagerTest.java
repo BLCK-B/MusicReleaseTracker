@@ -86,7 +86,7 @@ class ScraperManagerTest {
     }
 
     @Test
-    void erroringSourceCausesWarningLogAndIsRemoved() throws ScraperTimeoutException, ScraperGenericException {
+    void erroringSourceLogsWarningsAndIsRemoved() throws ScraperTimeoutException, ScraperGenericException {
         doThrow(ScraperGenericException.class).when(scraperMB).scrape(anyInt());
         doThrow(ScraperGenericException.class).when(scraperBP).scrape(anyInt());
         insertScrapers();
@@ -99,7 +99,7 @@ class ScraperManagerTest {
 
     @Test
     void delaysReturnsZeroWhenWaitedLongerThatMinDelay() {
-        assertEquals(scraperManager.delays("musicbrainz"), 0);
+        assertEquals(0, scraperManager.delays("musicbrainz"));
     }
 
     @Test

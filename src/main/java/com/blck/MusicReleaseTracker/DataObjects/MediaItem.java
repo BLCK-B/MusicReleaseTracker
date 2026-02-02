@@ -17,5 +17,5 @@ public interface MediaItem {
 
     String getDate();
 
-    Optional<String> getThumbnailUrl();
+    String getThumbnailUrl();
 }

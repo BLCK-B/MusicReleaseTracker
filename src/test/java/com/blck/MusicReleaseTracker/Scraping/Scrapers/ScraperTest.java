@@ -92,4 +92,41 @@ public class ScraperTest {
         assertEquals("123-id-123", scraperYT.getID());
     }
 
+    @Test
+    void youtubeExtractDateFromDescription() {
+        ScraperYoutube scraperYT = new ScraperYoutube(null, null, null, null, "https://www.youtube.com/channel/123-id-123");
+        String description1 = """
+                Provided to YouTube by Sound Recordings · Dimension · Karen ℗ 2025
+                Under exclusive licence Released on: 2025-12-05 Sound Recordings
+                Associated Performer: Dimension x Karen
+                """;
+        String description2 = """
+                Live from AIR Studios by Dimension & Karen is available to download now. Follow Dimension: https://www.example.com
+                Follow Karen: https://www.example.com/
+                """;
+
+        var result = scraperYT.extractDateFromDescription(new String[]{description1, description2});
+
+        assertEquals(2, result.length);
+        assertEquals("2025-12-05", result[0]);
+        assertEquals("", result[1]);
+    }
+
+    @Test
+    void youtubeMergeDescriptionAndPublishedDates() {
+        ScraperYoutube scraperYT = new ScraperYoutube(null, null, null, null, "https://www.youtube.com/channel/123-id-123");
+        var preferredDates = new String[]{"a", "", "b", "c"};
+        var preferredDatesMissing = new String[]{"a", "b"};
+        var defaultDates = new String[]{"x", "x", "x", "x"};
+
+        assertArrayEquals(
+                new String[]{"a", "x", "b", "c"},
+                scraperYT.mergeDescriptionAndPublishedDates(preferredDates, defaultDates)
+        );
+        assertArrayEquals(
+                defaultDates,
+                scraperYT.mergeDescriptionAndPublishedDates(preferredDatesMissing, defaultDates)
+        );
+    }
+
 }

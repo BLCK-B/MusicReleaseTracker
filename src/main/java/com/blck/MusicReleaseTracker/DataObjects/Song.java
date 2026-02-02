@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -17,9 +16,9 @@ public class Song implements Comparable<Song>, MediaItem {
 
     private final String date;
 
-    private final Optional<String> type;
+    private final String type;
 
-    private final Optional<String> thumbnailUrl;
+    private String thumbnailUrl;
 
     private String album;
 
@@ -35,14 +34,8 @@ public class Song implements Comparable<Song>, MediaItem {
         this.artists = new TreeSet<>();
         this.artists.add(songArtists);
         this.date = date;
-        if (type == null || type.isBlank())
-            this.type = Optional.empty();
-        else
-            this.type = Optional.of(type);
-        if (thumbnailUrl == null)
-            this.thumbnailUrl = Optional.empty();
-        else
-            this.thumbnailUrl = Optional.of(thumbnailUrl);
+        this.type = type;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     @JsonIgnore
@@ -71,12 +64,16 @@ public class Song implements Comparable<Song>, MediaItem {
         return date;
     }
 
-    public Optional<String> getType() {
+    public String getType() {
         return type;
     }
 
-    public Optional<String> getThumbnailUrl() {
+    public String getThumbnailUrl() {
         return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     /**
@@ -129,7 +126,8 @@ public class Song implements Comparable<Song>, MediaItem {
 
     @Override
     public String toString() {
-        return name + " " + getArtists() + " " + date +
-                (type.map(type -> " " + type).orElse(""));
+        String stringType = type == null ? "" : " " + type;
+        String stringThumbnailUrl = thumbnailUrl == null ? "" : " " + thumbnailUrl;
+        return name + " " + getArtists() + " " + date + stringType + stringThumbnailUrl;
     }
 }

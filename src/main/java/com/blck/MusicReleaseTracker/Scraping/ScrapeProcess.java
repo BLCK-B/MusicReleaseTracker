@@ -110,12 +110,11 @@ public class ScrapeProcess {
      * @return list of songs with merged duplicates
      */
     public List<Song> mergeNameArtistDuplicates(List<Song> songList) {
-        Map<String, Song> nameArtistMap =
-                songList.stream()
-                        .collect(Collectors.toUnmodifiableMap(
-                                key -> noSpacesLowerCase(key.getName() + key.getArtists()),
-                                key -> key, this::getOlderDateSong
-                        ));
+        Map<String, Song> nameArtistMap = songList.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        key -> noSpacesLowerCase(key.getName() + key.getArtists()),
+                        key -> key, this::getOlderDateSong
+                ));
         return new ArrayList<>(nameArtistMap.values());
     }
 
@@ -133,15 +132,17 @@ public class ScrapeProcess {
      * @return list of songs with merged duplicates
      */
     public List<Song> mergeNameDateDuplicates(List<Song> songList) {
-        Map<String, Song> nameDateMap =
-                songList.stream()
-                        .collect(Collectors.toUnmodifiableMap(
-                                key -> noSpacesLowerCase(key.getName() + key.getDate()),
-                                key -> key, (existingValue, newValue) -> {
-                                    existingValue.appendArtist(newValue.getArtists());
-                                    return existingValue;
-                                }
-                        ));
+        Map<String, Song> nameDateMap = songList.stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        key -> noSpacesLowerCase(key.getName() + key.getDate()),
+                        key -> key, (existingValue, newValue) -> {
+                            existingValue.appendArtist(newValue.getArtists());
+                            if (existingValue.getThumbnailUrl() == null && newValue.getThumbnailUrl() != null) {
+                                existingValue.setThumbnailUrl(newValue.getThumbnailUrl());
+                            }
+                            return existingValue;
+                        }
+                ));
         return new ArrayList<>(nameDateMap.values());
     }
 
@@ -163,21 +164,20 @@ public class ScrapeProcess {
      */
     public List<Song> mergeSongsWithinDaysApart(List<Song> songList, int maxDays) {
         List<Song> tempList = new ArrayList<>();
-        Map<String, Song> nameArtistMap =
-                songList.stream()
-                        .collect(Collectors.toMap(
-                                key -> noSpacesLowerCase(key.getName()),
-                                key -> key, (existing, replacement) -> {
-                                    Song older = getOlderDateSong(existing, replacement);
-                                    Song newer = getNewerDateSong(existing, replacement);
-                                    if (!existing.getArtists().equalsIgnoreCase(replacement.getArtists()))
-                                        older.appendArtist(newer.getArtists());
-                                    if (getDayDifference(existing, replacement) > maxDays)
-                                        tempList.add(newer);
-                                    return older;
-                                },
-                                LinkedHashMap::new
-                        ));
+        Map<String, Song> nameArtistMap = songList.stream()
+                .collect(Collectors.toMap(
+                        key -> noSpacesLowerCase(key.getName()),
+                        key -> key, (existing, replacement) -> {
+                            Song older = getOlderDateSong(existing, replacement);
+                            Song newer = getNewerDateSong(existing, replacement);
+                            if (!existing.getArtists().equalsIgnoreCase(replacement.getArtists()))
+                                older.appendArtist(newer.getArtists());
+                            if (getDayDifference(existing, replacement) > maxDays)
+                                tempList.add(newer);
+                            return older;
+                        },
+                        LinkedHashMap::new
+                ));
         tempList.forEach(s -> nameArtistMap.put(s.getDate() + s.getArtists(), s));
         return new ArrayList<>(
                 nameArtistMap.values()).stream()
@@ -193,11 +193,10 @@ public class ScrapeProcess {
      * @return list of songs with and without album identifiers
      */
     public List<Song> groupSameDateArtistSongs(List<Song> songList, int atLeast) {
-        Map<String, List<Song>> artistSameDayCounts =
-                songList.stream()
-                        .collect(Collectors.groupingBy(
-                                song -> noSpacesLowerCase(song.getArtists() + song.getDate())
-                        ));
+        Map<String, List<Song>> artistSameDayCounts = songList.stream()
+                .collect(Collectors.groupingBy(
+                        song -> noSpacesLowerCase(song.getArtists() + song.getDate())
+                ));
         for (List<Song> group : artistSameDayCounts.values()) {
             if (group.size() >= atLeast)
                 group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.getFirst().getArtists()));
@@ -233,7 +232,12 @@ public class ScrapeProcess {
         try {
             Date existingDate = dateFormat.parse(song1.getDate());
             Date newDate = dateFormat.parse(song2.getDate());
-            return existingDate.before(newDate) ? song1 : song2;
+            Song olderSong = existingDate.before(newDate) ? song1 : song2;
+            Song newerSong = existingDate.before(newDate) ? song2 : song1;
+            if (olderSong.getThumbnailUrl() == null && newerSong.getThumbnailUrl() != null) {
+                olderSong.setThumbnailUrl(newerSong.getThumbnailUrl());
+            }
+            return olderSong;
         } catch (ParseException e) {
             log.error(e, ErrorLogging.Severity.SEVERE, "incorrect date format");
         }

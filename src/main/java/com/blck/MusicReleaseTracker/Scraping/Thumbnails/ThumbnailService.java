@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -59,7 +58,7 @@ public class ThumbnailService {
                     }
                     String key = (song.getName() + song.getDate()).toLowerCase().replaceAll("[^a-z0-9]", "");
 
-                    String url = song.getThumbnailUrl().orElse(null);
+                    String url = song.getThumbnailUrl();
                     if (!isValidUrl(url)) {
                         continue;
                     }

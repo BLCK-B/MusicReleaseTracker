@@ -41,7 +41,7 @@ public class SongTest {
     void argumentNullTypeIsEmpty() {
         Song song = new Song("song", "artist", "date", null, null);
 
-        assertThat(song.getType()).isEmpty();
+        assertThat(song.getType()).isNull();
     }
 
     @Test

@@ -336,15 +336,16 @@ public class DBqueries {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
 
-        if (song.getType().isEmpty())
+        if (song.getType() == null) {
             return disabledWords.stream()
                     .map(this::getRealFilterName)
                     .noneMatch(disabledWord -> song.getName().toLowerCase().contains(disabledWord.toLowerCase()));
-        else
+        } else {
             return disabledWords.stream()
                     .map(this::getRealFilterName)
-                    .noneMatch(disabledWord -> song.getType().get().toLowerCase().contains(disabledWord.toLowerCase()) ||
+                    .noneMatch(disabledWord -> song.getType().toLowerCase().contains(disabledWord.toLowerCase()) ||
                             song.getName().toLowerCase().contains(disabledWord.toLowerCase()));
+        }
     }
 
     private String getRealFilterName(String settingName) {
@@ -405,24 +406,25 @@ public class DBqueries {
             throw new RuntimeException("use dedicated combview insert method");
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             String sql;
-            if (songList.getFirst().getType().isPresent())
+            if (songList.getFirst().getType() != null) {
                 sql = "insert into " + source + "(song, artist, date, type, thumbnail) values(?, ?, ?, ?, ?)";
-            else
+            } else {
                 sql = "insert into " + source + "(song, artist, date, thumbnail) values(?, ?, ?, ?)";
+            }
             PreparedStatement pstmt = conn.prepareStatement(sql);
             int i = 0;
             for (Song songObject : songList) {
-                if (i == limit)
-                    break;
+                if (i == limit) break;
+
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());
 
-                if (songList.getFirst().getType().isPresent()) {
-                    pstmt.setString(4, songObject.getType().get());
-                    pstmt.setString(5, songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null);
+                if (songList.getFirst().getType() != null) {
+                    pstmt.setString(4, songObject.getType());
+                    pstmt.setString(5, songObject.getThumbnailUrl());
                 } else {
-                    pstmt.setString(4, songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null);
+                    pstmt.setString(4, songObject.getThumbnailUrl());
                 }
                 ++i;
                 pstmt.addBatch();
@@ -450,7 +452,7 @@ public class DBqueries {
             for (Song songObject : songList) {
                 if (i == combviewSize)
                     break;
-                String thumbnailUrl = songObject.getThumbnailUrl().isPresent() ? songObject.getThumbnailUrl().get() : null;
+                String thumbnailUrl = songObject.getThumbnailUrl();
                 pstmt.setString(1, songObject.getName());
                 pstmt.setString(2, songObject.getArtists());
                 pstmt.setString(3, songObject.getDate());

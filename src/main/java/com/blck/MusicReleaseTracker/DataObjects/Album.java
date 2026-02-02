@@ -32,7 +32,7 @@ public record Album(String album, List<Song> songs) implements MediaItem {
     }
 
     @Override
-    public Optional<String> getThumbnailUrl() {
+    public String getThumbnailUrl() {
         return songs.getFirst().getThumbnailUrl();
     }
 }

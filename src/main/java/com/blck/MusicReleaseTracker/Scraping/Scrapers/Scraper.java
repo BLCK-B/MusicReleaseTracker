@@ -97,8 +97,8 @@ public abstract class Scraper {
                 .map(song -> new Song(unifyAphostrophes(song.getName()),
                         song.getArtists(),
                         song.getDate(),
-                        song.getType().orElse(""),
-                        song.getThumbnailUrl().orElse("")
+                        song.getType(),
+                        song.getThumbnailUrl()
                 ))
                 .sorted((song1, song2) -> song1.compareDates(song2, formatter))
                 .distinct() // remove all name duplicates but the oldest by date

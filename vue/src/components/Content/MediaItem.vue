@@ -107,10 +107,10 @@ th {
 
 .tdsong {
   width: 80%;
-  white-space: nowrap;
-  overflow: hidden;
   margin-left: 8px;
   cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .tdalbumname {

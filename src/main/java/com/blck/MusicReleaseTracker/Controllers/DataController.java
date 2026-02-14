@@ -5,7 +5,9 @@ import com.blck.MusicReleaseTracker.Core.TablesEnum;
 import com.blck.MusicReleaseTracker.DTO.MediaItemDTO;
 import com.blck.MusicReleaseTracker.ServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +54,11 @@ public class DataController {
         return serviceLayer.doesUrlExist(TablesEnum.valueOf(source), artist);
     }
 
+    @GetMapping("/sourcesWithUrl")
+    public List<TablesEnum> sourcesWithUrl(@RequestParam String artist) {
+        return serviceLayer.sourcesWithUrl(artist);
+    }
+
     @PostMapping("/confirmSaveUrl")
     public void confirmSaveUrl(@RequestParam String source, @RequestParam String artist) {
         serviceLayer.saveUrl(TablesEnum.valueOf(source), artist);
@@ -93,4 +100,13 @@ public class DataController {
         serviceLayer.resetDB();
     }
 
+    @GetMapping("/getDBfile")
+    public Resource getDBfile() {
+        return serviceLayer.getDBfile();
+    }
+
+    @PostMapping("/uploadDBfile")
+    public void uploadDBfile(@RequestParam("file") MultipartFile file) {
+        serviceLayer.uploadDBfile(file);
+    }
 }

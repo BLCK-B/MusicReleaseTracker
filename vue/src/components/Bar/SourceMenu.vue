@@ -1,11 +1,25 @@
 <template>
   <div class="wrapper">
     <div class="tabs">
-      <div :class="{ active: activeTab === 'beatport' }" class="sourceTab" @mousedown="setStoreTab('beatport')">BP</div>
-      <div :class="{ active: activeTab === 'musicbrainz' }" class="sourceTab" @mousedown="setStoreTab('musicbrainz')">
+      <div
+          :class="{ active: activeTab === 'beatport', notEmpty: sourceHasUrl.beatport }"
+          class="sourceTab"
+          @mousedown="setStoreTab('beatport')">
+        BP
+      </div>
+      <div
+          :class="{ active: activeTab === 'musicbrainz', notEmpty: sourceHasUrl.musicbrainz }"
+          class="sourceTab"
+          @mousedown="setStoreTab('musicbrainz')"
+      >
         MB
       </div>
-      <div :class="{ active: activeTab === 'youtube' }" class="sourceTab" @mousedown="setStoreTab('youtube')">YT</div>
+      <div
+          :class="{ active: activeTab === 'youtube', notEmpty: sourceHasUrl.youtube }"
+          class="sourceTab"
+          @mousedown="setStoreTab('youtube')">
+        YT
+      </div>
     </div>
 
     <a v-if="isMrtUpdate" href="https://github.com/BLCK-B/MusicReleaseTracker/releases" target="_blank"
@@ -40,7 +54,7 @@ import {computed, ref, watch, onMounted} from "vue";
 import {useRouter} from "vue-router";
 import {useMainStore} from "@/store/mainStore.ts";
 import axios from "axios";
-import type {WebSources} from "@/types/Sources.ts";
+import type {WebSource} from "@/types/Sources.ts";
 
 const activeTab = ref("");
 const eventSource = ref<EventSource | null>(null);
@@ -55,11 +69,20 @@ const sourceTab = computed(() => store.sourceTab);
 const allowButtons = computed(() => store.allowButtons);
 const primaryColor = computed(() => store.primaryColor);
 const selectedArtist = computed(() => store.selectedArtist);
+const sourceHasUrl = computed(() => {
+  const urls = store.sourcesWithUrls || [];
+  return {
+    beatport: urls.includes('beatport'),
+    musicbrainz: urls.includes('musicbrainz'),
+    youtube: urls.includes('youtube'),
+  };
+});
+
 
 // trigger sourceClick if tab is not combview
-watch(sourceTab, (tabValue) => {
+watch(sourceTab, async (tabValue) => {
   activeTab.value = tabValue;
-  if (tabValue) sourceClick(tabValue);
+  if (tabValue) await sourceClick(tabValue);
 });
 
 onMounted(() => {
@@ -78,7 +101,7 @@ onMounted(() => {
 });
 
 // set store tab, trigger sourceClick
-const setStoreTab = (source: WebSources) => {
+const setStoreTab = (source: WebSource) => {
   if (sourceTab.value === source) source = "combview";
   store.setSourceTab(source);
 };
@@ -133,7 +156,7 @@ const clickScrape = () => {
             day: "2-digit",
             month: "2-digit",
           }).format(today) + " " +
-        new Intl.DateTimeFormat("de-DE", {
+          new Intl.DateTimeFormat("de-DE", {
             hour: "2-digit",
             minute: "2-digit",
           }).format(today);
@@ -156,7 +179,6 @@ const scrapeMouseOff = () => {
 
 const openSettings = () => {
   router.push("/settings");
-  store.setSettingsOpen(true);
 };
 
 const mrtUpdateCheck = async () => {
@@ -241,11 +263,16 @@ const mrtUpdateCheck = async () => {
   width: 20%;
   max-width: 85px;
   padding: 8px;
-  border: solid 3px transparent;
+  border: solid 2px var(--duller-color);
   white-space: nowrap;
   overflow: hidden;
-  background-color: var(--duller-color);
+  background-color: transparent;
   margin-right: 5px;
+}
+
+.notEmpty {
+  border: solid 2px transparent;
+  background-color: var(--duller-color);
 }
 
 .active {
@@ -253,7 +280,7 @@ const mrtUpdateCheck = async () => {
   opacity: 1;
   background-color: var(--accent-color);
   color: var(--accent-contrast);
-  border: solid 3px transparent;
+  border: solid 2px transparent;
 }
 
 .active:hover {
@@ -278,7 +305,7 @@ const mrtUpdateCheck = async () => {
 }
 
 .newUpdateLink {
-  animation: hueRotate 15s linear infinite;
+  animation: hueRotate 25s linear infinite;
 }
 
 @keyframes hueRotate {

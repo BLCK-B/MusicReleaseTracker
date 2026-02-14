@@ -32,7 +32,7 @@
     </section>
 
     <section class="danger">
-      <SettingsDangerZone/>
+      <SettingsBackupAndReset/>
     </section>
 
     <section class="self">
@@ -47,7 +47,7 @@ import {useRouter} from "vue-router";
 import {ref, computed, onBeforeMount} from "vue";
 import {useMainStore} from "@/store/mainStore.ts";
 import SettingsOther from "../components/Settings/SettingsOther.vue";
-import SettingsDangerZone from "../components/Settings/SettingsDangerZone.vue";
+import SettingsBackupAndReset from "../components/Settings/SettingsBackupAndReset.vue";
 import SettingsFilters from "../components/Settings/SettingsFilters.vue";
 import SettingsAppearance from "../components/Settings/SettingsAppearance.vue";
 import SettingsSelf from "../components/Settings/SettingsSelf.vue";
@@ -94,16 +94,23 @@ onBeforeMount(() => {
   axios
       .get("/api/appVersion")
       .then((response) => {
-        appVersion.value = response.data;
+        appVersion.value = stripSemver(response.data);
       })
       .catch((error) => {
         console.error(error);
       });
 });
 
+const stripSemver = (version: string) => {
+  const parts = version.split(".");
+  while (parts.length > 1 && parts[parts.length - 1] === "0") {
+    parts.pop();
+  }
+  return parts.join(".");
+};
+
 // close settings, trigger rebuild combview in app
 const clickClose = () => {
-  store.setSettingsOpen(false);
   router.push("/");
 };
 

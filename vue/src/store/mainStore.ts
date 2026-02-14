@@ -2,26 +2,26 @@ import {defineStore} from "pinia";
 import type {MediaItemType} from "@/types/MediaItemType.ts";
 import type {AccentColors, PrimaryThemes} from "@/types/Theming.ts";
 import type {SongType} from "@/types/SongType.ts";
-import type {WebSources} from "@/types/Sources.ts";
+import type {WebSource} from "@/types/Sources.ts";
 
 export const useMainStore = defineStore("main", {
     state: () => ({
         tableData: [] as MediaItemType[],
         selectedSongDetails: null as SongType | null,
-        sourceTab: "combview" as WebSources,
+        sourceTab: "combview" as WebSource,
         primaryColor: "" as PrimaryThemes,
         accentColor: "" as AccentColors,
         selectedArtist: "" as string,
         progress: 0 as number,
         loadListRequest: false as boolean,
         allowButtons: true as boolean,
-        settingsOpen: false as boolean,
         previewVis: false as boolean,
         isoDates: false as boolean,
         urlExists: false as boolean,
+        sourcesWithUrls: [] as WebSource[],
     }),
     actions: {
-        setSourceTab(sourceTab: WebSources) {
+        setSourceTab(sourceTab: WebSource) {
             this.sourceTab = sourceTab;
         },
         setSelectedArtist(selectedArtist: string) {
@@ -38,9 +38,6 @@ export const useMainStore = defineStore("main", {
         },
         setProgress(progress: number) {
             this.progress = progress * 100;
-        },
-        setSettingsOpen(settingsOpen: boolean) {
-            this.settingsOpen = settingsOpen;
         },
         setPrimaryColor(color: PrimaryThemes) {
             this.primaryColor = color;
@@ -59,6 +56,9 @@ export const useMainStore = defineStore("main", {
         },
         setSelectedSongDetails(selected: any) {
             this.selectedSongDetails = selected;
+        },
+        setSourcesWithUrls(sourcesWithUrls: WebSource[]) {
+            this.sourcesWithUrls = sourcesWithUrls;
         },
     },
 });

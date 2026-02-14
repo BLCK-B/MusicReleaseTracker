@@ -17,13 +17,18 @@ import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
 import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
 import com.blck.MusicReleaseTracker.Scraping.Thumbnails.ThumbnailService;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * First layer to be called from DataController
@@ -135,6 +140,12 @@ public class ServiceLayer {
         DB.updateArtistSourceID(artist, source, tempID);
     }
 
+    public List<TablesEnum> sourcesWithUrl(String artist) {
+        return Stream.of(TablesEnum.values())
+                .filter(source -> doesUrlExist(source, artist))
+                .toList();
+    }
+
     public boolean doesUrlExist(TablesEnum source, String artist) {
         if (source == TablesEnum.combview)
             return false;
@@ -187,6 +198,30 @@ public class ServiceLayer {
 
     public void resetDB() {
         manageDB.resetDB();
+    }
+
+    public Resource getDBfile() {
+        try {
+            Resource resource = new UrlResource(store.getDBpath().toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                log.error(new FileNotFoundException(), ErrorLogging.Severity.WARNING, "DB file not found or unreadable");
+            }
+            return resource;
+        } catch (Exception e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "error getting DB file: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public void uploadDBfile(MultipartFile file) {
+        if (file.isEmpty()) {
+            log.error(new FileNotFoundException(), ErrorLogging.Severity.WARNING, "DB file is empty");
+        }
+        try {
+            Files.copy(file.getInputStream(), store.getDBpath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            log.error(e, ErrorLogging.Severity.SEVERE, "Error saving DB file: " + e.getMessage());
+        }
     }
 
     public String getAppVersion() {

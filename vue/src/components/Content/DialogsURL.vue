@@ -19,13 +19,13 @@
 import axios from "axios";
 import {useMainStore} from "@/store/mainStore.ts";
 import {computed, ref, watch} from "vue";
-import type {WebSources} from "@/types/Sources.ts";
+import type {WebSource} from "@/types/Sources.ts";
 
 const store = useMainStore();
 
 const userInput = ref("");
 const tableData = computed(() => store.tableData);
-const sourceTab = computed<WebSources>(() => store.sourceTab);
+const sourceTab = computed<WebSource>(() => store.sourceTab);
 const allowButtons = computed(() => store.allowButtons);
 const selectedArtist = computed(() => store.selectedArtist);
 const primaryColor = computed(() => store.primaryColor);
@@ -39,7 +39,7 @@ type SourceDetails = {
   instructions: string;
 };
 
-const sources = computed<Record<WebSources, SourceDetails>>(() => ({
+const sources = computed<Record<WebSource, SourceDetails>>(() => ({
   musicbrainz: {
     title: "MusicBrainz",
     link: `https://musicbrainz.org/search?query=${selectedArtist.value}&type=artist`,

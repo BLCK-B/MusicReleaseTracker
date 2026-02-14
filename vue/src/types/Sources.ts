@@ -1,1 +1,1 @@
-export type WebSources = 'combview' | 'musicbrainz' | 'beatport' | 'youtube';
+export type WebSource = 'combview' | 'musicbrainz' | 'beatport' | 'youtube';

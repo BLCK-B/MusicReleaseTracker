@@ -21,17 +21,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * First layer to be called from DataController
@@ -141,6 +138,12 @@ public class ServiceLayer {
 
     public void saveUrl(TablesEnum source, String artist) {
         DB.updateArtistSourceID(artist, source, tempID);
+    }
+
+    public List<TablesEnum> sourcesWithUrl(String artist) {
+        return Stream.of(TablesEnum.values())
+                .filter(source -> doesUrlExist(source, artist))
+                .toList();
     }
 
     public boolean doesUrlExist(TablesEnum source, String artist) {

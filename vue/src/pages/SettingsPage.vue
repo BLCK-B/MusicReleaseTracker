@@ -111,7 +111,6 @@ const stripSemver = (version: string) => {
 
 // close settings, trigger rebuild combview in app
 const clickClose = () => {
-  store.setSettingsOpen(false);
   router.push("/");
 };
 

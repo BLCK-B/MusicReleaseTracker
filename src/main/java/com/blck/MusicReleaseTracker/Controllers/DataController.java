@@ -54,6 +54,11 @@ public class DataController {
         return serviceLayer.doesUrlExist(TablesEnum.valueOf(source), artist);
     }
 
+    @GetMapping("/sourcesWithUrl")
+    public List<TablesEnum> sourcesWithUrl(@RequestParam String artist) {
+        return serviceLayer.sourcesWithUrl(artist);
+    }
+
     @PostMapping("/confirmSaveUrl")
     public void confirmSaveUrl(@RequestParam String source, @RequestParam String artist) {
         serviceLayer.saveUrl(TablesEnum.valueOf(source), artist);

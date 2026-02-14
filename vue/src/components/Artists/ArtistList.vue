@@ -86,6 +86,20 @@ const loadList = async () => {
       });
 };
 
+const getSourcesWithUrls = async (artist: string) => {
+  try {
+    const response = await axios.get("/api/sourcesWithUrl", {
+      params: {
+        artist
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
 const artistSelected = async (artist: string) => {
   axios
       .get("/api/tableData", {
@@ -101,6 +115,8 @@ const artistSelected = async (artist: string) => {
       .catch((error) => {
         console.error(error);
       });
+
+  store.setSourcesWithUrls(await getSourcesWithUrls(artist));
 };
 
 const addArtist = () => {

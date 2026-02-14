@@ -4,11 +4,7 @@
   <div v-if="tableVisible" class="table-container">
     <div class="table-body">
       <div v-for="(mediaItem, mediaIndex) in tableDataWithThumbnails" :key="mediaIndex" class="aBubble">
-        <table>
-          <tbody>
-          <MediaItem :mediaItem="mediaItem"/>
-          </tbody>
-        </table>
+        <MediaItem :mediaItem="mediaItem"/>
       </div>
     </div>
   </div>
@@ -21,7 +17,7 @@
       <span class="title">Quickstart guide</span> <br/>
       1. click "add artist" to insert an artist <br/>
       2. select any source at the top <br/>
-      3. follow the other instructions <br/>
+      3. copy URLs <br/>
       <br/>
       This message may appear after an update.
     </p>

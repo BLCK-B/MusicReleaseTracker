@@ -133,7 +133,7 @@ const clickScrape = () => {
             day: "2-digit",
             month: "2-digit",
           }).format(today) + " " +
-        new Intl.DateTimeFormat("de-DE", {
+          new Intl.DateTimeFormat("de-DE", {
             hour: "2-digit",
             minute: "2-digit",
           }).format(today);
@@ -278,7 +278,7 @@ const mrtUpdateCheck = async () => {
 }
 
 .newUpdateLink {
-  animation: hueRotate 15s linear infinite;
+  animation: hueRotate 25s linear infinite;
 }
 
 @keyframes hueRotate {

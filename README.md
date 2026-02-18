@@ -17,8 +17,9 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 ##
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/2fb0fbd2-9be0-4954-ba44-b58358723670" width="500px"/> <br>
-<img src="https://github.com/user-attachments/assets/e5ce7960-75a0-4720-adaa-36d75f79897d" width="500px"/>
+<img src="https://github.com/user-attachments/assets/2fb0fbd2-9be0-4954-ba44-b58358723670" height="200px"/>
+<img src="https://github.com/user-attachments/assets/7c08af12-52ca-4faa-9465-6837d7ab8737" height="200px"/> <br>
+<img src="https://github.com/user-attachments/assets/18b663a9-a4b9-4ef1-92d8-c068281f71d1" width="400px"/>
 </p>
 
 ##

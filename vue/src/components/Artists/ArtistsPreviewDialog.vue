@@ -3,11 +3,11 @@
     <h1>preview</h1>
     <p v-if="!hideTable">Do you want to use this source?</p>
     <p v-if="hideTable">Incorrect link.</p>
-    <button @click="clickConfirm" class="imgbutton" :disabled="hideTable" testid="confirm-button">
+    <button @click="clickConfirm" class="imgbutton" :disabled="hideTable">
       <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
       <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
     </button>
-    <button @click="clickCancel" class="imgbutton" testid="cancel-button">
+    <button @click="clickCancel" class="imgbutton">
       <img v-if="primaryColor !== 'light'" class="image" src="../icons/crossdark.png" alt="X"/>
       <img v-if="primaryColor === 'light'" class="image" src="../icons/crosslight.png" alt="X"/>
     </button>

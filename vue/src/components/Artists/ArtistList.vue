@@ -5,17 +5,21 @@
       <button class="morebtn" @click="showMore()">more</button>
       <div v-show="showDropdown" class="dropdown">
         <button
-            :disabled="sourceTab == null || sourceTab === 'combview' || selectedArtist === '' || !allowButtons"
+            :disabled="urlButtonDisabled"
+            @click="visitUrl"
+            class="menubtn">
+          visit source URL
+        </button>
+        <button
+            :disabled="urlButtonDisabled"
             @click="deleteUrl"
-            class="deletebtn"
-            testid="delete-url-button">
+            class="menubtn">
           delete selected URL
         </button>
         <button
             :disabled="selectedArtist === '' || !allowButtons"
             @click="deleteArtist"
-            class="deletebtn"
-            testid="delete-button">
+            class="menubtn">
           delete artist
         </button>
       </div>
@@ -73,6 +77,10 @@ watch(
 
 onMounted(() => {
   loadList();
+});
+
+const urlButtonDisabled = computed(() => {
+  return sourceTab.value == null || sourceTab.value === 'combview' || selectedArtist.value === '' || !allowButtons.value || !store.sourcesWithUrls.some(s => s === sourceTab.value);
 });
 
 const loadList = async () => {
@@ -144,6 +152,23 @@ const deleteArtist = () => {
 };
 
 const showMore = () => (showDropdown.value = !showDropdown.value);
+
+const visitUrl = async () => {
+  try {
+    const response = await axios.get("/api/sourceUrl", {
+      params: {
+        source: sourceTab.value,
+        artist: selectedArtist.value,
+      },
+    });
+    const url = response.data;
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const deleteUrl = () => {
   axios
@@ -232,13 +257,13 @@ button:active {
   padding-left: 7px;
 }
 
-.dropdown .deletebtn {
+.dropdown .menubtn {
   font-size: 13px;
   height: 25px;
   margin-top: 5px;
 }
 
-.deletebtn:hover {
+.menubtn:hover {
   background-color: red;
 }
 

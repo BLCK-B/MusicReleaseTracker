@@ -34,10 +34,15 @@ public final class ScraperBeatport extends Scraper {
     }
 
     @Override
+    public String getUrl() {
+        return "https://www.beatport.com/artist/" + id + "/tracks";
+    }
+
+    @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
 
-        String url = "https://www.beatport.com/artist/" + id + "/tracks";
+        String url = getUrl();
 
         Document doc = null;
         try {

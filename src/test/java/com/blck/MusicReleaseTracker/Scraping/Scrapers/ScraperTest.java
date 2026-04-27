@@ -28,6 +28,13 @@ public class ScraperTest {
     }
 
     @Test
+    void unicodeNormalisation() {
+        ScraperBeatport scraperBP = new ScraperBeatport(null, null, null, null, null);
+
+        assertEquals("<3", scraperBP.decodeUnicode("\\u003c3"));
+    }
+
+    @Test
     void checkDateValidity() {
         ScraperBeatport scraperBP = new ScraperBeatport(null, null, null, null, null);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

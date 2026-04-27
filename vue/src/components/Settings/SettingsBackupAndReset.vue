@@ -10,10 +10,10 @@
       </button>
     </div>
     <div class="vertical-buttons" v-if="!isDragAndDropField">
-      <button @click="resetSettings" @mouseleave="resetProtection" class="danger" testid="reset-settings-btn">
+      <button @click="resetSettings" @mouseleave="resetProtection" class="danger">
         {{ settingsProtection ? "Reset settings" : "Confirm" }}
       </button>
-      <button @click="resetDB" @mouseleave="resetProtection" class="danger" testid="reset-db-btn">
+      <button @click="resetDB" @mouseleave="resetProtection" class="danger">
         {{ dbProtection ? "Reset database" : "Confirm" }}
       </button>
     </div>

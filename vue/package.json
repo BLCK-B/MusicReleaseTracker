@@ -16,7 +16,7 @@
     "lint": "eslint . --ext .js,.ts,.vue"
   },
   "dependencies": {
-    "axios": "^1.14.0",
+    "axios": "^1.15.2",
     "electron-window-state": "^5.0.3",
     "pinia": "^3.0.4",
     "vue": "^3.5.32",
@@ -30,7 +30,7 @@
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/tsconfig": "^0.9.1",
     "cross-env": "^10.1.0",
-    "electron": "^40.6.1",
+    "electron": "^40.9.3",
     "electron-builder": "^26.8.1",
     "eslint": "^10.1.0",
     "eslint-plugin-vue": "^10.8.0",

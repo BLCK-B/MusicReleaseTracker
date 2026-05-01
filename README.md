@@ -5,7 +5,7 @@
 <h2 align="center">MusicReleaseTracker</h2>
 
 <p align="center">
-Multi-source music scraper that helps you follow latest songs. <br> Available for Windows, Linux, macOS.
+Multi-source music scraper that helps you follow latest songs. <br> Distributed as desktop application for Windows, Linux, macOS.
 </p>
 
 <p align="center">
@@ -24,7 +24,7 @@ Multi-source music scraper that helps you follow latest songs. <br> Available fo
 
 ##
 
-You will no longer have to search on social media or streaming services for new songs. You can choose exactly which
+You will no longer have to search on social media or streaming services for new songs. You can choose which
 sources to use,
 and which artists to track. Latest information is compiled into one simple overview.
 This is achieved through custom processing.
@@ -32,17 +32,23 @@ This is achieved through custom processing.
 For the latest information, press the refresh button. Combining more sources means that you are less likely to miss
 anything. Best of all, you don’t need any accounts - MRT runs locally on your computer.
 
-Currently available sources: `Beatport`, `Musicbrainz` and `Youtube`.
+Currently available sources: `Beatport`, `Musicbrainz`, `Youtube`.
 
 ##
 
-**Issue reporting and contributing**
+**Installation**
 
-If you find a bug, which may well happen, report it at
-the [issue tracker](https://github.com/BLCK-B/MusicReleaseTracker/issues).
+Download the package at https://github.com/BLCK-B/MusicReleaseTracker/releases. The packages are not signed.
 
-For compilation and contribution,
-see [CONTRIBUTING.md](https://github.com/BLCK-B/MusicReleaseTracker/blob/main/CONTRIBUTING.md).
+Windows: Click "More info". Then click "Run anyway".
+
+MacOS: [Open a Mac app from an unknown developer](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)
+
+##
+
+**Issue reporting**
+
+Report bugs at the [issue tracker](https://github.com/BLCK-B/MusicReleaseTracker/issues).
 
 ---
 

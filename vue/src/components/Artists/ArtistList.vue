@@ -1,8 +1,9 @@
 <template>
-  <div v-if="!previewVis">
+  <div v-if="!previewVis" class="container">
     <div class="buttonspace">
       <button :disabled="!allowButtons" class="addbtn" @mousedown="addArtist">add artist</button>
       <button class="morebtn" @click="showMore()">more</button>
+
       <div v-show="showDropdown" class="dropdown">
         <button
             :disabled="urlButtonDisabled"
@@ -13,13 +14,13 @@
         <button
             :disabled="urlButtonDisabled"
             @click="deleteUrl"
-            class="menubtn">
+            class="menubtn del">
           delete selected URL
         </button>
         <button
             :disabled="selectedArtist === '' || !allowButtons"
             @click="deleteArtist"
-            class="menubtn">
+            class="menubtn del">
           delete artist
         </button>
       </div>
@@ -34,14 +35,8 @@
           :class="{ highlighted: item === selectedArtist }"
           class="listbtn"
           @mousedown="artistSelected(item)">
-        <div class="listitems">
-          {{ item }}
-        </div>
+        {{ item }}
       </div>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
     </div>
   </div>
 
@@ -97,9 +92,7 @@ const loadList = async () => {
 const getSourcesWithUrls = async (artist: string) => {
   try {
     const response = await axios.get("/api/sourcesWithUrl", {
-      params: {
-        artist
-      },
+      params: {artist},
     });
     return response.data;
   } catch (error) {
@@ -131,18 +124,18 @@ const addArtist = () => {
   addVisibility.value = true;
 };
 
-const closeAddNew = () => {
+const closeAddNew = async () => {
   addVisibility.value = false;
-  loadList();
+  await loadList();
 };
 
-const deleteArtist = () => {
+const deleteArtist = async () => {
   if (selectedArtist.value !== "") {
     axios
         .delete(`/api/artist/${selectedArtist.value}`)
         .then(() => {
           store.setSelectedArtist("");
-          store.setSourceTab("combview")
+          store.setSourceTab("combview");
           loadList();
         })
         .catch((error) => {
@@ -197,6 +190,12 @@ const deleteUrl = () => {
   background-color: var(--dull-color);
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 button {
   border: none;
   border-radius: 5px;
@@ -214,29 +213,8 @@ button:active {
   opacity: 75%;
 }
 
-.listbtn {
-  width: 92%;
-  height: 28px;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-left: 6px;
-  margin: 0 0 0 2px;
-  cursor: pointer;
-}
-
-.artistlist {
-  height: calc(100vh - 40px);
-  overflow-y: scroll;
-}
-
-.artistlist li {
-  list-style-type: none;
-}
-
 .buttonspace {
+  flex-shrink: 0;
   margin-bottom: 5px;
 }
 
@@ -249,12 +227,12 @@ button:active {
 }
 
 .dropdown {
-  position: relative;
   display: flex;
   flex-direction: column;
   background-color: var(--subtle-color);
   padding-right: 11px;
   padding-left: 7px;
+  margin-top: 5px;
 }
 
 .dropdown .menubtn {
@@ -263,8 +241,35 @@ button:active {
   margin-top: 5px;
 }
 
+.del {
+  border: 2px solid red;
+}
+
 .menubtn:hover {
+  background-color: var(--duller-color);
+}
+
+.del:hover {
   background-color: red;
+}
+
+.artistlist {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.listbtn {
+  width: 92%;
+  height: 28px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-left: 6px;
+  margin: 0 0 0 2px;
+  cursor: pointer;
 }
 
 .listbtn:hover {

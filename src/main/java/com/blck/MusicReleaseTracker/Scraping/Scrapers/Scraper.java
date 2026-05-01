@@ -1,4 +1,3 @@
-
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.Core.ErrorLogging;
@@ -8,7 +7,9 @@ import com.blck.MusicReleaseTracker.DB.DBqueries;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
+import org.apache.commons.text.StringEscapeUtils;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -47,6 +48,12 @@ public abstract class Scraper {
      * @return base artist identifier for a given source
      */
     public abstract String getID();
+
+    /**
+     *
+     * @return assembled website URL with ID
+     */
+    public abstract String getUrl();
 
     /**
      * Reduces to base id when possible. Does not discard otherwise.
@@ -94,7 +101,7 @@ public abstract class Scraper {
 
         return songList.stream()
                 .filter(song -> isValidDate(song.getDate(), formatter))
-                .map(song -> new Song(unifyAphostrophes(song.getName()),
+                .map(song -> new Song(decodeUnicode(unifyAphostrophes(song.getName())),
                         song.getArtists(),
                         song.getDate(),
                         song.getType(),
@@ -109,6 +116,11 @@ public abstract class Scraper {
         return input.replace("’", "'")
                 .replace("`", "'")
                 .replace("´", "'");
+    }
+
+    public String decodeUnicode(String input) {
+        String decoded = StringEscapeUtils.unescapeJava(input);
+        return Normalizer.normalize(decoded, Normalizer.Form.NFKC);
     }
 
     /**

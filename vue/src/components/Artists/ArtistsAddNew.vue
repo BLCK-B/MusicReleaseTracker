@@ -1,16 +1,16 @@
 <template>
   <div v-if="addVisibility" class="barrier">
     <div class="pill">
-      <input v-model="input" placeholder="Artist's name" />
+      <input v-model="input" placeholder="Artist's name"/>
 
       <div class="buttons">
-        <button @click="$emit('close-add-new')" class="imgbutton" testid="close-button">
-          <img v-if="primaryColor !== 'light'" class="image" src="../icons/crossdark.png" alt="X" />
-          <img v-if="primaryColor === 'light'" class="image" src="../icons/crosslight.png" alt="X" />
+        <button @click="$emit('close-add-new')" class="imgbutton">
+          <img v-if="primaryColor !== 'light'" class="image" src="../icons/crossdark.png" alt="X"/>
+          <img v-if="primaryColor === 'light'" class="image" src="../icons/crosslight.png" alt="X"/>
         </button>
-        <button @click="clickAdd" class="imgbutton" :disabled="!isValid" testid="add-button">
-          <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK" />
-          <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK" />
+        <button @click="clickAdd" class="imgbutton" :disabled="!isValid">
+          <img v-if="primaryColor !== 'light'" class="image" src="../icons/confirmdark.png" alt="OK"/>
+          <img v-if="primaryColor === 'light'" class="image" src="../icons/confirmlight.png" alt="OK"/>
         </button>
       </div>
     </div>
@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useMainStore } from "@/store/mainStore.ts";
+import {ref, computed} from "vue";
+import {useMainStore} from "@/store/mainStore.ts";
 import axios from "axios";
 
 defineProps({
@@ -62,13 +62,16 @@ function clickAdd() {
   z-index: 4;
   height: 38px;
 }
+
 .pill {
   border: 2px solid var(--accent-color);
   width: 220px;
 }
+
 button {
   border: none;
 }
+
 input {
   position: absolute;
   height: 26px;
@@ -79,14 +82,17 @@ input {
   border: none;
   display: inline-block;
 }
+
 input:focus {
   outline: none;
 }
+
 .buttons {
   height: 28px;
   background-color: var(--duller-color);
   align-content: center;
 }
+
 .imgbutton,
 .image {
   height: 23px;
@@ -97,12 +103,15 @@ input:focus {
   margin-right: 2px;
   background-color: transparent;
 }
+
 .imgbutton {
   position: relative;
 }
+
 .imgbutton:hover {
   opacity: 50%;
 }
+
 :disabled {
   opacity: 0.3;
   pointer-events: none;

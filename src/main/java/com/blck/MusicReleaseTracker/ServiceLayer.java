@@ -147,9 +147,21 @@ public class ServiceLayer {
     }
 
     public boolean doesUrlExist(TablesEnum source, String artist) {
-        if (source == TablesEnum.combview)
-            return false;
+        if (source == TablesEnum.combview) return false;
         return DB.getArtistSourceID(artist, source).isPresent();
+    }
+
+    public String getUrl(TablesEnum source, String artist) {
+        String id = DB.getArtistSourceID(artist, source).orElse(null);
+        if (id == null) return null;
+        
+        Scraper scraper = null;
+        switch (source) {
+            case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, DB, artist, id);
+            case beatport -> scraper = new ScraperBeatport(store, log, DB, artist, id);
+            case youtube -> scraper = new ScraperYoutube(store, log, DB, artist, id);
+        }
+        return scraper.getUrl();
     }
 
     public void clickScrape() {

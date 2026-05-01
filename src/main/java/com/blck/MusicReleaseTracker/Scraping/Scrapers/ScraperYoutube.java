@@ -35,10 +35,15 @@ public final class ScraperYoutube extends Scraper {
     }
 
     @Override
+    public String getUrl() {
+        return "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
+    }
+
+    @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
 
-        String url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
+        String url = getUrl();
 
         Document doc = null;
         try {

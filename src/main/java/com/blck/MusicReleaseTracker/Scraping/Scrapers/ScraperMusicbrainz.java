@@ -31,10 +31,15 @@ public final class ScraperMusicbrainz extends Scraper {
     }
 
     @Override
+    public String getUrl() {
+        return "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
+    }
+
+    @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
 
-        String url = "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
+        String url = getUrl();
 
         Document doc = null;
         try {

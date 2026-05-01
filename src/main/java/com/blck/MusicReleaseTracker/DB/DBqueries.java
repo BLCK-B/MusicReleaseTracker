@@ -247,8 +247,9 @@ public class DBqueries {
      * @param name artist name
      */
     public void removeArtistFromAllTables(String name) {
-        for (TablesEnum table : TablesEnum.values())
+        for (TablesEnum table : TablesEnum.values()) {
             clearArtistDataFrom(name, table);
+        }
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM artists WHERE artist = ?");
             pstmt.setString(1, name);
@@ -265,8 +266,9 @@ public class DBqueries {
     public void truncateAllTables() {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             Statement stmt = conn.createStatement();
-            for (TablesEnum table : TablesEnum.values())
+            for (TablesEnum table : TablesEnum.values()) {
                 stmt.addBatch("DELETE FROM " + table);
+            }
             conn.setAutoCommit(false);
             stmt.executeBatch();
             conn.setAutoCommit(true);
@@ -298,8 +300,8 @@ public class DBqueries {
         ArrayList<Song> songObjectList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + store.getDBpath())) {
             for (TablesEnum table : TablesEnum.values()) {
-                if (table == TablesEnum.combview)
-                    continue;
+                if (table == TablesEnum.combview) continue;
+
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + " ORDER BY date DESC LIMIT 200");
                 while (rs.next()) {
@@ -353,7 +355,7 @@ public class DBqueries {
     }
 
     /**
-     * Creates a list of scraper objects from {@code artists} table where one scraper holds one UR.
+     * Creates a list of scraper objects from {@code artists} table where one scraper holds one URL.
      *
      * @return list of scraper objects
      * @see Scraper

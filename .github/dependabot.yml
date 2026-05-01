@@ -1,26 +1,26 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
-version: 2
-updates:
-  - package-ecosystem: "gradle"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    target-branch: "main"
-    groups:
-      minor-and-patches:
-        update-types:
-          - "patch"
-          - "minor"
-    ignore:
-      - dependency-name: "org.graalvm.buildtools.native"
-        versions: [ ">=0.10.6" ]
-  - package-ecosystem: "npm"
-    directory: "/vue"
-    schedule:
-      interval: "monthly"
-    groups:
-      minor-and-patches:
-        update-types:
-          - "patch"
-          - "minor"
+#version: 2
+#updates:
+#  - package-ecosystem: "gradle"
+#    directory: "/"
+#    schedule:
+#      interval: "monthly"
+#    target-branch: "main"
+#    groups:
+#      minor-and-patches:
+#        update-types:
+#          - "patch"
+#          - "minor"
+#    ignore:
+#      - dependency-name: "org.graalvm.buildtools.native"
+#        versions: [ ">=0.10.6" ]
+#  - package-ecosystem: "npm"
+#    directory: "/vue"
+#    schedule:
+#      interval: "monthly"
+#    groups:
+#      minor-and-patches:
+#        update-types:
+#          - "patch"
+#          - "minor"

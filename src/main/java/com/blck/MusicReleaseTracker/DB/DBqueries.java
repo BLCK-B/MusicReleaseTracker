@@ -7,10 +7,7 @@ import com.blck.MusicReleaseTracker.DataObjects.Album;
 import com.blck.MusicReleaseTracker.DataObjects.MediaItem;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
 import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -371,19 +368,21 @@ public class DBqueries {
                 String artist = artistResults.getString("artist");
                 // cycling sources
                 for (TablesEnum webSource : TablesEnum.values()) {
-                    if (webSource == TablesEnum.combview)
-                        continue;
+                    if (webSource == TablesEnum.combview) continue;
+
                     pstmt = conn.prepareStatement(
                             "SELECT * FROM artists WHERE artist = ? LIMIT 100");
                     pstmt.setString(1, artist);
                     ResultSet rs = pstmt.executeQuery();
                     String url = rs.getString("url" + webSource);
-                    if (url == null)
-                        continue;
+
+                    if (url == null) continue;
+
                     switch (webSource) {
                         case musicbrainz -> scrapers.add(new ScraperMusicbrainz(store, log, this, artist, url));
                         case beatport -> scrapers.add(new ScraperBeatport(store, log, this, artist, url));
                         case youtube -> scrapers.add(new ScraperYoutube(store, log, this, artist, url));
+                        case bandcamp -> scrapers.add(new ScraperBandcamp(store, log, this, artist, url));
                     }
                 }
             }

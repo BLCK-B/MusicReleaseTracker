@@ -61,6 +61,13 @@ const sources = computed<Record<WebSource, SourceDetails>>(() => ({
     placeholder: "https://youtube.com/channel/UCwZEU0wAwIyZb...",
     instructions: `Find an auto-generated channel called <b>${selectedArtist.value} - Topic</b>. You can find it by searching the artist name on YT and filtering by channels. Or try the link above.<br/>A channel ID and URL are supported. Channel handles will not work.`,
   },
+  bandcamp: {
+    title: "Bandcamp",
+    link: `https://bandcamp.k47.cz/?s=${selectedArtist.value}`,
+    linkText: "bandcamp.k47.cz",
+    placeholder: "https://bandcamp.k47.cz/?art=artistname",
+    instructions: `Find <b>${selectedArtist.value}</b> on the website (artists category) and copy URL of their page.`,
+  },
   combview: {
     title: "", link: "", linkText: "", placeholder: "", instructions: "",
   }

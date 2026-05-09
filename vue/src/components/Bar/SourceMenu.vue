@@ -20,6 +20,12 @@
           @mousedown="setStoreTab('youtube')">
         YT
       </div>
+      <div
+          :class="{ active: activeTab === 'bandcamp', notEmpty: sourceHasUrl.bandcamp }"
+          class="sourceTab"
+          @mousedown="setStoreTab('bandcamp')">
+        BC
+      </div>
     </div>
 
     <a v-if="isMrtUpdate" href="https://github.com/BLCK-B/MusicReleaseTracker/releases" target="_blank"
@@ -56,7 +62,7 @@ import {useMainStore} from "@/store/mainStore.ts";
 import axios from "axios";
 import type {WebSource} from "@/types/Sources.ts";
 
-const activeTab = ref("");
+const activeTab = ref<WebSource | "">("");
 const eventSource = ref<EventSource | null>(null);
 const scrapeDateInfo = ref(false);
 const scrapeLast = ref("-");
@@ -75,9 +81,9 @@ const sourceHasUrl = computed(() => {
     beatport: urls.includes('beatport'),
     musicbrainz: urls.includes('musicbrainz'),
     youtube: urls.includes('youtube'),
+    bandcamp: urls.includes('bandcamp'),
   };
 });
-
 
 // trigger sourceClick if tab is not combview
 watch(sourceTab, async (tabValue) => {

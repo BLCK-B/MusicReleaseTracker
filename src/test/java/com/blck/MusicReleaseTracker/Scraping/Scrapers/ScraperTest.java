@@ -102,6 +102,15 @@ public class ScraperTest {
     }
 
     @Test
+    void reduceToIDBandcamp() {
+        ScraperBandcamp scraperBC = new ScraperBandcamp(null, null, null, null, "https://bandcamp.k47.cz/?art=123-id-123");
+        assertEquals("123-id-123", scraperBC.getID());
+
+        scraperBC = new ScraperBandcamp(null, null, null, null, "123-id-123");
+        assertEquals("123-id-123", scraperBC.getID());
+    }
+
+    @Test
     void youtubeExtractDateFromDescription() {
         ScraperYoutube scraperYT = new ScraperYoutube(null, null, null, null, "https://www.youtube.com/channel/123-id-123");
         String description1 = """

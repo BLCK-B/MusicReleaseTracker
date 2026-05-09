@@ -32,7 +32,7 @@ This is achieved through custom processing.
 For the latest information, press the refresh button. Combining more sources means that you are less likely to miss
 anything. Best of all, you don’t need any accounts - MRT runs locally on your computer.
 
-Currently available sources: `Beatport`, `Musicbrainz`, `Youtube`.
+Currently available sources: `Beatport`, `Musicbrainz`, `Youtube`, `Bandcamp`.
 
 ##
 

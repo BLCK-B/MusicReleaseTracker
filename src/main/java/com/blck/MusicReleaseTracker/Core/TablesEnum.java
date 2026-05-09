@@ -8,5 +8,6 @@ public enum TablesEnum {
     combview,
     beatport,
     musicbrainz,
-    youtube
+    youtube,
+    bandcamp
 }

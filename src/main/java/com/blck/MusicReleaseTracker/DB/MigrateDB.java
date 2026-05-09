@@ -41,7 +41,8 @@ public class MigrateDB {
                     artist text PRIMARY KEY,
                     urlmusicbrainz text,
                     urlbeatport text,
-                    urlyoutube text
+                    urlyoutube text,
+                    urlbandcamp text
                     );
                     """);
 
@@ -76,6 +77,15 @@ public class MigrateDB {
 
             stmt.addBatch("""
                     CREATE TABLE IF NOT EXISTS youtube (
+                    song text NOT NULL,
+                    artist text NOT NULL,
+                    date text NOT NULL,
+                    thumbnail text
+                    );
+                    """);
+
+            stmt.addBatch("""
+                    CREATE TABLE IF NOT EXISTS bandcamp (
                     song text NOT NULL,
                     artist text NOT NULL,
                     date text NOT NULL,

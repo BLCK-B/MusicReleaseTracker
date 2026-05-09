@@ -12,10 +12,7 @@ import com.blck.MusicReleaseTracker.JsonSettings.SettingsIO;
 import com.blck.MusicReleaseTracker.Misc.UpdateChecker;
 import com.blck.MusicReleaseTracker.Scraping.ScrapeProcess;
 import com.blck.MusicReleaseTracker.Scraping.ScraperManager;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.Scraper;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperBeatport;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperMusicbrainz;
-import com.blck.MusicReleaseTracker.Scraping.Scrapers.ScraperYoutube;
+import com.blck.MusicReleaseTracker.Scraping.Scrapers.*;
 import com.blck.MusicReleaseTracker.Scraping.Thumbnails.ThumbnailService;
 import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +124,7 @@ public class ServiceLayer {
                 case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, DB, artist, url);
                 case beatport -> scraper = new ScraperBeatport(store, log, DB, artist, url);
                 case youtube -> scraper = new ScraperYoutube(store, log, DB, artist, url);
+                case bandcamp -> scraper = new ScraperBandcamp(store, log, DB, artist, url);
             }
             id = scraper.getID();
             scraper.scrape(25000);
@@ -154,12 +152,13 @@ public class ServiceLayer {
     public String getUrl(TablesEnum source, String artist) {
         String id = DB.getArtistSourceID(artist, source).orElse(null);
         if (id == null) return null;
-        
+
         Scraper scraper = null;
         switch (source) {
             case musicbrainz -> scraper = new ScraperMusicbrainz(store, log, DB, artist, id);
             case beatport -> scraper = new ScraperBeatport(store, log, DB, artist, id);
             case youtube -> scraper = new ScraperYoutube(store, log, DB, artist, id);
+            case bandcamp -> scraper = new ScraperBandcamp(store, log, DB, artist, id);
         }
         return scraper.getUrl();
     }

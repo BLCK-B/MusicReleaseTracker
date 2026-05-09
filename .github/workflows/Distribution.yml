@@ -10,7 +10,7 @@ on:
       platforms:
         description: "PLatforms to compile for."
         required: true
-        default: "[\"ubuntu-latest\",\"windows-latest\",\"macos-latest\"]"
+        default: "[\"ubuntu-latest\",\"ubuntu-24.04-arm\",\"windows-latest\",\"macos-latest\"]"
       make-draft:
         description: "Make draft release?"
         required: true

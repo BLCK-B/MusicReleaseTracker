@@ -38,10 +38,10 @@ const isValid = computed(() => rules.every((rule) => rule(input.value)));
 
 const primaryColor = computed(() => store.primaryColor);
 
-function clickAdd() {
+const clickAdd = async () => {
   try {
     const artistId = String(input.value).trim();
-    axios.post(`/api/artist/${artistId}`);
+    await axios.post(`/api/artist/${artistId}`);
     input.value = "";
     store.setSelectedArtist(artistId);
     emit("close-add-new");
@@ -49,7 +49,7 @@ function clickAdd() {
   } catch (error) {
     console.error(error);
   }
-}
+};
 </script>
 
 <style scoped>

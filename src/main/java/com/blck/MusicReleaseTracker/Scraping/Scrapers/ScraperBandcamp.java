@@ -9,11 +9,14 @@ import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
 import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.List;
 
-public final class ScraperMusicbrainz extends Scraper {
+public final class ScraperBandcamp extends Scraper {
 
     private final String songArtist;
 
@@ -21,7 +24,7 @@ public final class ScraperMusicbrainz extends Scraper {
 
     private String id;
 
-    public ScraperMusicbrainz(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
+    public ScraperBandcamp(ValueStore store, ErrorLogging log, DBqueries DB, String songArtist, String id) {
         super(store, log, DB);
         this.songArtist = songArtist;
         this.id = id;
@@ -32,7 +35,7 @@ public final class ScraperMusicbrainz extends Scraper {
 
     @Override
     public String getUrl() {
-        return "https://musicbrainz.org/ws/2/release-group?artist=" + id + "&type=single&limit=400";
+        return "https://bandcamp.k47.cz/?art=" + id;
     }
 
     @Override
@@ -52,16 +55,28 @@ public final class ScraperMusicbrainz extends Scraper {
             throw new ScraperGenericException(url);
         }
 
-        String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
-        String[] datesArray = doc.select("first-release-date").eachText().toArray(new String[0]);
+        Elements albums = doc.select("div.album");
 
-        super.source = TablesEnum.musicbrainz;
+        List<String> songs = new ArrayList<>();
+        List<String> dates = new ArrayList<>();
+
+        for (Element album : albums) {
+            Element titleEl = album.selectFirst("a.out");
+            Element dateEl = album.selectFirst("span[title]");
+
+            if (titleEl == null || dateEl == null) continue;
+
+            songs.add(titleEl.text());
+            dates.add(dateEl.attr("title"));
+        }
+
+        super.source = TablesEnum.bandcamp;
         super.insertSet(
                 processInfo(
                         artistToSongList(
-                                List.of(songsArray),
+                                songs,
                                 songArtist,
-                                List.of(datesArray),
+                                dates,
                                 null,
                                 null
                         )));
@@ -73,17 +88,11 @@ public final class ScraperMusicbrainz extends Scraper {
 
         int idStartIndex;
         int idEndIndex;
-        // https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings
-        int artistIndex = id.indexOf("/artist/");
-        if (artistIndex != -1 && id.contains("musicbrainz.org")) {
-            idStartIndex = artistIndex + "/artist/".length();
-            // the next '/' after /artist/
-            idEndIndex = id.indexOf('/', idStartIndex);
-            if (idEndIndex != -1)
-                id = id.substring(idStartIndex, idEndIndex);
-            else // if no other '/'
-                id = id.substring(idStartIndex);
-            // ad110705-cbe6-4c47-9b99-8526e6db0f41
+        // https://bandcamp.k47.cz/?art=123-id-123
+        int queryIndex = id.indexOf("?art=");
+        if (queryIndex != -1) {
+            idStartIndex = queryIndex + "?art=".length();
+            id = id.substring(idStartIndex);
         }
     }
 
@@ -94,7 +103,7 @@ public final class ScraperMusicbrainz extends Scraper {
 
     @Override
     public String toString() {
-        return "musicbrainz";
+        return "bandcamp";
     }
 
 }

@@ -2,6 +2,8 @@
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
 import com.blck.MusicReleaseTracker.DataObjects.Song;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 
 import java.time.format.DateTimeFormatter;
@@ -100,6 +102,15 @@ public class ScraperTest {
     }
 
     @Test
+    void reduceToIDBandcamp() {
+        ScraperBandcamp scraperBC = new ScraperBandcamp(null, null, null, null, "https://bandcamp.k47.cz/?art=123-id-123");
+        assertEquals("123-id-123", scraperBC.getID());
+
+        scraperBC = new ScraperBandcamp(null, null, null, null, "123-id-123");
+        assertEquals("123-id-123", scraperBC.getID());
+    }
+
+    @Test
     void youtubeExtractDateFromDescription() {
         ScraperYoutube scraperYT = new ScraperYoutube(null, null, null, null, "https://www.youtube.com/channel/123-id-123");
         String description1 = """
@@ -134,6 +145,37 @@ public class ScraperTest {
                 defaultDates,
                 scraperYT.mergeDescriptionAndPublishedDates(preferredDatesMissing, defaultDates)
         );
+    }
+
+    @Test
+    void emptyFeedDetectionYoutube() {
+        String emptyFeed = """
+                        <feed>
+                        <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UCcc1G3A0ZDQ94V1iRRjNjGw"/>
+                        <id>yt:channel:cc1G3A0ZDQ94V1iRRjNjGw</id>
+                        <yt:channelId>cc1G3A0ZDQ94V1iRRjNjGw</yt:channelId>
+                        <title> - Topic</title>
+                        <link rel="alternate" href="https://www.youtube.com/channel/UCcc1G3A0ZDQ94V1iRRjNjGw"/>
+                        <author>
+                        <name> - Topic</name>
+                        <uri>
+                        https://www.youtube.com/channel/UCcc1G3A0ZDQ94V1iRRjNjGw
+                        </uri>
+                        </author>
+                        <published>2023-07-20T11:46:00+00:00</published>
+                        </feed>
+                """;
+        String nullFeed = """
+                        <feed>
+                        </feed>
+                """;
+        Document doc1 = Jsoup.parse(emptyFeed, "", org.jsoup.parser.Parser.xmlParser());
+        Document doc2 = Jsoup.parse(nullFeed, "", org.jsoup.parser.Parser.xmlParser());
+
+        ScraperYoutube scraper = new ScraperYoutube(null, null, null, "", "");
+
+        assertTrue(scraper.isFeedEmpty(doc1));
+        assertFalse(scraper.isFeedEmpty(doc2));
     }
 
 }

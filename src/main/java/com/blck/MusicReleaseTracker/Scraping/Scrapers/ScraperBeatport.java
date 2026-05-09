@@ -97,8 +97,8 @@ public final class ScraperBeatport extends Scraper {
 
     @Override
     public void reduceToID() {
-        if (isIDnull)
-            return;
+        if (isIDnull) return;
+
         int idStartIndex;
         int idEndIndex;
         // https://beatport.com/artist/koven/245904/charts

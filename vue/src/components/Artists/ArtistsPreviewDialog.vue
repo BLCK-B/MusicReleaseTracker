@@ -27,7 +27,7 @@ const selectedArtist = computed(() => store.selectedArtist);
 
 const hideTable = computed(() => tableData.value.length === 0);
 
-function clickCancel() {
+const clickCancel = () => {
   axios
       .post("/api/cleanArtistSource", null, {
         params: {
@@ -39,9 +39,9 @@ function clickCancel() {
         console.error(error);
       });
   store.setPreviewVis(false);
-}
+};
 
-function clickConfirm() {
+const clickConfirm = () => {
   axios
       .post("/api/confirmSaveUrl", null, {
         params: {
@@ -53,7 +53,7 @@ function clickConfirm() {
         console.error(error);
       });
   store.setPreviewVis(false);
-}
+};
 </script>
 
 <style scoped>

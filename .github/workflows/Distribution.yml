@@ -101,7 +101,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: downloaded
-          pattern: "*-latest"
+          pattern: "*-"
           merge-multiple: true
       - name: Release
         uses: softprops/action-gh-release@v2

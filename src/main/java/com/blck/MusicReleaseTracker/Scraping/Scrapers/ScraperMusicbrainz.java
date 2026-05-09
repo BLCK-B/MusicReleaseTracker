@@ -69,8 +69,8 @@ public final class ScraperMusicbrainz extends Scraper {
 
     @Override
     public void reduceToID() {
-        if (isIDnull)
-            return;
+        if (isIDnull) return;
+
         int idStartIndex;
         int idEndIndex;
         // https://musicbrainz.org/artist/ad110705-cbe6-4c47-9b99-8526e6db0f41/recordings

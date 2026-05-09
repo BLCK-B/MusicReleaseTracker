@@ -141,4 +141,8 @@ public abstract class Scraper {
     public void insertSet(List<Song> songList) {
         DB.batchInsertSongs(songList, source, 15);
     }
+
+    protected void removeArtistSourceUrl(String artistName, TablesEnum source) {
+        DB.updateArtistSourceID(artistName, TablesEnum.youtube, null);
+    }
 }

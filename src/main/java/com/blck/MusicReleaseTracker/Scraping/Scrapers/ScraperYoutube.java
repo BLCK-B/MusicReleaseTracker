@@ -39,6 +39,12 @@ public final class ScraperYoutube extends Scraper {
         return "https://www.youtube.com/feeds/videos.xml?channel_id=" + id;
     }
 
+    public boolean isFeedEmpty(Document doc) {
+        String channelTitle = doc.select("feed > title").text();
+        return channelTitle != null && doc.select("entry").isEmpty() && channelTitle.trim().equals("- Topic");
+    }
+
+
     @Override
     public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
@@ -53,6 +59,11 @@ public final class ScraperYoutube extends Scraper {
             throw new ScraperTimeoutException(url);
         } catch (Exception e) {
             throw new ScraperGenericException(url);
+        }
+
+        if (isFeedEmpty(doc)) {
+            super.removeArtistSourceUrl(songArtist, TablesEnum.youtube);
+            return;
         }
 
         String[] songsArray = doc.select("title").eachText().toArray(new String[0]);
@@ -112,8 +123,8 @@ public final class ScraperYoutube extends Scraper {
 
     @Override
     public void reduceToID() {
-        if (isIDnull)
-            return;
+        if (isIDnull) return;
+
         int idStartIndex;
         int idEndIndex;
         // https://www.youtube.com/channel/UCWaKvFOf-a7vENyuEsZkNqg

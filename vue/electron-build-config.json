@@ -36,7 +36,7 @@
     "runAfterFinish": false
   },
   "linux": {
-    "artifactName": "MRT-${version}-linux.${ext}",
+    "artifactName": "MRT-${version}-linux-${arch}.${ext}",
     "extraFiles": [
       {
         "from": "buildResources/MusicReleaseTracker",

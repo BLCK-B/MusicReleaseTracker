@@ -21,7 +21,7 @@
             :disabled="selectedArtist === '' || !allowButtons"
             @click="deleteArtist"
             class="menubtn del">
-          delete artist
+          delete artist {{ selectedArtist }}
         </button>
       </div>
     </div>
@@ -239,6 +239,9 @@ button:active {
   font-size: 13px;
   height: 25px;
   margin-top: 5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .del {

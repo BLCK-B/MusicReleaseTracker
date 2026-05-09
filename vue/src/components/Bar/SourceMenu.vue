@@ -2,29 +2,29 @@
   <div class="wrapper">
     <div class="tabs">
       <div
+          :class="{ active: activeTab === 'bandcamp', notEmpty: sourceHasUrl.bandcamp }"
+          class="sourceTab"
+          @mousedown="setStoreTab('bandcamp')">
+        Bandcamp
+      </div>
+      <div
           :class="{ active: activeTab === 'beatport', notEmpty: sourceHasUrl.beatport }"
           class="sourceTab"
           @mousedown="setStoreTab('beatport')">
-        BP
+        Beatport
       </div>
       <div
           :class="{ active: activeTab === 'musicbrainz', notEmpty: sourceHasUrl.musicbrainz }"
           class="sourceTab"
           @mousedown="setStoreTab('musicbrainz')"
       >
-        MB
+        MusicBrainz
       </div>
       <div
           :class="{ active: activeTab === 'youtube', notEmpty: sourceHasUrl.youtube }"
           class="sourceTab"
           @mousedown="setStoreTab('youtube')">
-        YT
-      </div>
-      <div
-          :class="{ active: activeTab === 'bandcamp', notEmpty: sourceHasUrl.bandcamp }"
-          class="sourceTab"
-          @mousedown="setStoreTab('bandcamp')">
-        BC
+        YouTube
       </div>
     </div>
 
@@ -206,7 +206,6 @@ const mrtUpdateCheck = async () => {
 
 <style scoped>
 .wrapper {
-  min-width: 500px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -216,10 +215,8 @@ const mrtUpdateCheck = async () => {
 .tabs {
   display: flex;
   text-align: center;
-  font-weight: bold;
   flex-grow: 1;
   height: 38px;
-  cursor: pointer;
 }
 
 .imageSettings,
@@ -271,9 +268,9 @@ const mrtUpdateCheck = async () => {
   padding: 8px;
   border: solid 2px var(--duller-color);
   white-space: nowrap;
-  overflow: hidden;
   background-color: transparent;
   margin-right: 5px;
+  cursor: pointer;
 }
 
 .notEmpty {

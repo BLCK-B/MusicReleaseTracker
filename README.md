@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/f432e824-6772-401e-8419-90da707887f4" width="130px" alt="MusicReleaseTracker Image">
+  <img src="https://github.com/BLCK-B/MusicReleaseTracker/assets/123077751/f432e824-6772-401e-8419-90da707887f4" width="100px" alt="MusicReleaseTracker Image">
 </p>
 
 <h2 align="center">MusicReleaseTracker</h2>

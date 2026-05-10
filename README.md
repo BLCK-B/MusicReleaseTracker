@@ -15,24 +15,24 @@ Multi-source music scraper that helps you follow latest songs. <br> Distributed 
 </p>
 
 ##
-
 <p align="center">
-<img src="https://github.com/user-attachments/assets/2fb0fbd2-9be0-4954-ba44-b58358723670" height="200px"/>
-<img src="https://github.com/user-attachments/assets/7c08af12-52ca-4faa-9465-6837d7ab8737" height="200px"/> <br>
-<img src="https://github.com/user-attachments/assets/18b663a9-a4b9-4ef1-92d8-c068281f71d1" width="400px"/>
+<img src="https://github.com/user-attachments/assets/a71b5412-eed6-44af-8554-7ace68d0cf17" height="200px"/>
+<img src="https://github.com/user-attachments/assets/9f3bcd0b-f67a-4dd4-92b5-347c43b5d511" height="200px"/> <br>
+<img src="https://github.com/user-attachments/assets/c78e0d37-f238-4be2-a236-a9191b2a5840" width="400px"/>
 </p>
 
 ##
 
 You will no longer have to search on social media or streaming services for new songs. You can choose which
-sources to use,
-and which artists to track. Latest information is compiled into one simple overview.
+sources to use, and which artists to track. Latest information is compiled into one simple overview.
 This is achieved through custom processing.
 
 For the latest information, press the refresh button. Combining more sources means that you are less likely to miss
 anything. Best of all, you don’t need any accounts - MRT runs locally on your computer.
 
 Currently available sources: `Beatport`, `Musicbrainz`, `Youtube`, `Bandcamp`.
+
+If a source becomes unavailable, it is skipped during scraping. Most outages are temporary.
 
 ##
 
@@ -43,6 +43,8 @@ Download the package at https://github.com/BLCK-B/MusicReleaseTracker/releases. 
 Windows: Click "More info". Then click "Run anyway".
 
 MacOS: [Open a Mac app from an unknown developer](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)
+
+I don't have the means to verify that the app fully works on platforms other than Windows.
 
 ##
 

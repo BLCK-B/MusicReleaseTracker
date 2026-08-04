@@ -94,7 +94,7 @@ async function checkBackendReady() {
         } catch (error) {
             console.log("Waiting for backend ready.");
         }
-        await new Promise((resolve) => setTimeout(resolve, 5));
+        await new Promise((resolve) => setTimeout(resolve, 10));
         attempts++;
         if (attempts === 150) {
             writeLog(`Backend connection timeout.`);

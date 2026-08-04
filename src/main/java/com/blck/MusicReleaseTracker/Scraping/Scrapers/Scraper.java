@@ -95,7 +95,6 @@ public abstract class Scraper {
     public List<Song> processInfo(List<Song> songList) {
         if (songList.isEmpty()) {
             log.error(new Exception(), ErrorLogging.Severity.WARNING, "song list produced by scraper is empty");
-            return null;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 

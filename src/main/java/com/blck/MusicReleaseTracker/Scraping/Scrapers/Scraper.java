@@ -142,6 +142,6 @@ public abstract class Scraper {
     }
 
     protected void removeArtistSourceUrl(String artistName, TablesEnum source) {
-        DB.updateArtistSourceID(artistName, TablesEnum.youtube, null);
+        DB.updateArtistSourceID(artistName, source, null);
     }
 }

@@ -24,14 +24,14 @@ jobs:
   build-jar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: "temurin"
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: current
       - name: Grant execute permission for gradlew
@@ -52,16 +52,16 @@ jobs:
         os: ${{fromJson(inputs.platforms)}}
         make-native: [ yes ]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Setup GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: ${{ env.JAVA_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Node.js and npm
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version: 26
           cache: "npm"
           cache-dependency-path: "vue/package-lock.json"
       - name: Install npm dependencies
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ inputs.make-draft }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Download candidate artifacts
         uses: actions/download-artifact@v4
         with:

@@ -52,7 +52,7 @@ public class Main {
     }
 
     /**
-     * CORS redirect mapping for dev cross-origin permission TODO: chrome again
+     * CORS redirect mapping for dev cross-origin permission
      */
     @NullMarked
     @Bean
@@ -86,9 +86,6 @@ public class Main {
             startSetup.createDirs();
             manageDB.migrateDB(store.getDBpath(), store.getDBpathTemplate());
             settingsIO.updateSettings();
-            if (settingsIO.readSetting("theme").equals("black")) { // TODO: future release
-                settingsIO.writeSetting("theme", "dark");
-            }
             store.setBackendReady();
         }
     }

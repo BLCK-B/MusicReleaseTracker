@@ -192,8 +192,10 @@ public class ScrapeProcessTest {
 
         List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
 
-        for (int i = 0; i < expected.size(); ++i)
+        assertEquals(expected.size(), output.size());
+        for (int i = 0; i < expected.size(); ++i) {
             assertThat(expected.get(i)).dataMatches(output.get(i));
+        }
     }
 
     @Test
@@ -206,6 +208,7 @@ public class ScrapeProcessTest {
 
         List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
 
+        assertEquals(1, output.size());
         assertThat(expected).dataMatches(output.getFirst());
     }
 
@@ -218,8 +221,10 @@ public class ScrapeProcessTest {
 
         List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 1);
 
-        for (int i = 0; i < songList.size(); ++i)
+        assertEquals(songList.size(), output.size());
+        for (int i = 0; i < songList.size(); ++i) {
             assertThat(songList.get(i)).dataMatches(output.get(i));
+        }
     }
 
     @Test
@@ -249,8 +254,12 @@ public class ScrapeProcessTest {
 
         List<Song> output = scrapeProcess.mergeSongsWithinDaysApart(songList, 2);
 
-        for (int i = 0; i < expected.size(); ++i)
+        System.out.println(expected);
+        System.out.println(output);
+        assertEquals(expected.size(), output.size());
+        for (int i = 0; i < expected.size(); ++i) {
             assertThat(expected.get(i)).dataMatches(output.get(i));
+        }
     }
 
     @Test

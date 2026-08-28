@@ -163,26 +163,33 @@ public class ScrapeProcess {
      * @return list of songs with merged duplicates
      */
     public List<Song> mergeSongsWithinDaysApart(List<Song> songList, int maxDays) {
-        List<Song> tempList = new ArrayList<>();
-        Map<String, Song> nameArtistMap = songList.stream()
-                .collect(Collectors.toMap(
-                        key -> noSpacesLowerCase(key.getName()),
-                        key -> key, (existing, replacement) -> {
-                            Song older = getOlderDateSong(existing, replacement);
-                            Song newer = getNewerDateSong(existing, replacement);
-                            if (!existing.getArtists().equalsIgnoreCase(replacement.getArtists()))
-                                older.appendArtist(newer.getArtists());
-                            if (getDayDifference(existing, replacement) > maxDays)
-                                tempList.add(newer);
-                            return older;
-                        },
-                        LinkedHashMap::new
-                ));
-        tempList.forEach(s -> nameArtistMap.put(s.getDate() + s.getArtists(), s));
-        return new ArrayList<>(
-                nameArtistMap.values()).stream()
+        List<Song> sortedByNewest = songList.stream()
                 .sorted(Comparator.comparing(Song::getDate))
                 .toList();
+
+        ArrayList<Song> reduced = new ArrayList<>();
+
+        for (Song song : sortedByNewest) {
+            Song oldestSameNameSongInReduced = reduced.stream()
+                    .filter(s -> s.equals(song))
+                    .max(Comparator.comparing(Song::getDate))
+                    .orElse(null);
+
+            if (oldestSameNameSongInReduced == null) {
+                reduced.add(song);
+                continue;
+            }
+
+            if (oldestSameNameSongInReduced.getThumbnailUrl() == null) {
+                oldestSameNameSongInReduced.setThumbnailUrl(song.getThumbnailUrl());
+            }
+            if (getDayDifference(oldestSameNameSongInReduced, song) > maxDays) {
+                reduced.add(song);
+            } else if (!oldestSameNameSongInReduced.getArtists().contains(song.getArtists())) {
+                oldestSameNameSongInReduced.appendArtist(song.getArtists());
+            }
+        }
+        return reduced;
     }
 
     /**

@@ -45,7 +45,7 @@ const sources = computed<Record<WebSource, SourceDetails>>(() => ({
     link: `https://musicbrainz.org/search?query=${selectedArtist.value}&type=artist`,
     linkText: "musicbrainz.org",
     placeholder: "https://musicbrainz.org/artist/id/...",
-    instructions: `Find <b>${selectedArtist.value}</b> on the website and copy URL of their page.<br/>This source does not provide thumbnails.`,
+    instructions: `Find <b>${selectedArtist.value}</b> on the website and copy URL of their page.<br/>This source does not have thumbnails.`,
   },
   beatport: {
     title: "Beatport",
@@ -66,7 +66,7 @@ const sources = computed<Record<WebSource, SourceDetails>>(() => ({
     link: `https://bandcamp.k47.cz/?s=${selectedArtist.value}`,
     linkText: "bandcamp.k47.cz",
     placeholder: "https://bandcamp.k47.cz/?art=artistname",
-    instructions: `Find <b>${selectedArtist.value}</b> on the website (artists category) and copy URL of their page.`,
+    instructions: `Find <b>${selectedArtist.value}</b> on the website (artists category) and copy URL of their page.<br/>This source does not have thumbnails.`,
   },
   combview: {
     title: "", link: "", linkText: "", placeholder: "", instructions: "",

@@ -34,6 +34,9 @@ Currently available sources: `Beatport`, `Musicbrainz`, `Youtube`, `Bandcamp`.
 
 If a source becomes unavailable, it is skipped during scraping. Most outages are temporary.
 
+> [!TIP]
+> Rest assured: this app is not vibe coded.
+
 ##
 
 **Installation**

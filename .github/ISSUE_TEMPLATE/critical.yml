@@ -1,5 +1,5 @@
 name: Critical
-description: Changes on the side of sources or errors causing program unable to function
+description: Errors causing program unable to function
 title: "[Critical]: "
 labels: [ "critical" ]
 body:
@@ -7,15 +7,8 @@ body:
     attributes:
       label: Guidelines
       options:
-        - label: The issue renders the program or its part unusable.
-          required: false
         - label: I have searched the issue tracker for similar issues.
           required: false
-  - type: input
-    attributes:
-      label: MusicReleaseTracker version
-    validations:
-      required: false
   - type: input
     attributes:
       label: Operating system

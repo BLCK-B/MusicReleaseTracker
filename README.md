@@ -23,6 +23,22 @@ Multi-source music scraper that helps you follow latest songs. <br> Distributed 
 
 ##
 
+**Installation**
+
+Download the package at https://github.com/BLCK-B/MusicReleaseTracker/releases. The packages are not signed.
+
+Windows: Click "More info". Then click "Run anyway".
+
+MacOS: [Open a Mac app from an unknown developer](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)
+
+- Or remove the quarantine flag via commandline: `xattr -d com.apple.quarantine ~/Downloads/MRT-13.1.0-mac.dmg`
+
+I'm not able to fully verify that the app fully works on platforms other than Windows.
+
+##
+
+**Description**
+
 You will no longer have to search on social media or streaming services for new songs. You can choose which
 sources to use, and which artists to track. Latest information is compiled into one simple overview.
 This is achieved through custom processing.
@@ -36,20 +52,6 @@ If a source becomes unavailable, it is skipped during scraping. Most outages are
 
 > [!TIP]
 > Rest assured: this app is not vibe coded.
-
-##
-
-**Installation**
-
-Download the package at https://github.com/BLCK-B/MusicReleaseTracker/releases. The packages are not signed.
-
-Windows: Click "More info". Then click "Run anyway".
-
-MacOS: [Open a Mac app from an unknown developer](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)
-
-- Or remove the quarantine flag via commandline: `xattr -d com.apple.quarantine ~/Downloads/MRT-13.1.0-mac.dmg`
-
-I'm not able to fully verify that the app fully works on platforms other than Windows.
 
 ##
 

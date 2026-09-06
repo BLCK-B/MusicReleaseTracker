@@ -47,7 +47,9 @@ Windows: Click "More info". Then click "Run anyway".
 
 MacOS: [Open a Mac app from an unknown developer](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)
 
-I don't have the means to verify that the app fully works on platforms other than Windows.
+- Or remove the quarantine flag via commandline: `xattr -d com.apple.quarantine ~/Downloads/MRT-13.1.0-mac.dmg`
+
+I'm not able to fully verify that the app fully works on platforms other than Windows.
 
 ##
 

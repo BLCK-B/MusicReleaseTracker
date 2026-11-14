@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+    <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UC3OL1x7jvxKOHxEy42aW97A"/>
+    <id>yt:channel:3OL1x7jvxKOHxEy42aW97A</id>
+    <yt:channelId>3OL1x7jvxKOHxEy42aW97A</yt:channelId>
+    <title>A Little Sound - Topic</title>
+    <link rel="alternate" href="https://www.youtube.com/channel/UC3OL1x7jvxKOHxEy42aW97A"/>
+    <author>
+        <name>A Little Sound - Topic</name>
+        <uri>https://www.youtube.com/channel/UC3OL1x7jvxKOHxEy42aW97A</uri>
+    </author>
+    <published>2019-01-24T10:21:53+00:00</published>
+</feed>

@@ -39,9 +39,10 @@ public abstract class Scraper {
     /**
      * Scrapes data from given source and inserts them into the respective source table.
      *
+     * @param url website URL
      * @param timeout Jsoup timeout
      */
-    public abstract void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException;
+    public abstract void scrape(String url, int timeout) throws ScraperTimeoutException, ScraperGenericException;
 
     /**
      *

@@ -67,7 +67,7 @@ class ScraperManagerTest {
 
     @Test
     void removeSourceScraperOnTimeoutExceptions() throws ScraperTimeoutException, ScraperGenericException {
-        doThrow(ScraperTimeoutException.class).when(scraperMB).scrape(anyInt());
+        doThrow(ScraperTimeoutException.class).when(scraperMB).scrape(any(), anyInt());
         insertScrapers();
 
         assertEquals(4, scraperManager.loadWithScrapers());
@@ -77,7 +77,7 @@ class ScraperManagerTest {
 
     @Test
     void removingLastSourceScraperOnTimeoutExceptionsReturnsEmpty() throws ScraperTimeoutException, ScraperGenericException {
-        doThrow(ScraperTimeoutException.class).when(scraperMB).scrape(anyInt());
+        doThrow(ScraperTimeoutException.class).when(scraperMB).scrape(any(), anyInt());
         scrapers.add(scraperMB);
 
         assertEquals(1, scraperManager.loadWithScrapers());
@@ -87,8 +87,8 @@ class ScraperManagerTest {
 
     @Test
     void erroringSourceLogsWarningsAndIsRemoved() throws ScraperTimeoutException, ScraperGenericException {
-        doThrow(ScraperGenericException.class).when(scraperMB).scrape(anyInt());
-        doThrow(ScraperGenericException.class).when(scraperBP).scrape(anyInt());
+        doThrow(ScraperGenericException.class).when(scraperMB).scrape(any(), anyInt());
+        doThrow(ScraperGenericException.class).when(scraperBP).scrape(any(), anyInt());
         insertScrapers();
 
         assertEquals(4, scraperManager.loadWithScrapers());

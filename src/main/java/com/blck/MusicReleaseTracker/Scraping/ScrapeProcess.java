@@ -48,8 +48,8 @@ public class ScrapeProcess {
         scrapeCancel = false;
         DB.truncateAllTables();
         final int initSize = scraperManager.loadWithScrapers();
-        if (initSize == 0)
-            return;
+        if (initSize == 0) return;
+
         int remaining = 1;
         double progress = 0.0;
         while (!scrapeCancel) {
@@ -84,8 +84,7 @@ public class ScrapeProcess {
     public void fillCombviewTable() {
         DB.truncateCombview();
         List<Song> songList = DB.getSourceTablesDataForCombview();
-        if (songList.isEmpty())
-            return;
+        if (songList.isEmpty()) return;
 
         songList = mergeNameArtistDuplicates(songList);
         songList = mergeNameDateDuplicates(songList);
@@ -205,8 +204,9 @@ public class ScrapeProcess {
                         song -> noSpacesLowerCase(song.getArtists() + song.getDate())
                 ));
         for (List<Song> group : artistSameDayCounts.values()) {
-            if (group.size() >= atLeast)
+            if (group.size() >= atLeast) {
                 group.forEach(song -> song.setAlbumID("[" + group.size() + "] songs by " + group.getFirst().getArtists()));
+            }
         }
         return artistSameDayCounts.values().stream()
                 .flatMap(Collection::stream)

@@ -1,10 +1,14 @@
 
 package com.blck.MusicReleaseTracker.Scraping.Scrapers;
 
+import com.blck.MusicReleaseTracker.Core.ErrorLogging;
 import com.blck.MusicReleaseTracker.DataObjects.Song;
+import com.blck.MusicReleaseTracker.Scraping.ScraperGenericException;
+import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -12,6 +16,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 public class ScraperTest {
 
@@ -176,6 +185,31 @@ public class ScraperTest {
 
         assertTrue(scraper.isFeedEmpty(doc1));
         assertFalse(scraper.isFeedEmpty(doc2));
+    }
+
+    @Test
+    void youtubeScrapeFailsOnResultEmpty() {
+        ScraperYoutube scraper = spy(new ScraperYoutube(null, null, null, "", ""));
+
+        assertThatExceptionOfType(ScraperGenericException.class).isThrownBy(() ->
+                scraper.scrape("src/test/java/com/blck/MusicReleaseTracker/Scraping/Scrapers/youtubeEmptyResult.xml", 10)
+        );
+    }
+
+    @Test
+    void beatportContentParsing() throws ScraperTimeoutException, ScraperGenericException {
+        ScraperBeatport scraper = spy(new ScraperBeatport(null, null, null, "", ""));
+        ArgumentCaptor<List<Song>> songListCaptor = ArgumentCaptor.forClass(List.class);
+        doNothing().when(scraper).insertSet(songListCaptor.capture());
+        Song expected1 = new Song("Low Down", "", "2026-06-12", "Original Mix", "https://geo-media.beatport.com/image_size/{w}x{h}/8a03fab5-0061-4828-9850-725c06506943.png");
+        Song expected2 = new Song("Reload", "", "2025-11-06", "Original Mix", "https://geo-media.beatport.com/image_size/{w}x{h}/78221804-2b25-439f-b32a-0b0ae96ec576.png");
+
+        scraper.scrape("src/test/java/com/blck/MusicReleaseTracker/Scraping/Scrapers/beatportResults.html", 10);
+
+        List<Song> parsedSongs = songListCaptor.getValue();
+        assertEquals(2, parsedSongs.size());
+        assertEquals(expected1, parsedSongs.get(0));
+        assertEquals(expected2, parsedSongs.get(1));
     }
 
 }

@@ -10,7 +10,10 @@ import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -39,47 +42,44 @@ public final class ScraperBeatport extends Scraper {
     }
 
     @Override
-    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
+    public void scrape(String url, int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
-
-        String url = getUrl();
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
-                    .timeout(timeout).get();
+            if (url.toLowerCase().startsWith("http")) {
+                doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+                        .timeout(timeout).get();
+            } else { // local file for tests
+                File localFile = new File(url);
+                doc = Jsoup.parse(localFile, "UTF-8");
+            }
         } catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
         } catch (Exception e) {
-            throw new ScraperGenericException(url);
+            throw new ScraperGenericException(url, e.getMessage());
         }
 
-        // pattern matching to make sense of the JSON extracted from <script>
         Elements script = doc.select("script#__NEXT_DATA__[type=application/json]");
-        String JSON = script.first().data();
-        //   "mix_name": "Song name",
-        //   "name": "Joe Smith",
-        //   "new_release_date": "2024-02-01"
-        //   ...unwanted attributes...
-        //   "dynamic_uri":"https://geo-media.beatport.com/image_size/{w}x{h}/881...7118.jpg"}
-        Pattern pattern = Pattern.compile(
-                "\"mix_name\":\"([^\"]+)\"," +
-                        "\"name\":\"([^\"]+)\"," +
-                        "\"new_release_date\":\"([^\"]+)\"," +
-                        ".*?" +
-                        "\"dynamic_uri\":\"([^\"]+)\""
-        );
-        Matcher matcher = pattern.matcher(JSON);
-        ArrayList<String> typesArrayList = new ArrayList<>();
+        String jsonContent = script.first().data();
+
         ArrayList<String> songsArrayList = new ArrayList<>();
         ArrayList<String> datesArrayList = new ArrayList<>();
+        ArrayList<String> typesArrayList = new ArrayList<>();
         ArrayList<String> thumbnailUrlList = new ArrayList<>();
 
-        while (matcher.find()) {
-            typesArrayList.add(matcher.group(1));
-            songsArrayList.add(matcher.group(2).replace("\\u0026", "&"));
-            datesArrayList.add(matcher.group(3));
-            thumbnailUrlList.add(matcher.group(4).replace("{w}x{h}", "300x300"));
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(jsonContent);
+            JsonNode resultsNode = rootNode.findPath("results");
+            for (JsonNode track : resultsNode) {
+                songsArrayList.add(track.path("name").asString("").replace("\\u0026", "&"));
+                datesArrayList.add(track.path("new_release_date").asString(""));
+                typesArrayList.add(track.path("mix_name").asString(""));
+                thumbnailUrlList.add(track.path("image").path("uri").asString("").replace("{w}x{h}", "300x300"));
+            }
+        } catch (Exception e) {
+            throw new ScraperGenericException(url, e.getMessage());
         }
 
         super.source = TablesEnum.beatport;

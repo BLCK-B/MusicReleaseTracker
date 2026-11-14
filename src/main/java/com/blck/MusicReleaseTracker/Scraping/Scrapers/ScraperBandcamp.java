@@ -39,10 +39,8 @@ public final class ScraperBandcamp extends Scraper {
     }
 
     @Override
-    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
+    public void scrape(String url, int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
-
-        String url = getUrl();
 
         Document doc = null;
         try {
@@ -52,7 +50,7 @@ public final class ScraperBandcamp extends Scraper {
         } catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
         } catch (Exception e) {
-            throw new ScraperGenericException(url);
+            throw new ScraperGenericException(url, "scraping");
         }
 
         Elements albums = doc.select("div.album");

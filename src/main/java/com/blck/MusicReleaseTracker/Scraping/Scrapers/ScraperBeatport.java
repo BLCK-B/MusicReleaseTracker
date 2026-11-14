@@ -76,7 +76,7 @@ public final class ScraperBeatport extends Scraper {
                 songsArrayList.add(track.path("name").asString("").replace("\\u0026", "&"));
                 datesArrayList.add(track.path("new_release_date").asString(""));
                 typesArrayList.add(track.path("mix_name").asString(""));
-                thumbnailUrlList.add(track.path("image").path("uri").asString("").replace("{w}x{h}", "300x300"));
+                thumbnailUrlList.add(track.path("release").path("image").path("uri").asString("").replace("{w}x{h}", "300x300"));
             }
         } catch (Exception e) {
             throw new ScraperGenericException(url, e.getMessage());

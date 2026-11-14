@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const logFilePath = getLogPath();
 
 function getLogPath() {
-    let appDataPath = '';
+    let appDataPath: string;
     switch (process.platform) {
         case "win32":
             appDataPath = app.getPath("appData");

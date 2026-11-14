@@ -188,10 +188,10 @@ const openSettings = () => {
 };
 
 const mrtUpdateCheck = async () => {
+  if (localStorage.getItem("notifyWhenUpdate") !== "true") return;
+
   const today = new Date().toISOString().slice(0, 10);
-  if (localStorage.getItem("updateCheck") === today) {
-    return;
-  }
+  if (localStorage.getItem("updateCheck") === today) return;
   axios
       .get("/api/isNewUpdate")
       .then((response) => {

@@ -6,11 +6,11 @@
       <label>Dates as yyyy-MM-dd</label>
     </div>
     <div class="flex-padding">
-      <input type="checkbox" :checked="loadThumbnails" @change="onChange" data-setting="loadThumbnails" />
+      <input type="checkbox" :checked="loadThumbnails" @change="onChange" data-setting="loadThumbnails"/>
       <label>Download thumbnails</label>
     </div>
     <div class="flex-padding">
-      <input type="checkbox" :checked="isNotifyEnabled" @change="notifyUpdateToggle" data-setting="loadThumbnails" />
+      <input type="checkbox" :checked="isNotifyEnabled" @change="notifyUpdateToggle" data-setting="loadThumbnails"/>
       <label>MRT update notification</label>
     </div>
   </div>
@@ -51,9 +51,11 @@ const notifyUpdateToggle = () => {
 .title {
   font-weight: bold;
 }
+
 .flex-padding {
   padding: 5px;
 }
+
 input {
   margin-right: 5px;
 }

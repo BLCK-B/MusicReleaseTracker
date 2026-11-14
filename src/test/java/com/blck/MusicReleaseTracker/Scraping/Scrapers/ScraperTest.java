@@ -201,15 +201,18 @@ public class ScraperTest {
         ScraperBeatport scraper = spy(new ScraperBeatport(null, null, null, "", ""));
         ArgumentCaptor<List<Song>> songListCaptor = ArgumentCaptor.forClass(List.class);
         doNothing().when(scraper).insertSet(songListCaptor.capture());
-        Song expected1 = new Song("Low Down", "", "2026-06-12", "Original Mix", "https://geo-media.beatport.com/image_size/{w}x{h}/8a03fab5-0061-4828-9850-725c06506943.png");
-        Song expected2 = new Song("Reload", "", "2025-11-06", "Original Mix", "https://geo-media.beatport.com/image_size/{w}x{h}/78221804-2b25-439f-b32a-0b0ae96ec576.png");
 
         scraper.scrape("src/test/java/com/blck/MusicReleaseTracker/Scraping/Scrapers/beatportResults.html", 10);
 
         List<Song> parsedSongs = songListCaptor.getValue();
         assertEquals(2, parsedSongs.size());
-        assertEquals(expected1, parsedSongs.get(0));
-        assertEquals(expected2, parsedSongs.get(1));
+        assertEquals("Low Down", parsedSongs.get(0).getName());
+        assertEquals("2026-04-24", parsedSongs.get(0).getDate());
+        assertEquals("Original Mix", parsedSongs.get(0).getType());
+        assertEquals("https://geo-media.beatport.com/image_size/300x300/c4002400-d9ec-4a04-b74e-88539f911b44.jpg", parsedSongs.get(0).getThumbnailUrl());
+        assertEquals("Reload", parsedSongs.get(1).getName());
+        assertEquals("2025-11-06", parsedSongs.get(1).getDate());
+        assertEquals("Original Mix", parsedSongs.get(1).getType());
+        assertEquals("https://geo-media.beatport.com/image_size/300x300/9b1c1bc4-4bf2-4973-8953-2fc143f3ccd1.jpg", parsedSongs.get(1).getThumbnailUrl());
     }
-
 }

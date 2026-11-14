@@ -50,7 +50,7 @@ public final class ScraperBandcamp extends Scraper {
         } catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
         } catch (Exception e) {
-            throw new ScraperGenericException(url, "scraping");
+            throw new ScraperGenericException(url, e.getMessage());
         }
 
         Elements albums = doc.select("div.album");

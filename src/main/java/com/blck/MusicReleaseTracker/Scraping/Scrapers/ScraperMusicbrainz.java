@@ -36,10 +36,8 @@ public final class ScraperMusicbrainz extends Scraper {
     }
 
     @Override
-    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
+    public void scrape(String url, int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
-
-        String url = getUrl();
 
         Document doc = null;
         try {
@@ -49,7 +47,7 @@ public final class ScraperMusicbrainz extends Scraper {
         } catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
         } catch (Exception e) {
-            throw new ScraperGenericException(url);
+            throw new ScraperGenericException(url, e.getMessage());
         }
 
         String[] songsArray = doc.select("title").eachText().toArray(new String[0]);

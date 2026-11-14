@@ -27,8 +27,9 @@ public class ScraperManager {
         this.log = log;
         this.DB = DB;
         for (TablesEnum source : TablesEnum.values()) {
-            if (source == TablesEnum.combview)
+            if (source == TablesEnum.combview) {
                 continue;
+            }
             sourceTimes.put(source.toString(), 0.0);
         }
     }
@@ -45,8 +46,9 @@ public class ScraperManager {
         this.DB = DB;
         minDelay = customSleepTime;
         for (TablesEnum source : TablesEnum.values()) {
-            if (source == TablesEnum.combview)
+            if (source == TablesEnum.combview) {
                 continue;
+            }
             sourceTimes.put(source.toString(), 0.0);
         }
     }
@@ -71,13 +73,14 @@ public class ScraperManager {
         Scraper scraper = scrapers.getFirst();
         for (int i = 0; i <= 2; ++i) {
             try {
-                scraper.scrape(jsoupTimeout);
+                scraper.scrape(scraper.getUrl(), jsoupTimeout);
                 break;
             } catch (Exception e) {
                 scrapeErrorLaunder(i, scraper, e);
             }
-            if (scrapers.isEmpty())
+            if (scrapers.isEmpty()) {
                 return 0;
+            }
         }
         double elapsedTime = System.currentTimeMillis() - startTime;
         sourceTimes.replaceAll((key, value) -> value + elapsedTime);
@@ -87,9 +90,9 @@ public class ScraperManager {
             throw new RuntimeException(e);
         }
 
-        if (scraper.equals(scrapers.getFirst()))
+        if (scraper.equals(scrapers.getFirst())) {
             scrapers.removeFirst();
-
+        }
         return scrapers.size();
     }
 
@@ -101,13 +104,15 @@ public class ScraperManager {
      * @param e       exception thrown by {@code scraper}
      */
     private void scrapeErrorLaunder(int i, Scraper scraper, Exception e) {
-        if (e instanceof ScraperTimeoutException)
-            log.error(e, ErrorLogging.Severity.INFO, scraper + " scraper threw " + e + " " + (i + 1) + " times, " + e.getMessage());
-        else
-            log.error(e, ErrorLogging.Severity.WARNING, scraper + " scraper threw " + e + " " + (i + 1) + " times, " + e.getMessage());
+        if (e instanceof ScraperTimeoutException) {
+            log.error(e, ErrorLogging.Severity.INFO, scraper + " scraper threw " + e + " " + (i + 1) + " times: " + e.getMessage());
+        } else {
+            log.error(e, ErrorLogging.Severity.WARNING, scraper + " scraper threw " + e + " " + (i + 1) + " times: " + e.getMessage());
+        }
         // remove scrapers of a faulty source
-        if (i == 2)
+        if (i == 2) {
             scrapers.removeIf(s -> s.getClass().equals(scraper.getClass()));
+        }
         try {
             Thread.sleep(minDelay);
         } catch (InterruptedException ex) {

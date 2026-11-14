@@ -10,6 +10,7 @@ import com.blck.MusicReleaseTracker.Scraping.ScraperTimeoutException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.File;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
@@ -41,24 +42,28 @@ public final class ScraperYoutube extends Scraper {
 
     public boolean isFeedEmpty(Document doc) {
         String channelTitle = doc.select("feed > title").text();
-        return channelTitle != null && doc.select("entry").isEmpty() && channelTitle.trim().equals("- Topic");
+        return channelTitle != null &&
+                doc.select("entry").isEmpty() &&
+                channelTitle.trim().equals("- Topic");
     }
 
-
     @Override
-    public void scrape(int timeout) throws ScraperTimeoutException, ScraperGenericException {
+    public void scrape(String url, int timeout) throws ScraperTimeoutException, ScraperGenericException {
         if (isIDnull) return;
-
-        String url = getUrl();
 
         Document doc = null;
         try {
-            doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
-                    .timeout(timeout).get();
+            if (url.toLowerCase().startsWith("http")) {
+                doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/")
+                        .timeout(timeout).get();
+            } else { // local file for tests
+                File localFile = new File(url);
+                doc = Jsoup.parse(localFile, "UTF-8");
+            }
         } catch (SocketTimeoutException e) {
             throw new ScraperTimeoutException(url);
         } catch (Exception e) {
-            throw new ScraperGenericException(url);
+            throw new ScraperGenericException(url, e.getMessage());
         }
 
         if (isFeedEmpty(doc)) {
@@ -85,6 +90,10 @@ public final class ScraperYoutube extends Scraper {
 
         // date in the description seems to exist only when the video is uploaded later than release
         String[] datesArray = mergeDescriptionAndPublishedDates(mediaDescriptionDates, publishedDates);
+
+        if (songsArray.length == 0) {
+            throw new ScraperGenericException(url, "XML without results - temporary issue");
+        }
 
         super.source = TablesEnum.youtube;
         super.insertSet(

@@ -127,7 +127,7 @@ public class ServiceLayer {
                 case bandcamp -> scraper = new ScraperBandcamp(store, log, DB, artist, url);
             }
             id = scraper.getID();
-            scraper.scrape(25000);
+            scraper.scrape(scraper.getUrl(), 25000);
             tempID = id;
         } catch (Exception e) {
             log.error(e, ErrorLogging.Severity.INFO, "error scraping " + source + ", perhaps an incorrect link: " + e.getMessage());
